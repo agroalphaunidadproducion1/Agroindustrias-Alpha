@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | AgroAlpha</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f8f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+    .logo {
+      width: 150px;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #3f704d;
+    }
+    input {
+      width: 100%;
+      padding: 0.7rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #3f704d;
+      color: white;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #335c3d;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <img src="https://www.ccisur.org/wp-content/uploads/2023/06/LOGO-AGROALPHA.jpg" alt="Logo AgroAlpha" class="logo" />
+    <h2>Agro Alpha</h2>
+    <form onsubmit="handleLogin(event)">
+      <input type="text" id="username" placeholder="Usuario" required />
+      <input type="password" id="password" placeholder="Contraseña" required />
+      <button type="submit">Ingresar</button>
+    </form>
+  </div>
+
+  <script>
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (username === "admin" && password === "12") {
+        window.location.href = "inicio.html";
+      } else {
+        alert("Usuario o contraseña incorrectos");
+      }
+    }
+  </script>
+</body>
+</html>
