@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Agregar Producto Químico</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Formulario de Productos Químicos</h2>
+  <form id="formulario">
+    <input type="text" id="nombre" placeholder="Nombre Comercial" required><br>
+    <input type="text" id="ingredientes" placeholder="Ingredientes Activos" required><br>
+    <input type="text" id="senasa" placeholder="Registro SENASA"><br>
+    <input type="text" id="epa" placeholder="Registro EPA"><br>
+    <input type="number" id="dias" placeholder="Días a cosecha"><br>
+    <input type="text" id="plagas" placeholder="Plagas a controlar"><br>
+    <input type="text" id="dosisMax" placeholder="Dosis Máxima"><br>
+    <input type="text" id="dosisLitro" placeholder="Dosis/Litro de agua"><br>
+
+    <label for="banda">Banda:</label>
+    <select id="banda" onchange="cambiarColor()">
+      <option value="rojo">Rojo</option>
+      <option value="amarillo">Amarillo</option>
+      <option value="azul">Azul</option>
+      <option value="verde">Verde</option>
+    </select>
+    <div id="cuadroColor" style="width:50px; height:20px; display:inline-block; background:red; margin-left:10px;"></div><br><br>
+
+    <button type="submit">Agregar Producto</button>
+  </form>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
+      authDomain: "agro-productos.firebaseapp.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.firebasestorage.app",
+      messagingSenderId: "196774282512",
+      appId: "1:196774282512:web:92697209153eac8acb1195",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function cambiarColor() {
+      const color = document.getElementById("banda").value;
+      document.getElementById("cuadroColor").style.background = color;
+    }
+
+    document.getElementById("formulario").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const producto = {
+        nombre: nombre.value,
+        ingredientes: ingredientes.value,
+        senasa: senasa.value,
+        epa: epa.value,
+        dias: dias.value,
+        plagas: plagas.value,
+        dosisMax: dosisMax.value,
+        dosisLitro: dosisLitro.value,
+        banda: banda.value
+      };
+      db.ref("productos").push(producto).then(() => {
+        alert("Producto agregado correctamente");
+        document.getElementById("formulario").reset();
+        cambiarColor();
+      });
+    });
+  </script>
+</body>
+</html>

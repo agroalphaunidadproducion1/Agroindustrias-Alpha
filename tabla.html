@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabla de Productos</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Listado de Productos Químicos</h2>
+  <button onclick="exportarExcel()">Descargar Excel</button>
+  <button onclick="window.print()">Imprimir</button>
+  <table id="tabla" border="1">
+    <thead>
+      <tr>
+        <th>Nombre</th><th>Ingredientes</th><th>SENASA</th><th>EPA</th><th>Días</th>
+        <th>Plagas</th><th>Dosis Max</th><th>Dosis/L</th><th>Banda</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
+      authDomain: "agro-productos.firebaseapp.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.firebasestorage.app",
+      messagingSenderId: "196774282512",
+      appId: "1:196774282512:web:92697209153eac8acb1195",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    db.ref("productos").on("value", snapshot => {
+      const tbody = document.querySelector("#tabla tbody");
+      tbody.innerHTML = "";
+      snapshot.forEach(child => {
+        const p = child.val();
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${p.nombre}</td><td>${p.ingredientes}</td><td>${p.senasa}</td><td>${p.epa}</td>
+          <td>${p.dias}</td><td>${p.plagas}</td><td>${p.dosisMax}</td><td>${p.dosisLitro}</td>
+          <td style="background:${p.banda};">${p.banda}</td>
+        `;
+        tbody.appendChild(fila);
+      });
+    });
+
+    function exportarExcel() {
+      const tabla = document.getElementById("tabla");
+      const wb = XLSX.utils.table_to_book(tabla, { sheet: "Productos" });
+      XLSX.writeFile(wb, "productos.xlsx");
+    }
+  </script>
+</body>
+</html>
