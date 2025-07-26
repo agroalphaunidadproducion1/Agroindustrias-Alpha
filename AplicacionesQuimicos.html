@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplicaciones de Químicos | AgroAlpha</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://tse1.mm.bing.net/th/id/OIP.1Z2RApaiayckWVloAZkwpwHaC0') center center / cover no-repeat fixed;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 80px;
+      min-height: 100vh;
+      position: relative;
+    }
+    header { margin-top: 2rem; text-align: center; }
+    .logo { width: 120px; }
+    h1 { margin-top: 0.5rem; }
+    .form-container {
+      margin-top: 2rem;
+      background-color: rgba(63,112,77,0.8);
+      padding: 1.5rem;
+      border-radius: 10px;
+      width: 90%; max-width: 600px;
+    }
+    label { display: block; margin-top: 0.8rem; }
+    input, select {
+      width: 100%; padding: 0.6rem;
+      margin-top: 0.3rem;
+      border-radius: 5px; border: none;
+    }
+    button {
+      margin-top: 1rem; padding: 0.7rem 1.5rem;
+      background-color: #3f704d; color: white;
+      border: none; border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #2d563a; }
+    .info-panel {
+      margin-top: 1rem;
+      background-color: rgba(255,255,255,0.1);
+      padding: 1rem; border-radius: 8px;
+    }
+    .records {
+      margin-top: 2rem;
+      background-color: rgba(63,112,77,0.6);
+      padding: 1rem;
+      border-radius: 10px;
+      width: 90%; max-width: 600px;
+    }
+    .record {
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 0.5rem;
+    }
+    .btn-link {
+      background-color: #5a8d68;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none; color: white;
+      display: inline-block; margin-top: 2rem;
+    }
+    .return-btn {
+      position: fixed; bottom: 20px; left: 20px;
+      background-color: rgba(63,112,77,0.8);
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem; color: #fff;
+      text-decoration: none;
+    }
+    .return-btn:hover { background-color: #2d563a; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://www.ccisur.org/wp-content/uploads/2023/06/LOGO-AGROALPHA.jpg" class="logo" />
+    <h1>Aplicaciones de Químicos</h1>
+  </header>
+
+  <div class="form-container">
+    <label>Fecha:
+      <input type="date" id="fecha" required />
+    </label>
+
+    <label>Químico Aplicado:
+      <select id="quimico" onchange="mostrarInfoQuimico()" required></select>
+    </label>
+    <div id="info-quimico" class="info-panel">Selecciona un químico para ver su información.</div>
+
+    <label>Invernadero:
+      <select id="invernadero" required>
+        <option value="">-- Selecciona invernadero --</option>
+        <option value="9">Invernadero 9</option>
+        <option value="10">Invernadero 10</option>
+        <option value="11">Invernadero 11</option>
+        <option value="12">Invernadero 12</option>
+        <option value="13">Invernadero 13</option>
+        <option value="14">Invernadero 14</option>
+        <option value="15">Invernadero 15</option>
+        <option value="16">Invernadero 16</option>
+        <option value="33">Invernadero 33</option>
+        <option value="35">Invernadero 35</option>
+        <option value="37">Invernadero 37</option>
+        <option value="39">Invernadero 39</option>
+      </select>
+    </label>
+
+    <label>Área o Lote:
+      <input type="text" id="lote" required placeholder="Ej: Cama 5 - Tramo B" />
+    </label>
+
+    <button onclick="guardarRegistro()">Guardar aplicación</button>
+  </div>
+
+  <a href="AgregarQuimicos.html" class="btn-link">➕ Agregar químicos</a>
+
+  <div class="records" id="registros">
+    <h3>📋 Registros guardados:</h3>
+  </div>
+
+  <a href="Certificaciones.html" class="return-btn">← Regresar</a>
+
+  <script>
+    const baseDatosQuimicos = {};
+
+    function mostrarInfoQuimico() {
+      const seleccion = document.getElementById("quimico").value;
+      const info = baseDatosQuimicos[seleccion] || "Selecciona un químico para ver su información.";
+      document.getElementById("info-quimico").innerText = info;
+    }
+
+    function guardarRegistro() {
+      const fecha = document.getElementById("fecha").value;
+      const quimico = document.getElementById("quimico").value;
+      const invernadero = document.getElementById("invernadero").value;
+      const lote = document.getElementById("lote").value;
+
+      if (!fecha || !quimico || !invernadero || !lote) {
+        alert("Por favor completa todos los campos.");
+        return;
+      }
+
+      const nuevo = { fecha, quimico, invernadero, lote };
+      const registros = JSON.parse(localStorage.getItem("aplicacionesQuimicos") || "[]");
+      registros.push(nuevo);
+      localStorage.setItem("aplicacionesQuimicos", JSON.stringify(registros));
+      mostrarRegistros();
+    }
+
+    function mostrarRegistros() {
+      const contenedor = document.getElementById("registros");
+      const registros = JSON.parse(localStorage.getItem("aplicacionesQuimicos") || "[]");
+      contenedor.innerHTML = "<h3>📋 Registros guardados:</h3>";
+      registros.forEach((r, i) => {
+        contenedor.innerHTML += `
+          <div class="record">
+            <strong>${i+1})</strong> ${r.fecha} – <em>${r.quimico}</em>, Invernadero ${r.invernadero}, Área: ${r.lote}
+          </div>`;
+      });
+    }
+
+    function cargarQuimicos() {
+      const select = document.getElementById("quimico");
+      const lista = JSON.parse(localStorage.getItem("listaQuimicos") || "[]");
+
+      select.innerHTML = '<option value="">-- Selecciona un químico --</option>';
+      lista.forEach(q => {
+        select.innerHTML += `<option value="${q.nombre}">${q.nombre}</option>`;
+        baseDatosQuimicos[q.nombre] = q.descripcion;
+      });
+    }
+
+    window.onload = function() {
+      mostrarRegistros();
+      cargarQuimicos();
+    };
+  </script>
+</body>
+</html>
