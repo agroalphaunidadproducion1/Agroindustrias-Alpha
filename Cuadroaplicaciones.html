@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuadro de Aplicaciones | AgroAlpha</title>
+  <style>
+    body {
+      background: #eafbea;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2e5939;
+    }
+    form {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .field {
+      margin-bottom: 1rem;
+    }
+    .field label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #3f704d;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2d563a;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Cuadro de Aplicaciones</h1>
+
+<form id="aplicacionForm">
+  <div class="field"><label>Fecha</label><input type="date" id="fecha" required></div>
+  <div class="field"><label>Invernadero</label><input type="number" id="inv" required></div>
+  <div class="field">
+    <label>Cultivo</label>
+    <select id="cultivo" required>
+      <option value="Tomate">Tomate</option>
+      <option value="Chile">Chile</option>
+    </select>
+  </div>
+  <div class="field"><label>Producto</label><select id="producto" required></select></div>
+  <div class="field"><label>Días a Cosecha</label><input type="number" id="diasCosecha" required></div>
+  <div class="field"><label>Tiempo de Reingreso</label><input type="text" id="tiempoReingreso" required></div>
+  <div class="field"><label>Dosis Máxima (kg o lt/Ha)</label><input type="number" step="0.01" id="dosisMax" required></div>
+  <div class="field">
+    <label>Unidad</label>
+    <select id="unidad">
+      <option value="kg">kg</option>
+      <option value="lt">lt</option>
+    </select>
+  </div>
+  <div class="field"><label>Dosis/Litro (gr o ml)</label><input type="number" step="0.01" id="dosisLitro" required></div>
+  <div class="field"><label>Cantidad Aplicada (kg o lt)</label><input type="number" step="0.01" id="cantidad" required></div>
+  <div class="field"><label>Área Aplicada (Ha)</label><input type="number" step="0.01" id="area" required></div>
+  <div class="field"><label>Nº Capillas Aplicadas</label><input type="number" step="0.01" id="capillasNum" required></div>
+  <div class="field"><label>Capillas Aplicadas</label><input type="text" id="capillasTxt" required></div>
+  <div class="field"><label>Volumen de Agua (lts)</label><input type="number" id="agua" required></div>
+  <div class="field"><label>Hora de Aplicación</label><input type="time" id="horaAplicacion" required></div>
+  <div class="field"><label>Libre</label><input type="date" id="libre" readonly></div>
+  <div class="field"><label>Observaciones</label><textarea id="observaciones"></textarea></div>
+
+  <button type="submit">Guardar Aplicación</button>
+</form>
+
+<!-- Firebase -->
+<script type="module">
+  // Importa Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, set, push, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCvK7NzrXIB0Mo_BtX7nHYeCN5jD7vTzD8",
+    authDomain: "agro-productos.firebaseapp.com",
+    databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+    projectId: "agro-productos",
+    storageBucket: "agro-productos.appspot.com",
+    messagingSenderId: "379806928313",
+    appId: "1:379806928313:web:562df3c0e6ddbc60a6f814"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Campos
+  const form = document.getElementById("aplicacionForm");
+  const fecha = document.getElementById("fecha");
+  const inv = document.getElementById("inv");
+  const cultivo = document.getElementById("cultivo");
+  const producto = document.getElementById("producto");
+  const diasCosecha = document.getElementById("diasCosecha");
+  const tiempoReingreso = document.getElementById("tiempoReingreso");
+  const dosisMax = document.getElementById("dosisMax");
+  const unidad = document.getElementById("unidad");
+  const dosisLitro = document.getElementById("dosisLitro");
+  const cantidad = document.getElementById("cantidad");
+  const area = document.getElementById("area");
+  const capillasNum = document.getElementById("capillasNum");
+  const capillasTxt = document.getElementById("capillasTxt");
+  const agua = document.getElementById("agua");
+  const horaAplicacion = document.getElementById("horaAplicacion");
+  const libre = document.getElementById("libre");
+  const observaciones = document.getElementById("observaciones");
+
+  // Cargar productos desde Firebase (de la tabla)
+  const cargarProductos = async () => {
+    const productosRef = ref(db, "productos");
+    const snapshot = await get(productosRef);
+    if (snapshot.exists()) {
+      producto.innerHTML = ""; // limpiar
+      Object.values(snapshot.val()).forEach(p => {
+        const option = document.createElement("option");
+        option.textContent = p.nombre;
+        option.value = p.nombre;
+        producto.appendChild(option);
+      });
+    } else {
+      producto.innerHTML = "<option>No hay productos</option>";
+    }
+  };
+
+  // Calcular fecha "Libre"
+  function calcularFechaLibre() {
+    const fechaAplicacion = new Date(fecha.value);
+    const dias = parseInt(diasCosecha.value || "0", 10);
+    const hora = horaAplicacion.value;
+
+    if (isNaN(fechaAplicacion.getTime())) return;
+
+    let fechaLibre = new Date(fechaAplicacion);
+    fechaLibre.setDate(fechaLibre.getDate() + dias);
+
+    if (hora) {
+      const [h] = hora.split(":").map(Number);
+      if (h >= 12) fechaLibre.setDate(fechaLibre.getDate() + 1);
+    }
+
+    const yyyy = fechaLibre.getFullYear();
+    const mm = String(fechaLibre.getMonth() + 1).padStart(2, "0");
+    const dd = String(fechaLibre.getDate()).padStart(2, "0");
+    libre.value = `${yyyy}-${mm}-${dd}`;
+  }
+
+  diasCosecha.addEventListener("input", calcularFechaLibre);
+  horaAplicacion.addEventListener("change", calcularFechaLibre);
+  fecha.addEventListener("change", calcularFechaLibre);
+
+  // Guardar en Firebase
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = {
+      fecha: fecha.value,
+      inv: inv.value,
+      cultivo: cultivo.value,
+      producto: producto.value,
+      diasCosecha: diasCosecha.value,
+      tiempoReingreso: tiempoReingreso.value,
+      dosisMax: dosisMax.value,
+      unidad: unidad.value,
+      dosisLitro: dosisLitro.value,
+      cantidad: cantidad.value,
+      area: area.value,
+      capillasNum: capillasNum.value,
+      capillasTxt: capillasTxt.value,
+      agua: agua.value,
+      horaAplicacion: horaAplicacion.value,
+      libre: libre.value,
+      observaciones: observaciones.value
+    };
+
+    const nuevaEntrada = push(ref(db, "cuadro_aplicaciones"));
+    set(nuevaEntrada, data)
+      .then(() => {
+        alert("Aplicación guardada correctamente");
+        form.reset();
+      })
+      .catch((error) => {
+        alert("Error al guardar: " + error.message);
+      });
+  });
+
+  cargarProductos();
+</script>
+
+</body>
+</html>
