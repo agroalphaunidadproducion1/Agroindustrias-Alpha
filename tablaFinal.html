@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Áreas y Horas de Cosecha</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef9f0;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+      color: #2e7031;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #3f704d;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f3fbf5;
+    }
+    button {
+      padding: 4px 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+<body>
+  <h1>Áreas y Horas de Cosecha</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Inv</th>
+        <th>Área (Ha)</th>
+        <th>Capillas</th>
+        <th>Inicio Cosecha</th>
+        <th>Producto</th>
+        <th>Días a cosecha</th>
+        <th>Fecha Aplicado</th>
+        <th>Hora</th>
+        <th>Libre</th>
+        <th>Eliminar</th>
+      </tr>
+    </thead>
+    <tbody id="tabla"></tbody>
+  </table>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuCuRAx8fMTPp3cNKhRYjUXn-UWmZXTlU",
+      authDomain: "agro-productos.firebaseapp.com",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.appspot.com",
+      messagingSenderId: "896964881925",
+      appId: "1:896964881925:web:e24cb1f3038ef3f812f540"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const tabla = document.getElementById("tabla");
+
+    // Leer datos de Firebase
+    db.ref("aplicaciones").on("value", snapshot => {
+      tabla.innerHTML = "";
+      snapshot.forEach(child => {
+        const d = child.val();
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${d.fecha || ""}</td>
+          <td>${d.inv || ""}</td>
+          <td>${d.areaAplicada || ""}</td>
+          <td>${d.capillas || ""}</td>
+          <td>${d.horaInicioCosecha || ""}</td>
+          <td>${d.producto || ""}</td>
+          <td>${d.diasCosecha || ""}</td>
+          <td>${d.fechaAplicacion || ""}</td>
+          <td>${d.horaAplicacion || ""}</td>
+          <td>${d.libre || ""}</td>
+          <td><button onclick="eliminar('${child.key}')">🗑</button></td>
+        `;
+        tabla.appendChild(tr);
+      });
+    });
+
+    function eliminar(id) {
+      if (confirm("¿Eliminar esta fila?")) {
+        db.ref("aplicaciones/" + id).remove();
+      }
+    }
+  </script>
+</body>
+</html>
