@@ -7,18 +7,17 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #eef9f0;
-      padding: 1rem;
+      background-color: #e6f2e6;
+      padding: 20px;
     }
     h1 {
       text-align: center;
-      color: #2e7031;
+      color: #2f5233;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 1rem;
-      background: white;
     }
     th, td {
       border: 1px solid #ccc;
@@ -26,93 +25,144 @@
       text-align: center;
     }
     th {
-      background-color: #3f704d;
-      color: white;
+      background-color: #8bc78a;
     }
     tr:nth-child(even) {
-      background-color: #f3fbf5;
+      background-color: #f0f9f0;
     }
-    button {
-      padding: 4px 10px;
-      background-color: red;
+    .botones {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .btn {
+      padding: 10px 20px;
+      background-color: #3f704d;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 1rem;
     }
-    button:hover {
-      background-color: darkred;
+    .btn:hover {
+      background-color: #2d563a;
     }
   </style>
 </head>
 <body>
   <h1>Áreas y Horas de Cosecha</h1>
-  <table>
+  <table id="tablaCosecha">
     <thead>
       <tr>
         <th>Fecha</th>
         <th>Inv</th>
-        <th>Área (Ha)</th>
-        <th>Capillas</th>
-        <th>Inicio Cosecha</th>
+        <th>Área Aplicada (Ha)</th>
+        <th>Capillas Aplicadas</th>
+        <th>Hora de Cosecha</th>
         <th>Producto</th>
-        <th>Días a cosecha</th>
+        <th>Días a Cosecha</th>
         <th>Fecha Aplicado</th>
         <th>Hora</th>
         <th>Libre</th>
-        <th>Eliminar</th>
       </tr>
     </thead>
-    <tbody id="tabla"></tbody>
+    <tbody></tbody>
   </table>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
+  <div class="botones">
+    <button class="btn" onclick="cargarTabla()">🔄 Actualizar</button>
+    <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+    <button class="btn" onclick="exportarCSV()">📤 Exportar CSV</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import {
+      getDatabase, ref, onValue, remove
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
     const firebaseConfig = {
-      apiKey: "AIzaSyCuCuRAx8fMTPp3cNKhRYjUXn-UWmZXTlU",
+      apiKey: "AIzaSyA4t0cC8Mv8AKozAK8JUbZ3uSpMfdk5xxU",
       authDomain: "agro-productos.firebaseapp.com",
       databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
       projectId: "agro-productos",
       storageBucket: "agro-productos.appspot.com",
-      messagingSenderId: "896964881925",
-      appId: "1:896964881925:web:e24cb1f3038ef3f812f540"
+      messagingSenderId: "137940367969",
+      appId: "1:137940367969:web:2c6d72d06efacfbcc3b372"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
 
-    const tabla = document.getElementById("tabla");
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const tabla = document.querySelector("#tablaCosecha tbody");
 
-    // Leer datos de Firebase
-    db.ref("aplicaciones").on("value", snapshot => {
-      tabla.innerHTML = "";
-      snapshot.forEach(child => {
-        const d = child.val();
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${d.fecha || ""}</td>
-          <td>${d.inv || ""}</td>
-          <td>${d.areaAplicada || ""}</td>
-          <td>${d.capillas || ""}</td>
-          <td>${d.horaInicioCosecha || ""}</td>
-          <td>${d.producto || ""}</td>
-          <td>${d.diasCosecha || ""}</td>
-          <td>${d.fechaAplicacion || ""}</td>
-          <td>${d.horaAplicacion || ""}</td>
-          <td>${d.libre || ""}</td>
-          <td><button onclick="eliminar('${child.key}')">🗑</button></td>
-        `;
-        tabla.appendChild(tr);
-      });
-    });
-
-    function eliminar(id) {
-      if (confirm("¿Eliminar esta fila?")) {
-        db.ref("aplicaciones/" + id).remove();
+    function calcularLibre(fechaAplicado, diasCosecha, hora) {
+      const f = new Date(fechaAplicado);
+      f.setDate(f.getDate() + parseInt(diasCosecha));
+      if (hora.toLowerCase().includes("p.m")) {
+        f.setDate(f.getDate() + 1);
       }
+      return f.toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
     }
+
+    window.cargarTabla = function () {
+      const refCosecha = ref(db, "areas_cosecha");
+      tabla.innerHTML = "";
+      const hoy = new Date();
+
+      onValue(refCosecha, snapshot => {
+        tabla.innerHTML = "";
+
+        snapshot.forEach(child => {
+          const data = child.val();
+          const key = child.key;
+          const fechaAplicado = new Date(data.fechaAplicado);
+          const vencimiento = new Date(fechaAplicado);
+          vencimiento.setDate(fechaAplicado.getDate() + parseInt(data.diasCosecha));
+
+          if (data.hora.toLowerCase().includes("p.m")) {
+            vencimiento.setDate(vencimiento.getDate() + 1);
+          }
+
+          if (vencimiento < hoy) {
+            remove(ref(db, "areas_cosecha/" + key));
+            return;
+          }
+
+          const fila = document.createElement("tr");
+          fila.innerHTML = `
+            <td>${data.fecha || ""}</td>
+            <td>${data.invernadero || ""}</td>
+            <td>${data.area || ""}</td>
+            <td>${data.capillas || ""}</td>
+            <td>${data.horaCosecha || ""}</td>
+            <td>${data.producto || ""}</td>
+            <td>${data.diasCosecha || ""}</td>
+            <td>${data.fechaAplicado || ""}</td>
+            <td>${data.hora || ""}</td>
+            <td>${calcularLibre(data.fechaAplicado, data.diasCosecha, data.hora)}</td>
+          `;
+          tabla.appendChild(fila);
+        });
+      });
+    };
+
+    window.exportarCSV = function () {
+      let csv = "Fecha,Invernadero,Área,Capillas,Hora Cosecha,Producto,Días Cosecha,Fecha Aplicado,Hora,Libre\n";
+      const filas = document.querySelectorAll("#tablaCosecha tbody tr");
+      filas.forEach(fila => {
+        const celdas = fila.querySelectorAll("td");
+        const datos = Array.from(celdas).map(td => `"${td.innerText}"`).join(",");
+        csv += datos + "\n";
+      });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "cosecha.csv";
+      link.click();
+    };
+
+    cargarTabla(); // inicial
   </script>
 </body>
 </html>
