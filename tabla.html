@@ -1,27 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Tabla de Productos</title>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabla de Productos Químicos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
-<body>
-  <h2>Listado de Productos Químicos</h2>
-  <button onclick="exportarExcel()">Descargar Excel</button>
-  <button onclick="window.print()">Imprimir</button>
-  <table id="tabla" border="1">
-    <thead>
-      <tr>
-        <th>Nombre</th><th>Ingredientes</th><th>SENASA</th><th>EPA</th><th>Días</th>
-        <th>Plagas</th><th>Dosis Max</th><th>Dosis/L</th><th>Banda</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<body class="p-4 bg-light">
+
+  <div class="container">
+    <h1 class="mb-4 text-center">📋 Tabla de Productos Químicos</h1>
+
+    <div class="mb-3 text-end">
+      <a href="formulario.html" class="btn btn-success">➕ Agregar nuevo producto</a>
+    </div>
+
+    <div class="table-responsive">
+      <table id="productosTable" class="table table-bordered table-hover bg-white">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre Comercial</th>
+            <th>Ingredientes Activos</th>
+            <th>Registro Senasa</th>
+            <th>Registro EPA</th>
+            <th>Días a Cosecha</th>
+            <th>Plagas a Controlar</th>
+            <th>Dosis Máxima</th>
+            <th>Dosis/Litro</th>
+            <th>Banda</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="text-end mt-3">
+      <button onclick="window.print()" class="btn btn-outline-primary">🖨️ Imprimir</button>
+      <button onclick="descargarExcel()" class="btn btn-outline-success">📥 Descargar Excel</button>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
@@ -30,31 +52,52 @@
       storageBucket: "agro-productos.firebasestorage.app",
       messagingSenderId: "196774282512",
       appId: "1:196774282512:web:92697209153eac8acb1195",
+      measurementId: "G-WF8V7PV87M",
       databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    const tabla = document.querySelector("#productosTable tbody");
+
     db.ref("productos").on("value", snapshot => {
-      const tbody = document.querySelector("#tabla tbody");
-      tbody.innerHTML = "";
+      tabla.innerHTML = "";
       snapshot.forEach(child => {
-        const p = child.val();
+        const data = child.val();
         const fila = document.createElement("tr");
+
         fila.innerHTML = `
-          <td>${p.nombre}</td><td>${p.ingredientes}</td><td>${p.senasa}</td><td>${p.epa}</td>
-          <td>${p.dias}</td><td>${p.plagas}</td><td>${p.dosisMax}</td><td>${p.dosisLitro}</td>
-          <td style="background:${p.banda};">${p.banda}</td>
+          <td>${data.nombre}</td>
+          <td>${data.ingredientes}</td>
+          <td>${data.registroSenasa}</td>
+          <td>${data.registroEpa}</td>
+          <td>${data.diasCosecha}</td>
+          <td>${data.plagas}</td>
+          <td>${data.dosisMax}</td>
+          <td>${data.dosisLitro}</td>
+          <td><span class="badge bg-${colorBootstrap(data.banda)}">${data.banda}</span></td>
         `;
-        tbody.appendChild(fila);
+        tabla.appendChild(fila);
       });
     });
 
-    function exportarExcel() {
-      const tabla = document.getElementById("tabla");
-      const wb = XLSX.utils.table_to_book(tabla, { sheet: "Productos" });
-      XLSX.writeFile(wb, "productos.xlsx");
+    function colorBootstrap(banda) {
+      switch (banda.toLowerCase()) {
+        case "rojo": return "danger";
+        case "amarillo": return "warning";
+        case "azul": return "primary";
+        case "verde": return "success";
+        default: return "secondary";
+      }
     }
-  </script>
-</body>
-</html>
+
+    function descargarExcel() {
+      const tablaHTML = document.getElementById
+
+¡Claro, Donis! Solo necesitas **agregar esto** dentro del `<body>` de tu `tabla.html`, **justo arriba de la tabla**:
+
+```html
+<div class="mb-3 text-end">
+  <a href="formulario.html" class="btn btn-success">➕ Agregar nuevo producto</a>
+</div>
