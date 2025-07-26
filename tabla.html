@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Productos</title>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; background-color: #f0f9f0; }
+    h1 { text-align: center; color: #2f5d3f; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; font-size: 14px; text-align: left; }
+    th { background-color: #d1e7d1; }
+    .acciones { text-align: center; margin: 20px; }
+    button { margin: 5px; padding: 10px; background: #2f5d3f; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #244a32; }
+    .banda { font-weight: bold; padding: 4px 8px; border-radius: 5px; color: white; }
+    .rojo { background-color: #d32f2f; }
+    .amarillo { background-color: #fbc02d; color: #000; }
+    .azul { background-color: #1976d2; }
+    .verde { background-color: #388e3c; }
+  </style>
+</head>
+<body>
+
+<h1>Listado de Productos Químicos</h1>
+
+<div class="acciones">
+  <button onclick="descargarExcel()">📥 Descargar Excel</button>
+  <button onclick="window.print()">🖨️ Imprimir</button>
+  <button onclick="window.location.href='formulario.html'">➕ Agregar Producto</button>
+</div>
+
+<table id="tabla">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Ingredientes</th>
+      <th>SENASA</th>
+      <th>EPA</th>
+      <th>Días</th>
+      <th>Plagas</th>
+      <th>Dosis Máx</th>
+      <th>Dosis/L</th>
+      <th>Banda</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD9rjGJvZ6YEh7u-YG5kL-HBoeVK8ExXXX",
+    authDomain: "agroalpha-demo.firebaseapp.com",
+    databaseURL: "https://agroalpha-demo-default-rtdb.firebaseio.com",
+    projectId: "agroalpha-demo",
+    storageBucket: "agroalpha-demo.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abcd1234"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const tbody = document.querySelector("tbody");
+
+  db.ref("productos").on("value", snapshot => {
+    tbody.innerHTML = "";
+    snapshot.forEach(child => {
+      const p = child.val();
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${p.nombre}</td>
+        <td>${p.ingredientes}</td>
+        <td>${p.senasa}</td>
+        <td>${p.epa}</td>
+        <td>${p.dias}</td>
+        <td>${p.plagas}</td>
+        <td>${p.dosis_maxima}</td>
+        <td>${p.dosis_litro}</td>
+        <td><span class="banda ${p.banda}">${p.banda.toUpperCase()}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+
+  function descargarExcel() {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(document.getElementById("tabla"));
+    XLSX.utils.book_append_sheet(wb, ws, "Productos");
+    XLSX.writeFile(wb, "productos_agricolas.xlsx");
+  }
+</script>
+
+</body>
+</html>

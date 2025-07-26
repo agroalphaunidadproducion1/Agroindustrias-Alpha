@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Producto Químico</title>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: Arial; background-color: #eef6ec; padding: 20px; }
+    form { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    label { font-weight: bold; margin-top: 15px; display: block; }
+    input, textarea, select { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    .banda-preview { height: 40px; text-align: center; line-height: 40px; color: white; margin-top: 10px; border-radius: 5px; }
+    button { margin-top: 15px; padding: 10px; width: 100%; border: none; border-radius: 5px; background: #2f5d3f; color: white; font-size: 16px; cursor: pointer; }
+    .btn-secondary { background: #6c757d; }
+  </style>
+</head>
+<body>
+
+<h1 style="text-align:center;">Registrar Producto Químico</h1>
+
+<form id="formulario">
+  <label>Nombre Comercial:</label>
+  <input type="text" name="nombre" required>
+  <label>Ingredientes Activos:</label>
+  <textarea name="ingredientes" required></textarea>
+  <label>Registro SENASA:</label>
+  <input type="text" name="senasa" required>
+  <label>Registro EPA:</label>
+  <input type="text" name="epa">
+  <label>Días a Cosecha:</label>
+  <input type="number" name="dias">
+  <label>Plagas a Controlar:</label>
+  <textarea name="plagas" required></textarea>
+  <label>Dosis Máxima:</label>
+  <input type="text" name="dosis_maxima">
+  <label>Dosis/Litro de Agua:</label>
+  <input type="text" name="dosis_litro">
+  <label>Banda:</label>
+  <select name="banda" id="banda" onchange="cambiarColorBanda()" required>
+    <option value="">Seleccionar</option>
+    <option value="rojo">Rojo</option>
+    <option value="amarillo">Amarillo</option>
+    <option value="azul">Azul</option>
+    <option value="verde">Verde</option>
+  </select>
+  <div class="banda-preview" id="banda-preview">BANDA</div>
+  <button type="submit">Guardar Producto</button>
+  <button type="button" class="btn-secondary" onclick="location.href='tabla.html'">Ver Productos</button>
+</form>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD9rjGJvZ6YEh7u-YG5kL-HBoeVK8ExXXX",
+    authDomain: "agroalpha-demo.firebaseapp.com",
+    databaseURL: "https://agroalpha-demo-default-rtdb.firebaseio.com",
+    projectId: "agroalpha-demo",
+    storageBucket: "agroalpha-demo.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abcd1234"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function cambiarColorBanda() {
+    const select = document.getElementById("banda");
+    const preview = document.getElementById("banda-preview");
+    const colores = { rojo: "#d32f2f", amarillo: "#fbc02d", azul: "#1976d2", verde: "#388e3c" };
+    const valor = select.value;
+    preview.style.backgroundColor = colores[valor] || "#ccc";
+    preview.style.color = valor === "amarillo" ? "#000" : "#fff";
+    preview.textContent = valor ? "BANDA " + valor.toUpperCase() : "BANDA";
+  }
+
+  document.getElementById("formulario").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const producto = {
+      nombre: form.nombre.value,
+      ingredientes: form.ingredientes.value,
+      senasa: form.senasa.value,
+      epa: form.epa.value,
+      dias: form.dias.value,
+      plagas: form.plagas.value,
+      dosis_maxima: form.dosis_maxima.value,
+      dosis_litro: form.dosis_litro.value,
+      banda: form.banda.value
+    };
+    db.ref("productos").push(producto).then(() => {
+      alert("✅ Producto guardado");
+      form.reset();
+      cambiarColorBanda();
+    });
+  });
+</script>
+
+</body>
+</html>
