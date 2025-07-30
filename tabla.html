@@ -15,16 +15,19 @@
       color: #2e7d32;
       text-align: center;
     }
-    a {
+    .acciones {
+      text-align: right;
+      margin-bottom: 20px;
+    }
+    .acciones a {
       background: #2e7d32;
       color: white;
       padding: 10px 15px;
       text-decoration: none;
       border-radius: 5px;
-      margin-bottom: 20px;
-      display: inline-block;
+      margin-left: 10px;
     }
-    a:hover {
+    .acciones a:hover {
       background: #1b5e20;
     }
     table {
@@ -62,10 +65,12 @@
 </head>
 <body>
   <h2>Productos Químicos Registrados</h2>
-  <div style="text-align:right;">
+
+  <div class="acciones">
     <a href="formulario.html">➕ Agregar nuevo producto</a>
+    <a href="danosabeficos.html">📈 Ver % Daños a Benéficos</a>
   </div>
-  <br>
+
   <table>
     <thead>
       <tr>
@@ -74,6 +79,7 @@
         <th>Registro Senasa</th>
         <th>Registro EPA</th>
         <th>Días a Cosecha</th>
+        <th>Periodo de Reingreso</th>
         <th>Plagas</th>
         <th>Dosis Máxima</th>
         <th>Dosis/Litro</th>
@@ -93,10 +99,9 @@
       authDomain: "agro-productos.firebaseapp.com",
       databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
       projectId: "agro-productos",
-      storageBucket: "agro-productos.firebasestorage.app",
+      storageBucket: "agro-productos.appspot.com",
       messagingSenderId: "196774282512",
-      appId: "1:196774282512:web:92697209153eac8acb1195",
-      measurementId: "G-WF8V7PV87M"
+      appId: "1:196774282512:web:92697209153eac8acb1195"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -115,6 +120,7 @@
           <td>${data.senasa || ""}</td>
           <td>${data.epa || ""}</td>
           <td>${data.dias || ""}</td>
+          <td>${data.reingreso || ""}</td>
           <td>${data.plagas || ""}</td>
           <td>${data.dosis_maxima || ""}</td>
           <td>${data.dosis_litro || ""}</td>
