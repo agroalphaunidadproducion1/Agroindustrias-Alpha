@@ -19,15 +19,18 @@
       text-align: right;
       margin-bottom: 20px;
     }
-    .acciones a {
+    .acciones a, .acciones button {
       background: #2e7d32;
       color: white;
       padding: 10px 15px;
       text-decoration: none;
       border-radius: 5px;
       margin-left: 10px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
     }
-    .acciones a:hover {
+    .acciones a:hover, .acciones button:hover {
       background: #1b5e20;
     }
     table {
@@ -69,6 +72,8 @@
   <div class="acciones">
     <a href="formulario.html">➕ Agregar nuevo producto</a>
     <a href="danosabeficos.html">📈 Ver % Daños a Benéficos</a>
+    <button onclick="exportarCSV()">📥</button>
+    <button onclick="exportarExcel()">📊</button>
   </div>
 
   <table>
@@ -140,6 +145,31 @@
       if (confirm("¿Estás seguro de que deseas eliminar este producto?")) {
         db.ref("productos/" + id).remove();
       }
+    }
+
+    function exportarCSV() {
+      let csv = "Nombre Comercial,Ingredientes Activos,Registro Senasa,Registro EPA,Días a Cosecha,Periodo de Reingreso,Plagas,Dosis Máxima,Dosis/Litro,Banda\n";
+      document.querySelectorAll("#tabla-productos tr").forEach(fila => {
+        const celdas = fila.querySelectorAll("td");
+        if (celdas.length > 0) {
+          const datos = Array.from(celdas).slice(0, 10).map(td => `"${td.innerText.trim()}"`).join(",");
+          csv += datos + "\n";
+        }
+      });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "productos.csv";
+      link.click();
+    }
+
+    function exportarExcel() {
+      const tablaHTML = document.querySelector("table").outerHTML;
+      const blob = new Blob(["<table>" + tablaHTML + "</table>"], { type: "application/vnd.ms-excel" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "productos.xls";
+      link.click();
     }
   </script>
 </body>
