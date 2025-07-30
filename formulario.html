@@ -56,7 +56,18 @@
     <input type="text" id="senasa" placeholder="Registro Senasa" required />
     <input type="text" id="epa" placeholder="Registro EPA" />
     <input type="number" id="dias" placeholder="Días a cosecha" required />
-    <textarea id="plagas" placeholder="Plagas a controlar" required></textarea>
+    <input type="text" id="reingreso" placeholder="Periodo de reingreso (horas/días)" required />
+
+    <label for="plagas">Plagas a controlar:</label>
+    <select id="plagas" required>
+      <option value="" disabled selected>Seleccione una plaga</option>
+      <option value="Mosca">Mosca</option>
+      <option value="Picudo">Picudo</option>
+      <option value="Trips">Trips</option>
+      <option value="Gusano">Gusano</option>
+      <option value="Chinche">Chinche</option>
+    </select>
+
     <input type="text" id="dosis_maxima" placeholder="Dosis máxima" />
     <input type="text" id="dosis_litro" placeholder="Dosis por litro de agua" />
 
@@ -82,10 +93,9 @@
       authDomain: "agro-productos.firebaseapp.com",
       databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
       projectId: "agro-productos",
-      storageBucket: "agro-productos.firebasestorage.app",
+      storageBucket: "agro-productos.appspot.com",
       messagingSenderId: "196774282512",
-      appId: "1:196774282512:web:92697209153eac8acb1195",
-      measurementId: "G-WF8V7PV87M"
+      appId: "1:196774282512:web:92697209153eac8acb1195"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -99,6 +109,7 @@
         senasa: document.getElementById("senasa").value,
         epa: document.getElementById("epa").value,
         dias: document.getElementById("dias").value,
+        reingreso: document.getElementById("reingreso").value,
         plagas: document.getElementById("plagas").value,
         dosis_maxima: document.getElementById("dosis_maxima").value,
         dosis_litro: document.getElementById("dosis_litro").value,
