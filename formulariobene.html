@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Evaluación de Daño por Organismos Benéficos</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -62,7 +64,6 @@
     <label for="ingrediente">Ingrediente activo:</label>
     <input type="text" id="ingrediente" required>
 
-    <!-- Selectores para organismos -->
     <label for="swirskii">Daño a A. Swirskii:</label>
     <select id="swirskii">
       <option value="1">🟢 Nivel 1 – &lt; 25% (Ligero)</option>
@@ -99,7 +100,6 @@
       <option value="?">⚪ Desconocido</option>
     </select>
 
-    <!-- Acción sugerida para abejorros -->
     <label for="abejorros">Nivel de daño a abejorros:</label>
     <select id="abejorros">
       <option value="retirar">❌ Nivel 4 – Retirar colmena</option>
@@ -112,8 +112,17 @@
   </form>
 
   <script>
+    // 🔐 Configuración Firebase
+    const firebaseConfig = {
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 🚀 Registro al nodo 'dañobeneficos'
     document.getElementById("formularioDañoOrganismos").addEventListener("submit", function(e) {
       e.preventDefault();
+
       const registro = {
         producto: document.getElementById("producto").value,
         ingrediente: document.getElementById("ingrediente").value,
@@ -121,11 +130,19 @@
         cucumeris: document.getElementById("cucumeris").value,
         carnea: document.getElementById("carnea").value,
         colemani: document.getElementById("colemani").value,
-        abejorros: document.getElementById("abejorros").value
+        abejorros: document.getElementById("abejorros").value,
+        timestamp: new Date().toISOString()
       };
-      console.log("✅ Registro completo:", registro);
-      alert("Registro guardado con niveles de daño y acción para abejorros.");
-      this.reset();
+
+      db.ref("dañobeneficos").push(registro)
+        .then(() => {
+          alert("✅ Registro guardado en Firebase (dañobeneficos).");
+          this.reset();
+        })
+        .catch((error) => {
+          console.error("❌ Error al guardar:", error);
+          alert("Ocurrió un error al guardar en Firebase.");
+        });
     });
   </script>
 
