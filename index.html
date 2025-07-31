@@ -1,101 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK6pM2j_2yXjRnGm8nKJQ064y-EOLqYOnnJA&s');
-            background-size: cover;
-            background-position: center;
-            font-family: Arial, sans-serif;
-        }
-        .login-container {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            width: 300px;
-            text-align: center;
-        }
-        .login-container h2 {
-            margin-bottom: 1.5rem;
-            color: #333;
-        }
-        .login-container input {
-            width: 100%;
-            padding: 0.5rem;
-            margin: 0.5rem 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .login-container button {
-            width: 100%;
-            padding: 0.7rem;
-            background: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-        .login-container button:hover {
-            background: #0056b3;
-        }
-        .error {
-            color: red;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login libre</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK6pM2j_2yXjRnGm8nKJQ064y-EOLqYOnnJA&s');
+      background-size: cover;
+      background-position: center;
+      font-family: Arial, sans-serif;
+    }
+    .login-container {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      width: 300px;
+      text-align: center;
+    }
+    .login-container h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 0.7rem;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .login-container button:hover {
+      background: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Iniciar Sesión</h2>
-        <input type="text" id="username" placeholder="Usuario" required>
-        <input type="password" id="password" placeholder="Contraseña" required>
-        <button onclick="login()">Entrar</button>
-        <p id="error" class="error"></p>
-    </div>
+  <div class="login-container">
+    <h2>Acceso Libre</h2>
+    <button onclick="login()">Entrar</button>
+  </div>
 
-    <script>
-        // Lista de usuarios
-        const users = [
-            { username: "admin", password: "12" },
-            { username: "usuario1", password: "clave123" },
-            { username: "usuario2", password: "pass456" },
-            { username: "invitado", password: "guest789" }
-        ];
-
-        function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            const error = document.getElementById("error");
-
-            // Verificar credenciales
-            const user = users.find(u => u.username === username && u.password === password);
-
-            if (user) {
-                alert("¡Login exitoso! Bienvenido, " + username);
-                window.location.href = "inicio.html"; // Redirige a inicio.html
-            } else {
-                error.textContent = "Usuario o contraseña incorrectos";
-            }
-        }
-
-        // Permitir login con la tecla Enter
-        document.getElementById("password").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                login();
-            }
-        });
-    </script>
+  <script>
+    function login() {
+      alert("🔓 Acceso exitoso. Bienvenido.");
+      window.location.href = "inicio.html"; // Redirige sin validación
+    }
+  </script>
 </body>
 </html>
