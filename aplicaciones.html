@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulario de Aplicación</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0fff0;
+      padding: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .input-group {
+      display: flex;
+      gap: 5px;
+    }
+    input, select {
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    input[type="text"], input[type="date"], input[type="time"] {
+      flex: 1;
+    }
+    .unidad {
+      width: 60px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <h2>Aplicación de Productos</h2>
+
+  <form id="formularioAplicacion">
+    <label>Invernadero:</label>
+    <select id="invernadero">
+      <option>Selecciona</option>
+      <option>9</option><option>10</option><option>11</option>
+      <option>12</option><option>13</option><option>14</option>
+      <option>15</option><option>16</option><option>33</option>
+      <option>35</option><option>37</option><option>39</option>
+    </select>
+
+    <label>Cultivo:</label>
+    <select id="cultivo">
+      <option>Selecciona</option>
+      <option>Chile</option>
+      <option>Tomate</option>
+    </select>
+
+    <label>Producto:</label>
+    <select id="producto" onchange="llenarDatosProducto()">
+      <option value="">Cargando productos...</option>
+    </select>
+
+    <label>Fecha aplicada:</label>
+    <input type="date" id="fechaAplicada">
+
+    <label>Hora:</label>
+    <input type="time" id="hora">
+
+    <label>Días a cosecha:</label>
+    <input type="text" id="diasCosecha" oninput="calcularFechaLibre()">
+
+    <label>Libre (fecha + días):</label>
+    <input type="text" id="fechaLibre" readonly>
+
+    <label>Dosis máxima:</label>
+    <div class="input-group">
+      <input type="text" id="dosisMaxima">
+      <select id="unidadDosisMaxima" class="unidad">
+        <option>kg</option>
+        <option>lt</option>
+      </select>
+    </div>
+
+    <label>Área aplicada:</label>
+    <input type="text" id="areaAplicada">
+
+    <label>Cantidad aplicada:</label>
+    <div class="input-group">
+      <input type="text" id="cantidadAplicada">
+      <select id="unidadCantidadAplicada" class="unidad">
+        <option>kg</option>
+        <option>lt</option>
+      </select>
+    </div>
+
+    <label>Periodo de reingreso:</label>
+    <input type="text" id="periodoReingreso">
+
+    <label>Dosis por litro:</label>
+    <div class="input-group">
+      <input type="text" id="dosisPorLitro">
+      <select id="unidadDosisPorLitro" class="unidad">
+        <option>ml</option>
+        <option>gr</option>
+      </select>
+    </div>
+
+    <button type="button" onclick="guardarAplicacion()">Guardar aplicación</button>
+  </form>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const productoSelect = document.getElementById("producto");
+
+    // Cargar productos
+    db.ref("productos").once("value", snapshot => {
+      const productos = snapshot.val();
+      productoSelect.innerHTML = '<option value="">Selecciona...</option>';
+      for (let id in productos) {
+        let option = document.createElement("option");
+        option.value = id;
+        option.textContent = productos[id].nombre;
+        productoSelect.appendChild(option);
+      }
+    });
+
+    function llenarDatosProducto() {
+      const id = productoSelect.value;
+      if (!id) return;
+      db.ref("productos/" + id).once("value", snapshot => {
+        const datos = snapshot.val();
+        document.getElementById("dosisMaxima").value = datos.dosisMaxima || "";
+        document.getElementById("dosisPorLitro").value = datos.dosisPorLitro || "";
+        document.getElementById("periodoReingreso").value = datos.reingreso || "";
+        document.getElementById("diasCosecha").value = datos.diasCosecha || "";
+        calcularFechaLibre();
+      });
+    }
+
+    function calcularFechaLibre() {
+      const fecha = document.getElementById("fechaAplicada").value;
+      const hora = document.getElementById("hora").value;
+      const dias = parseInt(document.getElementById("diasCosecha").value);
+      if (!fecha || isNaN(dias)) return;
+      const partes = fecha.split("-");
+      const fechaBase = new Date(partes[0], partes[1] - 1, partes[2]);
+      if (hora && hora >= "12:00") {
+        fechaBase.setDate(fechaBase.getDate() + dias + 1);
+      } else {
+        fechaBase.setDate(fechaBase.getDate() + dias);
+      }
+      const resultado = fechaBase.toISOString().split("T")[0];
+      document.getElementById("fechaLibre").value = resultado;
+    }
+
+    document.getElementById("fechaAplicada").addEventListener("change", calcularFechaLibre);
+    document.getElementById("hora").addEventListener("change", calcularFechaLibre);
+
+    function guardarAplicacion() {
+      const dosisMax = parseFloat(document.getElementById("dosisMaxima").value);
+      const cantidad = parseFloat(document.getElementById("cantidadAplicada").value);
+
+      if (!isNaN(dosisMax) && !isNaN(cantidad)) {
+        const limite = dosisMax * 1.94;
+        if (cantidad > limite) {
+          alert("❌ Error: La cantidad aplicada (" + cantidad + ") excede la dosis máxima permitida (" + limite.toFixed(2) + ")");
+          return;
+        }
+      }
+
+      const datos = {
+        invernadero: document.getElementById("invernadero").value,
+        cultivo: document.getElementById("cultivo").value,
+        producto: productoSelect.options[productoSelect.selectedIndex].text,
+        fechaAplicada: document.getElementById("fechaAplicada").value,
+        hora: document.getElementById("hora").value,
+        diasCosecha: document.getElementById("diasCosecha").value,
+        fechaLibre: document.getElementById("fechaLibre").value,
+        dosisMaxima: document.getElementById("dosisMaxima").value,
+        unidadDosisMaxima: document.getElementById("unidadDosisMaxima").value,
+        areaAplicada: document.getElementById("areaAplicada").value,
+        cantidadAplicada: document.getElementById("cantidadAplicada").value,
+        unidadCantidadAplicada: document.getElementById("unidadCantidadAplicada").value,
+        periodoReingreso: document.getElementById("periodoReingreso").value,
+        dosisPorLitro: document.getElementById("dosisPorLitro").value,
+        unidadDosisPorLitro: document.getElementById("unidadDosisPorLitro").value
+      };
+
+      db.ref("aplicaciones").push(datos, err => {
+        if (err) {
+          alert("❌ Error al guardar en Firebase.");
+        } else {
+          alert("✅ Aplicación guardada exitosamente.");
+          document.getElementById("formularioAplicacion").reset();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
