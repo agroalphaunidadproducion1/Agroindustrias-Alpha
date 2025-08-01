@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Aplicaciones</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f2e6;
+      padding: 20px;
+    }
+    h2 {
+      color: #2d6a4f;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      cursor: pointer;
+      margin: 5px 5px 15px 0;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+
+    /* CAMPANITA flotante */
+    #campanaNotificaciones {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    #panelNotificaciones {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 9999;
+    }
+
+    #panelNotificaciones div {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      background-color: #fff59d;
+      font-size: 14px;
+    }
+
+    #panelNotificaciones div:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Aplicaciones Registradas</h2>
+<button onclick="window.print()">🖨️ Imprimir Tabla</button>
+<button onclick="exportarExcel()">📥 Descargar Excel</button>
+
+<button onclick="descargarImagen()">🖼️ Descargar Imagen</button>
+
+
+<!-- Panel flotante de notificaciones -->
+<button id="campanaNotificaciones">🔔</button>
+<div id="panelNotificaciones"></div>
+
+<table id="tablaAplicaciones">
+  <thead>
+    <tr>
+      <th>Fecha Aplicada</th>
+      <th>Cultivo</th>
+      <th>Invernadero</th>
+      <th>Producto</th>
+      <th>Dosis Máxima</th>
+      <th>Días Cosecha</th>
+      <th>Período Reingreso</th>
+      <th>Dosis por Litro</th>
+      <th>Cantidad Aplicada</th>
+      <th>Área Aplicada</th>
+      <th>Hora</th>
+      <th>Fecha Libre</th>
+    </tr>
+  </thead>
+  <tbody id="cuerpoTabla"></tbody>
+</table>
+
+<script>
+  const firebaseConfig = {
+    databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const hoy = new Date().toISOString().split('T')[0];
+  let datosExcel = [];
+
+  const cuerpo = document.getElementById("cuerpoTabla");
+  const panelNotificaciones = document.getElementById("panelNotificaciones");
+
+  // Mostrar u ocultar el panel al hacer clic en la campana
+  document.getElementById("campanaNotificaciones").onclick = () => {
+    panelNotificaciones.style.display = panelNotificaciones.style.display === "none" ? "block" : "none";
+  };
+
+  db.ref("aplicaciones").on("value", (snapshot) => {
+    cuerpo.innerHTML = "";
+    panelNotificaciones.innerHTML = "";
+    datosExcel = [];
+
+    snapshot.forEach((child) => {
+      const datos = child.val();
+      const id = child.key;
+      const fechaLibre = datos.fechaLibre || "";
+
+      // Notificaciones si está vencido
+      if (fechaLibre && fechaLibre <= hoy) {
+        panelNotificaciones.innerHTML += `<div>
+          ⚠️ ${datos.producto} en ${datos.invernadero} venció (${fechaLibre})
+        </div>`;
+        // db.ref("aplicaciones/" + id).remove(); // Puedes activarlo si deseas que se elimine automáticamente
+      }
+
+      // Mostrar en tabla
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>${datos.fechaAplicada || ""}</td>
+        <td>${datos.cultivo || ""}</td>
+        <td>${datos.invernadero || ""}</td>
+        <td>${datos.producto || ""}</td>
+        <td>${datos.dosisMaxima || ""}</td>
+        <td>${datos.diasCosecha || ""}</td>
+        <td>${datos.periodoReingreso || ""}</td>
+        <td>${datos.dosisPorLitro || ""}</td>
+        <td>${datos.cantidadAplicada || ""}</td>
+        <td>${datos.areaAplicada || ""}</td>
+        <td>${datos.hora || ""}</td>
+        <td>${fechaLibre}</td>
+      `;
+      cuerpo.appendChild(fila);
+
+      // Preparar para Excel
+      datosExcel.push({
+        "Fecha Aplicada": datos.fechaAplicada || "",
+        "Cultivo": datos.cultivo || "",
+        "Invernadero": datos.invernadero || "",
+        "Producto": datos.producto || "",
+        "Dosis Máxima": datos.dosisMaxima || "",
+        "Días Cosecha": datos.diasCosecha || "",
+        "Período Reingreso": datos.periodoReingreso || "",
+        "Dosis por Litro": datos.dosisPorLitro || "",
+        "Cantidad Aplicada": datos.cantidadAplicada || "",
+        "Área Aplicada": datos.areaAplicada || "",
+        "Hora": datos.hora || "",
+        "Fecha Libre": fechaLibre
+      });
+    });
+  });
+
+  function exportarExcel() {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(datosExcel);
+    XLSX.utils.book_append_sheet(wb, ws, "Aplicaciones");
+    XLSX.writeFile(wb, "Aplicaciones.xlsx");
+  }
+</script>
+
+</body>
+</html>
