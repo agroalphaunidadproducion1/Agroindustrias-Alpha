@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agregar Personal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      padding: 30px;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h2 {
+      color: #2e7d32;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: #2e7d32;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Agregar Personal</h2>
+
+    <form id="personalForm">
+      <label for="modulo">Módulo</label>
+      <select id="modulo" required>
+        <option value="">Seleccione</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="I">I</option>
+        <option value="J">J</option>
+      </select>
+
+      <label for="invernadero">Invernadero</label>
+      <select id="invernadero" required>
+        <option value="">Seleccione un módulo primero</option>
+      </select>
+
+      <label for="fecha">Fecha</label>
+      <input type="date" id="fecha" required>
+
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" required>
+
+      <label for="codigo">Código</label>
+      <input type="text" id="codigo" required>
+
+      <label for="tipoContrato">Tipo de Contrato</label>
+      <select id="tipoContrato" required>
+        <option value="">Seleccione</option>
+        <option value="Temporal">Temporal</option>
+        <option value="Permanente">Permanente</option>
+      </select>
+
+      <button type="submit">Guardar Personal</button>
+    </form>
+  </div>
+
+  <script type="module">
+    // Firebase config
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZJZtUOnCjFqfPrR7BtuwDDTWfwlUKdYE",
+      authDomain: "agro-productos.firebaseapp.com",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.appspot.com",
+      messagingSenderId: "289401990084",
+      appId: "1:289401990084:web:197e75ff1bb63df8c8d6ff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const form = document.getElementById("personalForm");
+    const moduloSelect = document.getElementById("modulo");
+    const invernaderoSelect = document.getElementById("invernadero");
+
+    // Invernaderos reales por módulo
+    const invernaderosPorModulo = {
+      C: ["9", "10", "11", "12"],
+      D: ["13", "14", "15", "16"],
+      I: ["33", "35"],
+      J: ["37", "39"]
+    };
+
+    // Actualizar invernaderos al seleccionar módulo
+    moduloSelect.addEventListener("change", () => {
+      const modulo = moduloSelect.value;
+      invernaderoSelect.innerHTML = `<option value="">Seleccione</option>`;
+      if (invernaderosPorModulo[modulo]) {
+        invernaderosPorModulo[modulo].forEach(inv => {
+          const option = document.createElement("option");
+          option.value = inv;
+          option.textContent = inv;
+          invernaderoSelect.appendChild(option);
+        });
+      }
+    });
+
+    // Guardar en Firebase
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const personal = {
+        modulo: moduloSelect.value,
+        invernadero: invernaderoSelect.value,
+        fecha: document.getElementById("fecha").value,
+        nombre: document.getElementById("nombre").value,
+        codigo: document.getElementById("codigo").value,
+        tipoContrato: document.getElementById("tipoContrato").value
+      };
+
+      push(ref(db, "personalinv"), personal)
+        .then(() => {
+          alert("✅ Personal guardado exitosamente.");
+          form.reset();
+          invernaderoSelect.innerHTML = '<option value="">Seleccione un módulo primero</option>';
+        })
+        .catch((error) => {
+          console.error("Error al guardar:", error);
+          alert("❌ Error al guardar los datos.");
+        });
+    });
+  </script>
+</body>
+</html>
