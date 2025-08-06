@@ -1,69 +1,115 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inicio | AgroAlpha</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agroalpha - San Marcos de Colón</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: url('https://tse1.mm.bing.net/th/id/OIP.1Z2RApaiayckWVloAZkwpwHaC0?rs=1&pid=ImgDetMain&o=7&rm=3') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: #fff;
-      text-shadow: 1px 1px 2px #000;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0fff0;
+      color: #2e5e2e;
     }
+
     header {
+      background: linear-gradient(to right, #388e3c, #81c784);
+      padding: 1.5em;
       text-align: center;
-      margin-top: 2rem;
+      color: white;
     }
-    .logo {
-      width: 120px;
-    }
+
     h1 {
-      margin-top: 0.5rem;
-      color: #f1ffe9;
+      margin: 0;
+      font-size: 2em;
     }
-    .button-container {
+
+    .descripcion {
+      text-align: center;
+      padding: 1em 2em;
+      font-size: 1em;
+      background-color: #e8f5e9;
+    }
+
+    .imagen-banner {
+      width: 100%;
+      max-height: 350px;
+      object-fit: cover;
+    }
+
+    .botones {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
-      margin-top: 3rem;
+      gap: 1em;
+      padding: 1.5em;
     }
-    .btn {
-      background-color: #3f704d;
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      color: white;
+
+    .boton {
+      background: white;
+      color: #388e3c;
+      border: 2px solid #81c784;
+      padding: 0.8em 1.5em;
+      border-radius: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
       cursor: pointer;
-      transition: background-color 0.3s;
-      min-width: 160px;
-      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 6px rgba(129, 199, 132, 0.3);
+      flex: 1 1 140px;
       text-align: center;
-      display: inline-block;
+      text-decoration: none;
     }
-    .btn:hover {
-      background-color: #2d563a;
+
+    .boton:hover {
+      background: #dcedc8;
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1em;
+      background-color: #c8e6c9;
+      color: #2e7d32;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.6em;
+      }
+
+      .boton {
+        flex: 1 1 100%;
+      }
+
+      .descripcion {
+        font-size: 0.95em;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="https://www.ccisur.org/wp-content/uploads/2023/06/LOGO-AGROALPHA.jpg" alt="AgroAlpha Logo" class="logo" />
-    <h1>Agro Alpha</h1>
+    <h1>Agroalpha</h1>
+    <p>Producción agrícola sostenible desde San Marcos de Colón</p>
   </header>
 
-  <div class="button-container">
-    <a class="btn" href="FitoSanidad.html">Fito Sanidad</a>
-    <a class="btn" href="practicas_culturalesofi.html">Prácticas Culturales</a>
-    <a class="btn" href="Riego.html">Riego</a>
-    <a class="btn" href="Produccion.html">Producción</a>
-  </div>
+  <img src="https://tse2.mm.bing.net/th/id/OIP.AIP2yjrabW6XhGtphiVCuAHaEy?cb=thfvnext&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Agroalpha San Marcos de Colón" class="imagen-banner">
+
+  <section class="descripcion">
+    <p><strong>Agroalpha</strong> está ubicada en el km 7 hacia Duyure, San Marcos de Colón, Choluteca. Especialistas en cultivo de hortalizas para exportación con enfoque en sostenibilidad, trazabilidad y desarrollo agrícola local.</p>
+  </section>
+
+  <section class="botones">
+    <a href="fitosanidad.html" class="boton">Fitosanidad</a>
+    <a href="Produccion.html" class="boton">Producción</a>
+    <a href="riego.html" class="boton">Riego</a>
+    <a href="practicas_culturalesofi.html" class="boton">Prácticas Culturales</a>
+  </section>
+
+  <footer>
+    &copy; 2025 Agroalpha | San Marcos de Colón, Choluteca, Honduras
+  </footer>
 </body>
 </html>
