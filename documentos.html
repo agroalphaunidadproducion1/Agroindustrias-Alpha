@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Documentos OneDrive</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0078d4; /* Color de Microsoft */
+            --secondary-color: #106ebe;
+            --light-gray: #f3f2f1;
+            --medium-gray: #e1dfdd;
+            --dark-gray: #323130;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background-color: var(--light-gray);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        h1 i {
+            margin-right: 12px;
+        }
+        
+        .search-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-input {
+            position: relative;
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 2px;
+            font-size: 14px;
+            height: 32px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0 16px;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 14px;
+            height: 32px;
+            transition: background-color 0.167s ease;
+            align-self: flex-end;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dark-gray);
+        }
+        
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .document-card {
+            background-color: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .document-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3.2px 7.2px 0 rgba(0, 0, 0, 0.132), 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.108);
+        }
+        
+        .document-icon {
+            background-color: #f3f2f1;
+            padding: 16px;
+            text-align: center;
+            font-size: 32px;
+            color: var(--primary-color);
+        }
+        
+        .document-info {
+            padding: 16px;
+        }
+        
+        .document-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .document-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--dark-gray);
+            margin-bottom: 12px;
+        }
+        
+        .document-type {
+            background-color: #f3f2f1;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .document-link {
+            display: block;
+            text-align: center;
+            padding: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 2px;
+            transition: background-color 0.167s ease;
+        }
+        
+        .document-link:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--dark-gray);
+            font-size: 16px;
+            grid-column: 1 / -1;
+        }
+        
+        /* Estilos para tipos de documentos */
+        .type-word { color: #2b579a; }
+        .type-excel { color: #217346; }
+        .type-powerpoint { color: #b7472a; }
+        .type-pdf { color: #d83b01; }
+        .type-image { color: #ff8c00; }
+        .type-video { color: #b4009e; }
+        .type-audio { color: #e81123; }
+        .type-zip { color: #737373; }
+        .type-other { color: #666666; }
+        
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-group, .search-input {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fab fa-microsoft"></i> Documentos en OneDrive</h1>
+        
+        <div class="search-container">
+            <div class="search-input">
+                <label for="search">Buscar documentos</label>
+                <input type="text" id="search" placeholder="Escribe para buscar...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="search-group">
+                <label for="type">Tipo de documento</label>
+                <select id="type">
+                    <option value="">Todos los tipos</option>
+                    <option value="word">Word</option>
+                    <option value="excel">Excel</option>
+                    <option value="powerpoint">PowerPoint</option>
+                    <option value="pdf">PDF</option>
+                    <option value="image">Imagen</option>
+                    <option value="video">Video</option>
+                    <option value="audio">Audio</option>
+                    <option value="zip">Archivo comprimido</option>
+                    <option value="other">Otros</option>
+                </select>
+            </div>
+            <button id="searchButton">Buscar</button>
+        </div>
+        
+        <div class="documents-grid" id="documentsGrid">
+            <!-- Los documentos se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de documentos (simulada)
+        const documents = [
+            {
+                name: "Informe Trimestral Q3 2023",
+                type: "word",
+                date: "2023-09-15",
+                size: "2.4 MB",
+                url: "https://onedrive.live.com/edit?resid=ABC123&authkey=!XYZ456",
+                icon: "fa-file-word"
+            },
+            {
+                name: "Presupuesto Anual 2024",
+                type: "excel",
+                date: "2023-11-20",
+                size: "1.8 MB",
+                url: "https://onedrive.live.com/edit?resid=DEF456&authkey=!UVW789",
+                icon: "fa-file-excel"
+            },
+            {
+                name: "Presentación Estrategia Comercial",
+                type: "powerpoint",
+                date: "2023-10-05",
+                size: "5.2 MB",
+                url: "https://onedrive.live.com/edit?resid=GHI789&authkey=!RST012",
+                icon: "fa-file-powerpoint"
+            },
+            {
+                name: "Manual de Usuario Final",
+                type: "pdf",
+                date: "2023-08-12",
+                size: "3.7 MB",
+                url: "https://onedrive.live.com/edit?resid=JKL012&authkey=!MNO345",
+                icon: "fa-file-pdf"
+            },
+            {
+                name: "Foto Producto Nuevo",
+                type: "image",
+                date: "2023-12-01",
+                size: "4.5 MB",
+                url: "https://onedrive.live.com/edit?resid=PQR345&authkey=!STU678",
+                icon: "fa-file-image"
+            },
+            {
+                name: "Tutorial Instalación",
+                type: "video",
+                date: "2023-07-22",
+                size: "15.8 MB",
+                url: "https://onedrive.live.com/edit?resid=VWX678&authkey=!YZA901",
+                icon: "fa-file-video"
+            },
+            {
+                name: "Grabación Reunión",
+                type: "audio",
+                date: "2023-09-30",
+                size: "8.3 MB",
+                url: "https://onedrive.live.com/edit?resid=BCD901&authkey=!EFG234",
+                icon: "fa-file-audio"
+            },
+            {
+                name: "Backup Datos",
+                type: "zip",
+                date: "2023-12-10",
+                size: "25.1 MB",
+                url: "https://onedrive.live.com/edit?resid=FGH234&authkey=!HIJ567",
+                icon: "fa-file-archive"
+            },
+            {
+                name: "Especificaciones Técnicas",
+                type: "other",
+                date: "2023-11-15",
+                size: "1.2 MB",
+                url: "https://onedrive.live.com/edit?resid=KLM567&authkey=!NOP890",
+                icon: "fa-file"
+            }
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar todos los documentos al cargar
+            displayDocuments(documents);
+            
+            // Manejar búsqueda
+            document.getElementById('searchButton').addEventListener('click', function() {
+                filterDocuments();
+            });
+            
+            // Buscar al presionar Enter
+            document.getElementById('search').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    filterDocuments();
+                }
+            });
+            
+            // Buscar al cambiar el tipo
+            document.getElementById('type').addEventListener('change', function() {
+                filterDocuments();
+            });
+        });
+        
+        function filterDocuments() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const typeFilter = document.getElementById('type').value;
+            
+            const filtered = documents.filter(doc => {
+                // Filtrar por término de búsqueda
+                const matchesSearch = doc.name.toLowerCase().includes(searchTerm);
+                
+                // Filtrar por tipo
+                const matchesType = !typeFilter || doc.type === typeFilter;
+                
+                return matchesSearch && matchesType;
+            });
+            
+            displayDocuments(filtered);
+        }
+        
+        function displayDocuments(docs) {
+            const grid = document.getElementById('documentsGrid');
+            grid.innerHTML = '';
+            
+            if (docs.length === 0) {
+                grid.innerHTML = '<div class="no-results">No se encontraron documentos con los criterios de búsqueda</div>';
+                return;
+            }
+            
+            docs.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'document-card';
+                
+                // Obtener clase de tipo para el color
+                const typeClass = `type-${doc.type}`;
+                
+                card.innerHTML = `
+                    <div class="document-icon">
+                        <i class="fas ${doc.icon} ${typeClass}"></i>
+                    </div>
+                    <div class="document-info">
+                        <div class="document-name" title="${doc.name}">${doc.name}</div>
+                        <div class="document-meta">
+                            <span>${formatDate(doc.date)}</span>
+                            <span>${doc.size}</span>
+                        </div>
+                        <div class="document-type ${typeClass}">${getTypeName(doc.type)}</div>
+                        <a href="${doc.url}" target="_blank" class="document-link">
+                            <i class="fas fa-external-link-alt"></i> Abrir en OneDrive
+                        </a>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+        
+        function getTypeName(type) {
+            const typeNames = {
+                'word': 'Documento Word',
+                'excel': 'Hoja de cálculo',
+                'powerpoint': 'Presentación',
+                'pdf': 'Documento PDF',
+                'image': 'Imagen',
+                'video': 'Video',
+                'audio': 'Audio',
+                'zip': 'Archivo comprimido',
+                'other': 'Otro tipo'
+            };
+            return typeNames[type] || 'Documento';
+        }
+    </script>
+</body>
+</html>
