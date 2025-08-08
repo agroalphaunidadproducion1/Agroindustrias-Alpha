@@ -1,21 +1,485 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard — Agroalpha</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Sistema Agrícola</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --admin-color: #2196F3;
+            --grower-color: #FF9800;
+            --digitador-color: #9C27B0;
+            --tecnico-color: #607D8B;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --dark-gray: #333;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+        }
+        
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .admin-badge { background-color: var(--admin-color); }
+        .grower-badge { background-color: var(--grower-color); }
+        .digitador-badge { background-color: var(--digitador-color); }
+        .fitosanidad-badge { background-color: var(--tecnico-color); }
+        .culturales-badge { background-color: #795548; }
+        .riego-badge { background-color: #00BCD4; }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--white);
+            color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e8f5e9;
+        }
+        
+        .btn-icon {
+            background: transparent;
+            color: white;
+            padding: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .welcome-container {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .welcome-title {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        
+        .welcome-subtitle {
+            color: var(--dark-gray);
+            margin-bottom: 0;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 3px solid var(--primary-color);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .card p {
+            color: var(--dark-gray);
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .card-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .card-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action-btn {
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
 </head>
 <body>
-  <nav>
-    <ul id="menu"></ul>
-    <button onclick="logout()">Cerrar Sesión</button>
-  </nav>
-  <main>
-    <h2>Bienvenido, <span id="userName"></span></h2>
-    <div id="content">
-      <p>Selecciona un área para ver o editar información.</p>
+    <div class="header">
+        <h1>Sistema Agrícola</h1>
+        <div class="user-actions">
+            <div class="quick-actions">
+                <button class="quick-action-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i> Ajustes
+                </button>
+                <button class="quick-action-btn" id="supportBtn">
+                    <i class="fas fa-question-circle"></i> Soporte
+                </button>
+                <button class="quick-action-btn" id="notificationsBtn">
+                    <i class="fas fa-bell"></i> Notificaciones
+                </button>
+            </div>
+            <div class="user-info">
+                <span id="user-name"></span>
+                <span id="user-role" class="role-badge"></span>
+                <button class="btn btn-primary" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+        </div>
     </div>
-  </main>
-  <script src="app.js"></script>
+    
+    <div class="main-content">
+        <div class="welcome-container">
+            <h1 class="welcome-title">Bienvenido, <span id="welcome-name"></span></h1>
+            <p class="welcome-subtitle" id="welcome-message"></p>
+        </div>
+        
+        <h2>Acciones Rápidas</h2>
+        <div class="quick-actions">
+            <button class="quick-action-btn" id="quickReportBtn">
+                <i class="fas fa-file-alt"></i> Generar Reporte
+            </button>
+            <button class="quick-action-btn" id="quickAddBtn">
+                <i class="fas fa-plus-circle"></i> Agregar Registro
+            </button>
+            <button class="quick-action-btn" id="quickMonitorBtn">
+                <i class="fas fa-chart-line"></i> Monitoreo
+            </button>
+        </div>
+        
+        <h2>Módulos Principales</h2>
+        <div class="cards-container" id="featuresContainer">
+            <!-- Las tarjetas se generarán dinámicamente según el rol -->
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Verificar sesión al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Mostrar información del usuario
+            document.getElementById('user-name').textContent = userData.name;
+            document.getElementById('welcome-name').textContent = userData.name;
+            
+            const roleBadge = document.getElementById('user-role');
+            roleBadge.textContent = userData.role;
+            roleBadge.className = 'role-badge ' + getBadgeClass(userData.role);
+            
+            // Mensaje de bienvenida personalizado
+            document.getElementById('welcome-message').textContent = getWelcomeMessage(userData.role);
+            
+            // Generar tarjetas según rol
+            generateFeatureCards(userData.role);
+            
+            // Configurar botones
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('settingsBtn').addEventListener('click', () => alert('Ajustes del sistema'));
+            document.getElementById('supportBtn').addEventListener('click', () => alert('Soporte técnico'));
+            document.getElementById('notificationsBtn').addEventListener('click', () => alert('Notificaciones'));
+            document.getElementById('quickReportBtn').addEventListener('click', () => alert('Generar reporte'));
+            document.getElementById('quickAddBtn').addEventListener('click', () => alert('Agregar nuevo registro'));
+            document.getElementById('quickMonitorBtn').addEventListener('click', () => alert('Monitoreo en tiempo real'));
+        });
+        
+        function getBadgeClass(role) {
+            switch(role) {
+                case 'Administrador': return 'admin-badge';
+                case 'Grower': return 'grower-badge';
+                case 'Digitador': return 'digitador-badge';
+                case 'Técnico Fitosanidad': return 'fitosanidad-badge';
+                case 'Técnico Prácticas Culturales': return 'culturales-badge';
+                case 'Técnico Riego': return 'riego-badge';
+                default: return '';
+            }
+        }
+        
+        function getWelcomeMessage(role) {
+            const today = new Date();
+            const hour = today.getHours();
+            let greeting = '';
+            
+            if (hour < 12) greeting = 'Buenos días';
+            else if (hour < 19) greeting = 'Buenas tardes';
+            else greeting = 'Buenas noches';
+            
+            const messages = {
+                'Administrador': `${greeting}, tiene acceso completo al sistema. ¿Qué desea gestionar hoy?`,
+                'Grower': `${greeting}, revise el estado de los cultivos y las tareas programadas.`,
+                'Digitador': `${greeting}, comience a registrar los datos del día.`,
+                'Técnico Fitosanidad': `${greeting}, monitoree las plagas y enfermedades en los cultivos.`,
+                'Técnico Prácticas Culturales': `${greeting}, revise las prácticas culturales a implementar.`,
+                'Técnico Riego': `${greeting}, verifique el programa de riego para hoy.`
+            };
+            
+            return messages[role] || `${greeting}, bienvenido al sistema de gestión agrícola.`;
+        }
+        
+        function generateFeatureCards(role) {
+            const container = document.getElementById('featuresContainer');
+            container.innerHTML = '';
+            
+            // Características comunes a todos los roles
+            const commonFeatures = [
+                { 
+                    icon: 'fa-chart-line', 
+                    title: 'Dashboard', 
+                    description: 'Visualización de datos y métricas clave del sistema',
+                    link: '#'
+                },
+                { 
+                    icon: 'fa-calendar-alt', 
+                    title: 'Calendario', 
+                    description: 'Planificación y seguimiento de actividades agrícolas',
+                    link: '#'
+                }
+            ];
+            
+            // Características por rol
+            const roleFeatures = {
+                'Administrador': [
+                    { 
+                        icon: 'fa-users-cog', 
+                        title: 'Gestión de Usuarios', 
+                        description: 'Administre los usuarios y permisos del sistema',
+                        link: 'crear-usuario.html'
+                    },
+                    { 
+                        icon: 'fa-cogs', 
+                        title: 'Configuración', 
+                        description: 'Ajustes generales del sistema',
+                        link: '#'
+                    }
+                ],
+                'Grower': [
+                    { 
+                        icon: 'fa-seedling', 
+                        title: 'Gestión de Cultivos', 
+                        description: 'Administración de cultivos y parcelas',
+                        link: '#'
+                    },
+                    { 
+                        icon: 'fa-clipboard-list', 
+                        title: 'Reportes', 
+                        description: 'Generación de reportes de producción',
+                        link: '#'
+                    }
+                ],
+                'Digitador': [
+                    { 
+                        icon: 'fa-keyboard', 
+                        title: 'Registro de Datos', 
+                        description: 'Ingreso de información al sistema',
+                        link: '#'
+                    },
+                    { 
+                        icon: 'fa-history', 
+                        title: 'Historial', 
+                        description: 'Consulta de registros históricos',
+                        link: '#'
+                    }
+                ],
+                'Técnico Fitosanidad': [
+                    { 
+                        icon: 'fa-bug', 
+                        title: 'Control de Plagas', 
+                        description: 'Monitoreo y control de plagas',
+                        link: '#'
+                    },
+                    { 
+                        icon: 'fa-flask', 
+                        title: 'Análisis', 
+                        description: 'Resultados de análisis y muestras',
+                        link: '#'
+                    }
+                ],
+                'Técnico Prácticas Culturales': [
+                    { 
+                        icon: 'fa-tractor', 
+                        title: 'Prácticas Culturales', 
+                        description: 'Registro de prácticas implementadas',
+                        link: '#'
+                    },
+                    { 
+                        icon: 'fa-clipboard-check', 
+                        title: 'Estándares', 
+                        description: 'Protocolos y estándares de cultivo',
+                        link: '#'
+                    }
+                ],
+                'Técnico Riego': [
+                    { 
+                        icon: 'fa-tint', 
+                        title: 'Control de Riego', 
+                        description: 'Programación y monitoreo de riego',
+                        link: '#'
+                    },
+                    { 
+                        icon: 'fa-water', 
+                        title: 'Humedad', 
+                        description: 'Niveles de humedad del suelo',
+                        link: '#'
+                    }
+                ]
+            };
+            
+            // Combinar características
+            const allFeatures = [...commonFeatures, ...(roleFeatures[role] || [])];
+            
+            // Generar tarjetas
+            allFeatures.forEach(feature => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-icon"><i class="fas ${feature.icon}"></i></div>
+                    <h3>${feature.title}</h3>
+                    <p>${feature.description}</p>
+                    <a href="${feature.link}" class="card-btn">Acceder <i class="fas fa-arrow-right"></i></a>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
 </html>
