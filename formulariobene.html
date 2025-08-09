@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Evaluación de Daño por Organismos Benéficos</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f8e9;
+      padding: 30px;
+    }
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,128,0,0.2);
+      max-width: 600px;
+      margin: auto;
+      border-left: 8px solid #4caf50;
+    }
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #c8e6c9;
+      border-radius: 5px;
+      background-color: #f9fff9;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #66bb6a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #43a047;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="formularioDañoOrganismos">
+    <h2>🌾 Registro de daño a organismos benéficos</h2>
+
+    <label for="producto">Nombre del producto:</label>
+    <input type="text" id="producto" required>
+
+    <label for="ingrediente">Ingrediente activo:</label>
+    <input type="text" id="ingrediente" required>
+
+    <label for="swirskii">Daño a A. Swirskii:</label>
+    <select id="swirskii">
+      <option value="1">🟢 Nivel 1 – &lt; 25% (Ligero)</option>
+      <option value="2">🟡 Nivel 2 – 25%-50%</option>
+      <option value="3">🟠 Nivel 3 – 50%-75%</option>
+      <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+      <option value="?">⚪ Desconocido</option>
+    </select>
+
+    <label for="cucumeris">Daño a N. Cucumeris:</label>
+    <select id="cucumeris">
+      <option value="1">🟢 Nivel 1 – &lt; 25% (Ligero)</option>
+      <option value="2">🟡 Nivel 2 – 25%-50%</option>
+      <option value="3">🟠 Nivel 3 – 50%-75%</option>
+      <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+      <option value="?">⚪ Desconocido</option>
+    </select>
+
+    <label for="carnea">Daño a C. Carnea:</label>
+    <select id="carnea">
+      <option value="1">🟢 Nivel 1 – &lt; 25% (Ligero)</option>
+      <option value="2">🟡 Nivel 2 – 25%-50%</option>
+      <option value="3">🟠 Nivel 3 – 50%-75%</option>
+      <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+      <option value="?">⚪ Desconocido</option>
+    </select>
+
+    <label for="colemani">Daño a A. Colemani:</label>
+    <select id="colemani">
+      <option value="1">🟢 Nivel 1 – &lt; 25% (Ligero)</option>
+      <option value="2">🟡 Nivel 2 – 25%-50%</option>
+      <option value="3">🟠 Nivel 3 – 50%-75%</option>
+      <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+      <option value="?">⚪ Desconocido</option>
+    </select>
+
+    <label for="abejorros">Nivel de daño a abejorros:</label>
+    <select id="abejorros">
+      <option value="retirar">❌ Nivel 4 – Retirar colmena</option>
+      <option value="cubrir">🟧 Nivel 3 – Cubrir colmena</option>
+      <option value="ninguna">✅ Nivel 1 o 2 – Sin acción</option>
+      <option value="desconocido">⚪ Efecto desconocido</option>
+    </select>
+
+    <button type="submit">Registrar</button>
+  </form>
+
+  <script>
+    // 🔐 Configuración Firebase
+    const firebaseConfig = {
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 🚀 Registro al nodo 'dañobeneficos'
+    document.getElementById("formularioDañoOrganismos").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const registro = {
+        producto: document.getElementById("producto").value,
+        ingrediente: document.getElementById("ingrediente").value,
+        swirskii: document.getElementById("swirskii").value,
+        cucumeris: document.getElementById("cucumeris").value,
+        carnea: document.getElementById("carnea").value,
+        colemani: document.getElementById("colemani").value,
+        abejorros: document.getElementById("abejorros").value,
+        timestamp: new Date().toISOString()
+      };
+
+      db.ref("dañobeneficos").push(registro)
+        .then(() => {
+          alert("✅ Registro guardado en Firebase (dañobeneficos).");
+          this.reset();
+        })
+        .catch((error) => {
+          console.error("❌ Error al guardar:", error);
+          alert("Ocurrió un error al guardar en Firebase.");
+        });
+    });
+  </script>
+<div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+        <p>Versión 2.0 - Módulo completo</p>
+    </div>
+</body>
+</html>

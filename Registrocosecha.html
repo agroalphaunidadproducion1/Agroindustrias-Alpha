@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Cosecha Semanal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+        .col {
+            flex: 1;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Producción semanal Unidad 1</h1>
+        
+        <form id="cosechaForm">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="semana">Semana (semana actual del año):</label>
+                        <input type="number" id="semana" name="semana" min="1" max="52" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="fecha">Fecha:</label>
+                        <input type="date" id="fecha" name="fecha" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dia">Día:</label>
+                <select id="dia" name="dia" required>
+                    <option value="">Seleccione un día</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                    <option value="Sábado">Sábado</option>
+                    <option value="Domingo">Domingo</option>
+                </select>
+            </div>
+            
+            <h3>Registro de producción</h3>
+            
+            <table id="produccionTable">
+                <thead>
+                    <tr>
+                        <th>Invernadero</th>
+                        <th>Cultivo</th>
+                        <th>Cantidad (kg)</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select name="invernadero[]" required>
+                                <option value="">Seleccione</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="33">33</option>
+                                <option value="35">35</option>
+                                <option value="37">37</option>
+                                <option value="39">39</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="cultivo[]" required>
+                                <option value="">Seleccione</option>
+                                <option value="Mini">Mini</option>
+                                <option value="Tomate">Tomate</option>
+                            </select>
+                        </td>
+                        <td><input type="number" name="cantidad[]" min="0" step="0.1" required></td>
+                        <td><input type="text" name="observaciones[]"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button type="button" id="addRow">Añadir fila</button>
+            <button type="submit">Guardar registro</button>
+            
+            <div id="message"></div>
+        </form>
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Establecer semana actual del año
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const startDate = new Date(today.getFullYear(), 0, 1);
+            const days = Math.floor((today - startDate) / (24 * 60 * 60 * 1000));
+            const weekNumber = Math.ceil(days / 7);
+            
+            document.getElementById('semana').value = weekNumber;
+            document.getElementById('fecha').valueAsDate = today;
+            
+            // Establecer día actual
+            const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const dayName = daysOfWeek[today.getDay()];
+            document.getElementById('dia').value = dayName;
+            
+            // Añadir fila a la tabla
+            document.getElementById('addRow').addEventListener('click', function() {
+                const tbody = document.querySelector('#produccionTable tbody');
+                const newRow = document.createElement('tr');
+                
+                newRow.innerHTML = `
+                    <td>
+                        <select name="invernadero[]" required>
+                            <option value="">Seleccione</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="33">33</option>
+                            <option value="35">35</option>
+                            <option value="37">37</option>
+                            <option value="39">39</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="cultivo[]" required>
+                            <option value="">Seleccione</option>
+                            <option value="Mini">Mini</option>
+                            <option value="Tomate">Tomate</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="cantidad[]" min="0" step="0.1" required></td>
+                    <td><input type="text" name="observaciones[]"></td>
+                `;
+                
+                tbody.appendChild(newRow);
+            });
+            
+            // Manejar envío del formulario
+            document.getElementById('cosechaForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = '';
+                messageDiv.className = '';
+                
+                // Obtener datos del formulario
+                const semana = document.getElementById('semana').value;
+                const fecha = document.getElementById('fecha').value;
+                const dia = document.getElementById('dia').value;
+                
+                // Obtener datos de producción
+                const invernaderos = document.getElementsByName('invernadero[]');
+                const cultivos = document.getElementsByName('cultivo[]');
+                const cantidades = document.getElementsByName('cantidad[]');
+                const observaciones = document.getElementsByName('observaciones[]');
+                
+                const produccion = [];
+                
+                for (let i = 0; i < invernaderos.length; i++) {
+                    produccion.push({
+                        invernadero: invernaderos[i].value,
+                        cultivo: cultivos[i].value,
+                        cantidad: parseFloat(cantidades[i].value),
+                        observaciones: observaciones[i].value
+                    });
+                }
+                
+                // Crear objeto de datos
+                const registroData = {
+                    semana: semana,
+                    fecha: fecha,
+                    dia: dia,
+                    produccion: produccion,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+                
+                // Guardar en Firebase
+                const registrosRef = database.ref('registro-de-cosecha-semanal');
+                const nuevoRegistroRef = registrosRef.push();
+                
+                nuevoRegistroRef.set(registroData)
+                    .then(() => {
+                        messageDiv.textContent = 'Registro guardado correctamente en Firebase';
+                        messageDiv.className = 'success-message';
+                        document.getElementById('cosechaForm').reset();
+                        
+                        // Restablecer la tabla (dejar solo una fila)
+                        const tbody = document.querySelector('#produccionTable tbody');
+                        tbody.innerHTML = '';
+                        document.getElementById('addRow').click();
+                    })
+                    .catch((error) => {
+                        messageDiv.textContent = 'Error al guardar el registro: ' + error.message;
+                        messageDiv.className = 'error-message';
+                    });
+            });
+        });
+    </script>
+
+    <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+        <p>Versión 2.0 - Módulo completo</p>
+    </div>
+</body>
+</html>

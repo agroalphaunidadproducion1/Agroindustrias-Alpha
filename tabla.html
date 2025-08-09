@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabla de Productos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3fdf5;
+      color: #222;
+      margin: 20px;
+    }
+    h2 {
+      color: #2e7d32;
+      text-align: center;
+    }
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .search-container {
+      flex: 1;
+      min-width: 250px;
+    }
+    #buscador {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #a5d6a7;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .acciones {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .acciones a, .acciones button {
+      background: #2e7d32;
+      color: white;
+      padding: 8px 12px;
+      text-decoration: none;
+      border-radius: 5px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .acciones a:hover, .acciones button:hover {
+      background: #1b5e20;
+    }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      min-width: 800px;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #a5d6a7;
+      color: #1b5e20;
+    }
+    tr:hover {
+      background-color: #e8f5e9;
+    }
+    .btn-eliminar {
+      background: #c62828;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-eliminar:hover {
+      background: #b71c1c;
+    }
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+      }
+      .search-container, .acciones {
+        width: 100%;
+      }
+      .acciones {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Productos Químicos Registrados</h2>
+
+  <div class="header-container">
+    <div class="search-container">
+      <input type="text" id="buscador" placeholder="Buscar por nombre, ingrediente o plagas...">
+    </div>
+    <div class="acciones">
+      <a href="formulario.html">➕ Agregar</a>
+      <a href="enemigosnaturales.html">📈 Benéficos</a>
+      <button onclick="exportarCSV()">📥 CSV</button>
+      <button onclick="exportarExcel()">📊 Excel</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre Comercial</th>
+          <th>Ingredientes Activos</th>
+          <th>Registro Senasa</th>
+          <th>Registro EPA</th>
+          <th>Días a Cosecha</th>
+          <th>Periodo de Reingreso</th>
+          <th>Plagas</th>
+          <th>Dosis Máxima</th>
+          <th>Dosis/Litro</th>
+          <th>Banda</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-productos"></tbody>
+    </table>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
+      authDomain: "agro-productos.firebaseapp.com",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.appspot.com",
+      messagingSenderId: "196774282512",
+      appId: "1:196774282512:web:92697209153eac8acb1195"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const tabla = document.getElementById("tabla-productos");
+    const buscador = document.getElementById("buscador");
+    let productos = [];
+
+    // Cargar datos
+    db.ref("productos").on("value", snapshot => {
+      productos = [];
+      snapshot.forEach(child => {
+        const producto = child.val();
+        producto.id = child.key;
+        productos.push(producto);
+      });
+      mostrarProductos(productos);
+    });
+
+    // Filtrar productos
+    function filtrarProductos() {
+      const termino = buscador.value.toLowerCase();
+      const resultados = productos.filter(p => 
+        (p.nombre && p.nombre.toLowerCase().includes(termino)) ||
+        (p.ingredientes && p.ingredientes.toLowerCase().includes(termino)) ||
+        (p.plagas && p.plagas.toLowerCase().includes(termino))
+      );
+      mostrarProductos(resultados);
+    }
+
+    // Mostrar productos en tabla
+    function mostrarProductos(lista) {
+      tabla.innerHTML = lista.map(p => `
+        <tr>
+          <td>${p.nombre || '-'}</td>
+          <td>${p.ingredientes || '-'}</td>
+          <td>${p.senasa || '-'}</td>
+          <td>${p.epa || '-'}</td>
+          <td>${p.dias || '-'}</td>
+          <td>${p.reingreso || '-'}</td>
+          <td>${p.plagas || '-'}</td>
+          <td>${p.dosis_maxima || '-'}</td>
+          <td>${p.dosis_litro || '-'}</td>
+          <td>${p.banda || '-'}</td>
+          <td><button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">Eliminar</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Eliminar producto
+    function eliminarProducto(id) {
+      if (confirm("¿Eliminar este producto?")) {
+        db.ref("productos/" + id).remove();
+      }
+    }
+
+    // Exportar a CSV
+    function exportarCSV() {
+      let csv = "Nombre,Ingredientes,Senasa,EPA,Días Cosecha,Reingreso,Plagas,Dosis Máx,Dosis/L,Banda\n";
+      productos.forEach(p => {
+        csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.senasa || ''}",` +
+               `"${p.epa || ''}","${p.dias || ''}","${p.reingreso || ''}",` +
+               `"${p.plagas || ''}","${p.dosis_maxima || ''}","${p.dosis_litro || ''}",` +
+               `"${p.banda || ''}"\n`;
+      });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "productos.csv";
+      link.click();
+    }
+
+    // Exportar a Excel (simulado)
+    function exportarExcel() {
+      const html = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+        <head><meta charset="UTF-8"></head>
+        <body>${document.querySelector("table").outerHTML}</body>
+        </html>
+      `;
+      const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "productos.xls";
+      link.click();
+    }
+
+    // Eventos
+    buscador.addEventListener("input", filtrarProductos);
+  </script>
+  <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+        <p>Versión 2.0 - Módulo completo</p>
+    </div>
+</body>
+</html>

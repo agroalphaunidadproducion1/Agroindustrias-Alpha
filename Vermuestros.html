@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ver Muestreos - Agroalpha</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0fff0; padding: 20px; }
+    h2 { color: #2d6a4f; }
+    label { margin-right: 15px; }
+    input, select { padding: 5px; margin-right: 10px; }
+    button {
+      padding: 8px 15px;
+      margin-top: 10px;
+      margin-right: 10px;
+      background-color: #2d6a4f;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover { background-color: #245a3a; }
+    table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #cce5cc;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📊 Ver Muestreos - Agroalpha</h2>
+
+  <div>
+    <label>📅 Fecha:
+      <input type="date" id="filtroFecha">
+    </label>
+    <label>📦 Módulo:
+      <select id="filtroModulo">
+        <option value="">Todos</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="I">I</option>
+        <option value="J">J</option>
+      </select>
+    </label>
+    <label>🏠 Invernadero:
+      <input type="number" id="filtroInvernadero" placeholder="Ej: 9">
+    </label>
+    <button onclick="cargarMuestreos()">🔍 Buscar</button>
+    <button onclick="exportarExcel()">📥 Exportar Excel</button>
+    <button onclick="window.print()">🖨️ Imprimir</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Módulo</th>
+        <th>Invernadero</th>
+        <th>Cultivo</th>
+        <th>Total individuos</th>
+        <th>Total m²</th>
+        <th>Ver detalles</th>
+      </tr>
+    </thead>
+    <tbody id="tablaMuestreos"></tbody>
+  </table>
+
+  <script>
+    const firebaseConfig = {
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let datosFiltrados = [];
+
+    async function cargarMuestreos() {
+      const fechaFiltro = document.getElementById("filtroFecha").value;
+      const moduloFiltro = document.getElementById("filtroModulo").value;
+      const invernaderoFiltro = document.getElementById("filtroInvernadero").value.trim();
+
+      const snapshot = await db.ref("muestreos").once("value");
+      const data = snapshot.val();
+      const tbody = document.getElementById("tablaMuestreos");
+      tbody.innerHTML = "";
+      datosFiltrados = [];
+
+      Object.entries(data || {}).forEach(([id, m]) => {
+        const coincideFecha = !fechaFiltro || m.fecha === fechaFiltro;
+        const coincideModulo = !moduloFiltro || m.modulo === moduloFiltro;
+        const coincideInvernadero = !invernaderoFiltro || m.invernadero == invernaderoFiltro;
+
+        if (coincideFecha && coincideModulo && coincideInvernadero) {
+          datosFiltrados.push({ id, ...m });
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${m.fecha}</td>
+            <td>${m.modulo}</td>
+            <td>${m.invernadero}</td>
+            <td>${m.cultivo}</td>
+            <td>${m.total_individuos}</td>
+            <td>${parseFloat(m.total_m2).toFixed(2)}</td>
+            <td><button onclick="verDetalles('${id}')">🔍</button></td>
+          `;
+          tbody.appendChild(row);
+        }
+      });
+    }
+
+    function exportarExcel() {
+      if (datosFiltrados.length === 0) {
+        alert("No hay datos para exportar.");
+        return;
+      }
+
+      const data = datosFiltrados.map(d => ({
+        Fecha: d.fecha,
+        Modulo: d.modulo,
+        Invernadero: d.invernadero,
+        Cultivo: d.cultivo,
+        "Total Individuos": d.total_individuos,
+        "Total m²": parseFloat(d.total_m2).toFixed(2)
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Muestreos");
+      XLSX.writeFile(wb, "muestreos_agroalpha.xlsx");
+    }
+
+    async function verDetalles(id) {
+      const snap = await db.ref("muestreos/" + id).once("value");
+      const m = snap.val();
+      if (!m) return alert("Datos no encontrados.");
+
+      let mensaje = `🗓️ Fecha: ${m.fecha}\n📦 Módulo: ${m.modulo}\n🏠 Invernadero: ${m.invernadero}\n🌱 Cultivo: ${m.cultivo}\n👥 Total individuos: ${m.total_individuos}\n📏 Total m²: ${m.total_m2.toFixed(2)}\n\n`;
+
+      m.muestras.forEach((muestreo, i) => {
+        mensaje += `--- Muestra ${i + 1} ---\nCapilla: ${muestreo.capilla}, Cama: ${muestreo.cama}, Módulo: ${muestreo.modulo_aleatorio}\n`;
+        Object.entries(muestreo).forEach(([k, v]) => {
+          if (!["capilla", "cama", "modulo_aleatorio"].includes(k)) {
+            mensaje += `• ${k.replaceAll("_", " ")}: ${v}\n`;
+          }
+        });
+        mensaje += "\n";
+      });
+
+      alert(mensaje);
+    }
+
+    cargarMuestreos();
+  </script>
+
+  <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+        <p>Versión 2.0 - Módulo completo</p>
+    </div>
+
+</body>
+</html>

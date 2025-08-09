@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agregar Producto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1fdf3;
+      margin: 20px;
+      color: #2e7d32;
+    }
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+    }
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #c8e6c9;
+      border-radius: 5px;
+    }
+    button {
+      background: #2e7d32;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1b5e20;
+    }
+    .success {
+      color: green;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Agregar Producto Químico</h2>
+  <form id="producto-form">
+    <input type="text" id="nombre" placeholder="Nombre comercial" required />
+    <input type="text" id="ingredientes" placeholder="Ingredientes activos" required />
+    <input type="text" id="senasa" placeholder="Registro Senasa" required />
+    <input type="text" id="epa" placeholder="Registro EPA" />
+    <input type="number" id="dias" placeholder="Días a cosecha" required />
+    <input type="text" id="reingreso" placeholder="Periodo de reingreso (horas/días)" required />
+
+    <label for="plagas">Plagas a controlar:</label>
+    <select id="plagas" required>
+      <option value="" disabled selected>Seleccione una plaga</option>
+      <option value="Mosca">Mosca</option>
+      <option value="Picudo">Picudo</option>
+      <option value="Trips">Trips</option>
+      <option value="Gusano">Gusano</option>
+      <option value="Chinche">Chinche</option>
+    </select>
+
+    <input type="text" id="dosis_maxima" placeholder="Dosis máxima" />
+    <input type="text" id="dosis_litro" placeholder="Dosis por litro de agua" />
+
+    <label for="banda">Banda:</label>
+    <select id="banda" required>
+      <option value="" disabled selected>Seleccione un color</option>
+      <option value="red">Rojo</option>
+      <option value="yellow">Amarillo</option>
+      <option value="blue">Azul</option>
+      <option value="green">Verde</option>
+    </select>
+
+    <button type="submit">Guardar Producto</button>
+    <div class="success" id="mensaje"></div>
+  </form>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
+      authDomain: "agro-productos.firebaseapp.com",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.appspot.com",
+      messagingSenderId: "196774282512",
+      appId: "1:196774282512:web:92697209153eac8acb1195"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    document.getElementById("producto-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const producto = {
+        nombre: document.getElementById("nombre").value,
+        ingredientes: document.getElementById("ingredientes").value,
+        senasa: document.getElementById("senasa").value,
+        epa: document.getElementById("epa").value,
+        dias: document.getElementById("dias").value,
+        reingreso: document.getElementById("reingreso").value,
+        plagas: document.getElementById("plagas").value,
+        dosis_maxima: document.getElementById("dosis_maxima").value,
+        dosis_litro: document.getElementById("dosis_litro").value,
+        banda: document.getElementById("banda").value
+      };
+      db.ref("productos").push(producto, function(error) {
+        const mensaje = document.getElementById("mensaje");
+        if (error) {
+          mensaje.textContent = "Error al guardar.";
+        } else {
+          mensaje.textContent = "Producto guardado con éxito.";
+          document.getElementById("producto-form").reset();
+        }
+      });
+    });
+  </script>
+  <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+        <p>Versión 2.0 - Módulo completo</p>
+    </div>
+</body>
+</html>

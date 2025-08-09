@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Daño a Organismos Benéficos</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #e8f5e9;
+      padding: 20px;
+    }
+    h2 {
+      color: #2e7d32;
+      text-align: center;
+    }
+    .acciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    button {
+      padding: 8px 12px;
+      background-color: #66bb6a;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #43a047;
+    }
+    #buscador {
+      flex-grow: 1;
+      min-width: 220px;
+      padding: 8px;
+      border: 1px solid #a5d6a7;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+    th {
+      background-color: #c8e6c9;
+      color: #1b5e20;
+      padding: 10px;
+      border: 1px solid #a5d6a7;
+    }
+    td {
+      padding: 8px;
+      border: 1px solid #c8e6c9;
+      text-align: center;
+    }
+    tr:nth-child(even) {
+      background-color: #f1f8e9;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      font-style: italic;
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🌿 Registros de daño a organismos benéficos</h2>
+
+  <div class="acciones">
+    <input type="text" id="buscador" placeholder="Buscar producto o ingrediente...">
+    <button onclick="window.print()">🖨️ Imprimir</button>
+    <button onclick="descargarCSV()">📥 Descargar</button>
+  </div>
+
+  <table id="tablaRegistros">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Ingrediente</th>
+        <th>Swirskii</th>
+        <th>Cucumeris</th>
+        <th>Carnea</th>
+        <th>Colemani</th>
+        <th>Abejorros</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="7" class="loading">Cargando datos...</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyABC123...", // Reemplaza con tu API Key real
+      authDomain: "agro-productos.firebaseapp.com",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abc123def456"
+    };
+    
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const tablaBody = document.querySelector("#tablaRegistros tbody");
+    const buscador = document.getElementById("buscador");
+    let registros = [];
+
+    // Función para cargar datos de Firebase
+    function cargarDatos() {
+      db.ref("dañobeneficos").once("value")
+        .then((snapshot) => {
+          registros = [];
+          snapshot.forEach((childSnapshot) => {
+            const registro = childSnapshot.val();
+            // Agregar el ID del registro como referencia
+            registro.id = childSnapshot.key;
+            registros.push(registro);
+          });
+          mostrarFiltrados();
+        })
+        .catch((error) => {
+          console.error("Error al cargar datos:", error);
+          tablaBody.innerHTML = `
+            <tr>
+              <td colspan="7" style="color: red; text-align: center;">
+                Error al cargar datos. Por favor recarga la página.
+              </td>
+            </tr>
+          `;
+        });
+    }
+
+    // Escuchar cambios en los datos
+    db.ref("dañobeneficos").on("value", (snapshot) => {
+      registros = [];
+      snapshot.forEach((childSnapshot) => {
+        const registro = childSnapshot.val();
+        registro.id = childSnapshot.key;
+        registros.push(registro);
+      });
+      mostrarFiltrados();
+    });
+
+    // Filtrar registros según búsqueda
+    function mostrarFiltrados() {
+      const filtro = buscador.value.toLowerCase();
+      
+      if (registros.length === 0) {
+        tablaBody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center;">
+              No hay registros disponibles
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      const registrosFiltrados = registros.filter(r => {
+        const producto = r.producto?.toString().toLowerCase() || "";
+        const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
+        return producto.includes(filtro) || ingrediente.includes(filtro);
+      });
+      
+      if (registrosFiltrados.length === 0) {
+        tablaBody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center;">
+              No se encontraron registros que coincidan con la búsqueda
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      tablaBody.innerHTML = "";
+      registrosFiltrados.forEach(r => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${r.producto || "-"}</td>
+          <td>${r.ingrediente || "-"}</td>
+          <td>${formatearValor(r.swirskii)}</td>
+          <td>${formatearValor(r.cucumeris)}</td>
+          <td>${formatearValor(r.carnea)}</td>
+          <td>${formatearValor(r.colemani)}</td>
+          <td>${formatearAbejorros(r.abejorros)}</td>
+        `;
+        tablaBody.appendChild(fila);
+      });
+    }
+
+    // Formatear valores numéricos
+    function formatearValor(valor) {
+      if (valor === undefined || valor === null) return "-";
+      
+      const strValor = valor.toString().trim();
+      
+      switch (strValor) {
+        case "1": return "🟢 1 (<25%)";
+        case "2": return "🟡 2 (25-50%)";
+        case "3": return "🟠 3 (50-75%)";
+        case "4": return "🔴 4 (>75%)";
+        case "?": 
+        case "desconocido": 
+          return "⚪ Desconocido";
+        default: 
+          return strValor || "-";
+      }
+    }
+
+    // Formatear valor de abejorros
+    function formatearAbejorros(valor) {
+      if (valor === undefined || valor === null) return "-";
+      
+      const strValor = valor.toString().trim().toLowerCase();
+      
+      switch (strValor) {
+        case "retirar": return "❌ Retirar colmena";
+        case "cubrir": return "🟧 Cubrir colmena";
+        case "ninguna": 
+        case "ninguna accion": 
+        case "ninguna acción": 
+          return "✅ Sin acción";
+        case "?": 
+        case "desconocido": 
+          return "⚪ Desconocido";
+        default: 
+          return strValor || "-";
+      }
+    }
+
+    // Descargar datos como CSV
+    function descargarCSV() {
+      if (registros.length === 0) {
+        alert("No hay datos para descargar");
+        return;
+      }
+      
+      let csv = "Producto,Ingrediente,Swirskii,Cucumeris,Carnea,Colemani,Abejorros\n";
+      
+      const filtro = buscador.value.toLowerCase();
+      const registrosFiltrados = registros.filter(r => {
+        const producto = r.producto?.toString().toLowerCase() || "";
+        const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
+        return producto.includes(filtro) || ingrediente.includes(filtro);
+      });
+      
+      registrosFiltrados.forEach(r => {
+        csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
+               `"${formatearValor(r.swirskii)}","${formatearValor(r.cucumeris)}",` +
+               `"${formatearValor(r.carnea)}","${formatearValor(r.colemani)}",` +
+               `"${formatearAbejorros(r.abejorros)}"\n`;
+      });
+      
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const fecha = new Date().toISOString().split('T')[0];
+      
+      link.href = URL.createObjectURL(blob);
+      link.download = `daño_beneficos_${fecha}.csv`;
+      link.click();
+    }
+
+    // Event listeners
+    buscador.addEventListener("input", mostrarFiltrados);
+    document.addEventListener("DOMContentLoaded", cargarDatos);
+  </script>
+  <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+        <p>Versión 2.0 - Módulo completo</p>
+    </div>
+</body>
+</html>
