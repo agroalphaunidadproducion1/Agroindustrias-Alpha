@@ -472,6 +472,7 @@
         }
         
         function logout() {
+            sessionStorage.setItem('userLoggedOut' , 'true');
             sessionStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         }
