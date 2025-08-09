@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Sistema Agrícola</title>
+    <title>Inicio - Sistema Agroalpha</title>
     <style>
         :root {
             --primary-color: #4CAF50;
@@ -228,7 +228,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Sistema Agrícola</h1>
+        <h1>Sistema Agroalpha</h1>
         <div class="user-actions">
             <div class="quick-actions">
                 <button class="quick-action-btn" id="settingsBtn">
@@ -286,14 +286,10 @@
         firebase.initializeApp(firebaseConfig);
         
         // Verificar sesión al cargar
-        document.addEventListener('DOMContentLoaded', function() {
-            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
-            
-            if (!userData) {
-                window.location.href = 'index.html';
-                return;
-            }
-            
+   // Verificar sesión al cargar
+if (localStorage.getItem('agricolaLoggedIn') !== 'true') {
+    window.location.href = 'index.html';
+    
             // Mostrar información del usuario
             document.getElementById('user-name').textContent = userData.name;
             document.getElementById('welcome-name').textContent = userData.name;
