@@ -167,12 +167,10 @@
         const usersRef = database.ref('login');
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar si hay una sesión guardada
-            const rememberedUser = localStorage.getItem('rememberedUser');
-            if (rememberedUser) {
-                document.getElementById('username').value = rememberedUser;
-                document.getElementById('remember').checked = true;
-            }
+    
+           / Verificar si ya hay sesión activa al cargar
+if (localStorage.getItem('agricolaLoggedIn') === 'true') {
+    window.location.href = 'dashboard.html';
             
             // Manejar el envío del formulario
             document.getElementById('loginForm').addEventListener('submit', function(e) {
