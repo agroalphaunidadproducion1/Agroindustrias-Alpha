@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="manifest" href="/manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #388E3C;
+            --primary-light: #C8E6C9;
+            --secondary-color: #FFC107;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --text-dark: #333333;
+            --text-light: #757575;
+        }
+        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        /* Pantalla de inicio para móviles */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s;
+        }
+        
+        .splash-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .splash-logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        .splash-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.97);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            margin: 20px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .logo {
+            width: 120px;
+            margin-bottom: 25px;
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            background-color: var(--light-gray);
+            -webkit-appearance: none;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            background-color: var(--white);
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        .remember-me label {
+            margin: 0;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+        
+        .forgot-password:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+            min-height: 20px;
+            padding: 0 10px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background-color: rgba(255,255,255,0.95);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 18px;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-light);
+            font-size: 20px;
+            user-select: none;
+            padding: 5px;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: var(--text-light);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Media Queries para Responsividad */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 30px;
+                margin: 15px;
+                width: calc(100% - 30px);
+            }
+            
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            
+            input {
+                padding: 14px 16px;
+            }
+            
+            button {
+                padding: 15px;
+            }
+            
+            .splash-logo {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .splash-text {
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+                border-radius: 10px;
+            }
+            
+            .logo {
+                width: 100px;
+            }
+            
+            .remember-forgot {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .forgot-password {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+            
+            .splash-logo {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .splash-text {
+                font-size: 18px;
+            }
+        }
+        
+        /* Detección de móvil */
+        @media (hover: none) and (pointer: coarse) {
+            body {
+                background-attachment: initial;
+            }
+            
+            input, button {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <!-- Pantalla de Splash para móviles -->
+    <div id="splashScreen" class="splash-screen">
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069172.png" alt="Agroalpha Logo" class="splash-logo">
+        <div class="splash-text">Sistema Agroalpha</div>
+    </div>
+    
+    <!-- Pantalla de carga -->
+    <div id="loadingScreen" class="loading-container hidden">
+        <div class="loading"></div>
+        <div class="loading-text">Verificando sesión...</div>
+    </div>
+    
+    <!-- Formulario de Login -->
+    <div id="loginFormContainer" class="login-container hidden">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK6pM2j_2yXjRnGm8nKJQ064y-EOLqYOnnJA&s" alt="Logo Agroalpha" class="logo">
+        <h1>Iniciar Sesión</h1>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" required autocomplete="username" autocapitalize="off">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="password-container">
+                    <input type="password" id="password" required autocomplete="current-password">
+                    <span class="toggle-password" id="togglePassword">👁️</span>
+                </div>
+            </div>
+            
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Recordarme</label>
+                </div>
+                <a href="#" class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
+            </div>
+            
+            <button type="submit" id="loginButton">
+                <span id="buttonText">Ingresar</span>
+            </button>
+            
+            <div id="errorMessage" class="error-message"></div>
+        </form>
+        
+        <div class="footer">
+            <p>Sistema Agroalpha © 2025 | Versión 2.1</p>
+            <p>Unidad de Producción 1 - <a href="#" id="helpLink">Ayuda Técnica</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Firebase (reemplaza con tus credenciales)
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "agro-productos.firebaseapp.com",
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+            projectId: "agro-productos",
+            storageBucket: "agro-productos.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        
+        // Referencias a las tablas
+        const usersRef = database.ref('login');
+        const activeUsersRef = database.ref('uactivos');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar splash screen en móviles
+            if (isMobileDevice()) {
+                setTimeout(() => {
+                    document.getElementById('splashScreen').classList.add('hidden');
+                    checkSavedSession();
+                }, 2000); // 2 segundos para el splash screen
+            } else {
+                document.getElementById('splashScreen').classList.add('hidden');
+                checkSavedSession();
+            }
+            
+            // Configurar toggle de contraseña
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '👁️';
+            });
+            
+            // Manejar el envío del formulario
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                loginUser();
+            });
+            
+            // Manejar clic en "Olvidó su contraseña"
+            document.getElementById('forgotPassword').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Por favor contacte al administrador del sistema para restablecer su contraseña.\n\nTeléfono: +123456789\nEmail: soporte@agroalpha.com');
+            });
+            
+            // Manejar clic en ayuda
+            document.getElementById('helpLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Para asistencia técnica, contacte al departamento de sistemas:\n\nTeléfono: +123456789\nEmail: soporte@agroalpha.com\nHorario: Lunes a Viernes 8:00 - 17:00');
+            });
+        });
+        
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+        }
+        
+        function checkSavedSession() {
+            document.getElementById('loadingScreen').classList.remove('hidden');
+            
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                // Verificar si el usuario está en uactivos
+                activeUsersRef.child(rememberedUser).once('value')
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            // El usuario está activo, verificar credenciales
+                            verifyUserCredentials(rememberedUser);
+                        } else {
+                            // No está activo, mostrar formulario
+                            showLoginForm();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al verificar usuario activo:", error);
+                        showLoginForm();
+                    });
+            } else {
+                showLoginForm();
+            }
+        }
+        
+        function verifyUserCredentials(username) {
+            usersRef.child(username).once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        
+                        // Registrar como activo nuevamente
+                        registerActiveUser(username, userData);
+                        
+                        // Guardar datos de usuario en sessionStorage
+                        sessionStorage.setItem('currentUser', JSON.stringify({
+                            username: username,
+                            role: userData.role,
+                            name: userData.name,
+                            lastLogin: new Date().toISOString()
+                        }));
+                        
+                        // Redirigir al dashboard
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Usuario no existe, mostrar formulario
+                        localStorage.removeItem('rememberedUser');
+                        showLoginForm();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al verificar credenciales:", error);
+                    showLoginForm();
+                });
+        }
+        
+        function showLoginForm() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginFormContainer').classList.remove('hidden');
+            
+            // Verificar si hay una sesión guardada para autocompletar
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                document.getElementById('username').value = rememberedUser;
+                document.getElementById('remember').checked = true;
+                document.getElementById('password').focus();
+            } else {
+                document.getElementById('username').focus();
+            }
+        }
+        
+        function decryptPassword(encrypted) {
+            // En un entorno real, usar un método más seguro
+            return atob(encrypted);
+        }
+        
+        function loginUser() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            const errorMessage = document.getElementById('errorMessage');
+            const loginButton = document.getElementById('loginButton');
+            const buttonText = document.getElementById('buttonText');
+            
+            errorMessage.textContent = '';
+            loginButton.disabled = true;
+            buttonText.innerHTML = '<span class="loading"></span> Verificando...';
+            
+            // Validación básica
+            if (!username || !password) {
+                errorMessage.textContent = 'Por favor complete todos los campos';
+                loginButton.disabled = false;
+                buttonText.textContent = 'Ingresar';
+                return;
+            }
+            
+            // Buscar usuario en la base de datos
+            usersRef.child(username).once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const decryptedPassword = decryptPassword(userData.password);
+                        
+                        if (password === decryptedPassword) {
+                            // Guardar en localStorage si marcó "Recordarme"
+                            if (remember) {
+                                localStorage.setItem('rememberedUser', username);
+                            } else {
+                                localStorage.removeItem('rememberedUser');
+                            }
+                            
+                            // Registrar usuario en uactivos
+                            registerActiveUser(username, userData);
+                            
+                            // Guardar datos de usuario en sessionStorage
+                            sessionStorage.setItem('currentUser', JSON.stringify({
+                                username: username,
+                                role: userData.role,
+                                name: userData.name,
+                                lastLogin: new Date().toISOString()
+                            }));
+                            
+                            // Redirigir al dashboard
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            errorMessage.textContent = 'Credenciales incorrectas';
+                            loginButton.disabled = false;
+                            buttonText.textContent = 'Ingresar';
+                            document.getElementById('password').focus();
+                        }
+                    } else {
+                        errorMessage.textContent = 'Usuario no encontrado';
+                        loginButton.disabled = false;
+                        buttonText.textContent = 'Ingresar';
+                        document.getElementById('username').focus();
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = 'Error al iniciar sesión. Intente nuevamente.';
+                    console.error("Error en login:", error);
+                    loginButton.disabled = false;
+                    buttonText.textContent = 'Ingresar';
+                });
+        }
+        
+        function registerActiveUser(username, userData) {
+            const userStatus = {
+                username: username,
+                name: userData.name,
+                role: userData.role,
+                lastLogin: firebase.database.ServerValue.TIMESTAMP,
+                status: 'active',
+                deviceType: isMobileDevice() ? 'mobile' : 'desktop',
+                os: navigator.platform
+            };
+            
+            activeUsersRef.child(username).set(userStatus)
+                .catch(error => {
+                    console.error("Error al registrar usuario activo:", error);
+                });
+        }
+    </script>
+</body>
+</html>

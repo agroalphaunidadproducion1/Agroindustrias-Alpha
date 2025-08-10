@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organismos Benéficos | Agroalpha</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #8BC34A, #689F38);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .benefico-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .benefico-header {
+            background: linear-gradient(135deg, #AED581, #8BC34A);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .benefico-icon {
+            font-size: 2.5em;
+            margin-right: 20px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .benefico-title {
+            font-size: 1.8em;
+            margin: 0;
+        }
+        
+        .benefico-subtitle {
+            font-style: italic;
+            margin: 5px 0 0;
+            font-weight: normal;
+        }
+        
+        .benefico-content {
+            padding: 25px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .benefico-image {
+            flex: 1;
+            min-width: 300px;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .benefico-image img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 5px;
+        }
+        
+        .benefico-info {
+            flex: 2;
+            min-width: 300px;
+            padding: 0 20px;
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+        }
+        
+        .info-section h3 {
+            color: #689F38;
+            margin-top: 0;
+            border-bottom: 2px solid #AED581;
+            padding-bottom: 5px;
+        }
+        
+        .dosis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .dosis-table th, .dosis-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .dosis-table th {
+            background-color: #8BC34A;
+            color: white;
+        }
+        
+        .dosis-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #8BC34A;
+            color: white;
+            margin-top: 40px;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #689F38;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: #558B2F;
+        }
+        
+        @media (max-width: 768px) {
+            .benefico-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .benefico-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .benefico-content {
+                flex-direction: column;
+            }
+            
+            .benefico-info {
+                padding: 20px 0 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Organismos Benéficos</h1>
+        <div class="subtitle">Control biológico en invernaderos</div>
+    </div>
+    
+    <a href="fitosanidadAgro.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+    
+    <div class="container">
+        <!-- Amblyseius cucumeris -->
+        <div class="benefico-card">
+            <div class="benefico-header">
+                <div class="benefico-icon">
+                    <i class="fas fa-spider"></i>
+                </div>
+                <div>
+                    <h2 class="benefico-title">Amblyseius cucumeris</h2>
+                    <p class="benefico-subtitle">Ácaro depredador de trips</p>
+                </div>
+            </div>
+            <div class="benefico-content">
+                <div class="benefico-image">
+                    <img src="https://www.koppert.com/wp-content/uploads/2018/05/Amblyseius-cucumeris-adults-1.jpg" alt="Amblyseius cucumeris">
+                </div>
+                <div class="benefico-info">
+                    <div class="info-section">
+                        <h3>Descripción</h3>
+                        <p>Ácaro depredador de 0.5 mm de largo, color beige a marrón claro. Controla eficazmente larvas de trips (Frankliniella occidentalis) y araña roja en estadios iniciales.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Modo de acción</h3>
+                        <p>Depredación activa - cada ácaro puede consumir 1-5 larvas de trips por día. Prefiere humedad relativa >65% y temperaturas de 20-25°C.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Dosis recomendada</h3>
+                        <table class="dosis-table">
+                            <tr>
+                                <th>Aplicación</th>
+                                <th>Dosis</th>
+                                <th>Frecuencia</th>
+                            </tr>
+                            <tr>
+                                <td>Preventiva</td>
+                                <td>50-100/m²</td>
+                                <td>Cada 2 semanas</td>
+                            </tr>
+                            <tr>
+                                <td>Curativa</td>
+                                <td>100-200/m²</td>
+                                <td>Semanal</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="info-section">
+                        <h3>Recomendaciones</h3>
+                        <p>• Usar sustratos con pupas para liberación prolongada<br>
+                        • Evitar aplicaciones de azufre o piretroides<br>
+                        • Complementar con Orius laevigatus para control adulto de trips</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Amblyseius swirskii -->
+        <div class="benefico-card">
+            <div class="benefico-header">
+                <div class="benefico-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div>
+                    <h2 class="benefico-title">Amblyseius swirskii</h2>
+                    <p class="benefico-subtitle">Depredador de mosca blanca y trips</p>
+                </div>
+            </div>
+            <div class="benefico-content">
+                <div class="benefico-image">
+                    <img src="https://www.koppert.com/wp-content/uploads/2018/05/Amblyseius-swirskii-adults-1.jpg" alt="Amblyseius swirskii">
+                </div>
+                <div class="benefico-info">
+                    <div class="info-section">
+                        <h3>Descripción</h3>
+                        <p>Ácaro depredador de 0.4-0.5 mm, color amarillo pálido. Eficaz contra huevos y ninfas de mosca blanca (Bemisia tabaci) y larvas de trips.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Modo de acción</h3>
+                        <p>Depredación activa en temperaturas altas (25-30°C). Puede sobrevivir con polen cuando las presas escasean.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Dosis recomendada</h3>
+                        <table class="dosis-table">
+                            <tr>
+                                <th>Aplicación</th>
+                                <th>Dosis</th>
+                                <th>Frecuencia</th>
+                            </tr>
+                            <tr>
+                                <td>Preventiva</td>
+                                <td>50-75/m²</td>
+                                <td>Cada 2 semanas</td>
+                            </tr>
+                            <tr>
+                                <td>Curativa</td>
+                                <td>100-150/m²</td>
+                                <td>Semanal</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="info-section">
+                        <h3>Recomendaciones</h3>
+                        <p>• Ideal para cultivos de pimiento, berenjena y cucurbitáceas<br>
+                        • Mantener HR >60%<br>
+                        • Compatible con Eretmocerus mundus para control de mosca blanca</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chrysoperla carnea -->
+        <div class="benefico-card">
+            <div class="benefico-header">
+                <div class="benefico-icon">
+                    <i class="fas fa-ladybug"></i>
+                </div>
+                <div>
+                    <h2 class="benefico-title">Chrysoperla carnea</h2>
+                    <p class="benefico-subtitle">Crisopa - Depredador generalista</p>
+                </div>
+            </div>
+            <div class="benefico-content">
+                <div class="benefico-image">
+                    <img src="https://www.koppert.com/wp-content/uploads/2018/05/Chrysoperla-carnea-adult-1.jpg" alt="Chrysoperla carnea">
+                </div>
+                <div class="benefico-info">
+                    <div class="info-section">
+                        <h3>Descripción</h3>
+                        <p>Insecto neuroptero de 1-1.5 cm, color verde claro con alas transparentes. Las larvas son depredadoras activas de múltiples plagas.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Modo de acción</h3>
+                        <p>Las larvas (llamadas "leones de áfidos") son voraces, consumiendo hasta 100 pulgones por semana. También atacan cochinillas, trips y huevos de lepidópteros.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Dosis recomendada</h3>
+                        <table class="dosis-table">
+                            <tr>
+                                <th>Aplicación</th>
+                                <th>Dosis</th>
+                                <th>Frecuencia</th>
+                            </tr>
+                            <tr>
+                                <td>Preventiva</td>
+                                <td>5-10 larvas/m²</td>
+                                <td>Mensual</td>
+                            </tr>
+                            <tr>
+                                <td>Curativa</td>
+                                <td>10-20 larvas/m²</td>
+                                <td>Quincenal</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="info-section">
+                        <h3>Recomendaciones</h3>
+                        <p>• Liberar larvas L2 directamente en focos de plaga<br>
+                        • Proporcionar fuentes de polen para adultos<br>
+                        • Evitar tratamientos con neonicotinoides</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Aphidius colemani -->
+        <div class="benefico-card">
+            <div class="benefico-header">
+                <div class="benefico-icon">
+                    <i class="fas fa-fly"></i>
+                </div>
+                <div>
+                    <h2 class="benefico-title">Aphidius colemani</h2>
+                    <p class="benefico-subtitle">Parasitoide de áfidos</p>
+                </div>
+            </div>
+            <div class="benefico-content">
+                <div class="benefico-image">
+                    <img src="https://www.koppert.com/wp-content/uploads/2018/05/Aphidius-colemani-adult-1.jpg" alt="Aphidius colemani">
+                </div>
+                <div class="benefico-info">
+                    <div class="info-section">
+                        <h3>Descripción</h3>
+                        <p>Avispa parasitoide de 2-3 mm, color negro. Parasita principalmente áfidos como Myzus persicae y Aphis gossypii.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Modo de acción</h3>
+                        <p>La hembra deposita huevos dentro de los áfidos. La larva se desarrolla dentro, matando al áfido y formando una "momia" característica.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Dosis recomendada</h3>
+                        <table class="dosis-table">
+                            <tr>
+                                <th>Aplicación</th>
+                                <th>Dosis</th>
+                                <th>Frecuencia</th>
+                            </tr>
+                            <tr>
+                                <td>Preventiva</td>
+                                <td>0.1-0.5/m²</td>
+                                <td>Semanal</td>
+                            </tr>
+                            <tr>
+                                <td>Curativa</td>
+                                <td>1-2/m²</td>
+                                <td>2 veces por semana</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="info-section">
+                        <h3>Recomendaciones</h3>
+                        <p>• Liberar adultos cerca de focos de pulgón<br>
+                        • Identificar momias para monitorear eficacia<br>
+                        • Complementar con depredadores como Adalia bipunctata</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Geocoris spp. -->
+        <div class="benefico-card">
+            <div class="benefico-header">
+                <div class="benefico-icon">
+                    <i class="fas fa-locust"></i>
+                </div>
+                <div>
+                    <h2 class="benefico-title">Geocoris spp.</h2>
+                    <p class="benefico-subtitle">Chinches depredadoras</p>
+                </div>
+            </div>
+            <div class="benefico-content">
+                <div class="benefico-image">
+                    <img src="https://www.koppert.com/wp-content/uploads/2020/05/Geocoris-punctipes-adult-1.jpg" alt="Geocoris spp.">
+                </div>
+                <div class="benefico-info">
+                    <div class="info-section">
+                        <h3>Descripción</h3>
+                        <p>Chinche depredadora de 3-5 mm, color marrón claro con ojos prominentes. Controla huevos y larvas pequeñas de lepidópteros, ácaros y pulgones.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Modo de acción</h3>
+                        <p>Depredación activa tanto de ninfas como adultos. Cada individuo puede consumir 30-50 presas por día.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Dosis recomendada</h3>
+                        <table class="dosis-table">
+                            <tr>
+                                <th>Aplicación</th>
+                                <th>Dosis</th>
+                                <th>Frecuencia</th>
+                            </tr>
+                            <tr>
+                                <td>Preventiva</td>
+                                <td>0.5-1/m²</td>
+                                <td>Quincenal</td>
+                            </tr>
+                            <tr>
+                                <td>Curativa</td>
+                                <td>2-3/m²</td>
+                                <td>Semanal</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="info-section">
+                        <h3>Recomendaciones</h3>
+                        <p>• Ideal para cultivos de soja, algodón y hortalizas<br>
+                        • Mantener diversidad vegetal para refugio<br>
+                        • Evitar insecticidas de amplio espectro</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bombus terrestris -->
+        <div class="benefico-card">
+            <div class="benefico-header">
+                <div class="benefico-icon">
+                    <i class="fas fa-bee"></i>
+                </div>
+                <div>
+                    <h2 class="benefico-title">Bombus terrestris</h2>
+                    <p class="benefico-subtitle">Abejorro polinizador</p>
+                </div>
+            </div>
+            <div class="benefico-content">
+                <div class="benefico-image">
+                    <img src="https://www.koppert.com/wp-content/uploads/2018/05/Bombus-terrestris-worker-1.jpg" alt="Bombus terrestris">
+                </div>
+                <div class="benefico-info">
+                    <div class="info-section">
+                        <h3>Descripción</h3>
+                        <p>Abejorro robusto de 1.5-2 cm, color negro con bandas amarillas. Excelente polinizador para tomate, berenjena, pimiento y frutillas.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Modo de acción</h3>
+                        <p>Polinización por vibración (sonificación), especialmente eficaz en flores de tomate. Cada colonia puede visitar hasta 5,000 flores por día.</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Dosis recomendada</h3>
+                        <table class="dosis-table">
+                            <tr>
+                                <th>Cultivo</th>
+                                <th>Colonias/ha</th>
+                                <th>Duración</th>
+                            </tr>
+                            <tr>
+                                <td>Tomate</td>
+                                <td>8-10</td>
+                                <td>Toda la floración</td>
+                            </tr>
+                            <tr>
+                                <td>Frutilla</td>
+                                <td>6-8</td>
+                                <td>Toda la floración</td>
+                            </tr>
+                            <tr>
+                                <td>Pimiento</td>
+                                <td>4-6</td>
+                                <td>Toda la floración</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="info-section">
+                        <h3>Recomendaciones</h3>
+                        <p>• Colocar colmenas a 0.5-1 m de altura<br>
+                        • Evitar temperaturas >30°C en invernadero<br>
+                        • No usar insecticidas durante la floración</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad de Producción 1</p>
+        <p>Módulo de Control Biológico - Versión 2.1</p>
+    </div>
+</body>
+</html>
