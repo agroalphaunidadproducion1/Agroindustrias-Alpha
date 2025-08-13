@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración - AgroAlpha</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #0d47a1;
+      text-align: center;
+      margin: 15px 0;
+      font-size: 1.5rem;
+    }
+
+    .btn {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .btn:hover {
+      background-color: #388e3c;
+    }
+
+    .btn-back {
+      background-color: #2196f3;
+      margin-top: 5px;
+    }
+
+    .btn-back:hover {
+      background-color: #1976d2;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #e3f2fd;
+      color: #0d47a1;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .save-btn {
+      background-color: #ff9800;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .save-btn:hover {
+      background-color: #f57c00;
+    }
+
+    .footer {
+      text-align: center;
+      color: #666;
+      font-size: 0.8rem;
+      margin-top: 20px;
+    }
+
+    /* PC */
+    @media (min-width: 768px) {
+      .container {
+        padding: 30px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+        margin: 20px 0;
+      }
+      
+      table {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="material-icons">settings</i> Configuración de Personal</h1>
+    
+    <table id="config-table">
+      <thead>
+        <tr>
+          <th>Invernadero</th>
+          <th>Personal Asignado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filas se generan automáticamente -->
+      </tbody>
+    </table>
+    
+    <a href="registro.html" class="btn btn-back">
+      <i class="material-icons">arrow_back</i> Volver al Registro
+    </a>
+  </div>
+  
+  <div class="footer">
+    Sistema Agroalpha © 2025 | Versión 3.0
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+  
+  <script>
+    // Configuración Firebase
+    const firebaseConfig = {
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+    };
+    
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const refConfig = database.ref('config');
+    
+    // Lista completa de invernaderos
+    const invernaderos = [
+      'C9', 'C10', 'C11', 'C12',
+      'D13', 'D14', 'D15', 'D16',
+      'I33', 'I35',
+      'J37', 'J39'
+    ];
+    
+    // Cargar y mostrar configuración
+    refConfig.on('value', (snapshot) => {
+      const configData = snapshot.val() || {};
+      const tbody = document.querySelector('#config-table tbody');
+      tbody.innerHTML = '';
+      
+      invernaderos.forEach(inv => {
+        const row = document.createElement('tr');
+        
+        const cellInvernadero = document.createElement('td');
+        cellInvernadero.textContent = inv;
+        
+        const cellPersonal = document.createElement('td');
+        const inputPersonal = document.createElement('input');
+        inputPersonal.type = 'number';
+        inputPersonal.min = '0';
+        inputPersonal.value = configData[inv]?.personal || 0;
+        inputPersonal.dataset.invernadero = inv;
+        cellPersonal.appendChild(inputPersonal);
+        
+        const cellAction = document.createElement('td');
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-btn';
+        saveBtn.innerHTML = '<i class="material-icons" style="font-size:16px">save</i> Guardar';
+        
+        saveBtn.addEventListener('click', () => {
+          const personal = parseInt(inputPersonal.value);
+          if (isNaN(personal) || personal < 0) {
+            alert('Ingrese un número válido');
+            return;
+          }
+          
+          // Actualizar en Firebase
+          const updates = {};
+          updates[`${inv}/personal`] = personal;
+          
+          refConfig.update(updates)
+            .then(() => {
+              alert(`Configuración guardada para ${inv}`);
+            })
+            .catch(error => {
+              console.error("Error al guardar:", error);
+              alert("Error al guardar la configuración");
+            });
+        });
+        
+        cellAction.appendChild(saveBtn);
+        
+        row.appendChild(cellInvernadero);
+        row.appendChild(cellPersonal);
+        row.appendChild(cellAction);
+        
+        tbody.appendChild(row);
+      });
+    });
+  </script>
+</body>
+</html>
