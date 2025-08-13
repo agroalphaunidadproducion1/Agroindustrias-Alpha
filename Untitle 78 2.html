@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Cosecha</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      text-align: center;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      margin: 20px 0;
+    }
+
+    h1 {
+      color: #2e7d32;
+      margin-bottom: 30px;
+      font-size: clamp(24px, 3vw, 28px);
+    }
+
+    /* --- BOTONES ESTILO FITOSANIDAD --- */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 20px;
+      margin: 12px 0;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      background-color: #388E3C;
+      box-shadow: 0 6px 12px rgba(56, 142, 60, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn:hover::after {
+      opacity: 1;
+    }
+
+    .icon {
+      margin-right: 12px;
+      font-size: 20px;
+    }
+
+    /* Estilo específico para cada botón */
+    .btn-registro {
+      background-color: #4CAF50; /* Verde */
+    }
+
+    .btn-ver {
+      background-color: #2196F3; /* Azul */
+      box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+    }
+
+    .btn-ver:hover {
+      background-color: #1976D2;
+      box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3);
+    }
+
+    .footer {
+      text-align: center;
+      color: #2e7d32;
+      padding: 20px;
+      font-size: 14px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* Tablet */
+    @media (min-width: 768px) {
+      .container {
+        padding: 50px;
+      }
+      .btn {
+        padding: 16px 24px;
+        font-size: 17px;
+      }
+    }
+
+    /* Móvil pequeño */
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+      }
+      .btn {
+        padding: 14px 18px;
+        font-size: 15px;
+      }
+      .icon {
+        margin-right: 8px;
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestión de Cosecha</h1>
+
+    <a href="Registrocosecha.html" class="btn btn-registro">
+      <span class="icon">🌱</span> Ingreso de Cosecha
+    </a>
+
+    <a href="Vercosechas.html" class="btn btn-ver">
+      <span class="icon">📊</span> Ver Registros
+    </a>
+  </div>
+  
+  <div class="footer">
+    <p>Sistema Agroalpha ©️ 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo completo</p>
+  </div>
+</body>
+</html>
