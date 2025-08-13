@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Cosecha Semanal</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #757575;
+            --white: #ffffff;
+            --projection-color: #2196F3;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: var(--light-gray);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            align-self: flex-end;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .results {
+            margin-top: 30px;
+        }
+        
+        .week-summary {
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        tr:hover {
+            background-color: #e8f5e9;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #e8f5e9 !important;
+        }
+        
+        .projection-row {
+            background-color: #e3f2fd !important;
+        }
+        
+        .projection-header {
+            background-color: var(--projection-color) !important;
+        }
+        
+        .cultivo-total {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .cultivo-card {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .cultivo-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .cultivo-card p {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--dark-gray);
+            font-size: 18px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+        
+        .comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        
+        .positive {
+            color: var(--primary-color);
+        }
+        
+        .negative {
+            color: #f44336;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+            
+            .cultivo-card {
+                min-width: 100%;
+            }
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Registros de Cosecha Semanal</h1>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label for="year">Año:</label>
+                <select id="year">
+                    <!-- Se llenará dinámicamente -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="week">Semana:</label>
+                <select id="week">
+                    <option value="">Todas las semanas</option>
+                    <!-- Se llenará dinámicamente -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="invernadero">Invernadero:</label>
+                <select id="invernadero">
+                    <option value="">Todos</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="33">33</option>
+                    <option value="35">35</option>
+                    <option value="37">37</option>
+                    <option value="39">39</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="cultivo">Cultivo:</label>
+                <select id="cultivo">
+                    <option value="">Todos</option>
+                    <option value="Mini">Mini</option>
+                    <option value="Tomate">Tomate</option>
+                </select>
+            </div>
+            <button id="filterButton">Filtrar</button>
+        </div>
+        
+        <div class="results">
+            <div id="weekResults"></div>
+            <div id="cultivoTotals" class="cultivo-total"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+        <p>Versión 2.0 - Módulo completo</p>
+        <p><a href="proyecciones.html">Ir al formulario de proyecciones</a></p>
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencias a la base de datos
+            const registrosRef = database.ref('registro-de-cosecha-semanal');
+            const proyeccionesRef = database.ref('proyecciones');
+            
+            // Llenar años disponibles
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById('year');
+            for (let year = currentYear; year >= 2020; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+            
+            // Llenar semanas disponibles
+            const weekSelect = document.getElementById('week');
+            for (let week = 1; week <= 52; week++) {
+                const option = document.createElement('option');
+                option.value = week;
+                option.textContent = `Semana ${week}`;
+                weekSelect.appendChild(option);
+            }
+            
+            // Manejar el botón de filtrar
+            document.getElementById('filterButton').addEventListener('click', function() {
+                loadData();
+            });
+            
+            // Cargar datos iniciales
+            loadData();
+            
+            function loadData() {
+                const year = document.getElementById('year').value;
+                const week = document.getElementById('week').value;
+                const invernadero = document.getElementById('invernadero').value;
+                const cultivo = document.getElementById('cultivo').value;
+                
+                // Cargar datos de producción
+                registrosRef.once('value', function(snapshot) {
+                    const registros = [];
+                    const cultivosTotales = { Mini: 0, Tomate: 0 };
+                    const semanasUnicas = new Set();
+                    
+                    // Objeto para almacenar los totales por semana e invernadero
+                    const resumenSemanal = {};
+                    
+                    snapshot.forEach(function(childSnapshot) {
+                        const registro = childSnapshot.val();
+                        const registroKey = childSnapshot.key;
+                        
+                        // Filtrar por año si está seleccionado
+                        if (year) {
+                            const fechaRegistro = new Date(registro.fecha);
+                            if (fechaRegistro.getFullYear() != year) return;
+                        }
+                        
+                        // Filtrar por semana si está seleccionada
+                        if (week && registro.semana != week) return;
+                        
+                        // Procesar cada registro de producción
+                        registro.produccion.forEach(function(item) {
+                            // Aplicar filtros adicionales
+                            if (invernadero && item.invernadero != invernadero) return;
+                            if (cultivo && item.cultivo != cultivo) return;
+                            
+                            // Crear clave única para semana e invernadero
+                            const clave = `${registro.semana}_${item.invernadero}_${item.cultivo}`;
+                            
+                            // Inicializar acumuladores si no existen
+                            if (!resumenSemanal[clave]) {
+                                resumenSemanal[clave] = {
+                                    semana: registro.semana,
+                                    invernadero: item.invernadero,
+                                    cultivo: item.cultivo,
+                                    cantidad: 0,
+                                    observaciones: []
+                                };
+                            }
+                            
+                            // Acumular cantidades
+                            resumenSemanal[clave].cantidad += parseFloat(item.cantidad) || 0;
+                            
+                            // Agregar observaciones si existen
+                            if (item.observaciones) {
+                                resumenSemanal[clave].observaciones.push(item.observaciones);
+                            }
+                            
+                            // Sumar a totales por cultivo
+                            if (item.cultivo === 'Mini' || item.cultivo === 'Tomate') {
+                                cultivosTotales[item.cultivo] += parseFloat(item.cantidad) || 0;
+                            }
+                            
+                            // Agregar semana al conjunto de semanas únicas
+                            semanasUnicas.add(registro.semana);
+                        });
+                    });
+                    
+                    // Convertir el objeto de resumen en un array para mostrarlo
+                    const registrosResumidos = Object.values(resumenSemanal);
+                    
+                    // Cargar datos de proyecciones
+                    proyeccionesRef.once('value', function(proyeccionesSnapshot) {
+                        const proyecciones = {};
+                        
+                        proyeccionesSnapshot.forEach(function(childSnapshot) {
+                            const proyeccion = childSnapshot.val();
+                            const key = `${proyeccion.semana}_${proyeccion.cultivo}`;
+                            
+                            // Filtrar por año si está seleccionado
+                            if (year) {
+                                const fechaProyeccion = new Date(proyeccion.fecha);
+                                if (fechaProyeccion.getFullYear() != year) return;
+                            }
+                            
+                            // Filtrar por semana si está seleccionada
+                            if (week && proyeccion.semana != week) return;
+                            
+                            // Filtrar por cultivo si está seleccionado
+                            if (cultivo && proyeccion.cultivo != cultivo) return;
+                            
+                            proyecciones[key] = proyeccion.cantidad;
+                        });
+                        
+                        // Mostrar resultados con proyecciones
+                        displayResults(registrosResumidos, cultivosTotales, proyecciones);
+                        
+                        // Actualizar opciones de semanas disponibles para el año seleccionado
+                        updateWeekOptions(Array.from(semanasUnicas).sort((a, b) => a - b));
+                    });
+                });
+            }
+            
+            function updateWeekOptions(weeks) {
+                const weekSelect = document.getElementById('week');
+                const currentWeek = weekSelect.value;
+                
+                // Guardar todas las opciones
+                const allOptions = Array.from(weekSelect.options);
+                
+                // Limpiar y agregar opción "Todas"
+                weekSelect.innerHTML = '<option value="">Todas las semanas</option>';
+                
+                // Agregar semanas disponibles
+                weeks.forEach(week => {
+                    const option = document.createElement('option');
+                    option.value = week;
+                    option.textContent = `Semana ${week}`;
+                    weekSelect.appendChild(option);
+                });
+                
+                // Restaurar selección si todavía está disponible
+                if (allOptions.some(opt => opt.value === currentWeek)) {
+                    weekSelect.value = currentWeek;
+                }
+            }
+            
+            function displayResults(registros, cultivosTotales, proyecciones) {
+                const weekResults = document.getElementById('weekResults');
+                const cultivoTotalsDiv = document.getElementById('cultivoTotals');
+                
+                // Limpiar resultados anteriores
+                weekResults.innerHTML = '';
+                cultivoTotalsDiv.innerHTML = '';
+                
+                if (registros.length === 0) {
+                    weekResults.innerHTML = '<div class="no-results">No se encontraron registros con los filtros seleccionados</div>';
+                    return;
+                }
+                
+                // Agrupar registros por semana
+                const registrosPorSemana = {};
+                registros.forEach(registro => {
+                    if (!registrosPorSemana[registro.semana]) {
+                        registrosPorSemana[registro.semana] = [];
+                    }
+                    registrosPorSemana[registro.semana].push(registro);
+                });
+                
+                // Mostrar registros por semana
+                for (const semana in registrosPorSemana) {
+                    const semanaDiv = document.createElement('div');
+                    semanaDiv.className = 'week-summary';
+                    
+                    const semanaTitle = document.createElement('h2');
+                    semanaTitle.textContent = `Semana ${semana}`;
+                    semanaDiv.appendChild(semanaTitle);
+                    
+                    // Crear tabla para la semana
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+                    
+                    // Encabezados de tabla
+                    thead.innerHTML = `
+                        <tr>
+                            <th>Invernadero</th>
+                            <th>Cultivo</th>
+                            <th>Cantidad Total (kg)</th>
+                            <th>Observaciones</th>
+                            <th class="projection-header">Proyección (kg)</th>
+                            <th class="projection-header">Diferencia</th>
+                        </tr>
+                    `;
+                    
+                    // Totales por cultivo en la semana
+                    const totalSemana = { Mini: 0, Tomate: 0 };
+                    const totalProyeccionSemana = { 
+                        Mini: proyecciones[`${semana}_Mini`] || 0, 
+                        Tomate: proyecciones[`${semana}_Tomate`] || 0 
+                    };
+                    
+                    // Primero contar cuántos invernaderos hay por cultivo para distribuir las proyecciones
+                    const invernaderosPorCultivo = {};
+                    registrosPorSemana[semana].forEach(registro => {
+                        if (!invernaderosPorCultivo[registro.cultivo]) {
+                            invernaderosPorCultivo[registro.cultivo] = new Set();
+                        }
+                        invernaderosPorCultivo[registro.cultivo].add(registro.invernadero);
+                    });
+                    
+                    // Llenar tabla con registros resumidos
+                    registrosPorSemana[semana].forEach(registro => {
+                        const proyeccionKey = `${registro.semana}_${registro.cultivo}`;
+                        const proyeccionTotal = proyecciones[proyeccionKey] || 0;
+                        
+                        // Calcular proyección por invernadero (distribuir el total)
+                        const numInvernaderos = invernaderosPorCultivo[registro.cultivo] ? invernaderosPorCultivo[registro.cultivo].size : 1;
+                        const proyeccionPorInvernadero = proyeccionTotal / numInvernaderos;
+                        
+                        const diferencia = registro.cantidad - proyeccionPorInvernadero;
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${registro.invernadero}</td>
+                            <td>${registro.cultivo}</td>
+                            <td>${registro.cantidad.toFixed(2)}</td>
+                            <td>${registro.observaciones.filter(obs => obs).join(', ') || '-'}</td>
+                            <td class="projection-row">${proyeccionPorInvernadero.toFixed(2)}</td>
+                            <td class="${diferencia >= 0 ? 'positive' : 'negative'}">
+                                ${diferencia.toFixed(2)}
+                                <div class="comparison">
+                                    ${proyeccionPorInvernadero > 0 ? `${(diferencia/proyeccionPorInvernadero*100).toFixed(1)}%` : '-'}
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                        
+                        // Sumar a totales de la semana
+                        if (registro.cultivo === 'Mini' || registro.cultivo === 'Tomate') {
+                            totalSemana[registro.cultivo] += parseFloat(registro.cantidad) || 0;
+                        }
+                    });
+                    
+                    // Agregar fila de totales
+                    const totalRow = document.createElement('tr');
+                    totalRow.className = 'total-row';
+                    const totalReal = totalSemana.Mini + totalSemana.Tomate;
+                    const totalProyeccion = totalProyeccionSemana.Mini + totalProyeccionSemana.Tomate;
+                    const totalDiferencia = totalReal - totalProyeccion;
+                    
+                    totalRow.innerHTML = `
+                        <td colspan="2">Total Semana ${semana}</td>
+                        <td>${totalReal.toFixed(2)}</td>
+                        <td></td>
+                        <td class="projection-row">${totalProyeccion.toFixed(2)}</td>
+                        <td class="${totalDiferencia >= 0 ? 'positive' : 'negative'}">
+                            ${totalDiferencia.toFixed(2)}
+                            <div class="comparison">
+                                ${totalProyeccion > 0 ? `${(totalDiferencia/totalProyeccion*100).toFixed(1)}%` : '-'}
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(totalRow);
+                    
+                    // Agregar filas de totales por cultivo
+                    const miniRow = document.createElement('tr');
+                    miniRow.className = 'total-row';
+                    const miniDiferencia = totalSemana.Mini - totalProyeccionSemana.Mini;
+                    miniRow.innerHTML = `
+                        <td></td>
+                        <td>Mini</td>
+                        <td>${totalSemana.Mini.toFixed(2)}</td>
+                        <td></td>
+                        <td class="projection-row">${totalProyeccionSemana.Mini.toFixed(2)}</td>
+                        <td class="${miniDiferencia >= 0 ? 'positive' : 'negative'}">
+                            ${miniDiferencia.toFixed(2)}
+                            <div class="comparison">
+                                ${totalProyeccionSemana.Mini > 0 ? `${(miniDiferencia/totalProyeccionSemana.Mini*100).toFixed(1)}%` : '-'}
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(miniRow);
+                    
+                    const tomateRow = document.createElement('tr');
+                    tomateRow.className = 'total-row';
+                    const tomateDiferencia = totalSemana.Tomate - totalProyeccionSemana.Tomate;
+                    tomateRow.innerHTML = `
+                        <td></td>
+                        <td>Tomate</td>
+                        <td>${totalSemana.Tomate.toFixed(2)}</td>
+                        <td></td>
+                        <td class="projection-row">${totalProyeccionSemana.Tomate.toFixed(2)}</td>
+                        <td class="${tomateDiferencia >= 0 ? 'positive' : 'negative'}">
+                            ${tomateDiferencia.toFixed(2)}
+                            <div class="comparison">
+                                ${totalProyeccionSemana.Tomate > 0 ? `${(tomateDiferencia/totalProyeccionSemana.Tomate*100).toFixed(1)}%` : '-'}
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tomateRow);
+                    
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+                    semanaDiv.appendChild(table);
+                    weekResults.appendChild(semanaDiv);
+                }
+                
+                // Calcular proyecciones totales
+                const proyeccionesTotales = { Mini: 0, Tomate: 0 };
+                for (const key in proyecciones) {
+                    const [semana, cultivo] = key.split('_');
+                    if (cultivo === 'Mini' || cultivo === 'Tomate') {
+                        proyeccionesTotales[cultivo] += parseFloat(proyecciones[key]) || 0;
+                    }
+                }
+                
+                // Mostrar totales por cultivo
+                const miniCard = document.createElement('div');
+                miniCard.className = 'cultivo-card';
+                const miniDiferenciaTotal = cultivosTotales.Mini - proyeccionesTotales.Mini;
+                miniCard.innerHTML = `
+                    <h3>Total Mini</h3>
+                    <p>${cultivosTotales.Mini.toFixed(2)} kg</p>
+                    <div style="margin-top: 10px;">
+                        <small>Proyección: ${proyeccionesTotales.Mini.toFixed(2)} kg</small>
+                        <div class="${miniDiferenciaTotal >= 0 ? 'positive' : 'negative'}" style="font-weight: bold;">
+                            ${miniDiferenciaTotal >= 0 ? '+' : ''}${miniDiferenciaTotal.toFixed(2)} kg
+                            ${proyeccionesTotales.Mini > 0 ? `(${(miniDiferenciaTotal/proyeccionesTotales.Mini*100).toFixed(1)}%)` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                const tomateCard = document.createElement('div');
+                tomateCard.className = 'cultivo-card';
+                const tomateDiferenciaTotal = cultivosTotales.Tomate - proyeccionesTotales.Tomate;
+                tomateCard.innerHTML = `
+                    <h3>Total Tomate</h3>
+                    <p>${cultivosTotales.Tomate.toFixed(2)} kg</p>
+                    <div style="margin-top: 10px;">
+                        <small>Proyección: ${proyeccionesTotales.Tomate.toFixed(2)} kg</small>
+                        <div class="${tomateDiferenciaTotal >= 0 ? 'positive' : 'negative'}" style="font-weight: bold;">
+                            ${tomateDiferenciaTotal >= 0 ? '+' : ''}${tomateDiferenciaTotal.toFixed(2)} kg
+                            ${proyeccionesTotales.Tomate > 0 ? `(${(tomateDiferenciaTotal/proyeccionesTotales.Tomate*100).toFixed(1)}%)` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                const totalCard = document.createElement('div');
+                totalCard.className = 'cultivo-card';
+                const totalGeneral = cultivosTotales.Mini + cultivosTotales.Tomate;
+                const totalProyeccionGeneral = proyeccionesTotales.Mini + proyeccionesTotales.Tomate;
+                const totalDiferenciaGeneral = totalGeneral - totalProyeccionGeneral;
+                totalCard.innerHTML = `
+                    <h3>Total General</h3>
+                    <p>${totalGeneral.toFixed(2)} kg</p>
+                    <div style="margin-top: 10px;">
+                        <small>Proyección: ${totalProyeccionGeneral.toFixed(2)} kg</small>
+                        <div class="${totalDiferenciaGeneral >= 0 ? 'positive' : 'negative'}" style="font-weight: bold;">
+                            ${totalDiferenciaGeneral >= 0 ? '+' : ''}${totalDiferenciaGeneral.toFixed(2)} kg
+                            ${totalProyeccionGeneral > 0 ? `(${(totalDiferenciaGeneral/totalProyeccionGeneral*100).toFixed(1)}%)` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                cultivoTotalsDiv.appendChild(miniCard);
+                cultivoTotalsDiv.appendChild(tomateCard);
+                cultivoTotalsDiv.appendChild(totalCard);
+            }
+        });
+    </script>
+</body>
+</html>
