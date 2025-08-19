@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes de Asistencia - Agro Productos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #1b5e20;
+            --accent-color: #7cb342;
+            --light-bg: #f1f8e9;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            padding-top: 20px;
+            padding-bottom: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: none;
+        }
+        
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .progress {
+            height: 25px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+        }
+        
+        .progress-bar {
+            border-radius: 12px;
+        }
+        
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .percentage-cell {
+            font-weight: bold;
+        }
+        
+        .high-percentage {
+            color: #28a745;
+        }
+        
+        .medium-percentage {
+            color: #ffc107;
+        }
+        
+        .low-percentage {
+            color: #dc3545;
+        }
+        
+        .date-filter {
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .badge-danger {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header text-center">
+            <h1><i class="fas fa-chart-bar me-2"></i>Reportes de Asistencia</h1>
+            <p class="lead">Agro Productos - Estadísticas por Invernadero</p>
+        </div>
+
+        <!-- Filtros de fecha -->
+        <div class="date-filter">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="fecha-inicio" class="form-label"><strong>Fecha de inicio:</strong></label>
+                    <input type="date" class="form-control" id="fecha-inicio">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="fecha-fin" class="form-label"><strong>Fecha de fin:</strong></label>
+                    <input type="date" class="form-control" id="fecha-fin">
+                </div>
+                <div class="col-12 text-center">
+                    <button class="btn btn-primary me-2" id="btn-filtrar">
+                        <i class="fas fa-filter me-2"></i>Filtrar por fecha
+                    </button>
+                    <button class="btn btn-outline-secondary" id="btn-hoy">
+                        <i class="fas fa-calendar-day me-2"></i>Hoy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de reportes -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-table me-2"></i>Reporte Detallado por Invernadero</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Invernadero</th>
+                                <th>Total Empleados</th>
+                                <th>Empleados Presentes</th>
+                                <th>Empleados Ausentes</th>
+                                <th>Porcentaje de Asistencia</th>
+                                <th>Barra de Progreso</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <tr>
+                                <td colspan="6" class="text-center">Seleccione un rango de fechas y haga clic en Filtrar</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invernaderos con baja asistencia -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Invernaderos con Baja Asistencia (< 70%)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Invernadero</th>
+                                <th>Porcentaje de Asistencia</th>
+                                <th>Empleados Presentes/Ausentes</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="low-attendance-table">
+                            <tr>
+                                <td colspan="4" class="text-center">Seleccione un rango de fechas y haga clic en Filtrar</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Configuración de Firebase con tu URL
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Referencias a las tablas
+        const personalRef = database.ref('personal');
+        const attendanceRef = database.ref('asistencia');
+
+        // Variables globales
+        let allEmployees = [];
+        let attendanceData = {};
+        let reportData = {};
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Establecer fechas por defecto (hoy)
+            const today = new Date();
+            document.getElementById('fecha-inicio').value = today.toISOString().split('T')[0];
+            document.getElementById('fecha-fin').value = today.toISOString().split('T')[0];
+            
+            // Configurar event listeners
+            document.getElementById('btn-filtrar').addEventListener('click', loadReportData);
+            document.getElementById('btn-hoy').addEventListener('click', setTodayDate);
+            
+            // Cargar datos iniciales
+            loadEmployees();
+        });
+
+        // Establecer fecha de hoy
+        function setTodayDate() {
+            const today = new Date();
+            document.getElementById('fecha-inicio').value = today.toISOString().split('T')[0];
+            document.getElementById('fecha-fin').value = today.toISOString().split('T')[0];
+            loadReportData();
+        }
+
+        // Cargar empleados desde Firebase
+        function loadEmployees() {
+            personalRef.once('value').then((snapshot) => {
+                allEmployees = [];
+                snapshot.forEach((childSnapshot) => {
+                    const employee = childSnapshot.val();
+                    employee.id = childSnapshot.key;
+                    allEmployees.push(employee);
+                });
+            }).catch((error) => {
+                console.error('Error al cargar empleados:', error);
+                showError('Error al cargar los datos de empleados');
+            });
+        }
+
+        // Cargar datos del reporte
+        function loadReportData() {
+            // Mostrar mensaje de carga
+            document.getElementById('report-table-body').innerHTML = 
+                '<tr><td colspan="6" class="text-center">Cargando datos...</td></tr>';
+            
+            document.getElementById('low-attendance-table').innerHTML = 
+                '<tr><td colspan="4" class="text-center">Cargando datos...</td></tr>';
+            
+            loadAttendanceData();
+        }
+
+        // Cargar datos de asistencia
+        function loadAttendanceData() {
+            const startDate = document.getElementById('fecha-inicio').value;
+            const endDate = document.getElementById('fecha-fin').value;
+            
+            if (!startDate || !endDate) {
+                showError('Por favor seleccione ambas fechas');
+                return;
+            }
+            
+            attendanceData = {};
+            
+            // Si las fechas son iguales, cargar solo un día
+            if (startDate === endDate) {
+                attendanceRef.child(startDate).once('value').then((snapshot) => {
+                    if (snapshot.exists()) {
+                        attendanceData[startDate] = snapshot.val();
+                    }
+                    processReportData();
+                }).catch((error) => {
+                    console.error('Error al cargar asistencia:', error);
+                    showError('Error al cargar los datos de asistencia');
+                });
+            } else {
+                // Cargar rango de fechas
+                const dates = getDatesInRange(startDate, endDate);
+                let loadedCount = 0;
+                
+                if (dates.length === 0) {
+                    processReportData();
+                    return;
+                }
+                
+                dates.forEach(date => {
+                    attendanceRef.child(date).once('value').then((snapshot) => {
+                        if (snapshot.exists()) {
+                            attendanceData[date] = snapshot.val();
+                        }
+                        loadedCount++;
+                        
+                        // Cuando se hayan cargado todas las fechas, procesar los datos
+                        if (loadedCount === dates.length) {
+                            processReportData();
+                        }
+                    }).catch((error) => {
+                        console.error('Error al cargar asistencia para la fecha:', date, error);
+                        loadedCount++;
+                        if (loadedCount === dates.length) {
+                            processReportData();
+                        }
+                    });
+                });
+            }
+        }
+
+        // Obtener todas las fechas en un rango
+        function getDatesInRange(startDate, endDate) {
+            const dates = [];
+            const currentDate = new Date(startDate);
+            const end = new Date(endDate);
+            
+            while (currentDate <= end) {
+                dates.push(currentDate.toISOString().split('T')[0]);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            return dates;
+        }
+
+        // Procesar datos para el reporte
+        function processReportData() {
+            reportData = {};
+            
+            // Inicializar estructura de datos para cada invernadero
+            allEmployees.forEach(employee => {
+                if (employee.invernaderos && Array.isArray(employee.invernaderos)) {
+                    employee.invernaderos.forEach(inv => {
+                        if (!reportData[inv]) {
+                            reportData[inv] = {
+                                totalEmployees: 0,
+                                presentCount: 0,
+                                employees: []
+                            };
+                        }
+                        
+                        // Agregar empleado al invernadero
+                        if (!reportData[inv].employees.includes(employee.id)) {
+                            reportData[inv].employees.push(employee.id);
+                            reportData[inv].totalEmployees++;
+                        }
+                    });
+                }
+            });
+            
+            // Procesar asistencia para cada fecha
+            Object.keys(attendanceData).forEach(date => {
+                const dailyAttendance = attendanceData[date];
+                
+                // Para cada empleado en la asistencia del día
+                Object.keys(dailyAttendance).forEach(employeeId => {
+                    const isPresent = dailyAttendance[employeeId];
+                    
+                    // Encontrar el empleado
+                    const employee = allEmployees.find(emp => emp.id === employeeId);
+                    if (employee && employee.invernaderos) {
+                        // Para cada invernadero del empleado
+                        employee.invernaderos.forEach(inv => {
+                            if (reportData[inv] && isPresent) {
+                                reportData[inv].presentCount++;
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Calcular porcentajes y ausentes
+            Object.keys(reportData).forEach(inv => {
+                const data = reportData[inv];
+                if (data.totalEmployees > 0) {
+                    data.attendancePercentage = Math.round((data.presentCount / data.totalEmployees) * 100);
+                    data.absentCount = data.totalEmployees - data.presentCount;
+                } else {
+                    data.attendancePercentage = 0;
+                    data.absentCount = 0;
+                }
+            });
+            
+            // Generar reporte
+            generateReport();
+        }
+
+        // Generar el reporte visual
+        function generateReport() {
+            // Generar tabla de reportes
+            generateReportTable();
+            
+            // Generar tabla de baja asistencia
+            generateLowAttendanceTable();
+        }
+
+        // Generar tabla de reportes
+        function generateReportTable() {
+            const tableBody = document.getElementById('report-table-body');
+            tableBody.innerHTML = '';
+            
+            const invernaderos = Object.keys(reportData).sort();
+            
+            if (invernaderos.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No hay datos disponibles para el rango de fechas seleccionado</td></tr>';
+                return;
+            }
+            
+            invernaderos.forEach(inv => {
+                const data = reportData[inv];
+                const percentageClass = getPercentageClass(data.attendancePercentage);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>Invernadero ${inv}</strong></td>
+                    <td>${data.totalEmployees}</td>
+                    <td>${data.presentCount}</td>
+                    <td>${data.absentCount}</td>
+                    <td class="percentage-cell ${percentageClass}">${data.attendancePercentage}%</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: ${data.attendancePercentage}%;" 
+                                 aria-valuenow="${data.attendancePercentage}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                ${data.attendancePercentage}%
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Generar tabla de baja asistencia
+        function generateLowAttendanceTable() {
+            const tableBody = document.getElementById('low-attendance-table');
+            tableBody.innerHTML = '';
+            
+            const lowAttendanceInvernaderos = Object.keys(reportData)
+                .filter(inv => reportData[inv].attendancePercentage < 70)
+                .sort((a, b) => reportData[a].attendancePercentage - reportData[b].attendancePercentage);
+            
+            if (lowAttendanceInvernaderos.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="text-center">No hay invernaderos con baja asistencia (<70%)</td></tr>';
+                return;
+            }
+            
+            lowAttendanceInvernaderos.forEach(inv => {
+                const data = reportData[inv];
+                const percentageClass = getPercentageClass(data.attendancePercentage);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>Invernadero ${inv}</strong></td>
+                    <td class="${percentageClass}">${data.attendancePercentage}%</td>
+                    <td>${data.presentCount} / ${data.totalEmployees}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-envelope me-1"></i>Notificar
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Obtener clase CSS según el porcentaje
+        function getPercentageClass(percentage) {
+            if (percentage >= 80) return 'high-percentage';
+            if (percentage >= 70) return 'medium-percentage';
+            return 'low-percentage';
+        }
+
+        // Mostrar mensaje de error
+        function showError(message) {
+            document.getElementById('report-table-body').innerHTML = 
+                `<tr><td colspan="6" class="text-center text-danger">${message}</td></tr>`;
+            
+            document.getElementById('low-attendance-table').innerHTML = 
+                `<tr><td colspan="4" class="text-center text-danger">${message}</td></tr>`;
+        }
+    </script>
+</body>
+</html>
