@@ -12,6 +12,8 @@
             --grower-color: #FF9800;
             --digitador-color: #9C27B0;
             --tecnico-color: #607D8B;
+            --supervisor-color: #FF5722;
+            --invitado-color: #9E9E9E;
             --error-color: #f44336;
             --light-gray: #f5f5f5;
             --white: #ffffff;
@@ -150,6 +152,8 @@
         .fitosanidad-badge { background-color: var(--tecnico-color); color: white; }
         .culturales-badge { background-color: #795548; color: white; }
         .riego-badge { background-color: #00BCD4; color: white; }
+        .supervisor-badge { background-color: var(--supervisor-color); color: white; }
+        .invitado-badge { background-color: var(--invitado-color); color: white; }
     </style>
 </head>
 <body>
@@ -176,11 +180,13 @@
             <select id="role" required>
                 <option value="">Seleccione un rol</option>
                 <option value="Administrador">Administrador</option>
+                <option value="Supervisor">Supervisor</option>
                 <option value="Grower">Grower</option>
                 <option value="Digitador">Digitador</option>
                 <option value="Técnico Fitosanidad">Técnico Fitosanidad</option>
                 <option value="Técnico Prácticas Culturales">Técnico Prácticas Culturales</option>
                 <option value="Técnico Riego">Técnico Riego</option>
+                <option value="Invitado">Invitado</option>
             </select>
         </div>
         
@@ -242,11 +248,13 @@
         function getBadgeClass(role) {
             switch(role) {
                 case 'Administrador': return 'admin-badge';
+                case 'Supervisor': return 'supervisor-badge';
                 case 'Grower': return 'grower-badge';
                 case 'Digitador': return 'digitador-badge';
                 case 'Técnico Fitosanidad': return 'fitosanidad-badge';
                 case 'Técnico Prácticas Culturales': return 'culturales-badge';
                 case 'Técnico Riego': return 'riego-badge';
+                case 'Invitado': return 'invitado-badge';
                 default: return '';
             }
         }
