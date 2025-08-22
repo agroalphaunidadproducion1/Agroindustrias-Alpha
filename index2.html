@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Unida Producción 1 Agroalpha - En Mantenimiento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2e35 0%, #0d5c3e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            font-size: 3rem;
+            color: #4CAF50;
+            margin-right: 15px;
+        }
+        
+        .logo-text {
+            text-align: left;
+        }
+        
+        .logo-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.1;
+        }
+        
+        .logo-subtitle {
+            font-size: 1.3rem;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin: 25px 0;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            border: 1px solid #FFC107;
+        }
+        
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #e0f2e0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            width: 200px;
+            transition: transform 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature i {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .feature h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .notify-form {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4CAF50;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #c8e6c9;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #a5d6a7;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #388E3C;
+        }
+        
+        .contact-info {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .contact-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+        
+        .contact-info p {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #a5d6a7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .logo-title {
+                font-size: 1.8rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .feature {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-tractor logo-icon"></i>
+            <div class="logo-text">
+                <div class="logo-title">AGROALPHA</div>
+                <div class="logo-subtitle">Sistema Unida Producción 1</div>
+            </div>
+        </div>
+        
+        <div class="status">SISTEMA EN MANTENIMIENTO</div>
+        
+        <h1>Estamos mejorando nuestro sistema</h1>
+        
+        <p>Nuestro equipo está trabajando para realizar actualizaciones y mejoras en el sistema. Estaremos de vuelta muy pronto con una experiencia mejorada y nuevas funcionalidades.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-cogs"></i>
+                <h3>Actualización de Sistema</h3>
+            </div>
+            <div class="feature">
+                <i class="fas fa-bolt"></i>
+                <h3>Mejora de Rendimiento</h3>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Refuerzo de Seguridad</h3>
+            </div>
+        </div>
+        
+        <div class="notify-form">
+            <h3 class="form-title">Notificarme cuando el sistema esté disponible</h3>
+            <form id="notification-form">
+                <div class="form-group">
+                    <label for="name">Nombre completo</label>
+                    <input type="text" id="name" placeholder="Ingresa tu nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensaje (opcional)</label>
+                    <textarea id="message" rows="3" placeholder="Déjanos saber si hay algo en lo que podamos ayudarte"></textarea>
+                </div>
+                <button type="submit"><i class="fas fa-bell"></i> Notificarme</button>
+            </form>
+        </div>
+        
+        <div class="contact-info">
+            <h3>Para emergencias durante el mantenimiento</h3>
+            <p><i class="fas fa-envelope"></i> soporte@agroalpha.com</p>
+            <p><i class="fas fa-phone"></i> +34 912 345 678</p>
+            <p><i class="fas fa-clock"></i> Horario de atención: Lunes a Viernes 8:00 - 18:00</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2023 Agroalpha - Sistema Unida Producción 1. Todos los derechos reservados.</p>
+        </div>
+    </div>
+
+    <script>
+        // Manejo del formulario
+        document.getElementById('notification-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            
+            // Aquí normalmente se enviarían los datos a un servidor
+            // Para este ejemplo, solo mostraremos una alerta
+            alert(`Gracias ${name}. Te notificaremos al correo ${email} cuando nuestro sistema esté disponible.`);
+            
+            // Limpiar el formulario
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('message').value = '';
+        });
+    </script>
+</body>
+</html>
