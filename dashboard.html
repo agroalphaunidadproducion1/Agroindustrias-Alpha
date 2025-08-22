@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistema Agroalpha</title>
-     <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="icon" type="image/x-icon" href="icon-192.png">
     <style>
         :root {
             --primary-color: #4CAF50;
             --secondary-color: #45a049;
             --admin-color: #2196F3;
+            --supervisor-color: #FF5722;
             --grower-color: #FF9800;
             --digitador-color: #9C27B0;
             --tecnico-color: #607D8B;
+            --invitado-color: #9E9E9E;
             --light-gray: #f5f5f5;
             --white: #ffffff;
             --dark-gray: #333;
@@ -65,11 +67,13 @@
         }
         
         .admin-badge { background-color: var(--admin-color); }
+        .supervisor-badge { background-color: var(--supervisor-color); }
         .grower-badge { background-color: var(--grower-color); }
         .digitador-badge { background-color: var(--digitador-color); }
         .fitosanidad-badge { background-color: var(--tecnico-color); }
         .culturales-badge { background-color: #795548; }
         .riego-badge { background-color: #00BCD4; }
+        .invitado-badge { background-color: var(--invitado-color); }
         
         .btn {
             padding: 8px 15px;
@@ -415,6 +419,16 @@
                 flex-direction: column;
             }
         }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #ddd;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Firebase SDK -->
@@ -577,7 +591,7 @@
 
     <!-- Contenido Principal del Dashboard -->
     <div class="header">
-        <h1>Sistema Agroalpha-Unidad produccion 1</h1>
+        <h1>Sistema Agroalpha - Unidad producción 1</h1>
         <div class="user-actions">
             <div class="quick-actions">
                 <button class="quick-action-btn" id="settingsBtn">
@@ -612,7 +626,6 @@
             <button class="quick-action-btn" id="quickReportBtn" onclick="redirectTo('generar-reporte.html')">
                 <i class="fas fa-file-alt"></i> Generar Reporte
             </button>
-            
         </div>
         
         <h2>Módulos Principales</h2>
@@ -632,7 +645,7 @@
         const database = firebase.database();
         const activeUsersRef = database.ref('uactivos');
         
-        // Datos de ejemplo para notificaciones (en un sistema real, estos vendrían de Firebase)
+        // Datos de ejemplo para notificaciones
         const notifications = [
             {
                 id: 1,
@@ -643,7 +656,6 @@
                 read: false,
                 link: "actualizacion-sistema.html"
             },
-  
         ];
         
         // Contador de notificaciones no leídas
@@ -681,7 +693,7 @@
             
             // Si es el modal de notificaciones, actualizar contador
             if (modalId === 'notificationsModal') {
-                // Marcar todas como leídas (en un sistema real, esto se haría en la base de datos)
+                // Marcar todas como leídas
                 notifications.forEach(n => n.read = true);
                 updateNotificationCounter();
             }
@@ -768,11 +780,13 @@
         function getBadgeClass(role) {
             const roleClasses = {
                 'Administrador': 'admin-badge',
+                'Supervisor': 'supervisor-badge',
                 'Grower': 'grower-badge',
                 'Digitador': 'digitador-badge',
                 'Técnico Fitosanidad': 'fitosanidad-badge',
                 'Técnico Prácticas Culturales': 'culturales-badge',
-                'Técnico Riego': 'riego-badge'
+                'Técnico Riego': 'riego-badge',
+                'Invitado': 'invitado-badge'
             };
             return roleClasses[role] || '';
         }
@@ -785,11 +799,13 @@
             
             const messages = {
                 'Administrador': `${greeting}, tiene acceso completo al sistema. ¿Qué desea gestionar hoy?`,
+                'Supervisor': `${greeting}, supervise las operaciones y actividades del sistema.`,
                 'Grower': `${greeting}, revise el estado de los cultivos y las tareas programadas.`,
                 'Digitador': `${greeting}, comience a registrar los datos del día.`,
                 'Técnico Fitosanidad': `${greeting}, monitoree las plagas y enfermedades en los cultivos.`,
                 'Técnico Prácticas Culturales': `${greeting}, revise las prácticas culturales a implementar.`,
-                'Técnico Riego': `${greeting}, verifique el programa de riego para hoy.`
+                'Técnico Riego': `${greeting}, verifique el programa de riego para hoy.`,
+                'Invitado': `${greeting}, bienvenido al sistema. Tiene acceso limitado a funciones de consulta.`
             };
             
             return messages[role] || `${greeting}, bienvenido al sistema de gestión agrícola.`;
@@ -808,8 +824,6 @@
                     description: 'Vista general del sistema con métricas clave',
                     link: 'inicio.html'
                 },
-                
-               
             ];
             
             // Características específicas por rol
@@ -821,7 +835,7 @@
                         description: 'Administre los usuarios y permisos del sistema',
                         link: 'gestionuser.html'
                     },
-                     { 
+                    { 
                         icon: 'fa-clipboard-check', 
                         title: 'Asistencias', 
                         description: 'Revise asistencias de personal.',
@@ -840,8 +854,34 @@
                         link: 'respaldo.html'
                     }
                 ],
+                'Supervisor': [
+                    { 
+                        icon: 'fa-clipboard-check', 
+                        title: 'Asistencias', 
+                        description: 'Revise asistencias de personal.',
+                        link: 'reporteasistencia.html'
+                    },
+                    { 
+                        icon: 'fa-chart-bar', 
+                        title: 'Reportes', 
+                        description: 'Genere reportes de productividad',
+                        link: 'reportes.html'
+                    },
+                    { 
+                        icon: 'fa-eye', 
+                        title: 'Supervisión', 
+                        description: 'Monitoreo de actividades en tiempo real',
+                        link: 'supervision.html'
+                    },
+                    { 
+                        icon: 'fa-tasks', 
+                        title: 'Asignaciones', 
+                        description: 'Asigne tareas al personal',
+                        link: 'asignaciones.html'
+                    }
+                ],
                 'Grower': [
-                     { 
+                    { 
                         icon: 'fa-clipboard-check', 
                         title: 'Asistencias', 
                         description: 'Revise asistencias de personal.',
@@ -901,7 +941,7 @@
                         description: 'Registro de prácticas implementadas',
                         link: 'practicas.html'
                     },
-                      { 
+                    { 
                         icon: 'fa-clipboard-check', 
                         title: 'Asistencias', 
                         description: 'Revise asistencias de personal.',
@@ -938,6 +978,26 @@
                         title: 'Estadísticas', 
                         description: 'Análisis de consumo de agua',
                         link: 'estadisticas-riego.html'
+                    }
+                ],
+                'Invitado': [
+                    { 
+                        icon: 'fa-eye', 
+                        title: 'Consulta', 
+                        description: 'Consulta de información general',
+                        link: 'consulta.html'
+                    },
+                    { 
+                        icon: 'fa-file-alt', 
+                        title: 'Reportes Públicos', 
+                        description: 'Acceso a reportes de acceso público',
+                        link: 'reportes-publicos.html'
+                    },
+                    { 
+                        icon: 'fa-info-circle', 
+                        title: 'Información', 
+                        description: 'Información general del sistema',
+                        link: 'informacion.html'
                     }
                 ]
             };
@@ -980,24 +1040,23 @@
                 window.location.href = 'index.html';
             }
         }
-    function actualizarFechaHora() {
-      const ahora = new Date();
-      const opciones = {
-        weekday: 'long', year: 'numeric', month: 'long',
-        day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
-      };
-      document.getElementById("fechaHora").textContent = ahora.toLocaleString('es-ES', opciones);
-    }
+        
+        function actualizarFechaHora() {
+            const ahora = new Date();
+            const opciones = {
+                weekday: 'long', year: 'numeric', month: 'long',
+                day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            };
+            document.getElementById("fechaHora").textContent = ahora.toLocaleString('es-ES', opciones);
+        }
 
-    actualizarFechaHora();
-    setInterval(actualizarFechaHora, 1000);
-  </script>
+        actualizarFechaHora();
+        setInterval(actualizarFechaHora, 1000);
+    </script>
 
     <div class="footer">
         <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
         <p>Versión 2.0 - Módulo completo</p>
     </div>
 </body>
-
 </html>
-
