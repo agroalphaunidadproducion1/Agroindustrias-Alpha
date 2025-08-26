@@ -63,6 +63,7 @@
         .table th {
             background-color: var(--primary-color);
             color: white;
+            text-align: center;
         }
         
         .table-responsive {
@@ -70,22 +71,11 @@
             overflow: hidden;
         }
         
-        .total-row {
-            background-color: #e8f5e9;
-            font-weight: bold;
-        }
-        
         .filter-section {
             background-color: #e8f5e9;
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 20px;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #6c757d;
         }
         
         .camas-completas {
@@ -99,6 +89,11 @@
         
         .cultivo-section {
             margin-bottom: 30px;
+        }
+        
+        .meta-cell {
+            text-align: center;
+            font-weight: 500;
         }
         
         @media (max-width: 768px) {
@@ -146,7 +141,7 @@
         <div class="cultivo-section">
             <div class="card">
                 <div class="card-header bg-success">
-                    <h5 class="mb-0 text-white"><i class="fas fa-pepper-hot me-2"></i>Chile - Resumen Semanal</h5>
+                    <h5 class="mb-0 text-white"><i class="fas fa-pepper-hot me-2"></i>Chile</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -159,12 +154,11 @@
                                     <th>Poda</th>
                                     <th>Amarrado</th>
                                     <th>Raleo</th>
-                                    <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-chile">
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -177,7 +171,7 @@
         <div class="cultivo-section">
             <div class="card">
                 <div class="card-header bg-danger">
-                    <h5 class="mb-0 text-white"><i class="fas fa-apple-alt me-2"></i>Tomate - Resumen Semanal</h5>
+                    <h5 class="mb-0 text-white"><i class="fas fa-apple-alt me-2"></i>Tomate</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -190,12 +184,11 @@
                                     <th>Bajado</th>
                                     <th>Deshoje</th>
                                     <th>Desbrote</th>
-                                    <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-tomate">
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -253,7 +246,45 @@
             
             // Cargar selector de semanas
             cargarSemanas();
+            
+            // Generar tablas vacías
+            generarTablasVacias();
         });
+
+        // Generar tablas vacías
+        function generarTablasVacias() {
+            generarTablaCultivoVacia('tabla-chile', 'chile');
+            generarTablaCultivoVacia('tabla-tomate', 'tomate');
+        }
+
+        // Generar tabla vacía para un cultivo
+        function generarTablaCultivoVacia(tablaId, cultivo) {
+            const tablaBody = document.getElementById(tablaId);
+            tablaBody.innerHTML = '';
+            
+            const invernaderos = invernaderosPorCultivo[cultivo];
+            
+            // Agregar filas para cada invernadero
+            invernaderos.forEach(inv => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero
+                const tdInvernadero = document.createElement('td');
+                tdInvernadero.textContent = `Invernadero ${inv}`;
+                tdInvernadero.style.fontWeight = '600';
+                fila.appendChild(tdInvernadero);
+                
+                // Celdas de actividades (vacías)
+                for (let i = 0; i < 5; i++) {
+                    const td = document.createElement('td');
+                    td.textContent = '-';
+                    td.className = 'meta-cell';
+                    fila.appendChild(td);
+                }
+                
+                tablaBody.appendChild(fila);
+            });
+        }
 
         // Cargar selector de semanas
         function cargarSemanas() {
@@ -365,9 +396,9 @@
             
             // Mostrar mensaje de carga
             document.getElementById('tabla-chile').innerHTML = 
-                '<tr><td colspan="7" class="text-center py-4">Cargando datos...</td></tr>';
+                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
             document.getElementById('tabla-tomate').innerHTML = 
-                '<tr><td colspan="7" class="text-center py-4">Cargando datos...</td></tr>';
+                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
             
             const activitiesRef = database.ref('actividades');
             
@@ -387,9 +418,9 @@
             }).catch((error) => {
                 console.error('Error al cargar datos:', error);
                 document.getElementById('tabla-chile').innerHTML = 
-                    '<tr><td colspan="7" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
                 document.getElementById('tabla-tomate').innerHTML = 
-                    '<tr><td colspan="7" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
             });
         }
 
@@ -415,7 +446,6 @@
             // Inicializar estructura
             invernaderos.forEach(inv => {
                 datos[inv] = {
-                    total: 0,
                     actividades: {}
                 };
                 
@@ -435,7 +465,6 @@
                     // Solo procesar si el invernadero y actividad son válidos
                     if (datos[inv] !== undefined && datos[inv].actividades[act] !== undefined) {
                         datos[inv].actividades[act] += camas;
-                        datos[inv].total += camas;
                     }
                 }
             });
@@ -465,78 +494,23 @@
                 actividades.forEach(act => {
                     const td = document.createElement('td');
                     const valor = datos[inv].actividades[act] || 0;
+                    const meta = totalCamasPorInvernadero[inv];
+                    
                     td.textContent = valor > 0 ? valor : '-';
+                    td.className = 'meta-cell';
                     
                     // Aplicar estilo si se alcanza la meta
-                    const totalCamas = totalCamasPorInvernadero[inv];
-                    if (valor >= totalCamas) {
+                    if (valor >= meta) {
                         td.classList.add('camas-completas');
-                    } else if (valor >= totalCamas * 0.8) {
+                    } else if (valor >= meta * 0.8) {
                         td.classList.add('camas-casi-completas');
                     }
                     
                     fila.appendChild(td);
                 });
                 
-                // Celda de total
-                const tdTotal = document.createElement('td');
-                const total = datos[inv].total || 0;
-                tdTotal.textContent = total > 0 ? total : '-';
-                tdTotal.style.fontWeight = '600';
-                
-                // Aplicar estilo al total
-                const totalCamas = totalCamasPorInvernadero[inv];
-                if (total >= totalCamas) {
-                    tdTotal.classList.add('camas-completas');
-                } else if (total >= totalCamas * 0.8) {
-                    tdTotal.classList.add('camas-casi-completas');
-                }
-                
-                fila.appendChild(tdTotal);
-                
                 tablaBody.appendChild(fila);
             });
-            
-            // Agregar fila de totales
-            const filaTotal = document.createElement('tr');
-            filaTotal.className = 'total-row';
-            
-            // Celda "Total"
-            const tdTotalLabel = document.createElement('td');
-            tdTotalLabel.textContent = 'TOTAL';
-            tdTotalLabel.style.fontWeight = 'bold';
-            filaTotal.appendChild(tdTotalLabel);
-            
-            // Calcular totales por actividad
-            const totalesPorActividad = {};
-            actividades.forEach(act => {
-                totalesPorActividad[act] = 0;
-            });
-            
-            let granTotal = 0;
-            invernaderos.forEach(inv => {
-                actividades.forEach(act => {
-                    totalesPorActividad[act] += datos[inv].actividades[act] || 0;
-                });
-                granTotal += datos[inv].total || 0;
-            });
-            
-            // Celdas de totales por actividad
-            actividades.forEach(act => {
-                const td = document.createElement('td');
-                td.textContent = totalesPorActividad[act] > 0 ? totalesPorActividad[act] : '-';
-                td.style.fontWeight = 'bold';
-                filaTotal.appendChild(td);
-            });
-            
-            // Celda de gran total
-            const tdGranTotal = document.createElement('td');
-            tdGranTotal.textContent = granTotal > 0 ? granTotal : '-';
-            tdGranTotal.style.fontWeight = 'bold';
-            tdGranTotal.style.backgroundColor = '#c8e6c9';
-            filaTotal.appendChild(tdGranTotal);
-            
-            tablaBody.appendChild(filaTotal);
         }
     </script>
 </body>
