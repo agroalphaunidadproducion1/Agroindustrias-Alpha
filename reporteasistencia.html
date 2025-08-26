@@ -136,6 +136,12 @@
             font-weight: bold;
         }
         
+        .summary-container {
+            margin-top: 20px;
+            border-top: 2px solid #e9ecef;
+            padding-top: 15px;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .header h1 {
@@ -244,7 +250,7 @@
             </div>
         </div>
 
-        <!-- Reporte Detallado Chile (ARRIBA) -->
+        <!-- Reporte Detallado Chile con Resumen -->
         <div class="card">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0"><i class="fas fa-table me-2"></i>Reporte Detallado - Chile</h5>
@@ -265,10 +271,44 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- Resumen Chile (debajo de la tabla) -->
+                <div class="summary-container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card cultivo-card">
+                                <div class="card-header bg-success">
+                                    <h5 class="mb-0 text-white"><i class="fas fa-pepper-hot me-2"></i>Chile - Resumen Semanal</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-12 mb-3">
+                                            <h6>Promedio Semanal</h6>
+                                            <h2 id="chile-promedio">0%</h2>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Día</th>
+                                                    <th>Asistencia</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="chile-resumen">
+                                                <tr><td colspan="2" class="text-center">Seleccione una semana</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Reporte Detallado Tomate (ARRIBA) -->
+        <!-- Reporte Detallado Tomate con Resumen -->
         <div class="card mt-4">
             <div class="card-header bg-danger text-white">
                 <h5 class="mb-0"><i class="fas fa-table me-2"></i>Reporte Detallado - Tomate</h5>
@@ -289,64 +329,37 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-        <!-- Resumen semanal por cultivo (ABAJO) -->
-        <div class="row mt-4">
-            <div class="col-md-6 mb-4">
-                <div class="card cultivo-card">
-                    <div class="card-header bg-success">
-                        <h5 class="mb-0 text-white"><i class="fas fa-pepper-hot me-2"></i>Chile - Resumen Semanal</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-12 mb-3">
-                                <h6>Promedio Semanal</h6>
-                                <h2 id="chile-promedio">0%</h2>
+                
+                <!-- Resumen Tomate (debajo de la tabla) -->
+                <div class="summary-container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card cultivo-card">
+                                <div class="card-header bg-danger">
+                                    <h5 class="mb-0 text-white"><i class="fas fa-apple-alt me-2"></i>Tomate - Resumen Semanal</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-12 mb-3">
+                                            <h6>Promedio Semanal</h6>
+                                            <h2 id="tomate-promedio">0%</h2>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Día</th>
+                                                    <th>Asistencia</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tomate-resumen">
+                                                <tr><td colspan="2" class="text-center">Seleccione una semana</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Día</th>
-                                        <th>Asistencia</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="chile-resumen">
-                                    <tr><td colspan="2" class="text-center">Seleccione una semana</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 mb-4">
-                <div class="card cultivo-card">
-                    <div class="card-header bg-danger">
-                        <h5 class="mb-0 text-white"><i class="fas fa-apple-alt me-2"></i>Tomate - Resumen Semanal</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-12 mb-3">
-                                <h6>Promedio Semanal</h6>
-                                <h2 id="tomate-promedio">0%</h2>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Día</th>
-                                        <th>Asistencia</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tomate-resumen">
-                                    <tr><td colspan="2" class="text-center">Seleccione una semana</td></tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
@@ -575,12 +588,15 @@
                             // Procesar datos por área/invernadero
                             Object.keys(dateData).forEach(area => {
                                 if (!weekData[date][area]) {
-                                    weekData[date][area] = {};
+                                    weekData[date][area] = {
+                                        employees: {},
+                                        totalEmployees: Object.keys(dateData[area]).length
+                                    };
                                 }
                                 
                                 // Procesar empleados en esta área y fecha
                                 Object.keys(dateData[area]).forEach(employeeId => {
-                                    weekData[date][area][employeeId] = dateData[area][employeeId];
+                                    weekData[date][area].employees[employeeId] = dateData[area][employeeId];
                                 });
                             });
                         } else {
@@ -611,8 +627,8 @@
             const allAreas = [...chileInvernaderos, ...tomateInvernaderos];
             allAreas.forEach(area => {
                 reportData[area] = {
-                    totalEmployees: 0,
                     dailyAttendance: {},
+                    dailyTotals: {},
                     weekTotal: 0,
                     weekMax: 0,
                     daysWithData: 0 // Contador de días con datos
@@ -621,13 +637,8 @@
                 // Inicializar días (todos los días de la semana)
                 currentWeekDates.forEach(date => {
                     reportData[area].dailyAttendance[date] = 0;
+                    reportData[area].dailyTotals[date] = 0;
                 });
-            });
-            
-            // Contar empleados únicos por área
-            const uniqueEmployeesByArea = {};
-            allAreas.forEach(area => {
-                uniqueEmployeesByArea[area] = new Set();
             });
             
             // Procesar cada fecha (incluso las que no tienen datos)
@@ -638,26 +649,22 @@
                             // Incrementar contador de días con datos para esta área
                             reportData[area].daysWithData++;
                             
-                            Object.keys(weekData[date][area]).forEach(employeeId => {
-                                // Registrar empleado único en esta área
-                                uniqueEmployeesByArea[area].add(employeeId);
-                                
-                                // Contar asistencia
-                                if (weekData[date][area][employeeId] === true) {
+                            // Guardar el total de empleados para este día e invernadero
+                            reportData[area].dailyTotals[date] = weekData[date][area].totalEmployees;
+                            
+                            // Contar asistencia
+                            Object.keys(weekData[date][area].employees).forEach(employeeId => {
+                                if (weekData[date][area].employees[employeeId] === true) {
                                     reportData[area].dailyAttendance[date]++;
                                     reportData[area].weekTotal++;
                                 }
                             });
+                            
+                            // Sumar al máximo posible (empleados * días con datos)
+                            reportData[area].weekMax += weekData[date][area].totalEmployees;
                         }
                     });
                 }
-            });
-            
-            // Actualizar total de empleados y máximo posible
-            allAreas.forEach(area => {
-                reportData[area].totalEmployees = uniqueEmployeesByArea[area].size;
-                // El máximo posible es empleados * días con datos (no todos los días de la semana)
-                reportData[area].weekMax = reportData[area].totalEmployees * reportData[area].daysWithData;
             });
             
             // Generar reporte
@@ -712,28 +719,20 @@
         function generateCultivoSummaries(reportData) {
             let chileWeekTotal = 0;
             let chileWeekMax = 0;
-            let chileDaysWithData = 0;
-            const chileDaily = {};
-            const chileDailyPercentages = {}; // Nuevo: almacenar porcentajes diarios
+            const chileDailyPercentages = {};
             
             let tomateWeekTotal = 0;
             let tomateWeekMax = 0;
-            let tomateDaysWithData = 0;
-            const tomateDaily = {};
-            const tomateDailyPercentages = {}; // Nuevo: almacenar porcentajes diarios
-            
-            // Inicializar días
-            currentWeekDates.forEach(date => {
-                chileDaily[date] = 0;
-                tomateDaily[date] = 0;
-                chileDailyPercentages[date] = 0; // Inicializar porcentajes
-                tomateDailyPercentages[date] = 0; // Inicializar porcentajes
-            });
+            const tomateDailyPercentages = {};
             
             // Variables para calcular totales diarios
             const chileDailyTotals = {};
             const tomateDailyTotals = {};
+            
+            // Inicializar días
             currentWeekDates.forEach(date => {
+                chileDailyPercentages[date] = 0;
+                tomateDailyPercentages[date] = 0;
                 chileDailyTotals[date] = { totalPresent: 0, totalMax: 0 };
                 tomateDailyTotals[date] = { totalPresent: 0, totalMax: 0 };
             });
@@ -743,15 +742,12 @@
                 if (reportData[inv]) {
                     chileWeekTotal += reportData[inv].weekTotal;
                     chileWeekMax += reportData[inv].weekMax;
-                    chileDaysWithData += reportData[inv].daysWithData;
                     
                     currentWeekDates.forEach(date => {
-                        chileDaily[date] += reportData[inv].dailyAttendance[date] || 0;
-                        
                         // Acumular para el total diario
-                        if (reportData[inv].dailyAttendance[date] !== undefined) {
+                        if (reportData[inv].dailyTotals[date] > 0) {
                             chileDailyTotals[date].totalPresent += reportData[inv].dailyAttendance[date] || 0;
-                            chileDailyTotals[date].totalMax += reportData[inv].totalEmployees;
+                            chileDailyTotals[date].totalMax += reportData[inv].dailyTotals[date];
                         }
                     });
                 }
@@ -762,15 +758,12 @@
                 if (reportData[inv]) {
                     tomateWeekTotal += reportData[inv].weekTotal;
                     tomateWeekMax += reportData[inv].weekMax;
-                    tomateDaysWithData += reportData[inv].daysWithData;
                     
                     currentWeekDates.forEach(date => {
-                        tomateDaily[date] += reportData[inv].dailyAttendance[date] || 0;
-                        
                         // Acumular para el total diario
-                        if (reportData[inv].dailyAttendance[date] !== undefined) {
+                        if (reportData[inv].dailyTotals[date] > 0) {
                             tomateDailyTotals[date].totalPresent += reportData[inv].dailyAttendance[date] || 0;
-                            tomateDailyTotals[date].totalMax += reportData[inv].totalEmployees;
+                            tomateDailyTotals[date].totalMax += reportData[inv].dailyTotals[date];
                         }
                     });
                 }
@@ -790,7 +783,7 @@
                 }
             });
             
-            // Calcular porcentajes semanales (dividir entre días con datos, no todos los días)
+            // Calcular porcentajes semanales
             const chilePercentage = chileWeekMax > 0 ? Math.round((chileWeekTotal / chileWeekMax) * 100) : 0;
             const tomatePercentage = tomateWeekMax > 0 ? Math.round((tomateWeekTotal / tomateWeekMax) * 100) : 0;
             
@@ -802,12 +795,12 @@
             applyPercentageColor('chile-promedio', chilePercentage);
             applyPercentageColor('tomate-promedio', tomatePercentage);
             
-            // Generar tablas de resumen diario (usando los mismos porcentajes que en las tablas principales)
+            // Generar tablas de resumen diario
             generateDailySummary('chile-resumen', chileDailyPercentages);
             generateDailySummary('tomate-resumen', tomateDailyPercentages);
         }
 
-        // Generar resumen diario (modificado para usar porcentajes precalculados)
+        // Generar resumen diario
         function generateDailySummary(elementId, dailyPercentages) {
             const tbody = document.getElementById(elementId);
             tbody.innerHTML = '';
@@ -859,8 +852,8 @@
                 return {
                     inv: inv,
                     data: reportData[inv] || {
-                        totalEmployees: 0,
                         dailyAttendance: {},
+                        dailyTotals: {},
                         weekTotal: 0,
                         weekMax: 0,
                         daysWithData: 0
@@ -891,31 +884,33 @@
                 
                 // Celdas de días (TODOS los días de la semana)
                 let weekTotalPresent = 0;
-                let daysWithDataCount = 0;
+                let weekTotalMax = 0;
                 
                 currentWeekDates.forEach(date => {
                     const presentCount = data.dailyAttendance[date] || 0;
+                    const totalEmployees = data.dailyTotals[date] || 0;
                     
-                    if (data.dailyAttendance[date] !== undefined) {
-                        weekTotalPresent += presentCount;
-                        daysWithDataCount++;
-                        
-                        const percentage = data.totalEmployees > 0 ? Math.round((presentCount / data.totalEmployees) * 100) : 0;
+                    if (totalEmployees > 0) {
+                        const percentage = Math.round((presentCount / totalEmployees) * 100);
                         const percentageClass = getPercentageClass(percentage);
                         
                         rowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
                         
                         // Acumular para el total diario
                         dailyTotals[date].totalPresent += presentCount;
-                        dailyTotals[date].totalMax += data.totalEmployees;
+                        dailyTotals[date].totalMax += totalEmployees;
+                        
+                        // Acumular para el total semanal
+                        weekTotalPresent += presentCount;
+                        weekTotalMax += totalEmployees;
                     } else {
                         // Día sin datos
                         rowContent += `<td class="percentage-cell no-attendance">-</td>`;
                     }
                 });
                 
-                // Celda de total semanal (solo divide entre días con datos)
-                const weekPercentage = data.weekMax > 0 ? Math.round((weekTotalPresent / data.weekMax) * 100) : 0;
+                // Celda de total semanal
+                const weekPercentage = weekTotalMax > 0 ? Math.round((weekTotalPresent / weekTotalMax) * 100) : 0;
                 const weekPercentageClass = getPercentageClass(weekPercentage);
                 
                 rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
@@ -969,8 +964,8 @@
                 return {
                     inv: inv,
                     data: reportData[inv] || {
-                        totalEmployees: 0,
                         dailyAttendance: {},
+                        dailyTotals: {},
                         weekTotal: 0,
                         weekMax: 0,
                         daysWithData: 0
@@ -1001,31 +996,33 @@
                 
                 // Celdas de días (TODOS los días de la semana)
                 let weekTotalPresent = 0;
-                let daysWithDataCount = 0;
+                let weekTotalMax = 0;
                 
                 currentWeekDates.forEach(date => {
                     const presentCount = data.dailyAttendance[date] || 0;
+                    const totalEmployees = data.dailyTotals[date] || 0;
                     
-                    if (data.dailyAttendance[date] !== undefined) {
-                        weekTotalPresent += presentCount;
-                        daysWithDataCount++;
-                        
-                        const percentage = data.totalEmployees > 0 ? Math.round((presentCount / data.totalEmployees) * 100) : 0;
+                    if (totalEmployees > 0) {
+                        const percentage = Math.round((presentCount / totalEmployees) * 100);
                         const percentageClass = getPercentageClass(percentage);
                         
                         rowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
                         
                         // Acumular para el total diario
                         dailyTotals[date].totalPresent += presentCount;
-                        dailyTotals[date].totalMax += data.totalEmployees;
+                        dailyTotals[date].totalMax += totalEmployees;
+                        
+                        // Acumular para el total semanal
+                        weekTotalPresent += presentCount;
+                        weekTotalMax += totalEmployees;
                     } else {
                         // Día sin datos
                         rowContent += `<td class="percentage-cell no-attendance">-</td>`;
                     }
                 });
                 
-                // Celda de total semanal (solo divide entre días con datos)
-                const weekPercentage = data.weekMax > 0 ? Math.round((weekTotalPresent / data.weekMax) * 100) : 0;
+                // Celda de total semanal
+                const weekPercentage = weekTotalMax > 0 ? Math.round((weekTotalPresent / weekTotalMax) * 100) : 0;
                 const weekPercentageClass = getPercentageClass(weekPercentage);
                 
                 rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
