@@ -15,6 +15,30 @@
       color: #2e7d32;
       text-align: center;
     }
+    .filtros-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .filtro-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 200px;
+    }
+    .filtro-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #2e7d32;
+    }
+    input, select {
+      padding: 8px;
+      border: 1px solid #a5d6a7;
+      border-radius: 5px;
+      font-size: 16px;
+    }
     .acciones {
       display: flex;
       justify-content: space-between;
@@ -33,14 +57,6 @@
     }
     button:hover {
       background-color: #43a047;
-    }
-    #buscador {
-      flex-grow: 1;
-      min-width: 220px;
-      padding: 8px;
-      border: 1px solid #a5d6a7;
-      border-radius: 5px;
-      font-size: 16px;
     }
     table {
       width: 100%;
@@ -67,21 +83,47 @@
       font-style: italic;
       color: #2e7d32;
     }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body>
 
   <h2>🌿 Registros de daño a organismos benéficos</h2>
 
+  <div class="filtros-container">
+    <div class="filtro-group">
+      <label class="filtro-label" for="filtro-categoria">Categoría:</label>
+      <select id="filtro-categoria">
+        <option value="">Todas las categorías</option>
+        <option value="Fungicida">Fungicida</option>
+        <option value="Insecticida">Insecticida</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+    
+    <div class="filtro-group">
+      <label class="filtro-label" for="buscador">Buscar:</label>
+      <input type="text" id="buscador" placeholder="Producto o ingrediente...">
+    </div>
+  </div>
+
   <div class="acciones">
-    <input type="text" id="buscador" placeholder="Buscar producto o ingrediente...">
-    <button onclick="window.print()">🖨️ Imprimir</button>
-    <button onclick="descargarCSV()">📥 Descargar</button>
+    <div></div> <!-- Espaciador para alinear botones a la derecha -->
+    <div>
+      <button onclick="window.print()">🖨️ Imprimir</button>
+      <button onclick="descargarCSV()">📥 Descargar CSV</button>
+    </div>
   </div>
 
   <table id="tablaRegistros">
     <thead>
       <tr>
+        <th>Categoría</th>
         <th>Producto</th>
         <th>Ingrediente</th>
         <th>Swirskii</th>
@@ -93,7 +135,7 @@
     </thead>
     <tbody>
       <tr>
-        <td colspan="7" class="loading">Cargando datos...</td>
+        <td colspan="8" class="loading">Cargando datos...</td>
       </tr>
     </tbody>
   </table>
@@ -101,13 +143,7 @@
   <script>
     // Configuración de Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyABC123...", // Reemplaza con tu API Key real
-      authDomain: "agro-productos.firebaseapp.com",
-      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/",
-      projectId: "agro-productos",
-      storageBucket: "agro-productos.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abc123def456"
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
     };
     
     // Inicializar Firebase
@@ -116,6 +152,7 @@
 
     const tablaBody = document.querySelector("#tablaRegistros tbody");
     const buscador = document.getElementById("buscador");
+    const filtroCategoria = document.getElementById("filtro-categoria");
     let registros = [];
 
     // Función para cargar datos de Firebase
@@ -135,7 +172,7 @@
           console.error("Error al cargar datos:", error);
           tablaBody.innerHTML = `
             <tr>
-              <td colspan="7" style="color: red; text-align: center;">
+              <td colspan="8" style="color: red; text-align: center;">
                 Error al cargar datos. Por favor recarga la página.
               </td>
             </tr>
@@ -156,12 +193,13 @@
 
     // Filtrar registros según búsqueda
     function mostrarFiltrados() {
-      const filtro = buscador.value.toLowerCase();
+      const textoFiltro = buscador.value.toLowerCase();
+      const categoriaFiltro = filtroCategoria.value;
       
       if (registros.length === 0) {
         tablaBody.innerHTML = `
           <tr>
-            <td colspan="7" style="text-align: center;">
+            <td colspan="8" style="text-align: center;">
               No hay registros disponibles
             </td>
           </tr>
@@ -170,16 +208,26 @@
       }
       
       const registrosFiltrados = registros.filter(r => {
-        const producto = r.producto?.toString().toLowerCase() || "";
-        const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
-        return producto.includes(filtro) || ingrediente.includes(filtro);
+        // Filtrar por categoría
+        if (categoriaFiltro && r.categoria !== categoriaFiltro) {
+          return false;
+        }
+        
+        // Filtrar por texto (producto o ingrediente)
+        if (textoFiltro) {
+          const producto = r.producto?.toString().toLowerCase() || "";
+          const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
+          return producto.includes(textoFiltro) || ingrediente.includes(textoFiltro);
+        }
+        
+        return true;
       });
       
       if (registrosFiltrados.length === 0) {
         tablaBody.innerHTML = `
           <tr>
-            <td colspan="7" style="text-align: center;">
-              No se encontraron registros que coincidan con la búsqueda
+            <td colspan="8" style="text-align: center;">
+              No se encontraron registros que coincidan con los filtros
             </td>
           </tr>
         `;
@@ -190,6 +238,7 @@
       registrosFiltrados.forEach(r => {
         const fila = document.createElement("tr");
         fila.innerHTML = `
+          <td>${r.categoria || "-"}</td>
           <td>${r.producto || "-"}</td>
           <td>${r.ingrediente || "-"}</td>
           <td>${formatearValor(r.swirskii)}</td>
@@ -249,20 +298,32 @@
         return;
       }
       
-      let csv = "Producto,Ingrediente,Swirskii,Cucumeris,Carnea,Colemani,Abejorros\n";
+      let csv = "Categoría,Producto,Ingrediente,Swirskii,Cucumeris,Carnea,Colemani,Abejorros\n";
       
-      const filtro = buscador.value.toLowerCase();
+      const textoFiltro = buscador.value.toLowerCase();
+      const categoriaFiltro = filtroCategoria.value;
+      
       const registrosFiltrados = registros.filter(r => {
-        const producto = r.producto?.toString().toLowerCase() || "";
-        const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
-        return producto.includes(filtro) || ingrediente.includes(filtro);
+        // Filtrar por categoría
+        if (categoriaFiltro && r.categoria !== categoriaFiltro) {
+          return false;
+        }
+        
+        // Filtrar por texto (producto o ingrediente)
+        if (textoFiltro) {
+          const producto = r.producto?.toString().toLowerCase() || "";
+          const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
+          return producto.includes(textoFiltro) || ingrediente.includes(textoFiltro);
+        }
+        
+        return true;
       });
       
       registrosFiltrados.forEach(r => {
-        csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
-               `"${formatearValor(r.swirskii)}","${formatearValor(r.cucumeris)}",` +
-               `"${formatearValor(r.carnea)}","${formatearValor(r.colemani)}",` +
-               `"${formatearAbejorros(r.abejorros)}"\n`;
+        csv += `"${r.categoria || ""}","${r.producto || ""}","${r.ingrediente || ""}",` +
+               `"${formatearValor(r.swirskii).replace(/"/g, '""')}","${formatearValor(r.cucumeris).replace(/"/g, '""')}",` +
+               `"${formatearValor(r.carnea).replace(/"/g, '""')}","${formatearValor(r.colemani).replace(/"/g, '""')}",` +
+               `"${formatearAbejorros(r.abejorros).replace(/"/g, '""')}"\n`;
       });
       
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -276,11 +337,13 @@
 
     // Event listeners
     buscador.addEventListener("input", mostrarFiltrados);
+    filtroCategoria.addEventListener("change", mostrarFiltrados);
     document.addEventListener("DOMContentLoaded", cargarDatos);
   </script>
+  
   <div class="footer">
-        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-        <p>Versión 2.0 - Módulo completo</p>
-    </div>
+    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo completo</p>
+  </div>
 </body>
 </html>
