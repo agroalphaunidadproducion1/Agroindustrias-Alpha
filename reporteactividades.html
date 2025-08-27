@@ -79,12 +79,12 @@
         }
         
         .camas-completas {
-            background-color: #c8e6c9 !important;
+            background-color: #fff9c4 !important; /* Cambiado a amarillo suave */
             font-weight: bold;
         }
         
         .camas-casi-completas {
-            background-color: #fff9c4 !important;
+            background-color: #fff9c4 !important; /* También cambiado a amarillo suave */
         }
         
         .cultivo-section {
@@ -149,11 +149,11 @@
                             <thead>
                                 <tr>
                                     <th>Invernadero</th>
-                                    <th>Cosecha</th>
                                     <th>Enguie</th>
                                     <th>Poda</th>
                                     <th>Amarrado</th>
                                     <th>Raleo</th>
+                                    <th>Cosecha</th> <!-- Cosecha movida al final -->
                                 </tr>
                             </thead>
                             <tbody id="tabla-chile">
@@ -179,11 +179,11 @@
                             <thead>
                                 <tr>
                                     <th>Invernadero</th>
-                                    <th>Cosecha</th>
                                     <th>Enguie</th>
                                     <th>Bajado</th>
                                     <th>Deshoje</th>
                                     <th>Desbrote</th>
+                                    <th>Cosecha</th> <!-- Cosecha movida al final -->
                                 </tr>
                             </thead>
                             <tbody id="tabla-tomate">
@@ -216,10 +216,10 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Definir actividades por cultivo
+        // Definir actividades por cultivo (con cosecha al final)
         const actividadesPorCultivo = {
-            chile: ['Cosecha', 'Enguie', 'Poda', 'Amarrado', 'Raleo'],
-            tomate: ['Cosecha', 'Enguie', 'Bajado', 'Deshoje', 'Desbrote']
+            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'], // Cosecha movida al final
+            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha'] // Cosecha movida al final
         };
 
         // Definir invernaderos por cultivo
