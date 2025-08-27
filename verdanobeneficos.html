@@ -2,143 +2,273 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Daño a Organismos Benéficos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluación de Organismos Benéficos</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
+    :root {
+      --primary-color: #2e7d32;
+      --primary-hover: #1b5e20;
+      --light-bg: #e8f5e9;
+      --light-border: #a5d6a7;
+      --table-header: #c8e6c9;
+      --white: #ffffff;
+      --row-hover: #f1f8e9;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: Arial;
-      background-color: #e8f5e9;
+      font-family: Arial, sans-serif;
+      background-color: var(--light-bg);
       padding: 20px;
+      margin: 0;
+      min-height: 100vh;
     }
+    
     h2 {
-      color: #2e7d32;
+      color: var(--primary-color);
       text-align: center;
+      margin-bottom: 20px;
+      padding: 10px;
     }
+    
+    .controls-container {
+      background-color: var(--white);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
     .filtros-container {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
-      margin-bottom: 20px;
       align-items: center;
     }
+    
     .filtro-group {
       display: flex;
       flex-direction: column;
       flex: 1;
-      min-width: 200px;
+      min-width: 150px;
     }
+    
     .filtro-label {
       font-weight: bold;
       margin-bottom: 5px;
-      color: #2e7d32;
+      color: var(--primary-color);
+      font-size: 14px;
     }
+    
     input, select {
-      padding: 8px;
-      border: 1px solid #a5d6a7;
+      padding: 10px;
+      border: 1px solid var(--light-border);
       border-radius: 5px;
-      font-size: 16px;
+      font-size: 14px;
+      background-color: var(--white);
     }
+    
     .acciones {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
+      margin-top: 15px;
       gap: 10px;
     }
+    
     button {
-      padding: 8px 12px;
-      background-color: #66bb6a;
+      padding: 10px 15px;
+      background-color: var(--primary-color);
       border: none;
       color: white;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
+    
     button:hover {
-      background-color: #43a047;
+      background-color: var(--primary-hover);
     }
+    
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
     table {
       width: 100%;
       border-collapse: collapse;
-      background-color: white;
+      min-width: 600px;
     }
+    
     th {
-      background-color: #c8e6c9;
-      color: #1b5e20;
-      padding: 10px;
-      border: 1px solid #a5d6a7;
-    }
-    td {
-      padding: 8px;
-      border: 1px solid #c8e6c9;
+      background-color: var(--table-header);
+      color: var(--primary-hover);
+      padding: 12px 8px;
+      border: 1px solid var(--light-border);
       text-align: center;
+      position: sticky;
+      top: 0;
+      font-size: 14px;
     }
+    
+    td {
+      padding: 10px 8px;
+      border: 1px solid var(--light-border);
+      text-align: center;
+      font-size: 14px;
+    }
+    
     tr:nth-child(even) {
-      background-color: #f1f8e9;
+      background-color: var(--row-hover);
     }
+    
+    tr:hover {
+      background-color: #e8f5e9;
+    }
+    
     .loading {
       text-align: center;
-      padding: 20px;
+      padding: 30px;
       font-style: italic;
-      color: #2e7d32;
+      color: var(--primary-color);
     }
+    
     .footer {
       text-align: center;
       margin-top: 20px;
       color: #666;
       font-size: 0.9em;
+      padding: 15px;
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 30px;
+      color: #666;
+      font-style: italic;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .filtros-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .filtro-group {
+        min-width: 100%;
+      }
+      
+      .acciones {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      button {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+      }
+      
+      th, td {
+        padding: 8px 5px;
+        font-size: 12px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      h2 {
+        font-size: 1.2rem;
+      }
+      
+      .controls-container {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h2>🌿 Registros de daño a organismos benéficos</h2>
+  <h2>🌿 Evaluación de Organismos Benéficos</h2>
 
-  <div class="filtros-container">
-    <div class="filtro-group">
-      <label class="filtro-label" for="filtro-categoria">Categoría:</label>
-      <select id="filtro-categoria">
-        <option value="">Todas las categorías</option>
-        <option value="Fungicida">Fungicida</option>
-        <option value="Insecticida">Insecticida</option>
-        <option value="Otro">Otro</option>
-      </select>
+  <div class="controls-container">
+    <div class="filtros-container">
+      <div class="filtro-group">
+        <label class="filtro-label" for="filtro-benefico">Organismo:</label>
+        <select id="filtro-benefico">
+          <option value="">Todos los organismos</option>
+          <option value="swirskii">A. Swirskii</option>
+          <option value="cucumeris">N. Cucumeris</option>
+          <option value="crizopa">Crizopa</option>
+          <option value="colemani">Aphidius Colemani</option>
+          <option value="abejorros">Abejorros</option>
+        </select>
+      </div>
+      
+      <div class="filtro-group">
+        <label class="filtro-label" for="filtro-categoria">Categoría:</label>
+        <select id="filtro-categoria">
+          <option value="">Todas las categorías</option>
+          <option value="Fungicida">Fungicida</option>
+          <option value="Insecticida">Insecticida</option>
+          <option value="Herbicida">Herbicida</option>
+          <option value="Acaricida">Acaricida</option>
+          <option value="Bactericida">Bactericida</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      
+      <div class="filtro-group">
+        <label class="filtro-label" for="buscador">Buscar:</label>
+        <input type="text" id="buscador" placeholder="Producto o ingrediente...">
+      </div>
     </div>
-    
-    <div class="filtro-group">
-      <label class="filtro-label" for="buscador">Buscar:</label>
-      <input type="text" id="buscador" placeholder="Producto o ingrediente...">
+
+    <div class="acciones">
+      <button onclick="window.print()"><span>🖨️</span> Imprimir</button>
+      <button onclick="descargarCSV()"><span>📥</span> CSV</button>
     </div>
   </div>
 
-  <div class="acciones">
-    <div></div> <!-- Espaciador para alinear botones a la derecha -->
-    <div>
-      <button onclick="window.print()">🖨️ Imprimir</button>
-      <button onclick="descargarCSV()">📥 Descargar CSV</button>
-    </div>
+  <div class="table-container">
+    <table id="tablaRegistros">
+      <thead>
+        <tr id="tabla-header">
+          <th>Producto</th>
+          <th>Ingrediente</th>
+          <!-- Las columnas dinámicas se agregarán aquí -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="2" class="loading">Cargando datos...</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <table id="tablaRegistros">
-    <thead>
-      <tr>
-        <th>Categoría</th>
-        <th>Producto</th>
-        <th>Ingrediente</th>
-        <th>Swirskii</th>
-        <th>Cucumeris</th>
-        <th>Carnea</th>
-        <th>Colemani</th>
-        <th>Abejorros</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td colspan="8" class="loading">Cargando datos...</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="footer">
+    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo completo</p>
+  </div>
 
   <script>
     // Configuración de Firebase
@@ -151,8 +281,10 @@
     const db = firebase.database();
 
     const tablaBody = document.querySelector("#tablaRegistros tbody");
+    const tablaHeader = document.getElementById("tabla-header");
     const buscador = document.getElementById("buscador");
     const filtroCategoria = document.getElementById("filtro-categoria");
+    const filtroBenefico = document.getElementById("filtro-benefico");
     let registros = [];
 
     // Función para cargar datos de Firebase
@@ -172,7 +304,7 @@
           console.error("Error al cargar datos:", error);
           tablaBody.innerHTML = `
             <tr>
-              <td colspan="8" style="color: red; text-align: center;">
+              <td colspan="10" style="color: red; text-align: center;">
                 Error al cargar datos. Por favor recarga la página.
               </td>
             </tr>
@@ -191,15 +323,81 @@
       mostrarFiltrados();
     });
 
+    // Función para verificar si un registro tiene datos relevantes (no solo "Sin efecto")
+    function tieneDatosRelevantes(registro, beneficoFiltro) {
+      if (!beneficoFiltro) {
+        // Verificar todos los benéficos
+        return (
+          (registro.swirskii_larva && registro.swirskii_larva !== "0") ||
+          (registro.swirskii_adulto && registro.swirskii_adulto !== "0") ||
+          (registro.swirskii_huevo && registro.swirskii_huevo !== "0") ||
+          (registro.swirskii_ninfa && registro.swirskii_ninfa !== "0") ||
+          (registro.cucumeris_larva && registro.cucumeris_larva !== "0") ||
+          (registro.cucumeris_adulto && registro.cucumeris_adulto !== "0") ||
+          (registro.cucumeris_huevo && registro.cucumeris_huevo !== "0") ||
+          (registro.cucumeris_ninfa && registro.cucumeris_ninfa !== "0") ||
+          (registro.crizopa_larva && registro.crizopa_larva !== "0") ||
+          (registro.crizopa_adulto && registro.crizopa_adulto !== "0") ||
+          (registro.crizopa_huevo && registro.crizopa_huevo !== "0") ||
+          (registro.crizopa_ninfa && registro.crizopa_ninfa !== "0") ||
+          (registro.colemani_larva && registro.colemani_larva !== "0") ||
+          (registro.colemani_adulto && registro.colemani_adulto !== "0") ||
+          (registro.colemani_huevo && registro.colemani_huevo !== "0") ||
+          (registro.colemani_ninfa && registro.colemani_ninfa !== "0") ||
+          (registro.abejorros_colonia && registro.abejorros_colonia !== "0") ||
+          (registro.abejorros_accion && registro.abejorros_accion !== "ninguna")
+        );
+      } else {
+        // Verificar solo el benéfico seleccionado
+        switch(beneficoFiltro) {
+          case "swirskii":
+            return (
+              (registro.swirskii_larva && registro.swirskii_larva !== "0") ||
+              (registro.swirskii_adulto && registro.swirskii_adulto !== "0") ||
+              (registro.swirskii_huevo && registro.swirskii_huevo !== "0") ||
+              (registro.swirskii_ninfa && registro.swirskii_ninfa !== "0")
+            );
+          case "cucumeris":
+            return (
+              (registro.cucumeris_larva && registro.cucumeris_larva !== "0") ||
+              (registro.cucumeris_adulto && registro.cucumeris_adulto !== "0") ||
+              (registro.cucumeris_huevo && registro.cucumeris_huevo !== "0") ||
+              (registro.cucumeris_ninfa && registro.cucumeris_ninfa !== "0")
+            );
+          case "crizopa":
+            return (
+              (registro.crizopa_larva && registro.crizopa_larva !== "0") ||
+              (registro.crizopa_adulto && registro.crizopa_adulto !== "0") ||
+              (registro.crizopa_huevo && registro.crizopa_huevo !== "0") ||
+              (registro.crizopa_ninfa && registro.crizopa_ninfa !== "0")
+            );
+          case "colemani":
+            return (
+              (registro.colemani_larva && registro.colemani_larva !== "0") ||
+              (registro.colemani_adulto && registro.colemani_adulto !== "0") ||
+              (registro.colemani_huevo && registro.colemani_huevo !== "0") ||
+              (registro.colemani_ninfa && registro.colemani_ninfa !== "0")
+            );
+          case "abejorros":
+            return (
+              (registro.abejorros_colonia && registro.abejorros_colonia !== "0") ||
+              (registro.abejorros_accion && registro.abejorros_accion !== "ninguna")
+            );
+        }
+      }
+      return true;
+    }
+
     // Filtrar registros según búsqueda
     function mostrarFiltrados() {
       const textoFiltro = buscador.value.toLowerCase();
       const categoriaFiltro = filtroCategoria.value;
+      const beneficoFiltro = filtroBenefico.value;
       
       if (registros.length === 0) {
         tablaBody.innerHTML = `
           <tr>
-            <td colspan="8" style="text-align: center;">
+            <td colspan="10" class="no-data">
               No hay registros disponibles
             </td>
           </tr>
@@ -217,77 +415,217 @@
         if (textoFiltro) {
           const producto = r.producto?.toString().toLowerCase() || "";
           const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
-          return producto.includes(textoFiltro) || ingrediente.includes(textoFiltro);
+          if (!producto.includes(textoFiltro) && !ingrediente.includes(textoFiltro)) {
+            return false;
+          }
         }
         
-        return true;
+        // Filtrar registros que solo tengan "Sin efecto"
+        return tieneDatosRelevantes(r, beneficoFiltro);
       });
       
       if (registrosFiltrados.length === 0) {
         tablaBody.innerHTML = `
           <tr>
-            <td colspan="8" style="text-align: center;">
-              No se encontraron registros que coincidan con los filtros
+            <td colspan="10" class="no-data">
+              No se encontraron registros con datos relevantes
             </td>
           </tr>
         `;
         return;
       }
       
+      // Actualizar encabezados según el filtro de benéfico
+      actualizarEncabezados(beneficoFiltro);
+      
+      // Generar filas de la tabla
       tablaBody.innerHTML = "";
       registrosFiltrados.forEach(r => {
         const fila = document.createElement("tr");
-        fila.innerHTML = `
-          <td>${r.categoria || "-"}</td>
+        
+        // Columnas fijas
+        let contenidoFila = `
           <td>${r.producto || "-"}</td>
           <td>${r.ingrediente || "-"}</td>
-          <td>${formatearValor(r.swirskii)}</td>
-          <td>${formatearValor(r.cucumeris)}</td>
-          <td>${formatearValor(r.carnea)}</td>
-          <td>${formatearValor(r.colemani)}</td>
-          <td>${formatearAbejorros(r.abejorros)}</td>
         `;
+        
+        // Columnas dinámicas según el benéfico seleccionado
+        if (!beneficoFiltro) {
+          // Mostrar todos los benéficos
+          contenidoFila += `
+            <td>${formatearValor(r.swirskii_larva)}</td>
+            <td>${formatearValor(r.swirskii_adulto)}</td>
+            <td>${formatearValor(r.swirskii_huevo)}</td>
+            <td>${formatearValor(r.swirskii_ninfa)}</td>
+            <td>${r.swirskii_persistencia || "-"}</td>
+            <td>${formatearValor(r.cucumeris_larva)}</td>
+            <td>${formatearValor(r.cucumeris_adulto)}</td>
+            <td>${formatearValor(r.cucumeris_huevo)}</td>
+            <td>${formatearValor(r.cucumeris_ninfa)}</td>
+            <td>${r.cucumeris_persistencia || "-"}</td>
+            <td>${formatearValor(r.crizopa_larva)}</td>
+            <td>${formatearValor(r.crizopa_adulto)}</td>
+            <td>${formatearValor(r.crizopa_huevo)}</td>
+            <td>${formatearValor(r.crizopa_ninfa)}</td>
+            <td>${r.crizopa_persistencia || "-"}</td>
+            <td>${formatearValor(r.colemani_larva)}</td>
+            <td>${formatearValor(r.colemani_adulto)}</td>
+            <td>${formatearValor(r.colemani_huevo)}</td>
+            <td>${formatearValor(r.colemani_ninfa)}</td>
+            <td>${r.colemani_persistencia || "-"}</td>
+            <td>${formatearValor(r.abejorros_colonia)}</td>
+            <td>${r.abejorros_persistencia || "-"}</td>
+            <td>${formatearAbejorrosAccion(r.abejorros_accion)}</td>
+          `;
+        } else {
+          // Mostrar solo el benéfico seleccionado
+          switch(beneficoFiltro) {
+            case "swirskii":
+              contenidoFila += `
+                <td>${formatearValor(r.swirskii_larva)}</td>
+                <td>${formatearValor(r.swirskii_adulto)}</td>
+                <td>${formatearValor(r.swirskii_huevo)}</td>
+                <td>${formatearValor(r.swirskii_ninfa)}</td>
+                <td>${r.swirskii_persistencia || "-"}</td>
+              `;
+              break;
+            case "cucumeris":
+              contenidoFila += `
+                <td>${formatearValor(r.cucumeris_larva)}</td>
+                <td>${formatearValor(r.cucumeris_adulto)}</td>
+                <td>${formatearValor(r.cucumeris_huevo)}</td>
+                <td>${formatearValor(r.cucumeris_ninfa)}</td>
+                <td>${r.cucumeris_persistencia || "-"}</td>
+              `;
+              break;
+            case "crizopa":
+              contenidoFila += `
+                <td>${formatearValor(r.crizopa_larva)}</td>
+                <td>${formatearValor(r.crizopa_adulto)}</td>
+                <td>${formatearValor(r.crizopa_huevo)}</td>
+                <td>${formatearValor(r.crizopa_ninfa)}</td>
+                <td>${r.crizopa_persistencia || "-"}</td>
+              `;
+              break;
+            case "colemani":
+              contenidoFila += `
+                <td>${formatearValor(r.colemani_larva)}</td>
+                <td>${formatearValor(r.colemani_adulto)}</td>
+                <td>${formatearValor(r.colemani_huevo)}</td>
+                <td>${formatearValor(r.colemani_ninfa)}</td>
+                <td>${r.colemani_persistencia || "-"}</td>
+              `;
+              break;
+            case "abejorros":
+              contenidoFila += `
+                <td>${formatearValor(r.abejorros_colonia)}</td>
+                <td>${r.abejorros_persistencia || "-"}</td>
+                <td>${formatearAbejorrosAccion(r.abejorros_accion)}</td>
+              `;
+              break;
+          }
+        }
+        
+        fila.innerHTML = contenidoFila;
         tablaBody.appendChild(fila);
       });
     }
 
+    // Actualizar encabezados de la tabla según el benéfico seleccionado
+    function actualizarEncabezados(beneficoFiltro) {
+      // Columnas fijas
+      let encabezados = `
+        <th>Producto</th>
+        <th>Ingrediente</th>
+      `;
+      
+      // Columnas dinámicas según el benéfico
+      if (!beneficoFiltro) {
+        encabezados += `
+          <th colspan="5">A. Swirskii</th>
+          <th colspan="5">N. Cucumeris</th>
+          <th colspan="5">Crizopa</th>
+          <th colspan="5">Aphidius Colemani</th>
+          <th colspan="3">Abejorros</th>
+        `;
+      } else {
+        switch(beneficoFiltro) {
+          case "swirskii":
+            encabezados += `
+              <th>Larva</th>
+              <th>Adulto</th>
+              <th>Huevo</th>
+              <th>Ninfa</th>
+              <th>Persistencia</th>
+            `;
+            break;
+          case "cucumeris":
+            encabezados += `
+              <th>Larva</th>
+              <th>Adulto</th>
+              <th>Huevo</th>
+              <th>Ninfa</th>
+              <th>Persistencia</th>
+            `;
+            break;
+          case "crizopa":
+            encabezados += `
+              <th>Larva</th>
+              <th>Adulto</th>
+              <th>Huevo</th>
+              <th>Ninfa</th>
+              <th>Persistencia</th>
+            `;
+            break;
+          case "colemani":
+            encabezados += `
+              <th>Larva</th>
+              <th>Adulto</th>
+              <th>Huevo</th>
+              <th>Ninfa</th>
+              <th>Persistencia</th>
+            `;
+            break;
+          case "abejorros":
+            encabezados += `
+              <th>Colonia</th>
+              <th>Persistencia</th>
+              <th>Acción</th>
+            `;
+            break;
+        }
+      }
+      
+      tablaHeader.innerHTML = encabezados;
+    }
+
     // Formatear valores numéricos
     function formatearValor(valor) {
-      if (valor === undefined || valor === null) return "-";
+      if (valor === undefined || valor === null || valor === "" || valor === "0") return "-";
       
       const strValor = valor.toString().trim();
       
       switch (strValor) {
-        case "1": return "🟢 1 (<25%)";
-        case "2": return "🟡 2 (25-50%)";
-        case "3": return "🟠 3 (50-75%)";
-        case "4": return "🔴 4 (>75%)";
-        case "?": 
-        case "desconocido": 
-          return "⚪ Desconocido";
-        default: 
-          return strValor || "-";
+        case "1": return "🟢 N1 (<25%)";
+        case "2": return "🟡 N2 (25-50%)";
+        case "3": return "🟠 N3 (50-75%)";
+        case "4": return "🔴 N4 (>75%)";
+        case "?": return "⚪ Desconocido";
+        default: return strValor;
       }
     }
 
-    // Formatear valor de abejorros
-    function formatearAbejorros(valor) {
-      if (valor === undefined || valor === null) return "-";
+    // Formatear acción de abejorros
+    function formatearAbejorrosAccion(valor) {
+      if (valor === undefined || valor === null || valor === "ninguna") return "-";
       
       const strValor = valor.toString().trim().toLowerCase();
       
       switch (strValor) {
-        case "retirar": return "❌ Retirar colmena";
-        case "cubrir": return "🟧 Cubrir colmena";
-        case "ninguna": 
-        case "ninguna accion": 
-        case "ninguna acción": 
-          return "✅ Sin acción";
-        case "?": 
-        case "desconocido": 
-          return "⚪ Desconocido";
-        default: 
-          return strValor || "-";
+        case "cubrir": return "🟧 Cubrir";
+        case "retirar": return "❌ Retirar";
+        case "incompatible": return "⚠️ Incompatible";
+        default: return strValor;
       }
     }
 
@@ -298,8 +636,7 @@
         return;
       }
       
-      let csv = "Categoría,Producto,Ingrediente,Swirskii,Cucumeris,Carnea,Colemani,Abejorros\n";
-      
+      const beneficoFiltro = filtroBenefico.value;
       const textoFiltro = buscador.value.toLowerCase();
       const categoriaFiltro = filtroCategoria.value;
       
@@ -313,37 +650,93 @@
         if (textoFiltro) {
           const producto = r.producto?.toString().toLowerCase() || "";
           const ingrediente = r.ingrediente?.toString().toLowerCase() || "";
-          return producto.includes(textoFiltro) || ingrediente.includes(textoFiltro);
+          if (!producto.includes(textoFiltro) && !ingrediente.includes(textoFiltro)) {
+            return false;
+          }
         }
         
-        return true;
+        // Filtrar registros que solo tengan "Sin efecto"
+        return tieneDatosRelevantes(r, beneficoFiltro);
       });
       
-      registrosFiltrados.forEach(r => {
-        csv += `"${r.categoria || ""}","${r.producto || ""}","${r.ingrediente || ""}",` +
-               `"${formatearValor(r.swirskii).replace(/"/g, '""')}","${formatearValor(r.cucumeris).replace(/"/g, '""')}",` +
-               `"${formatearValor(r.carnea).replace(/"/g, '""')}","${formatearValor(r.colemani).replace(/"/g, '""')}",` +
-               `"${formatearAbejorros(r.abejorros).replace(/"/g, '""')}"\n`;
-      });
+      if (registrosFiltrados.length === 0) {
+        alert("No hay datos relevantes para exportar");
+        return;
+      }
+      
+      let csv = "";
+      
+      if (!beneficoFiltro) {
+        // CSV para todos los benéficos
+        csv = "Producto,Ingrediente,A.Swirskii Larva,A.Swirskii Adulto,A.Swirskii Huevo,A.Swirskii Ninfa,A.Swirskii Persistencia," +
+              "N.Cucumeris Larva,N.Cucumeris Adulto,N.Cucumeris Huevo,N.Cucumeris Ninfa,N.Cucumeris Persistencia," +
+              "Crizopa Larva,Crizopa Adulto,Crizopa Huevo,Crizopa Ninfa,Crizopa Persistencia," +
+              "A.Colemani Larva,A.Colemani Adulto,A.Colemani Huevo,A.Colemani Ninfa,A.Colemani Persistencia," +
+              "Abejorros Colonia,Abejorros Persistencia,Abejorros Acción\n";
+              
+        registrosFiltrados.forEach(r => {
+          csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
+                 `"${formatearValor(r.swirskii_larva)}","${formatearValor(r.swirskii_adulto)}","${formatearValor(r.swirskii_huevo)}","${formatearValor(r.swirskii_ninfa)}","${r.swirskii_persistencia || ""}",` +
+                 `"${formatearValor(r.cucumeris_larva)}","${formatearValor(r.cucumeris_adulto)}","${formatearValor(r.cucumeris_huevo)}","${formatearValor(r.cucumeris_ninfa)}","${r.cucumeris_persistencia || ""}",` +
+                 `"${formatearValor(r.crizopa_larva)}","${formatearValor(r.crizopa_adulto)}","${formatearValor(r.crizopa_huevo)}","${formatearValor(r.crizopa_ninfa)}","${r.crizopa_persistencia || ""}",` +
+                 `"${formatearValor(r.colemani_larva)}","${formatearValor(r.colemani_adulto)}","${formatearValor(r.colemani_huevo)}","${formatearValor(r.colemani_ninfa)}","${r.colemani_persistencia || ""}",` +
+                 `"${formatearValor(r.abejorros_colonia)}","${r.abejorros_persistencia || ""}","${formatearAbejorrosAccion(r.abejorros_accion)}"\n`;
+        });
+      } else {
+        // CSV para un benéfico específico
+        switch(beneficoFiltro) {
+          case "swirskii":
+            csv = "Producto,Ingrediente,Larva,Adulto,Huevo,Ninfa,Persistencia\n";
+            registrosFiltrados.forEach(r => {
+              csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
+                     `"${formatearValor(r.swirskii_larva)}","${formatearValor(r.swirskii_adulto)}","${formatearValor(r.swirskii_huevo)}","${formatearValor(r.swirskii_ninfa)}","${r.swirskii_persistencia || ""}"\n`;
+            });
+            break;
+          case "cucumeris":
+            csv = "Producto,Ingrediente,Larva,Adulto,Huevo,Ninfa,Persistencia\n";
+            registrosFiltrados.forEach(r => {
+              csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
+                     `"${formatearValor(r.cucumeris_larva)}","${formatearValor(r.cucumeris_adulto)}","${formatearValor(r.cucumeris_huevo)}","${formatearValor(r.cucumeris_ninfa)}","${r.cucumeris_persistencia || ""}"\n`;
+            });
+            break;
+          case "crizopa":
+            csv = "Producto,Ingrediente,Larva,Adulto,Huevo,Ninfa,Persistencia\n";
+            registrosFiltrados.forEach(r => {
+              csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
+                     `"${formatearValor(r.crizopa_larva)}","${formatearValor(r.crizopa_adulto)}","${formatearValor(r.crizopa_huevo)}","${formatearValor(r.crizopa_ninfa)}","${r.crizopa_persistencia || ""}"\n`;
+            });
+            break;
+          case "colemani":
+            csv = "Producto,Ingrediente,Larva,Adulto,Huevo,Ninfa,Persistencia\n";
+            registrosFiltrados.forEach(r => {
+              csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
+                     `"${formatearValor(r.colemani_larva)}","${formatearValor(r.colemani_adulto)}","${formatearValor(r.colemani_huevo)}","${formatearValor(r.colemani_ninfa)}","${r.colemani_persistencia || ""}"\n`;
+            });
+            break;
+          case "abejorros":
+            csv = "Producto,Ingrediente,Colonia,Persistencia,Acción\n";
+            registrosFiltrados.forEach(r => {
+              csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
+                     `"${formatearValor(r.abejorros_colonia)}","${r.abejorros_persistencia || ""}","${formatearAbejorrosAccion(r.abejorros_accion)}"\n`;
+            });
+            break;
+        }
+      }
       
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
       const fecha = new Date().toISOString().split('T')[0];
       
       link.href = URL.createObjectURL(blob);
-      link.download = `daño_beneficos_${fecha}.csv`;
+      link.download = `evaluacion_beneficos_${fecha}.csv`;
       link.click();
     }
 
     // Event listeners
     buscador.addEventListener("input", mostrarFiltrados);
     filtroCategoria.addEventListener("change", mostrarFiltrados);
+    filtroBenefico.addEventListener("change", mostrarFiltrados);
     document.addEventListener("DOMContentLoaded", cargarDatos);
   </script>
-  
-  <div class="footer">
-    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-    <p>Versión 2.0 - Módulo completo</p>
-  </div>
 </body>
 </html>
