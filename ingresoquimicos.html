@@ -5,84 +5,221 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Agregar Producto</title>
   <style>
+    :root {
+      --primary-color: #2e7d32;
+      --primary-hover: #1b5e20;
+      --light-bg: #f1fdf3;
+      --light-border: #c8e6c9;
+      --white: #ffffff;
+      --shadow: rgba(0,0,0,0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
       font-family: Arial, sans-serif;
-      background: #f1fdf3;
-      margin: 20px;
-      color: #2e7d32;
+      background: var(--light-bg);
+      margin: 0;
+      padding: 20px;
+      color: var(--primary-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+    
     h2 {
       text-align: center;
-      color: #2e7d32;
+      color: var(--primary-color);
+      margin-top: 0;
     }
+    
     form {
-      background: #ffffff;
+      background: var(--white);
       padding: 20px;
       border-radius: 10px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 8px var(--shadow);
+      flex: 1;
     }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
     input, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #c8e6c9;
+      padding: 12px;
+      border: 1px solid var(--light-border);
       border-radius: 5px;
+      font-size: 16px;
     }
+    
     button {
-      background: #2e7d32;
+      background: var(--primary-color);
       color: white;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 16px;
+      display: block;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 300px;
     }
+    
     button:hover {
-      background: #1b5e20;
+      background: var(--primary-hover);
     }
+    
     .success {
       color: green;
       text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+      margin-top: auto;
+    }
+    
+    .footer p {
+      margin: 5px 0;
+    }
+    
+    /* Estilos para el datalist de plagas */
+    #plagas-list {
+      position: absolute;
+      background-color: white;
+      border: 1px solid var(--light-border);
+      border-radius: 0 0 5px 5px;
+      max-height: 150px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    
+    #plagas-list option {
+      padding: 10px;
+      cursor: pointer;
+    }
+    
+    #plagas-list option:hover {
+      background-color: var(--light-bg);
+    }
+    
+    .plagas-container {
+      position: relative;
+    }
+    
+    /* Responsive */
+    @media (min-width: 768px) {
+      .form-row {
+        display: flex;
+        gap: 20px;
+      }
+      
+      .form-row .form-group {
+        flex: 1;
+      }
     }
   </style>
 </head>
 <body>
   <h2>Agregar Producto Químico</h2>
   <form id="producto-form">
-    <input type="text" id="nombre" placeholder="Nombre comercial" required />
-    <input type="text" id="ingredientes" placeholder="Ingredientes activos" required />
-    <input type="text" id="senasa" placeholder="Registro Senasa" required />
-    <input type="text" id="epa" placeholder="Registro EPA" />
-    <input type="number" id="dias" placeholder="Días a cosecha" required />
-    <input type="text" id="reingreso" placeholder="Periodo de reingreso (horas/días)" required />
-
-    <label for="plagas">Plagas a controlar:</label>
-    <select id="plagas" required>
-      <option value="" disabled selected>Seleccione una plaga</option>
-      <option value="Mosca">Mosca</option>
-      <option value="Picudo">Picudo</option>
-      <option value="Trips">Trips</option>
-      <option value="Gusano">Gusano</option>
-      <option value="Chinche">Chinche</option>
-    </select>
-
-    <input type="text" id="dosis_maxima" placeholder="Dosis máxima" />
-    <input type="text" id="dosis_litro" placeholder="Dosis por litro de agua" />
-
-    <label for="banda">Banda:</label>
-    <select id="banda" required>
-      <option value="" disabled selected>Seleccione un color</option>
-      <option value="red">Rojo</option>
-      <option value="yellow">Amarillo</option>
-      <option value="blue">Azul</option>
-      <option value="green">Verde</option>
-    </select>
-
+    <div class="form-group">
+      <input type="text" id="nombre" placeholder="Nombre comercial" required />
+    </div>
+    
+    <div class="form-group">
+      <input type="text" id="ingredientes" placeholder="Ingredientes activos" required />
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <input type="text" id="senasa" placeholder="Registro Senasa" required />
+      </div>
+      
+      <div class="form-group">
+        <input type="text" id="epa" placeholder="Registro EPA" />
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="categoria">Categoría:</label>
+      <select id="categoria" required>
+        <option value="" disabled selected>Seleccione una categoría</option>
+        <option value="Insecticida">Insecticida</option>
+        <option value="Fungicida">Fungicida</option>
+        <option value="Aminoácido">Aminoácido</option>
+        <option value="Estimulador">Estimulador</option>
+        <option value="Herbicida">Herbicida</option>
+        <option value="Bactericida">Bactericida</option>
+      </select>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <input type="number" id="dias" placeholder="Días a cosecha" required />
+      </div>
+      
+      <div class="form-group">
+        <input type="text" id="reingreso" placeholder="Periodo de reingreso (horas/días)" required />
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="plagas">Plagas a controlar:</label>
+      <div class="plagas-container">
+        <input type="text" id="plagas" list="plagas-sugerencias" placeholder="Escriba o seleccione una plaga" required />
+        <datalist id="plagas-sugerencias"></datalist>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <input type="text" id="dosis_maxima" placeholder="Dosis máxima" />
+      </div>
+      
+      <div class="form-group">
+        <input type="text" id="dosis_litro" placeholder="Dosis por litro de agua" />
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="banda">Banda:</label>
+      <select id="banda" required>
+        <option value="" disabled selected>Seleccione un color</option>
+        <option value="red">Rojo</option>
+        <option value="yellow">Amarillo</option>
+        <option value="blue">Azul</option>
+        <option value="green">Verde</option>
+      </select>
+    </div>
+    
     <button type="submit">Guardar Producto</button>
     <div class="success" id="mensaje"></div>
   </form>
+
+  <div class="footer">
+    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo completo</p>
+  </div>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -101,34 +238,66 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Cargar sugerencias de plagas desde Firebase
+    let plagasSugerencias = [];
+    const plagasRef = db.ref("plagas");
+    
+    plagasRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      plagasSugerencias = data ? Object.values(data) : [];
+      
+      // Actualizar datalist
+      const datalist = document.getElementById("plagas-sugerencias");
+      datalist.innerHTML = '';
+      
+      plagasSugerencias.forEach(plaga => {
+        const option = document.createElement('option');
+        option.value = plaga;
+        datalist.appendChild(option);
+      });
+    });
+
     document.getElementById("producto-form").addEventListener("submit", function(e) {
       e.preventDefault();
+      
+      const plagaInput = document.getElementById("plagas").value.trim();
+      
+      // Guardar la nueva plaga si no existe en las sugerencias
+      if (plagaInput && !plagasSugerencias.includes(plagaInput)) {
+        db.ref("plagas").push(plagaInput);
+      }
+      
       const producto = {
         nombre: document.getElementById("nombre").value,
         ingredientes: document.getElementById("ingredientes").value,
         senasa: document.getElementById("senasa").value,
         epa: document.getElementById("epa").value,
+        categoria: document.getElementById("categoria").value,
         dias: document.getElementById("dias").value,
         reingreso: document.getElementById("reingreso").value,
-        plagas: document.getElementById("plagas").value,
+        plagas: plagaInput,
         dosis_maxima: document.getElementById("dosis_maxima").value,
         dosis_litro: document.getElementById("dosis_litro").value,
         banda: document.getElementById("banda").value
       };
+      
       db.ref("productos").push(producto, function(error) {
         const mensaje = document.getElementById("mensaje");
         if (error) {
           mensaje.textContent = "Error al guardar.";
+          mensaje.style.color = "red";
         } else {
           mensaje.textContent = "Producto guardado con éxito.";
+          mensaje.style.color = "green";
           document.getElementById("producto-form").reset();
+          
+          // Ocultar mensaje después de 3 segundos
+          setTimeout(() => {
+            mensaje.textContent = "";
+          }, 3000);
         }
       });
     });
   </script>
-  <div class="footer">
-        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-        <p>Versión 2.0 - Módulo completo</p>
-    </div>
 </body>
 </html>
