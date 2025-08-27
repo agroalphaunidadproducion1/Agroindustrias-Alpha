@@ -101,40 +101,36 @@
       margin: 5px 0;
     }
     
-    /* Estilos para el datalist de plagas */
-    #plagas-list {
-      position: absolute;
-      background-color: white;
-      border: 1px solid var(--light-border);
-      border-radius: 0 0 5px 5px;
-      max-height: 150px;
-      overflow-y: auto;
-      z-index: 100;
-      display: none;
+    .cultivo-section {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
     }
     
-    #plagas-list option {
-      padding: 10px;
-      cursor: pointer;
+    .cultivo-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--primary-color);
     }
     
-    #plagas-list option:hover {
-      background-color: var(--light-bg);
+    .form-row {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
     }
     
-    .plagas-container {
-      position: relative;
+    .form-row .form-group {
+      flex: 1;
+      min-width: 200px;
     }
     
     /* Responsive */
-    @media (min-width: 768px) {
+    @media (max-width: 768px) {
       .form-row {
-        display: flex;
-        gap: 20px;
-      }
-      
-      .form-row .form-group {
-        flex: 1;
+        flex-direction: column;
+        gap: 0;
       }
     }
   </style>
@@ -173,31 +169,69 @@
       </select>
     </div>
     
-    <div class="form-row">
-      <div class="form-group">
-        <input type="number" id="dias" placeholder="Días a cosecha" required />
+    <!-- Sección para MINI PEPINO -->
+    <div class="cultivo-section">
+      <div class="cultivo-title">MINI</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="number" id="dias_mini" placeholder="Días a cosecha (Mini)" required />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="reingreso_mini" placeholder="Periodo de reingreso (Mini)" required />
+        </div>
       </div>
       
       <div class="form-group">
-        <input type="text" id="reingreso" placeholder="Periodo de reingreso (horas/días)" required />
+        <label for="plagas_mini">Plagas a controlar (Mini):</label>
+        <div class="plagas-container">
+          <input type="text" id="plagas_mini" list="plagas-sugerencias" placeholder="Escriba o seleccione una plaga" required />
+          <datalist id="plagas-sugerencias"></datalist>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" id="dosis_maxima_mini" placeholder="Dosis máxima (Mini)" />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="dosis_litro_mini" placeholder="Dosis por litro de agua (Mini)" />
+        </div>
       </div>
     </div>
     
-    <div class="form-group">
-      <label for="plagas">Plagas a controlar:</label>
-      <div class="plagas-container">
-        <input type="text" id="plagas" list="plagas-sugerencias" placeholder="Escriba o seleccione una plaga" required />
-        <datalist id="plagas-sugerencias"></datalist>
-      </div>
-    </div>
-    
-    <div class="form-row">
-      <div class="form-group">
-        <input type="text" id="dosis_maxima" placeholder="Dosis máxima" />
+    <!-- Sección para TOMATE -->
+    <div class="cultivo-section">
+      <div class="cultivo-title">TOMATE</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="number" id="dias_tomate" placeholder="Días a cosecha (Tomate)" required />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="reingreso_tomate" placeholder="Periodo de reingreso (Tomate)" required />
+        </div>
       </div>
       
       <div class="form-group">
-        <input type="text" id="dosis_litro" placeholder="Dosis por litro de agua" />
+        <label for="plagas_tomate">Plagas a controlar (Tomate):</label>
+        <div class="plagas-container">
+          <input type="text" id="plagas_tomate" list="plagas-sugerencias" placeholder="Escriba o seleccione una plaga" required />
+          <datalist id="plagas-sugerencias"></datalist>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" id="dosis_maxima_tomate" placeholder="Dosis máxima (Tomate)" />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="dosis_litro_tomate" placeholder="Dosis por litro de agua (Tomate)" />
+        </div>
       </div>
     </div>
     
@@ -260,11 +294,16 @@
     document.getElementById("producto-form").addEventListener("submit", function(e) {
       e.preventDefault();
       
-      const plagaInput = document.getElementById("plagas").value.trim();
+      const plagaMiniInput = document.getElementById("plagas_mini").value.trim();
+      const plagaTomateInput = document.getElementById("plagas_tomate").value.trim();
       
-      // Guardar la nueva plaga si no existe en las sugerencias
-      if (plagaInput && !plagasSugerencias.includes(plagaInput)) {
-        db.ref("plagas").push(plagaInput);
+      // Guardar las nuevas plagas si no existen en las sugerencias
+      if (plagaMiniInput && !plagasSugerencias.includes(plagaMiniInput)) {
+        db.ref("plagas").push(plagaMiniInput);
+      }
+      
+      if (plagaTomateInput && !plagasSugerencias.includes(plagaTomateInput)) {
+        db.ref("plagas").push(plagaTomateInput);
       }
       
       const producto = {
@@ -273,11 +312,18 @@
         senasa: document.getElementById("senasa").value,
         epa: document.getElementById("epa").value,
         categoria: document.getElementById("categoria").value,
-        dias: document.getElementById("dias").value,
-        reingreso: document.getElementById("reingreso").value,
-        plagas: plagaInput,
-        dosis_maxima: document.getElementById("dosis_maxima").value,
-        dosis_litro: document.getElementById("dosis_litro").value,
+        // Datos para MINI PEPINO
+        dias_mini: document.getElementById("dias_mini").value,
+        reingreso_mini: document.getElementById("reingreso_mini").value,
+        plagas_mini: plagaMiniInput,
+        dosis_maxima_mini: document.getElementById("dosis_maxima_mini").value,
+        dosis_litro_mini: document.getElementById("dosis_litro_mini").value,
+        // Datos para TOMATE
+        dias_tomate: document.getElementById("dias_tomate").value,
+        reingreso_tomate: document.getElementById("reingreso_tomate").value,
+        plagas_tomate: plagaTomateInput,
+        dosis_maxima_tomate: document.getElementById("dosis_maxima_tomate").value,
+        dosis_litro_tomate: document.getElementById("dosis_litro_tomate").value,
         banda: document.getElementById("banda").value
       };
       
