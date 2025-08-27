@@ -2,665 +2,1353 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login - Sistema Agroalpha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema Agroalpha</title>
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="icon" type="image/x-icon" href="icon-192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4CAF50;
-            --primary-dark: #388E3C;
-            --primary-light: #C8E6C9;
-            --secondary-color: #FFC107;
-            --error-color: #f44336;
-            --light-gray: #f5f5f5;
+            --primary-color: #2E7D32;
+            --primary-light: #4CAF50;
+            --primary-dark: #1B5E20;
+            --secondary-color: #FF9800;
+            --admin-color: #1976D2;
+            --supervisor-color: #7B1FA2;
+            --grower-color: #D32F2F;
+            --digitador-color: #C2185B;
+            --tecnico-color: #0288D1;
+            --culturales-color: #5D4037;
+            --riego-color: #0097A7;
+            --invitado-color: #616161;
+            --light-gray: #f8f9fa;
             --white: #ffffff;
-            --text-dark: #333333;
-            --text-light: #757575;
+            --dark-gray: #343a40;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --hover-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
         
         * {
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
         }
         
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-gray);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            color: var(--text-color);
+            line-height: 1.6;
         }
         
-        /* Pantalla de inicio para móviles */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--primary-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.5s;
-        }
-        
-        .splash-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .splash-logo {
-            width: 150px;
-            height: 150px;
-            margin-bottom: 30px;
-            animation: pulse 2s infinite;
-        }
-        
-        .splash-text {
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
             color: white;
-            font-size: 24px;
-            font-weight: 500;
-            margin-top: 20px;
-        }
-        
-        .login-container {
-            background-color: rgba(255, 255, 255, 0.97);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-            margin: 20px;
-            backdrop-filter: blur(5px);
-        }
-        
-        .logo {
-            width: 120px;
-            margin-bottom: 25px;
-            transition: transform 0.3s;
-        }
-        
-        .logo:hover {
-            transform: scale(1.05);
-        }
-        
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            font-weight: 500;
-            font-size: 28px;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
-            position: relative;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-dark);
-            font-size: 14px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 15px 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: all 0.3s;
-            background-color: var(--light-gray);
-            -webkit-appearance: none;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-            background-color: var(--white);
-        }
-        
-        .remember-forgot {
+            padding: 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
-        .remember-me {
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .brand {
             display: flex;
             align-items: center;
+            gap: 12px;
         }
         
-        .remember-me input {
-            width: auto;
-            margin-right: 8px;
+        .brand-icon {
+            font-size: 24px;
         }
         
-        .remember-me label {
+        .brand-text h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
             margin: 0;
-            color: var(--text-light);
-            font-weight: 400;
         }
         
-        .forgot-password {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.3s;
-            white-space: nowrap;
+        .brand-text span {
+            font-size: 0.85rem;
+            opacity: 0.9;
         }
         
-        .forgot-password:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
         
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            transition: all 0.3s;
             font-weight: 500;
-            letter-spacing: 0.5px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
         }
         
-        button:hover {
-            background-color: var(--primary-dark);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        .btn-icon {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-icon:hover {
+            background-color: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
         }
         
-        button:active {
-            transform: translateY(0);
+        .btn-primary {
+            background-color: var(--white);
+            color: var(--primary-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-            transform: none !important;
+        .btn-primary:hover {
+            background-color: #f0f7f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         
-        .error-message {
-            color: var(--error-color);
-            margin-top: 15px;
-            font-size: 14px;
-            text-align: center;
-            min-height: 20px;
-            padding: 0 10px;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
         }
         
-        .loading {
+        .role-badge {
             display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .admin-badge { background-color: var(--admin-color); }
+        .supervisor-badge { background-color: var(--supervisor-color); }
+        .grower-badge { background-color: var(--grower-color); }
+        .digitador-badge { background-color: var(--digitador-color); }
+        .fitosanidad-badge { background-color: var(--tecnico-color); }
+        .culturales-badge { background-color: var(--culturales-color); }
+        .riego-badge { background-color: var(--riego-color); }
+        .invitado-badge { background-color: var(--invitado-color); }
+        
+        .notification-counter {
+            background-color: #F44336;
+            color: white;
+            border-radius: 50%;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-        
-        .loading-container {
             display: flex;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            flex-direction: column;
-            background-color: rgba(255,255,255,0.95);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1000;
-        }
-        
-        .loading-text {
-            margin-top: 20px;
-            color: var(--primary-color);
-            font-weight: 500;
-            font-size: 18px;
-        }
-        
-        .password-container {
-            position: relative;
-        }
-        
-        .toggle-password {
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
             position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--text-light);
-            font-size: 20px;
-            user-select: none;
-            padding: 5px;
+            top: -5px;
+            right: -5px;
         }
         
-        .footer {
-            margin-top: 30px;
-            color: var(--text-light);
-            font-size: 12px;
-            line-height: 1.5;
+        .main-content {
+            padding: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: color 0.3s;
+        .welcome-container {
+            background: linear-gradient(120deg, #f0f7f0 0%, #e8f5e9 100%);
+            padding: 28px;
+            border-radius: 12px;
+            margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
+            border-left: 5px solid var(--primary-color);
         }
         
-        .footer a:hover {
+        .welcome-title {
             color: var(--primary-dark);
-            text-decoration: underline;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            font-weight: 600;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .welcome-subtitle {
+            color: var(--dark-gray);
+            margin-bottom: 0;
+            font-size: 1.1rem;
+            max-width: 800px;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .dashboard-section {
+            margin-bottom: 32px;
         }
         
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--primary-color);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action-btn {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .quick-action-btn:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .quick-action-icon {
+            background-color: var(--primary-light);
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .quick-action-content {
+            flex-grow: 1;
+        }
+        
+        .quick-action-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+        
+        .quick-action-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--primary-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+            color: var(--primary-color);
+            background-color: rgba(46, 125, 50, 0.1);
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card p {
+            color: #495057;
+            margin-bottom: 20px;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+        
+        .card-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .card-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Estilos para modales */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 28px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalopen 0.4s ease-out;
+        }
+        
+        @keyframes modalopen {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #6c757d;
+            transition: color 0.3s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .close-btn:hover {
+            background-color: #f5f5f5;
+            color: var(--primary-color);
+        }
+        
+        .modal-body {
+            margin-bottom: 24px;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            text-align: right;
+        }
+        
+        /* Estilos específicos para modal de ajustes */
+        .settings-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+        
+        .settings-option:hover {
+            background-color: #f8f9fa;
+            border-color: var(--border-color);
+            transform: translateX(5px);
+        }
+        
+        .settings-option i {
+            margin-right: 16px;
+            color: var(--primary-color);
+            width: 28px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+        
+        .settings-option-content h3 {
+            margin: 0 0 6px 0;
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+        }
+        
+        .settings-option-content p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Estilos para modal de soporte */
+        .support-item {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .support-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .support-item h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+        }
+        
+        .support-item h3 i {
+            color: var(--primary-color);
+            width: 28px;
+            text-align: center;
+        }
+        
+        .support-item p {
+            margin: 12px 0 16px 0;
+            color: #495057;
+        }
+        
+        /* Estilos para modal de notificaciones */
+        .notification-item {
+            padding: 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fa;
+            border-color: var(--border-color);
+        }
+        
+        .notification-item.unread {
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .notification-icon {
+            margin-right: 16px;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            margin-top: 4px;
+        }
+        
+        .notification-content {
+            flex-grow: 1;
+        }
+        
+        .notification-content h3 {
+            margin: 0 0 8px 0;
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+        }
+        
+        .notification-content p {
+            margin: 0;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+        
+        .notification-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-align: right;
+            margin-top: 8px;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--white);
+        }
+        
+        /* Estilos responsivos */
+        @media (max-width: 992px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .quick-action-btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+        
+        /* Animaciones adicionales */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
         
-        .hidden {
-            display: none;
-        }
-        
-        /* Media Queries para Responsividad */
-        @media (max-width: 768px) {
-            .login-container {
-                padding: 30px;
-                margin: 15px;
-                width: calc(100% - 30px);
-            }
-            
-            h1 {
-                font-size: 24px;
-                margin-bottom: 20px;
-            }
-            
-            input {
-                padding: 14px 16px;
-            }
-            
-            button {
-                padding: 15px;
-            }
-            
-            .splash-logo {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .splash-text {
-                font-size: 20px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 25px 20px;
-                border-radius: 10px;
-            }
-            
-            .logo {
-                width: 100px;
-            }
-            
-            .remember-forgot {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .forgot-password {
-                margin-top: 10px;
-                align-self: flex-end;
-            }
-            
-            .splash-logo {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .splash-text {
-                font-size: 18px;
-            }
-        }
-        
-        /* Detección de móvil */
-        @media (hover: none) and (pointer: coarse) {
-            body {
-                background-attachment: initial;
-            }
-            
-            input, button {
-                font-size: 16px !important;
-            }
+        .pulse {
+            animation: pulse 2s infinite;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <!-- Pantalla de Splash para móviles -->
-    <div id="splashScreen" class="splash-screen">
-        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069172.png" alt="Agroalpha Logo" class="splash-logo">
-        <div class="splash-text">Sistema Agroalpha</div>
-    </div>
-    
-    <!-- Pantalla de carga -->
-    <div id="loadingScreen" class="loading-container hidden">
-        <div class="loading"></div>
-        <div class="loading-text">Verificando sesión...</div>
-    </div>
-    
-    <!-- Formulario de Login -->
-    <div id="loginFormContainer" class="login-container hidden">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK6pM2j_2yXjRnGm8nKJQ064y-EOLqYOnnJA&s" alt="Logo Agroalpha" class="logo">
-        <h1>Iniciar Sesión</h1>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" required autocomplete="username" autocapitalize="off">
+    <!-- Modal de Ajustes -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-sliders-h"></i> Configuración del Sistema</h2>
+                <button class="close-btn">&times;</button>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <div class="password-container">
-                    <input type="password" id="password" required autocomplete="current-password">
-                    <span class="toggle-password" id="togglePassword">👁️</span>
+            <div class="modal-body">
+                <div class="settings-option" onclick="redirectTo('perfil.html')">
+                    <i class="fas fa-user-cog"></i>
+                    <div class="settings-option-content">
+                        <h3>Perfil de Usuario</h3>
+                        <p>Actualiza tu información personal y preferencias de cuenta</p>
+                    </div>
+                </div>
+                
+                <div class="settings-option" onclick="redirectTo('seguridad.html')">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="settings-option-content">
+                        <h3>Seguridad y Acceso</h3>
+                        <p>Gestiona contraseñas, autenticación y permisos de acceso</p>
+                    </div>
+                </div>
+                
+                <div class="settings-option" onclick="redirectTo('notificaciones-config.html')">
+                    <i class="fas fa-bell"></i>
+                    <div class="settings-option-content">
+                        <h3>Preferencias de Notificaciones</h3>
+                        <p>Configura alertas y métodos de notificación preferidos</p>
+                    </div>
+                </div>
+                
+                <div class="settings-option" onclick="redirectTo('tema.html')">
+                    <i class="fas fa-palette"></i>
+                    <div class="settings-option-content">
+                        <h3>Personalización de Interfaz</h3>
+                        <p>Ajusta temas, colores y disposición de elementos visuales</p>
+                    </div>
+                </div>
+                
+                <div class="settings-option" onclick="redirectTo('preferencias.html')">
+                    <i class="fas fa-cogs"></i>
+                    <div class="settings-option-content">
+                        <h3>Preferencias del Sistema</h3>
+                        <p>Configura opciones generales de funcionamiento y visualización</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('settingsModal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Soporte -->
+    <div id="supportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-life-ring"></i> Centro de Soporte</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="support-item">
+                    <h3><i class="fas fa-book-open"></i> Centro de Documentación</h3>
+                    <p>Acceda a manuales completos, guías de usuario y documentación técnica para todos los módulos del sistema.</p>
+                    <button class="card-btn" onclick="redirectTo('documentacion.html')">Acceder a Documentación</button>
+                </div>
+                
+                <div class="support-item">
+                    <h3><i class="fas fa-graduation-cap"></i> Academia Agroalpha</h3>
+                    <p>Videotutoriales, cursos interactivos y materiales de capacitación para maximizar el uso del sistema.</p>
+                    <button class="card-btn" onclick="redirectTo('tutoriales.html')">Explorar Cursos</button>
+                </div>
+                
+                <div class="support-item">
+                    <h3><i class="fas fa-headset"></i> Soporte Técnico Directo</h3>
+                    <p>Contacte a nuestro equipo de especialistas para resolver incidencias y consultas técnicas.</p>
+                    <button class="card-btn" onclick="redirectTo('contacto-soporte.html')">Solicitar Ayuda</button>
+                </div>
+                
+                <div class="support-item">
+                    <h3><i class="fas fa-phone-alt"></i> Línea de Soporte Prioritario</h3>
+                    <p>Asistencia telefónica especializada disponible de lunes a viernes de 7:00 am a 7:00 pm.</p>
+                    <p><strong>Teléfono:</strong> +1 234-567-8900</p>
+                    <button class="card-btn" onclick="window.location.href='tel:+12345678900'">Llamar Ahora</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('supportModal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Notificaciones -->
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-bell"></i> Centro de Notificaciones</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="notification-item unread" onclick="redirectTo('actualizacion-sistema.html')">
+                    <div class="notification-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="notification-content">
+                        <h3>Actualización del Sistema Disponible</h3>
+                        <p>Nueva versión 2.3.1 disponible con mejoras de rendimiento, nuevas funcionalidades y correcciones de seguridad.</p>
+                        <div class="notification-time">Hace 1 día</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item" onclick="redirectTo('tareas-pendientes.html')">
+                    <div class="notification-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="notification-content">
+                        <h3>Tareas Pendientes de Finalizar</h3>
+                        <p>Tiene 3 registros pendientes de completar para la jornada de hoy. Revise y actualice su estado.</p>
+                        <div class="notification-time">Hoy, 9:30 AM</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item" onclick="redirectTo('calendario.html?event=123')">
+                    <div class="notification-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="notification-content">
+                        <h3>Reunión de Equipo Programada</h3>
+                        <p>Reunión de revisión de productividad mañana a las 10:00 AM en el salón de conferencias principal.</p>
+                        <div class="notification-time">Ayer, 4:45 PM</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item" onclick="redirectTo('reporte-detalle.html?id=45')">
+                    <div class="notification-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="notification-content">
+                        <h3>Reporte de Producción Mensual Generado</h3>
+                        <p>El reporte de producción del mes actual está disponible para su revisión y análisis.</p>
+                        <div class="notification-time">Ayer, 2:30 PM</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item" onclick="redirectTo('alertas.html')">
+                    <div class="notification-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="notification-content">
+                        <h3>Alerta de Programación de Riego</h3>
+                        <p>El sector 4 requiere programación de riego urgente. Niveles de humedad por debajo del umbral recomendado.</p>
+                        <div class="notification-time">Ayer, 11:15 AM</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="redirectTo('todas-notificaciones.html')">Ver Todas las Notificaciones</button>
+                <button class="btn btn-primary" onclick="closeModal('notificationsModal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal del Dashboard -->
+    <div class="header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Sistema Agroalpha</h1>
+                    <span>Unidad de Producción 1</span>
                 </div>
             </div>
             
-            <div class="remember-forgot">
-                <div class="remember-me">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Recordarme</label>
+            <div class="user-actions">
+                <div class="action-buttons">
+                    <button class="btn-icon" id="settingsBtn" title="Configuración">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="btn-icon" id="supportBtn" title="Soporte">
+                        <i class="fas fa-question"></i>
+                    </button>
+                    <button class="btn-icon" id="notificationsBtn" title="Notificaciones" style="position: relative;">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-counter" id="notificationCounter" style="display: none;"></span>
+                    </button>
                 </div>
-                <a href="#" class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
+                
+                <div class="user-info">
+                    <span id="user-name">Usuario</span>
+                    <span id="user-role" class="role-badge">Rol</span>
+                    <button class="btn btn-primary" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
             </div>
-            
-            <button type="submit" id="loginButton">
-                <span id="buttonText">Ingresar</span>
-            </button>
-            
-            <div id="errorMessage" class="error-message"></div>
-        </form>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="welcome-container">
+            <h1 class="welcome-title">Bienvenido, <span id="welcome-name">Usuario</span></h1>
+            <p class="welcome-subtitle" id="welcome-message">Sistema integral de gestión agrícola - Monitoreo y control de producción</p>
+        </div>
         
-        <div class="footer">
-            <p>Sistema Agroalpha © 2025 | Versión 2.1</p>
-            <p>Unidad de Producción 1 - <a href="#" id="helpLink">Ayuda Técnica</a></p>
+        <div class="dashboard-section">
+            <h2 class="section-title"><i class="fas fa-bolt"></i> Acciones Rápidas</h2>
+            <div class="quick-actions">
+                <div class="quick-action-btn" id="quickReportBtn" onclick="redirectTo('generar-reporte.html')">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-file-chart-line"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Generar Reporte</div>
+                        <div class="quick-action-desc">Crear reportes personalizados de producción y análisis</div>
+                    </div>
+                </div>
+                
+                <div class="quick-action-btn" onclick="redirectTo('registro-actividad.html')">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-clipboard-list-check"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Registrar Actividad</div>
+                        <div class="quick-action-desc">Documentar tareas y actividades realizadas</div>
+                    </div>
+                </div>
+                
+                <div class="quick-action-btn" onclick="redirectTo('monitoreo-cultivos.html')">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Monitoreo en Tiempo Real</div>
+                        <div class="quick-action-desc">Seguimiento de condiciones y estado de cultivos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h2 class="section-title"><i class="fas fa-th-large"></i> Módulos del Sistema</h2>
+            <div class="cards-container" id="featuresContainer">
+                <!-- Las tarjetas se generarán dinámicamente según el rol -->
+            </div>
         </div>
     </div>
 
     <script>
-        // Configuración de Firebase (reemplaza con tus credenciales)
+        // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "agro-productos.firebaseapp.com",
-            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
-            projectId: "agro-productos",
-            storageBucket: "agro-productos.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
         };
         
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const auth = firebase.auth();
-        
-        // Referencias a las tablas
-        const usersRef = database.ref('login');
         const activeUsersRef = database.ref('uactivos');
         
+        // Datos de ejemplo para notificaciones
+        const notifications = [
+            {
+                id: 1,
+                title: "Actualización del Sistema Disponible",
+                message: "Nueva versión 2.3.1 disponible. Incluye mejoras en rendimiento y nuevas características.",
+                icon: "rocket",
+                time: "Hace 2 horas",
+                read: false,
+                link: "actualizacion-sistema.html"
+            },
+        ];
+        
+        // Contador de notificaciones no leídas
+        function updateNotificationCounter() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            const counter = document.getElementById('notificationCounter');
+            
+            if (unreadCount > 0) {
+                counter.textContent = unreadCount;
+                counter.style.display = 'flex';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+        
+        // Redireccionar a una página
+        function redirectTo(page) {
+            closeAllModals();
+            window.location.href = page;
+        }
+        
+        // Cerrar todos los modales
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Abrir un modal específico
+        function openModal(modalId) {
+            closeAllModals();
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Si es el modal de notificaciones, actualizar contador
+            if (modalId === 'notificationsModal') {
+                // Marcar todas como leídas
+                notifications.forEach(n => n.read = true);
+                updateNotificationCounter();
+            }
+        }
+        
+        // Cerrar un modal específico
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Verificar sesión al cargar
         document.addEventListener('DOMContentLoaded', function() {
-            // Mostrar splash screen en móviles
-            if (isMobileDevice()) {
-                setTimeout(() => {
-                    document.getElementById('splashScreen').classList.add('hidden');
-                    checkSavedSession();
-                }, 2000); // 2 segundos para el splash screen
-            } else {
-                document.getElementById('splashScreen').classList.add('hidden');
-                checkSavedSession();
-            }
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
             
-            // Configurar toggle de contraseña
-            document.getElementById('togglePassword').addEventListener('click', function() {
-                const passwordInput = document.getElementById('password');
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                this.textContent = type === 'password' ? '👁️' : '👁️';
-            });
-            
-            // Manejar el envío del formulario
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                loginUser();
-            });
-            
-            // Manejar clic en "Olvidó su contraseña"
-            document.getElementById('forgotPassword').addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Por favor contacte al administrador del sistema para restablecer su contraseña.\n\nTeléfono: +123456789\nEmail: soporte@agroalpha.com');
-            });
-            
-            // Manejar clic en ayuda
-            document.getElementById('helpLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Para asistencia técnica, contacte al departamento de sistemas:\n\nTeléfono: +123456789\nEmail: soporte@agroalpha.com\nHorario: Lunes a Viernes 8:00 - 17:00');
-            });
-        });
-        
-        function isMobileDevice() {
-            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
-        }
-        
-        function checkSavedSession() {
-            document.getElementById('loadingScreen').classList.remove('hidden');
-            
-            const rememberedUser = localStorage.getItem('rememberedUser');
-            if (rememberedUser) {
-                // Verificar si el usuario está en uactivos
-                activeUsersRef.child(rememberedUser).once('value')
-                    .then(snapshot => {
-                        if (snapshot.exists()) {
-                            // El usuario está activo, verificar credenciales
-                            verifyUserCredentials(rememberedUser);
-                        } else {
-                            // No está activo, mostrar formulario
-                            showLoginForm();
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error al verificar usuario activo:", error);
-                        showLoginForm();
-                    });
-            } else {
-                showLoginForm();
-            }
-        }
-        
-        function verifyUserCredentials(username) {
-            usersRef.child(username).once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        
-                        // Registrar como activo nuevamente
-                        registerActiveUser(username, userData);
-                        
-                        // Guardar datos de usuario en sessionStorage
-                        sessionStorage.setItem('currentUser', JSON.stringify({
-                            username: username,
-                            role: userData.role,
-                            name: userData.name,
-                            lastLogin: new Date().toISOString()
-                        }));
-                        
-                        // Redirigir al dashboard
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        // Usuario no existe, mostrar formulario
-                        localStorage.removeItem('rememberedUser');
-                        showLoginForm();
-                    }
-                })
-                .catch(error => {
-                    console.error("Error al verificar credenciales:", error);
-                    showLoginForm();
-                });
-        }
-        
-        function showLoginForm() {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('loginFormContainer').classList.remove('hidden');
-            
-            // Verificar si hay una sesión guardada para autocompletar
-            const rememberedUser = localStorage.getItem('rememberedUser');
-            if (rememberedUser) {
-                document.getElementById('username').value = rememberedUser;
-                document.getElementById('remember').checked = true;
-                document.getElementById('password').focus();
-            } else {
-                document.getElementById('username').focus();
-            }
-        }
-        
-        function decryptPassword(encrypted) {
-            // En un entorno real, usar un método más seguro
-            return atob(encrypted);
-        }
-        
-        function loginUser() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
-            
-            const errorMessage = document.getElementById('errorMessage');
-            const loginButton = document.getElementById('loginButton');
-            const buttonText = document.getElementById('buttonText');
-            
-            errorMessage.textContent = '';
-            loginButton.disabled = true;
-            buttonText.innerHTML = '<span class="loading"></span> Verificando...';
-            
-            // Validación básica
-            if (!username || !password) {
-                errorMessage.textContent = 'Por favor complete todos los campos';
-                loginButton.disabled = false;
-                buttonText.textContent = 'Ingresar';
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
                 return;
             }
             
-            // Buscar usuario en la base de datos
-            usersRef.child(username).once('value')
+            // Verificar si el usuario sigue activo en uactivos
+            activeUsersRef.child(userData.username).once('value')
                 .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        const decryptedPassword = decryptPassword(userData.password);
-                        
-                        if (password === decryptedPassword) {
-                            // Guardar en localStorage si marcó "Recordarme"
-                            if (remember) {
-                                localStorage.setItem('rememberedUser', username);
-                            } else {
-                                localStorage.removeItem('rememberedUser');
-                            }
-                            
-                            // Registrar usuario en uactivos
-                            registerActiveUser(username, userData);
-                            
-                            // Guardar datos de usuario en sessionStorage
-                            sessionStorage.setItem('currentUser', JSON.stringify({
-                                username: username,
-                                role: userData.role,
-                                name: userData.name,
-                                lastLogin: new Date().toISOString()
-                            }));
-                            
-                            // Redirigir al dashboard
-                            window.location.href = 'dashboard.html';
-                        } else {
-                            errorMessage.textContent = 'Credenciales incorrectas';
-                            loginButton.disabled = false;
-                            buttonText.textContent = 'Ingresar';
-                            document.getElementById('password').focus();
-                        }
-                    } else {
-                        errorMessage.textContent = 'Usuario no encontrado';
-                        loginButton.disabled = false;
-                        buttonText.textContent = 'Ingresar';
-                        document.getElementById('username').focus();
+                    if (!snapshot.exists()) {
+                        logout();
+                        return;
                     }
+                    
+                    // Mostrar información del usuario
+                    displayUserInfo(userData);
+                    
+                    // Configurar eventos de los botones
+                    setupEventListeners();
+                    
+                    // Actualizar contador de notificaciones
+                    updateNotificationCounter();
                 })
                 .catch(error => {
-                    errorMessage.textContent = 'Error al iniciar sesión. Intente nuevamente.';
-                    console.error("Error en login:", error);
-                    loginButton.disabled = false;
-                    buttonText.textContent = 'Ingresar';
+                    console.error('Error verificando sesión activa:', error);
+                    logout();
                 });
+        });
+        
+        // Mostrar información del usuario
+        function displayUserInfo(userData) {
+            document.getElementById('user-name').textContent = userData.name || userData.username;
+            document.getElementById('welcome-name').textContent = userData.name || userData.username;
+            
+            const roleBadge = document.getElementById('user-role');
+            roleBadge.textContent = userData.role;
+            roleBadge.className = 'role-badge ' + getBadgeClass(userData.role);
+            
+            document.getElementById('welcome-message').textContent = getWelcomeMessage(userData.role);
+            generateFeatureCards(userData.role);
         }
         
-        function registerActiveUser(username, userData) {
-            const userStatus = {
-                username: username,
-                name: userData.name,
-                role: userData.role,
-                lastLogin: firebase.database.ServerValue.TIMESTAMP,
-                status: 'active',
-                deviceType: isMobileDevice() ? 'mobile' : 'desktop',
-                os: navigator.platform
+        // Configurar eventos de los botones
+        function setupEventListeners() {
+            // Botones de modales
+            document.getElementById('settingsBtn').addEventListener('click', () => openModal('settingsModal'));
+            document.getElementById('supportBtn').addEventListener('click', () => openModal('supportModal'));
+            document.getElementById('notificationsBtn').addEventListener('click', () => openModal('notificationsModal'));
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            // Botones de cierre de modales
+            document.querySelectorAll('.close-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal.id);
+                });
+            });
+            
+            // Cerrar modal al hacer clic fuera del contenido
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this.id);
+                    }
+                });
+            });
+        }
+        
+        // Obtener clase CSS para el badge según el rol
+        function getBadgeClass(role) {
+            const roleClasses = {
+                'Administrador': 'admin-badge',
+                'Supervisor': 'supervisor-badge',
+                'Grower': 'grower-badge',
+                'Digitador': 'digitador-badge',
+                'Técnico Fitosanidad': 'fitosanidad-badge',
+                'Técnico Prácticas Culturales': 'culturales-badge',
+                'Técnico Riego': 'riego-badge',
+                'Invitado': 'invitado-badge'
+            };
+            return roleClasses[role] || 'invitado-badge';
+        }
+        
+        // Obtener mensaje de bienvenida según el rol
+        function getWelcomeMessage(role) {
+            const today = new Date();
+            const hour = today.getHours();
+            let greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+            
+            const messages = {
+                'Administrador': `${greeting}, tiene acceso completo al sistema. ¿Qué desea gestionar hoy?`,
+                'Supervisor': `${greeting}, supervise las operaciones y actividades del sistema.`,
+                'Grower': `${greeting}, revise el estado de los cultivos y las tareas programadas.`,
+                'Digitador': `${greeting}, comience a registrar los datos del día.`,
+                'Técnico Fitosanidad': `${greeting}, monitoree las plagas y enfermedades en los cultivos.`,
+                'Técnico Prácticas Culturales': `${greeting}, revise las prácticas culturales a implementar.`,
+                'Técnico Riego': `${greeting}, verifique el programa de riego para hoy.`,
+                'Invitado': `${greeting}, bienvenido al sistema. Tiene acceso limitado a funciones de consulta.`
             };
             
-            activeUsersRef.child(username).set(userStatus)
-                .catch(error => {
-                    console.error("Error al registrar usuario activo:", error);
-                });
+            return messages[role] || `${greeting}, bienvenido al sistema de gestión agrícola.`;
+        }
+        
+        // Generar tarjetas de características según el rol
+        function generateFeatureCards(role) {
+            const container = document.getElementById('featuresContainer');
+            container.innerHTML = '';
+            
+            // Características comunes a todos los roles
+            const commonFeatures = [
+                { 
+                    icon: 'fa-chart-network', 
+                    title: 'Panel de Control', 
+                    description: 'Vista general del sistema con métricas clave y KPIs de producción',
+                    link: 'inicio.html'
+                },
+            ];
+            
+            // Definir permisos por rol
+            const rolePermissions = {
+                'Administrador': [
+                    { 
+                        icon: 'fa-users-gear', 
+                        title: 'Gestión de Usuarios', 
+                        description: 'Administre usuarios, roles y permisos del sistema de forma centralizada',
+                        link: 'gestionuser.html'
+                    },
+                    { 
+                        icon: 'fa-clipboard-check', 
+                        title: 'Control de Asistencias', 
+                        description: 'Revise y gestione registros de asistencia del personal',
+                        link: 'reporteasistencia.html'
+                    },
+                    { 
+                        icon: 'fa-user-tie', 
+                        title: 'Administración de Personal', 
+                        description: 'Gestión integral de colaboradores y asignación de recursos',
+                        link: 'adminpersonal.html'
+                    },
+                    { 
+                        icon: 'fa-database', 
+                        title: 'Gestión de Cosechas', 
+                        description: 'Monitoreo y análisis de datos de producción y rendimiento',
+                        link: 'Vercosechas.html'
+                    },
+                    { 
+                        icon: 'fa-pen-to-square', 
+                        title: 'Registro de Cosechas', 
+                        description: 'Captura y actualización de información de producción',
+                        link: 'Registrocosecha.html'
+                    },
+                    { 
+                        icon: 'fa-project-diagram', 
+                        title: 'Proyecciones y Planificación', 
+                        description: 'Análisis predictivo y planificación estratégica de producción',
+                        link: 'proyecciones.html'
+                    },
+                    { 
+                        icon: 'fa-bug', 
+                        title: 'Daño a Organismos Benéficos', 
+                        description: 'Registro y análisis de impacto de productos en fauna auxiliar',
+                        link: 'ingresodanobeneficos.html'
+                    },
+                    { 
+                        icon: 'fa-clipboard-list', 
+                        title: 'Registro de Actividades', 
+                        description: 'Sistematización de operaciones y tareas diarias realizadas',
+                        link: 'registroactividades.html'
+                    },
+                    { 
+                        icon: 'fa-magnifying-glass', 
+                        title: 'Consulta de Personal', 
+                        description: 'Búsqueda avanzada y visualización de información de colaboradores',
+                        link: 'registropersonal.html'
+                    },
+                    { 
+                        icon: 'fa-folder-tree', 
+                        title: 'Gestión Documental', 
+                        description: 'Acceso organizado a documentación técnica y operativa',
+                        link: 'documentos.html'
+                    },
+                    { 
+                        icon: 'fa-chart-column', 
+                        title: 'Análisis de Daños a Benéficos', 
+                        description: 'Evaluación de impacto de agroquímicos en control biológico',
+                        link: 'verdanobeneficos.html'
+                    },
+                    { 
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencias', 
+                        description: 'Captura y validación de asistencia del personal',
+                        link: 'registrarasistencia.html'
+                    },
+                    { 
+                        icon: 'fa-list-check', 
+                        title: 'Seguimiento de Actividades', 
+                        description: 'Monitoreo y control del cumplimiento de tareas programadas',
+                        link: 'reporteactividades.html'
+                    },
+                    { 
+                        icon: 'fa-flask', 
+                        title: 'Inventario de Agroquímicos', 
+                        description: 'Catálogo y gestión de insumos fitosanitarios',
+                        link: 'veragroquimicos.html'
+                    },
+                    { 
+                        icon: 'fa-plus-circle', 
+                        title: 'Registro de Agroquímicos', 
+                        description: 'Incorporación de nuevos productos al inventario',
+                        link: 'ingresoquimicos.html'
+                    }
+                ],
+                'Supervisor': [
+                    { 
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencia', 
+                        description: 'Validación y registro de asistencia del personal a cargo',
+                        link: 'registrarasistencia.html'
+                    }
+                ],
+                'Grower': [
+                    { 
+                        icon: 'fa-clipboard-check', 
+                        title: 'Control de Asistencias', 
+                        description: 'Consulta de registros de asistencia del equipo',
+                        link: 'reporteasistencia.html'
+                    },
+                    { 
+                        icon: 'fa-list-check', 
+                        title: 'Seguimiento de Actividades', 
+                        description: 'Monitoreo del avance de tareas y actividades programadas',
+                        link: 'reporteactividades.html'
+                    },
+                    { 
+                        icon: 'fa-chart-column', 
+                        title: 'Análisis de Daños a Benéficos', 
+                        description: 'Evaluación de impacto de agroquímicos en control biológico',
+                        link: 'verdanobeneficos.html'
+                    },
+                    { 
+                        icon: 'fa-clipboard-list', 
+                        title: 'Registro de Actividades', 
+                        description: 'Documentación de operaciones y tareas realizadas',
+                        link: 'registroactividades.html'
+                    },
+                    { 
+                        icon: 'fa-flask', 
+                        title: 'Inventario de Agroquímicos', 
+                        description: 'Consulta de insumos fitosanitarios disponibles',
+                        link: 'veragroquimicos.html'
+                    },
+                    { 
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencias', 
+                        description: 'Captura de asistencia del personal a cargo',
+                        link: 'registrarasistencia.html'
+                    },
+                    { 
+                        icon: 'fa-folder-tree', 
+                        title: 'Documentación Técnica', 
+                        description: 'Acceso a manuales, protocolos y procedimientos',
+                        link: 'documentos.html'
+                    }
+                ],
+                'Técnico Prácticas Culturales': [
+                    { 
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencia', 
+                        description: 'Registro de asistencia personal',
+                        link: 'registrarasistencia.html'
+                    },
+                    { 
+                        icon: 'fa-clipboard-check', 
+                        title: 'Consulta de Asistencias', 
+                        description: 'Revisión de registros de asistencia del equipo',
+                        link: 'reporteasistencia.html'
+                    }
+                ],
+                'Digitador': [
+                    { 
+                        icon: 'fa-pen-to-square', 
+                        title: 'Registro de Cosechas', 
+                        description: 'Captura de datos de producción y rendimiento',
+                        link: 'Registrocosecha.html'
+                    },
+                    { 
+                        icon: 'fa-project-diagram', 
+                        title: 'Proyecciones', 
+                        description: 'Registro de estimaciones y planificación productiva',
+                        link: 'proyecciones.html'
+                    },
+                    { 
+                        icon: 'fa-magnifying-glass', 
+                        title: 'Consultas Avanzadas', 
+                        description: 'Búsqueda y análisis de información del sistema',
+                        link: 'sistemaAsistencia.html'
+                    }
+                ],
+                'Técnico Fitosanidad': [
+                    { 
+                        icon: 'fa-bug', 
+                        title: 'Manejo Integrado de Plagas', 
+                        description: 'Monitoreo, identificación y control de plagas',
+                        link: 'plagas.html'
+                    },
+                    { 
+                        icon: 'fa-flask', 
+                        title: 'Análisis de Laboratorio', 
+                        description: 'Gestión de muestras y resultados de análisis',
+                        link: 'analisis.html'
+                    },
+                    { 
+                        icon: 'fa-spray-can', 
+                        title: 'Aplicaciones Fitosanitarias', 
+                        description: 'Planificación y registro de aplicaciones',
+                        link: 'aplicaciones.html'
+                    }
+                ],
+                'Técnico Riego': [
+                    { 
+                        icon: 'fa-droplet', 
+                        title: 'Control de Riego', 
+                        description: 'Programación y monitoreo de sistemas de irrigación',
+                        link: 'riego.html'
+                    },
+                    { 
+                        icon: 'fa-cloud-rain', 
+                        title: 'Manejo de Humedad', 
+                        description: 'Seguimiento de niveles de humedad del suelo',
+                        link: 'humedad.html'
+                    },
+                    { 
+                        icon: 'fa-chart-bar', 
+                        title: 'Estadísticas de Riego', 
+                        description: 'Análisis de eficiencia en el uso de agua',
+                        link: 'estadisticas-riego.html'
+                    }
+                ],
+                'Invitado': [
+                    { 
+                        icon: 'fa-eye', 
+                        title: 'Consultas', 
+                        description: 'Acceso a información de consulta general',
+                        link: 'consulta.html'
+                    },
+                    { 
+                        icon: 'fa-file-lines', 
+                        title: 'Reportes Públicos', 
+                        description: 'Visualización de reportes de acceso abierto',
+                        link: 'reportes-publicos.html'
+                    },
+                    { 
+                        icon: 'fa-circle-info', 
+                        title: 'Información General', 
+                        description: 'Datos generales sobre el sistema y operaciones',
+                        link: 'informacion.html'
+                    }
+                ]
+            };
+            
+            // Obtener características según el rol
+            const allFeatures = [...commonFeatures, ...(rolePermissions[role] || [])];
+            
+            // Generar tarjetas
+            allFeatures.forEach(feature => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-icon"><i class="fas ${feature.icon}"></i></div>
+                    <h3>${feature.title}</h3>
+                    <p>${feature.description}</p>
+                    <a href="${feature.link}" class="card-btn">Acceder <i class="fas fa-arrow-right"></i></a>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Cerrar sesión
+        function logout() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (userData?.username) {
+                // Eliminar de usuarios activos
+                activeUsersRef.child(userData.username).remove()
+                    .then(() => {
+                        sessionStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => {
+                        console.error('Error al cerrar sesión:', error);
+                        sessionStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    });
+            } else {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
         }
     </script>
+
+    <div class="footer">
+        <p>Sistema Agroalpha © 2025 | Unidad de Producción 1</p>
+        <p>Versión 2.3.1 - Plataforma Integral de Gestión Agrícola</p>
+    </div>
 </body>
-
 </html>
-
