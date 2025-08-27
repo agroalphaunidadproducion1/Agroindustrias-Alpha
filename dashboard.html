@@ -8,61 +8,151 @@
     <link rel="icon" type="image/x-icon" href="icon-192.png">
     <style>
         :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #45a049;
-            --admin-color: #2196F3;
-            --supervisor-color: #FF5722;
-            --grower-color: #FF9800;
-            --digitador-color: #9C27B0;
-            --tecnico-color: #607D8B;
-            --invitado-color: #9E9E9E;
-            --light-gray: #f5f5f5;
+            --primary-color: #2E7D32;
+            --primary-light: #4CAF50;
+            --primary-dark: #1B5E20;
+            --secondary-color: #FF9800;
+            --admin-color: #1976D2;
+            --supervisor-color: #7B1FA2;
+            --grower-color: #D32F2F;
+            --digitador-color: #C2185B;
+            --tecnico-color: #0288D1;
+            --culturales-color: #5D4037;
+            --riego-color: #0097A7;
+            --invitado-color: #616161;
+            --light-gray: #f8f9fa;
             --white: #ffffff;
-            --dark-gray: #333;
-            --text-color: #333;
+            --dark-gray: #343a40;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --hover-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-gray);
             color: var(--text-color);
+            line-height: 1.6;
         }
         
         .header {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
             color: white;
-            padding: 15px 20px;
+            padding: 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
-        .header h1 {
-            margin: 0;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .brand-icon {
+            font-size: 24px;
+        }
+        
+        .brand-text h1 {
             font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .brand-text span {
+            font-size: 0.85rem;
+            opacity: 0.9;
         }
         
         .user-actions {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-icon {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-icon:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background-color: var(--white);
+            color: var(--primary-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary:hover {
+            background-color: #f0f7f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            padding: 8px 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
         }
         
         .role-badge {
             display: inline-block;
             padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
             color: white;
         }
         
@@ -71,143 +161,197 @@
         .grower-badge { background-color: var(--grower-color); }
         .digitador-badge { background-color: var(--digitador-color); }
         .fitosanidad-badge { background-color: var(--tecnico-color); }
-        .culturales-badge { background-color: #795548; }
-        .riego-badge { background-color: #00BCD4; }
+        .culturales-badge { background-color: var(--culturales-color); }
+        .riego-badge { background-color: var(--riego-color); }
         .invitado-badge { background-color: var(--invitado-color); }
         
-        .btn {
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
+        .notification-counter {
+            background-color: #F44336;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
-            gap: 5px;
-        }
-        
-        .btn-primary {
-            background-color: var(--white);
-            color: var(--primary-color);
-        }
-        
-        .btn-primary:hover {
-            background-color: #e8f5e9;
-        }
-        
-        .btn-icon {
-            background: transparent;
-            color: white;
-            padding: 8px;
-            font-size: 1.1rem;
-        }
-        
-        .btn-icon:hover {
-            transform: scale(1.1);
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            position: absolute;
+            top: -5px;
+            right: -5px;
         }
         
         .main-content {
-            padding: 20px;
+            padding: 24px;
             max-width: 1200px;
             margin: 0 auto;
         }
         
         .welcome-container {
-            background-color: var(--white);
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: linear-gradient(120deg, #f0f7f0 0%, #e8f5e9 100%);
+            padding: 28px;
+            border-radius: 12px;
+            margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
             border-left: 5px solid var(--primary-color);
         }
         
         .welcome-title {
-            color: var(--primary-color);
-            margin-top: 0;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
             font-size: 1.8rem;
+            font-weight: 600;
         }
         
         .welcome-subtitle {
             color: var(--dark-gray);
             margin-bottom: 0;
+            font-size: 1.1rem;
+            max-width: 800px;
         }
         
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+        .dashboard-section {
+            margin-bottom: 32px;
         }
         
-        .card {
-            background-color: var(--white);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            border-top: 3px solid var(--primary-color);
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--primary-dark);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .card h3 {
+        .section-title i {
             color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        
-        .card p {
-            color: var(--dark-gray);
-            margin-bottom: 15px;
-        }
-        
-        .card-icon {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-        
-        .card-btn {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 0.9rem;
-            transition: background-color 0.3s;
-        }
-        
-        .card-btn:hover {
-            background-color: var(--secondary-color);
         }
         
         .quick-actions {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
         }
         
         .quick-action-btn {
             background-color: var(--white);
-            border: 1px solid #ddd;
-            padding: 10px 15px;
-            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            box-shadow: var(--card-shadow);
         }
         
         .quick-action-btn:hover {
-            border-color: var(--primary-color);
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .quick-action-icon {
+            background-color: var(--primary-light);
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .quick-action-content {
+            flex-grow: 1;
+        }
+        
+        .quick-action-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+        
+        .quick-action-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--primary-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
             color: var(--primary-color);
+            background-color: rgba(46, 125, 50, 0.1);
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card p {
+            color: #495057;
+            margin-bottom: 20px;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+        
+        .card-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .card-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
         /* Estilos para modales */
@@ -221,17 +365,18 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
             overflow: auto;
+            backdrop-filter: blur(4px);
         }
         
         .modal-content {
             background-color: white;
             margin: 5% auto;
-            padding: 25px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 600px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: modalopen 0.4s;
+            padding: 28px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalopen 0.4s ease-out;
         }
         
         @keyframes modalopen {
@@ -243,8 +388,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
             margin-bottom: 20px;
         }
         
@@ -253,7 +398,8 @@
             color: var(--primary-color);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-size: 1.5rem;
         }
         
         .close-btn {
@@ -261,21 +407,28 @@
             border: none;
             font-size: 1.8rem;
             cursor: pointer;
-            color: #777;
+            color: #6c757d;
             transition: color 0.3s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
         
         .close-btn:hover {
+            background-color: #f5f5f5;
             color: var(--primary-color);
         }
         
         .modal-body {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         
         .modal-footer {
-            border-top: 1px solid #eee;
-            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
             text-align: right;
         }
         
@@ -283,42 +436,45 @@
         .settings-option {
             display: flex;
             align-items: center;
-            padding: 12px;
-            border-radius: 6px;
+            padding: 16px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
         }
         
         .settings-option:hover {
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            border-color: var(--border-color);
             transform: translateX(5px);
         }
         
         .settings-option i {
-            margin-right: 15px;
+            margin-right: 16px;
             color: var(--primary-color);
-            width: 25px;
+            width: 28px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
         
         .settings-option-content h3 {
-            margin: 0 0 5px 0;
+            margin: 0 0 6px 0;
             color: var(--dark-gray);
+            font-size: 1.1rem;
         }
         
         .settings-option-content p {
             margin: 0;
-            color: #666;
+            color: #6c757d;
             font-size: 0.9rem;
         }
         
         /* Estilos para modal de soporte */
         .support-item {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .support-item:last-child {
@@ -330,46 +486,50 @@
         .support-item h3 {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin-top: 0;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
         }
         
         .support-item h3 i {
             color: var(--primary-color);
-            width: 25px;
+            width: 28px;
             text-align: center;
         }
         
         .support-item p {
-            margin: 10px 0 15px 0;
-            color: #555;
+            margin: 12px 0 16px 0;
+            color: #495057;
         }
         
         /* Estilos para modal de notificaciones */
         .notification-item {
-            padding: 12px;
-            border-radius: 6px;
+            padding: 16px;
+            border-radius: 10px;
             display: flex;
             align-items: flex-start;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.3s;
+            border: 1px solid transparent;
         }
         
         .notification-item:hover {
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+            border-color: var(--border-color);
         }
         
         .notification-item.unread {
-            background-color: #f0f8ff;
-            border-left: 3px solid var(--primary-color);
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--primary-color);
         }
         
         .notification-icon {
-            margin-right: 15px;
+            margin-right: 16px;
             color: var(--primary-color);
-            font-size: 1.2rem;
-            margin-top: 3px;
+            font-size: 1.3rem;
+            margin-top: 4px;
         }
         
         .notification-content {
@@ -377,29 +537,41 @@
         }
         
         .notification-content h3 {
-            margin: 0 0 5px 0;
+            margin: 0 0 8px 0;
             color: var(--dark-gray);
+            font-size: 1.1rem;
         }
         
         .notification-content p {
             margin: 0;
-            color: #666;
-            font-size: 0.9rem;
+            color: #495057;
+            font-size: 0.95rem;
         }
         
         .notification-time {
             font-size: 0.8rem;
-            color: #999;
+            color: #6c757d;
             text-align: right;
-            margin-top: 5px;
+            margin-top: 8px;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--white);
         }
         
         /* Estilos responsivos */
-        @media (max-width: 768px) {
-            .header {
+        @media (max-width: 992px) {
+            .header-content {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 15px;
+                gap: 16px;
             }
             
             .user-actions {
@@ -407,32 +579,54 @@
                 justify-content: space-between;
             }
             
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .quick-action-btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+            
             .cards-container {
                 grid-template-columns: 1fr;
             }
             
             .modal-content {
-                width: 90%;
+                width: 95%;
                 margin: 10% auto;
-                padding: 15px;
+                padding: 20px;
             }
             
-            .quick-actions {
+            .action-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-info {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
             }
         }
         
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
-            color: #666;
-            font-size: 0.9rem;
-            border-top: 1px solid #ddd;
+        /* Animaciones adicionales */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
@@ -442,47 +636,47 @@
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
+                <h2><i class="fas fa-sliders-h"></i> Configuración del Sistema</h2>
                 <button class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="settings-option" onclick="redirectTo('perfil.html')">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-user-cog"></i>
                     <div class="settings-option-content">
                         <h3>Perfil de Usuario</h3>
-                        <p>Actualiza tu información personal y preferencias</p>
+                        <p>Actualiza tu información personal y preferencias de cuenta</p>
                     </div>
                 </div>
                 
                 <div class="settings-option" onclick="redirectTo('seguridad.html')">
                     <i class="fas fa-shield-alt"></i>
                     <div class="settings-option-content">
-                        <h3>Seguridad</h3>
-                        <p>Cambia tu contraseña y configuración de seguridad</p>
+                        <h3>Seguridad y Acceso</h3>
+                        <p>Gestiona contraseñas, autenticación y permisos de acceso</p>
                     </div>
                 </div>
                 
                 <div class="settings-option" onclick="redirectTo('notificaciones-config.html')">
                     <i class="fas fa-bell"></i>
                     <div class="settings-option-content">
-                        <h3>Notificaciones</h3>
-                        <p>Configura cómo recibir alertas y notificaciones</p>
+                        <h3>Preferencias de Notificaciones</h3>
+                        <p>Configura alertas y métodos de notificación preferidos</p>
                     </div>
                 </div>
                 
                 <div class="settings-option" onclick="redirectTo('tema.html')">
                     <i class="fas fa-palette"></i>
                     <div class="settings-option-content">
-                        <h3>Apariencia</h3>
-                        <p>Personaliza el tema y colores del sistema</p>
+                        <h3>Personalización de Interfaz</h3>
+                        <p>Ajusta temas, colores y disposición de elementos visuales</p>
                     </div>
                 </div>
                 
                 <div class="settings-option" onclick="redirectTo('preferencias.html')">
-                    <i class="fas fa-sliders-h"></i>
+                    <i class="fas fa-cogs"></i>
                     <div class="settings-option-content">
-                        <h3>Preferencias</h3>
-                        <p>Ajusta tus preferencias de visualización y funcionamiento</p>
+                        <h3>Preferencias del Sistema</h3>
+                        <p>Configura opciones generales de funcionamiento y visualización</p>
                     </div>
                 </div>
             </div>
@@ -496,31 +690,31 @@
     <div id="supportModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-question-circle"></i> Soporte Técnico</h2>
+                <h2><i class="fas fa-life-ring"></i> Centro de Soporte</h2>
                 <button class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="support-item">
-                    <h3><i class="fas fa-book"></i> Documentación</h3>
-                    <p>Consulta nuestro manual de usuario y guías rápidas para aprender a usar todas las funciones del sistema.</p>
+                    <h3><i class="fas fa-book-open"></i> Centro de Documentación</h3>
+                    <p>Acceda a manuales completos, guías de usuario y documentación técnica para todos los módulos del sistema.</p>
                     <button class="card-btn" onclick="redirectTo('documentacion.html')">Acceder a Documentación</button>
                 </div>
                 
                 <div class="support-item">
-                    <h3><i class="fas fa-video"></i> Tutoriales en Video</h3>
-                    <p>Videos explicativos paso a paso para usar todas las funcionalidades del sistema Agroalpha.</p>
-                    <button class="card-btn" onclick="redirectTo('tutoriales.html')">Ver Tutoriales</button>
+                    <h3><i class="fas fa-graduation-cap"></i> Academia Agroalpha</h3>
+                    <p>Videotutoriales, cursos interactivos y materiales de capacitación para maximizar el uso del sistema.</p>
+                    <button class="card-btn" onclick="redirectTo('tutoriales.html')">Explorar Cursos</button>
                 </div>
                 
                 <div class="support-item">
-                    <h3><i class="fas fa-envelope"></i> Contactar Soporte</h3>
-                    <p>Envía un mensaje directo a nuestro equipo técnico para reportar problemas o solicitar ayuda.</p>
-                    <button class="card-btn" onclick="redirectTo('contacto-soporte.html')">Contactar por Email</button>
+                    <h3><i class="fas fa-headset"></i> Soporte Técnico Directo</h3>
+                    <p>Contacte a nuestro equipo de especialistas para resolver incidencias y consultas técnicas.</p>
+                    <button class="card-btn" onclick="redirectTo('contacto-soporte.html')">Solicitar Ayuda</button>
                 </div>
                 
                 <div class="support-item">
-                    <h3><i class="fas fa-phone-alt"></i> Soporte Telefónico</h3>
-                    <p>Línea directa disponible de lunes a viernes de 8:00 am a 6:00 pm.</p>
+                    <h3><i class="fas fa-phone-alt"></i> Línea de Soporte Prioritario</h3>
+                    <p>Asistencia telefónica especializada disponible de lunes a viernes de 7:00 am a 7:00 pm.</p>
                     <p><strong>Teléfono:</strong> +1 234-567-8900</p>
                     <button class="card-btn" onclick="window.location.href='tel:+12345678900'">Llamar Ahora</button>
                 </div>
@@ -535,42 +729,42 @@
     <div id="notificationsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-bell"></i> Notificaciones</h2>
+                <h2><i class="fas fa-bell"></i> Centro de Notificaciones</h2>
                 <button class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="notification-item unread" onclick="redirectTo('actualizacion-sistema.html')">
-                    <div class="notification-icon"><i class="fas fa-exclamation-circle"></i></div>
+                    <div class="notification-icon"><i class="fas fa-rocket"></i></div>
                     <div class="notification-content">
                         <h3>Actualización del Sistema Disponible</h3>
-                        <p>Nueva versión 2.0.0 disponible. Incluye mejoras en rendimiento y nuevas características.</p>
-                        <div class="notification-time">Hace 1 dia</div>
+                        <p>Nueva versión 2.3.1 disponible con mejoras de rendimiento, nuevas funcionalidades y correcciones de seguridad.</p>
+                        <div class="notification-time">Hace 1 día</div>
                     </div>
                 </div>
                 
                 <div class="notification-item" onclick="redirectTo('tareas-pendientes.html')">
                     <div class="notification-icon"><i class="fas fa-tasks"></i></div>
                     <div class="notification-content">
-                        <h3>Tareas Pendientes</h3>
-                        <p>Tienes 3 registros pendientes de completar para hoy.</p>
+                        <h3>Tareas Pendientes de Finalizar</h3>
+                        <p>Tiene 3 registros pendientes de completar para la jornada de hoy. Revise y actualice su estado.</p>
                         <div class="notification-time">Hoy, 9:30 AM</div>
                     </div>
                 </div>
                 
                 <div class="notification-item" onclick="redirectTo('calendario.html?event=123')">
-                    <div class="notification-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="notification-icon"><i class="fas fa-calendar-alt"></i></div>
                     <div class="notification-content">
-                        <h3>Reunión Programada</h3>
-                        <p>Reunión de equipo mañana a las 10:00 AM en el salón principal.</p>
+                        <h3>Reunión de Equipo Programada</h3>
+                        <p>Reunión de revisión de productividad mañana a las 10:00 AM en el salón de conferencias principal.</p>
                         <div class="notification-time">Ayer, 4:45 PM</div>
                     </div>
                 </div>
                 
                 <div class="notification-item" onclick="redirectTo('reporte-detalle.html?id=45')">
-                    <div class="notification-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="notification-icon"><i class="fas fa-chart-line"></i></div>
                     <div class="notification-content">
-                        <h3>Reporte Generado</h3>
-                        <p>El reporte de producción mensual está listo para revisión.</p>
+                        <h3>Reporte de Producción Mensual Generado</h3>
+                        <p>El reporte de producción del mes actual está disponible para su revisión y análisis.</p>
                         <div class="notification-time">Ayer, 2:30 PM</div>
                     </div>
                 </div>
@@ -578,8 +772,8 @@
                 <div class="notification-item" onclick="redirectTo('alertas.html')">
                     <div class="notification-icon"><i class="fas fa-exclamation-triangle"></i></div>
                     <div class="notification-content">
-                        <h3>Alerta de Riego</h3>
-                        <p>El sector 4 necesita programación de riego urgente.</p>
+                        <h3>Alerta de Programación de Riego</h3>
+                        <p>El sector 4 requiere programación de riego urgente. Niveles de humedad por debajo del umbral recomendado.</p>
                         <div class="notification-time">Ayer, 11:15 AM</div>
                     </div>
                 </div>
@@ -593,46 +787,88 @@
 
     <!-- Contenido Principal del Dashboard -->
     <div class="header">
-        <h1>Sistema Agroalpha - Unidad producción 1</h1>
-        <div class="user-actions">
-            <div class="quick-actions">
-                <button class="quick-action-btn" id="settingsBtn">
-                    <i class="fas fa-cog"></i> Ajustes
-                </button>
-                <button class="quick-action-btn" id="supportBtn">
-                    <i class="fas fa-question-circle"></i> Soporte
-                </button>
-                <button class="quick-action-btn" id="notificationsBtn">
-                    <i class="fas fa-bell"></i> Notificaciones
-                    <span class="notification-counter" id="notificationCounter" style="display: none;"></span>
-                </button>
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Sistema Agroalpha</h1>
+                    <span>Unidad de Producción 1</span>
+                </div>
             </div>
-            <div class="user-info">
-                <span id="user-name"></span>
-                <span id="user-role" class="role-badge"></span>
-                <button class="btn btn-primary" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Salir
-                </button>
+            
+            <div class="user-actions">
+                <div class="action-buttons">
+                    <button class="btn-icon" id="settingsBtn" title="Configuración">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="btn-icon" id="supportBtn" title="Soporte">
+                        <i class="fas fa-question"></i>
+                    </button>
+                    <button class="btn-icon" id="notificationsBtn" title="Notificaciones" style="position: relative;">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-counter" id="notificationCounter" style="display: none;"></span>
+                    </button>
+                </div>
+                
+                <div class="user-info">
+                    <span id="user-name">Usuario</span>
+                    <span id="user-role" class="role-badge">Rol</span>
+                    <button class="btn btn-primary" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
             </div>
         </div>
     </div>
     
     <div class="main-content">
         <div class="welcome-container">
-            <h1 class="welcome-title">Bienvenido, <span id="welcome-name"></span></h1>
-            <p class="welcome-subtitle" id="welcome-message"></p>
+            <h1 class="welcome-title">Bienvenido, <span id="welcome-name">Usuario</span></h1>
+            <p class="welcome-subtitle" id="welcome-message">Sistema integral de gestión agrícola - Monitoreo y control de producción</p>
         </div>
         
-        <h2>Acciones Rápidas</h2>
-        <div class="quick-actions">
-            <button class="quick-action-btn" id="quickReportBtn" onclick="redirectTo('generar-reporte.html')">
-                <i class="fas fa-file-alt"></i> Generar Reporte
-            </button>
+        <div class="dashboard-section">
+            <h2 class="section-title"><i class="fas fa-bolt"></i> Acciones Rápidas</h2>
+            <div class="quick-actions">
+                <div class="quick-action-btn" id="quickReportBtn" onclick="redirectTo('generar-reporte.html')">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-file-chart-line"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Generar Reporte</div>
+                        <div class="quick-action-desc">Crear reportes personalizados de producción y análisis</div>
+                    </div>
+                </div>
+                
+                <div class="quick-action-btn" onclick="redirectTo('registro-actividad.html')">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-clipboard-list-check"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Registrar Actividad</div>
+                        <div class="quick-action-desc">Documentar tareas y actividades realizadas</div>
+                    </div>
+                </div>
+                
+                <div class="quick-action-btn" onclick="redirectTo('monitoreo-cultivos.html')">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="quick-action-content">
+                        <div class="quick-action-title">Monitoreo en Tiempo Real</div>
+                        <div class="quick-action-desc">Seguimiento de condiciones y estado de cultivos</div>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <h2>Módulos Principales</h2>
-        <div class="cards-container" id="featuresContainer">
-            <!-- Las tarjetas se generarán dinámicamente según el rol -->
+        <div class="dashboard-section">
+            <h2 class="section-title"><i class="fas fa-th-large"></i> Módulos del Sistema</h2>
+            <div class="cards-container" id="featuresContainer">
+                <!-- Las tarjetas se generarán dinámicamente según el rol -->
+            </div>
         </div>
     </div>
 
@@ -653,7 +889,7 @@
                 id: 1,
                 title: "Actualización del Sistema Disponible",
                 message: "Nueva versión 2.3.1 disponible. Incluye mejoras en rendimiento y nuevas características.",
-                icon: "exclamation-circle",
+                icon: "rocket",
                 time: "Hace 2 horas",
                 read: false,
                 link: "actualizacion-sistema.html"
@@ -667,7 +903,7 @@
             
             if (unreadCount > 0) {
                 counter.textContent = unreadCount;
-                counter.style.display = 'inline-block';
+                counter.style.display = 'flex';
             } else {
                 counter.style.display = 'none';
             }
@@ -790,7 +1026,7 @@
                 'Técnico Riego': 'riego-badge',
                 'Invitado': 'invitado-badge'
             };
-            return roleClasses[role] || '';
+            return roleClasses[role] || 'invitado-badge';
         }
         
         // Obtener mensaje de bienvenida según el rol
@@ -821,9 +1057,9 @@
             // Características comunes a todos los roles
             const commonFeatures = [
                 { 
-                    icon: 'fa-chart-line', 
-                    title: 'Inicio', 
-                    description: 'Vista general del sistema con métricas clave',
+                    icon: 'fa-chart-network', 
+                    title: 'Panel de Control', 
+                    description: 'Vista general del sistema con métricas clave y KPIs de producción',
                     link: 'inicio.html'
                 },
             ];
@@ -832,255 +1068,239 @@
             const rolePermissions = {
                 'Administrador': [
                     { 
-                        icon: 'fa-users-cog', 
+                        icon: 'fa-users-gear', 
                         title: 'Gestión de Usuarios', 
-                        description: 'Administre los usuarios y permisos del sistema',
+                        description: 'Administre usuarios, roles y permisos del sistema de forma centralizada',
                         link: 'gestionuser.html'
                     },
                     { 
                         icon: 'fa-clipboard-check', 
-                        title: 'Asistencias', 
-                        description: 'Revise asistencias de personal.',
+                        title: 'Control de Asistencias', 
+                        description: 'Revise y gestione registros de asistencia del personal',
                         link: 'reporteasistencia.html'
                     },
                     { 
-                        icon: 'fa-cogs', 
-                        title: 'administrar personal', 
-                        description: 'Ajustes generales del sistema',
+                        icon: 'fa-user-tie', 
+                        title: 'Administración de Personal', 
+                        description: 'Gestión integral de colaboradores y asignación de recursos',
                         link: 'adminpersonal.html'
                     },
                     { 
                         icon: 'fa-database', 
-                        title: 'Ver cosechas', 
-                        description: 'Realice copias de seguridad del sistema',
+                        title: 'Gestión de Cosechas', 
+                        description: 'Monitoreo y análisis de datos de producción y rendimiento',
                         link: 'Vercosechas.html'
                     },
                     { 
-                        icon: 'fa-keyboard', 
-                        title: 'Registro de cosechas', 
-                        description: 'Ingreso de información al sistema',
+                        icon: 'fa-pen-to-square', 
+                        title: 'Registro de Cosechas', 
+                        description: 'Captura y actualización de información de producción',
                         link: 'Registrocosecha.html'
                     },
                     { 
-                        icon: 'fa-history', 
-                        title: 'Proyeciones', 
-                        description: 'Ingreso de proyecciones',
+                        icon: 'fa-project-diagram', 
+                        title: 'Proyecciones y Planificación', 
+                        description: 'Análisis predictivo y planificación estratégica de producción',
                         link: 'proyecciones.html'
                     },
                     { 
-                        icon: 'fa-history', 
-                        title: 'Ingreso daño a beneficos', 
-                        description: 'Ingreso de productos y sus daños a los beneficos',
+                        icon: 'fa-bug', 
+                        title: 'Daño a Organismos Benéficos', 
+                        description: 'Registro y análisis de impacto de productos en fauna auxiliar',
                         link: 'ingresodanobeneficos.html'
                     },
                     { 
-                        icon: 'fa-search', 
-                        title: 'Registro de actividades', 
-                        description: 'Registro de actividades del dia',
+                        icon: 'fa-clipboard-list', 
+                        title: 'Registro de Actividades', 
+                        description: 'Sistematización de operaciones y tareas diarias realizadas',
                         link: 'registroactividades.html'
                     },
                     { 
-                        icon: 'fa-search', 
-                        title: 'Registro personal', 
-                        description: 'Búsqueda avanzada de información',
+                        icon: 'fa-magnifying-glass', 
+                        title: 'Consulta de Personal', 
+                        description: 'Búsqueda avanzada y visualización de información de colaboradores',
                         link: 'registropersonal.html'
                     },
                     { 
-                        icon: 'fa-keyboard', 
-                        title: 'Documentos', 
-                        description: 'Acceso a documentos en Onedrive',
+                        icon: 'fa-folder-tree', 
+                        title: 'Gestión Documental', 
+                        description: 'Acceso organizado a documentación técnica y operativa',
                         link: 'documentos.html'
                     },
                     { 
-                        icon: 'fa-keyboard', 
-                        title: 'Ver daños de beneficos', 
-                        description: 'Vea los daños de los quimicos a los beneficos y acciones con los abejorros',
+                        icon: 'fa-chart-column', 
+                        title: 'Análisis de Daños a Benéficos', 
+                        description: 'Evaluación de impacto de agroquímicos en control biológico',
                         link: 'verdanobeneficos.html'
                     },
                     { 
-                        icon: 'fa-file-alt', 
-                        title: 'Registrar asistencaias', 
-                        description: 'Genere reportes del sistema',
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencias', 
+                        description: 'Captura y validación de asistencia del personal',
                         link: 'registrarasistencia.html'
                     },
-                      { 
-                        icon: 'fa-file-alt', 
-                        title: 'Ver actividades', 
-                        description: 'Genere reportes del sistema',
+                    { 
+                        icon: 'fa-list-check', 
+                        title: 'Seguimiento de Actividades', 
+                        description: 'Monitoreo y control del cumplimiento de tareas programadas',
                         link: 'reporteactividades.html'
                     },
                     { 
-                        icon: 'fa-file-alt', 
-                        title: 'Ver agroquimicos', 
-                        description: 'Revise los agroquimicos',
+                        icon: 'fa-flask', 
+                        title: 'Inventario de Agroquímicos', 
+                        description: 'Catálogo y gestión de insumos fitosanitarios',
                         link: 'veragroquimicos.html'
                     },
-                     { 
-                        icon: 'fa-file-alt', 
-                        title: 'Agregar quimicos', 
-                        description: 'Revise los agroquimicos',
+                    { 
+                        icon: 'fa-plus-circle', 
+                        title: 'Registro de Agroquímicos', 
+                        description: 'Incorporación de nuevos productos al inventario',
                         link: 'ingresoquimicos.html'
                     }
-
-
-                  
                 ],
                 'Supervisor': [
                     { 
-                        icon: 'fa-clipboard-check', 
-                        title: 'Registrar Asistencia', 
-                        description: 'Registre la asistencia del personal',
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencia', 
+                        description: 'Validación y registro de asistencia del personal a cargo',
                         link: 'registrarasistencia.html'
-                    },
-                     { 
-                        icon: 'fa-search', 
-                        title: 'Registro de actividades', 
-                        description: 'Registro de actividades del dia',
-                        link: 'registroactividades.html'
                     }
                 ],
                 'Grower': [
                     { 
                         icon: 'fa-clipboard-check', 
-                        title: 'Asistencias', 
-                        description: 'Revise asistencias de personal.',
+                        title: 'Control de Asistencias', 
+                        description: 'Consulta de registros de asistencia del equipo',
                         link: 'reporteasistencia.html'
                     },
-                     { 
-                        icon: 'fa-file-alt', 
-                        title: 'Ver actividades', 
-                        description: 'Genere reportes del sistema',
+                    { 
+                        icon: 'fa-list-check', 
+                        title: 'Seguimiento de Actividades', 
+                        description: 'Monitoreo del avance de tareas y actividades programadas',
                         link: 'reporteactividades.html'
                     },
-                     { 
-                        icon: 'fa-keyboard', 
-                        title: 'Ver daños de beneficos', 
-                        description: 'Vea los daños de los quimicos a los beneficos y acciones con los abejorros',
+                    { 
+                        icon: 'fa-chart-column', 
+                        title: 'Análisis de Daños a Benéficos', 
+                        description: 'Evaluación de impacto de agroquímicos en control biológico',
                         link: 'verdanobeneficos.html'
                     },
                     { 
-                        icon: 'fa-search', 
-                        title: 'Registro de actividades', 
-                        description: 'Registro de actividades del dia',
+                        icon: 'fa-clipboard-list', 
+                        title: 'Registro de Actividades', 
+                        description: 'Documentación de operaciones y tareas realizadas',
                         link: 'registroactividades.html'
                     },
                     { 
-                        icon: 'fa-file-alt', 
-                        title: 'Ver agroquimicos', 
-                        description: 'Revise los agroquimicos',
+                        icon: 'fa-flask', 
+                        title: 'Inventario de Agroquímicos', 
+                        description: 'Consulta de insumos fitosanitarios disponibles',
                         link: 'veragroquimicos.html'
                     },
                     { 
-                        icon: 'fa-clipboard-check', 
-                        title: 'Registrar Asistencias', 
-                        description: 'Revise asistencias de personal.',
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencias', 
+                        description: 'Captura de asistencia del personal a cargo',
                         link: 'registrarasistencia.html'
                     },
-                    
                     { 
-                        icon: 'fa-keyboard', 
-                        title: 'Documentos', 
-                        description: 'Acceso a documentos en Onedrive',
+                        icon: 'fa-folder-tree', 
+                        title: 'Documentación Técnica', 
+                        description: 'Acceso a manuales, protocolos y procedimientos',
                         link: 'documentos.html'
                     }
                 ],
                 'Técnico Prácticas Culturales': [
                     { 
-                        icon: 'fa-clipboard-check', 
-                        title: 'Registrar Asistencia', 
-                        description: 'Registre su asistencia',
+                        icon: 'fa-user-check', 
+                        title: 'Registro de Asistencia', 
+                        description: 'Registro de asistencia personal',
                         link: 'registrarasistencia.html'
                     },
                     { 
                         icon: 'fa-clipboard-check', 
-                        title: 'Reporte de Asistencia', 
-                        description: 'Consulte reportes de asistencia',
+                        title: 'Consulta de Asistencias', 
+                        description: 'Revisión de registros de asistencia del equipo',
                         link: 'reporteasistencia.html'
-                    },
-                     { 
-                        icon: 'fa-search', 
-                        title: 'Registro de actividades', 
-                        description: 'Registro de actividades del dia',
-                        link: 'registroactividades.html'
                     }
                 ],
                 'Digitador': [
                     { 
-                        icon: 'fa-keyboard', 
-                        title: 'Registro de cosechas', 
-                        description: 'Ingreso de información al sistema',
+                        icon: 'fa-pen-to-square', 
+                        title: 'Registro de Cosechas', 
+                        description: 'Captura de datos de producción y rendimiento',
                         link: 'Registrocosecha.html'
                     },
                     { 
-                        icon: 'fa-history', 
-                        title: 'Proyeciones', 
-                        description: 'Ingreso de proyecciones',
+                        icon: 'fa-project-diagram', 
+                        title: 'Proyecciones', 
+                        description: 'Registro de estimaciones y planificación productiva',
                         link: 'proyecciones.html'
                     },
                     { 
-                        icon: 'fa-search', 
-                        title: 'Consultas', 
-                        description: 'Búsqueda avanzada de información',
+                        icon: 'fa-magnifying-glass', 
+                        title: 'Consultas Avanzadas', 
+                        description: 'Búsqueda y análisis de información del sistema',
                         link: 'sistemaAsistencia.html'
                     }
                 ],
                 'Técnico Fitosanidad': [
                     { 
                         icon: 'fa-bug', 
-                        title: 'Control de Plagas', 
-                        description: 'Monitoreo y control de plagas',
+                        title: 'Manejo Integrado de Plagas', 
+                        description: 'Monitoreo, identificación y control de plagas',
                         link: 'plagas.html'
                     },
                     { 
                         icon: 'fa-flask', 
-                        title: 'Análisis', 
-                        description: 'Resultados de análisis y muestras',
+                        title: 'Análisis de Laboratorio', 
+                        description: 'Gestión de muestras y resultados de análisis',
                         link: 'analisis.html'
                     },
                     { 
                         icon: 'fa-spray-can', 
-                        title: 'Aplicaciones', 
-                        description: 'Registro de aplicaciones fitosanitarias',
+                        title: 'Aplicaciones Fitosanitarias', 
+                        description: 'Planificación y registro de aplicaciones',
                         link: 'aplicaciones.html'
                     }
                 ],
                 'Técnico Riego': [
                     { 
-                        icon: 'fa-tint', 
+                        icon: 'fa-droplet', 
                         title: 'Control de Riego', 
-                        description: 'Programación y monitoreo de riego',
+                        description: 'Programación y monitoreo de sistemas de irrigación',
                         link: 'riego.html'
                     },
                     { 
-                        icon: 'fa-water', 
-                        title: 'Humedad', 
-                        description: 'Niveles de humedad del suelo',
+                        icon: 'fa-cloud-rain', 
+                        title: 'Manejo de Humedad', 
+                        description: 'Seguimiento de niveles de humedad del suelo',
                         link: 'humedad.html'
                     },
                     { 
                         icon: 'fa-chart-bar', 
-                        title: 'Estadísticas', 
-                        description: 'Análisis de consumo de agua',
+                        title: 'Estadísticas de Riego', 
+                        description: 'Análisis de eficiencia en el uso de agua',
                         link: 'estadisticas-riego.html'
                     }
                 ],
                 'Invitado': [
                     { 
                         icon: 'fa-eye', 
-                        title: 'Consulta', 
-                        description: 'Consulta de información general',
+                        title: 'Consultas', 
+                        description: 'Acceso a información de consulta general',
                         link: 'consulta.html'
                     },
                     { 
-                        icon: 'fa-file-alt', 
+                        icon: 'fa-file-lines', 
                         title: 'Reportes Públicos', 
-                        description: 'Acceso a reportes de acceso público',
+                        description: 'Visualización de reportes de acceso abierto',
                         link: 'reportes-publicos.html'
                     },
                     { 
-                        icon: 'fa-info-circle', 
-                        title: 'Información', 
-                        description: 'Información general del sistema',
+                        icon: 'fa-circle-info', 
+                        title: 'Información General', 
+                        description: 'Datos generales sobre el sistema y operaciones',
                         link: 'informacion.html'
                     }
                 ]
@@ -1124,23 +1344,12 @@
                 window.location.href = 'index.html';
             }
         }
-        
-        function actualizarFechaHora() {
-            const ahora = new Date();
-            const opciones = {
-                weekday: 'long', year: 'numeric', month: 'long',
-                day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
-            };
-            document.getElementById("fechaHora").textContent = ahora.toLocaleString('es-ES', opciones);
-        }
-
-        actualizarFechaHora();
-        setInterval(actualizarFechaHora, 1000);
     </script>
 
     <div class="footer">
-        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-        <p>Versión 2.0 - Módulo completo</p>
+        <p>Sistema Agroalpha © 2025 | Unidad de Producción 1</p>
+        <p>Versión 2.3.1 - Plataforma Integral de Gestión Agrícola</p>
     </div>
 </body>
 </html>
+
