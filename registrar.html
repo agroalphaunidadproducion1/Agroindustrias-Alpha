@@ -18,6 +18,7 @@
             --culturales-color: #5D4037;
             --riego-color: #0097A7;
             --invitado-color: #616161;
+            --personal-color: #9C27B0; /* Color específico para personal */
             --light-gray: #f8f9fa;
             --white: #ffffff;
             --dark-gray: #343a40;
@@ -182,6 +183,7 @@
         .card[onclick*="actividades"] .card-icon { color: #ED6C02; }
         .card[onclick*="cosecha"] .card-icon { color: #2E7D32; }
         .card[onclick*="proyecciones"] .card-icon { color: #0288D1; }
+        .card[onclick*="personal"] .card-icon { color: var(--personal-color); }
         .card[onclick*="beneficos"] .card-icon { color: var(--beneficos-color); }
         
         .card h3 {
@@ -317,25 +319,25 @@
         
         <div class="cards-container">
             <!-- Botón de Químicos -->
-            <div class="card" onclick="navigateTo('quimicos.html')">
+            <div class="card" onclick="navigateTo('ingresoquimicos.html')">
                 <div class="card-icon"><i class="fas fa-flask"></i></div>
                 <h3>Químicos</h3>
             </div>
             
             <!-- Botón de Asistencia -->
-            <div class="card" onclick="navigateTo('asistencia.html')">
+            <div class="card" onclick="navigateTo('registrarasistencia.html')">
                 <div class="card-icon"><i class="fas fa-user-check"></i></div>
                 <h3>Asistencia</h3>
             </div>
             
             <!-- Botón de Actividades -->
-            <div class="card" onclick="navigateTo('actividades.html')">
+            <div class="card" onclick="navigateTo('registroactividades.html')">
                 <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
                 <h3>Actividades</h3>
             </div>
             
             <!-- Botón de Cosecha -->
-            <div class="card" onclick="navigateTo('cosecha.html')">
+            <div class="card" onclick="navigateTo('Registrocosecha.html')">
                 <div class="card-icon"><i class="fas fa-apple-whole"></i></div>
                 <h3>Cosecha</h3>
             </div>
@@ -346,8 +348,14 @@
                 <h3>Proyecciones</h3>
             </div>
             
-            <!-- Botón de Benéficos con nuevo icono -->
-            <div class="card" onclick="navigateTo('beneficos.html')">
+            <!-- Botón de Agregar Personal (NUEVO) -->
+            <div class="card" onclick="navigateTo('registropersonal.html')">
+                <div class="card-icon"><i class="fas fa-user-plus"></i></div>
+                <h3>Agregar Personal</h3>
+            </div>
+            
+            <!-- Botón de Benéficos -->
+            <div class="card" onclick="navigateTo('ingresodanobeneficos.html')">
                 <div class="card-icon">
                     <div class="beneficos-icon"></div>
                 </div>
