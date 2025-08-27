@@ -5,16 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tabla de Productos</title>
   <style>
+    :root {
+      --primary-color: #2e7d32;
+      --primary-hover: #1b5e20;
+      --light-bg: #f3fdf5;
+      --light-border: #c8e6c9;
+      --table-header: #a5d6a7;
+      --table-hover: #e8f5e9;
+      --danger: #c62828;
+      --danger-hover: #b71c1c;
+      --white: #ffffff;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
       font-family: Arial, sans-serif;
-      background: #f3fdf5;
+      background: var(--light-bg);
       color: #222;
-      margin: 20px;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+    
     h2 {
-      color: #2e7d32;
+      color: var(--primary-color);
       text-align: center;
+      margin-top: 0;
     }
+    
     .header-container {
       display: flex;
       justify-content: space-between;
@@ -23,26 +46,37 @@
       gap: 15px;
       margin-bottom: 20px;
     }
-    .search-container {
+    
+    .filters-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
       flex: 1;
-      min-width: 250px;
     }
-    #buscador {
+    
+    .search-container, .filter-container {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    #buscador, #filtro-categoria, #filtro-cultivo {
       width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #a5d6a7;
+      padding: 10px 12px;
+      border: 1px solid var(--light-border);
       border-radius: 5px;
       font-size: 16px;
     }
+    
     .acciones {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
     }
+    
     .acciones a, .acciones button {
-      background: #2e7d32;
+      background: var(--primary-color);
       color: white;
-      padding: 8px 12px;
+      padding: 10px 15px;
       text-decoration: none;
       border-radius: 5px;
       border: none;
@@ -50,51 +84,80 @@
       cursor: pointer;
       white-space: nowrap;
     }
+    
     .acciones a:hover, .acciones button:hover {
-      background: #1b5e20;
+      background: var(--primary-hover);
     }
+    
     .table-container {
       width: 100%;
       overflow-x: auto;
       margin-bottom: 20px;
+      flex: 1;
     }
+    
     table {
       border-collapse: collapse;
       width: 100%;
-      background: white;
-      min-width: 800px;
+      background: var(--white);
+      min-width: 1100px;
     }
+    
     th, td {
-      padding: 10px;
+      padding: 12px;
       border-bottom: 1px solid #ddd;
       text-align: left;
     }
+    
     th {
-      background-color: #a5d6a7;
-      color: #1b5e20;
+      background-color: var(--table-header);
+      color: var(--primary-hover);
+      position: sticky;
+      top: 0;
     }
+    
     tr:hover {
-      background-color: #e8f5e9;
+      background-color: var(--table-hover);
     }
+    
     .btn-eliminar {
-      background: #c62828;
+      background: var(--danger);
       color: white;
       border: none;
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 4px;
       cursor: pointer;
     }
+    
     .btn-eliminar:hover {
-      background: #b71c1c;
+      background: var(--danger-hover);
     }
+    
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+      margin-top: auto;
+    }
+    
+    .footer p {
+      margin: 5px 0;
+    }
+    
+    /* Responsive */
     @media (max-width: 768px) {
       .header-container {
         flex-direction: column;
       }
-      .search-container, .acciones {
+      
+      .filters-container {
         width: 100%;
       }
+      
       .acciones {
+        width: 100%;
         justify-content: center;
       }
     }
@@ -104,12 +167,31 @@
   <h2>Productos Químicos Registrados</h2>
 
   <div class="header-container">
-    <div class="search-container">
-      <input type="text" id="buscador" placeholder="Buscar por nombre, ingrediente o plagas...">
+    <div class="filters-container">
+      <div class="search-container">
+        <input type="text" id="buscador" placeholder="Buscar por nombre, ingrediente o plagas...">
+      </div>
+      <div class="filter-container">
+        <select id="filtro-categoria">
+          <option value="">Todas las categorías</option>
+          <option value="Insecticida">Insecticida</option>
+          <option value="Fungicida">Fungicida</option>
+          <option value="Aminoácido">Aminoácido</option>
+          <option value="Estimulador">Estimulador</option>
+          <option value="Herbicida">Herbicida</option>
+          <option value="Bactericida">Bactericida</option>
+        </select>
+      </div>
+      <div class="filter-container">
+        <select id="filtro-cultivo">
+          <option value="">Todos los cultivos</option>
+          <option value="mini">MINI</option>
+          <option value="tomate">TOMATE</option>
+        </select>
+      </div>
     </div>
     <div class="acciones">
       <a href="formulario.html">➕ Agregar</a>
-      <a href="enemigosnaturales.html">📈 Benéficos</a>
       <button onclick="exportarCSV()">📥 CSV</button>
       <button onclick="exportarExcel()">📊 Excel</button>
     </div>
@@ -121,8 +203,10 @@
         <tr>
           <th>Nombre Comercial</th>
           <th>Ingredientes Activos</th>
+          <th>Categoría</th>
           <th>Registro Senasa</th>
           <th>Registro EPA</th>
+          <th>Cultivo</th>
           <th>Días a Cosecha</th>
           <th>Periodo de Reingreso</th>
           <th>Plagas</th>
@@ -136,6 +220,12 @@
     </table>
   </div>
 
+  <div class="footer">
+    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo completo</p>
+  </div>
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
   <script>
@@ -153,6 +243,8 @@
     const db = firebase.database();
     const tabla = document.getElementById("tabla-productos");
     const buscador = document.getElementById("buscador");
+    const filtroCategoria = document.getElementById("filtro-categoria");
+    const filtroCultivo = document.getElementById("filtro-cultivo");
     let productos = [];
 
     // Cargar datos
@@ -169,77 +261,269 @@
     // Filtrar productos
     function filtrarProductos() {
       const termino = buscador.value.toLowerCase();
-      const resultados = productos.filter(p => 
-        (p.nombre && p.nombre.toLowerCase().includes(termino)) ||
-        (p.ingredientes && p.ingredientes.toLowerCase().includes(termino)) ||
-        (p.plagas && p.plagas.toLowerCase().includes(termino))
-      );
+      const categoria = filtroCategoria.value;
+      const cultivo = filtroCultivo.value;
+      
+      const resultados = productos.filter(p => {
+        const coincideTermino = 
+          (p.nombre && p.nombre.toLowerCase().includes(termino)) ||
+          (p.ingredientes && p.ingredientes.toLowerCase().includes(termino)) ||
+          (p.plagas_mini && p.plagas_mini.toLowerCase().includes(termino)) ||
+          (p.plagas_tomate && p.plagas_tomate.toLowerCase().includes(termino));
+        
+        const coincideCategoria = !categoria || p.categoria === categoria;
+        
+        // Filtro por cultivo
+        let coincideCultivo = true;
+        if (cultivo === "mini") {
+          coincideCultivo = p.dias_mini || p.reingreso_mini || p.plagas_mini;
+        } else if (cultivo === "tomate") {
+          coincideCultivo = p.dias_tomate || p.reingreso_tomate || p.plagas_tomate;
+        }
+        
+        return coincideTermino && coincideCategoria && coincideCultivo;
+      });
+      
       mostrarProductos(resultados);
     }
 
     // Mostrar productos en tabla
     function mostrarProductos(lista) {
-      tabla.innerHTML = lista.map(p => `
-        <tr>
-          <td>${p.nombre || '-'}</td>
-          <td>${p.ingredientes || '-'}</td>
-          <td>${p.senasa || '-'}</td>
-          <td>${p.epa || '-'}</td>
-          <td>${p.dias || '-'}</td>
-          <td>${p.reingreso || '-'}</td>
-          <td>${p.plagas || '-'}</td>
-          <td>${p.dosis_maxima || '-'}</td>
-          <td>${p.dosis_litro || '-'}</td>
-          <td>${p.banda || '-'}</td>
-          <td><button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">Eliminar</button></td>
-        </tr>
-      `).join('');
+      tabla.innerHTML = lista.map(p => {
+        // Determinar qué datos mostrar según el filtro de cultivo
+        const cultivoFiltro = filtroCultivo.value;
+        let dias, reingreso, plagas, dosisMaxima, dosisLitro, cultivoTxt;
+        
+        if (cultivoFiltro === "mini" || (!cultivoFiltro && p.dias_mini)) {
+          dias = p.dias_mini;
+          reingreso = p.reingreso_mini;
+          plagas = p.plagas_mini;
+          dosisMaxima = p.dosis_maxima_mini;
+          dosisLitro = p.dosis_litro_mini;
+          cultivoTxt = "MINI ";
+        } else if (cultivoFiltro === "tomate" || (!cultivoFiltro && p.dias_tomate && !p.dias_mini)) {
+          dias = p.dias_tomate;
+          reingreso = p.reingreso_tomate;
+          plagas = p.plagas_tomate;
+          dosisMaxima = p.dosis_maxima_tomate;
+          dosisLitro = p.dosis_litro_tomate;
+          cultivoTxt = "TOMATE";
+        } else {
+          // Si no hay filtro y hay datos para ambos cultivos, mostrar MINI por defecto
+          dias = p.dias_mini || p.dias_tomate;
+          reingreso = p.reingreso_mini || p.reingreso_tomate;
+          plagas = p.plagas_mini || p.plagas_tomate;
+          dosisMaxima = p.dosis_maxima_mini || p.dosis_maxima_tomate;
+          dosisLitro = p.dosis_litro_mini || p.dosis_litro_tomate;
+          cultivoTxt = p.dias_mini ? "MINI" : "TOMATE";
+        }
+        
+        return `
+          <tr>
+            <td>${p.nombre || '-'}</td>
+            <td>${p.ingredientes || '-'}</td>
+            <td>${p.categoria || '-'}</td>
+            <td>${p.senasa || '-'}</td>
+            <td>${p.epa || '-'}</td>
+            <td>${cultivoTxt}</td>
+            <td>${dias || '-'}</td>
+            <td>${reingreso || '-'}</td>
+            <td>${plagas || '-'}</td>
+            <td>${dosisMaxima || '-'}</td>
+            <td>${dosisLitro || '-'}</td>
+            <td>${p.banda || '-'}</td>
+            <td><button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">Eliminar</button></td>
+          </tr>
+        `;
+      }).join('');
     }
 
     // Eliminar producto
     function eliminarProducto(id) {
-      if (confirm("¿Eliminar este producto?")) {
+      if (confirm("¿Está seguro de eliminar este producto?")) {
         db.ref("productos/" + id).remove();
       }
     }
 
     // Exportar a CSV
     function exportarCSV() {
-      let csv = "Nombre,Ingredientes,Senasa,EPA,Días Cosecha,Reingreso,Plagas,Dosis Máx,Dosis/L,Banda\n";
+      const cultivoFiltro = filtroCultivo.value;
+      let csv = "Nombre,Ingredientes,Categoría,Senasa,EPA,Cultivo,Días Cosecha,Reingreso,Plagas,Dosis Máx,Dosis/L,Banda\n";
+      
       productos.forEach(p => {
-        csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.senasa || ''}",` +
-               `"${p.epa || ''}","${p.dias || ''}","${p.reingreso || ''}",` +
-               `"${p.plagas || ''}","${p.dosis_maxima || ''}","${p.dosis_litro || ''}",` +
-               `"${p.banda || ''}"\n`;
+        // Para exportar, incluimos ambos cultivos si no hay filtro
+        if (!cultivoFiltro) {
+          if (p.dias_mini) {
+            csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.categoria || ''}",` +
+                   `"${p.senasa || ''}","${p.epa || ''}","MINI ",` +
+                   `"${p.dias_mini || ''}","${p.reingreso_mini || ''}",` +
+                   `"${p.plagas_mini || ''}","${p.dosis_maxima_mini || ''}","${p.dosis_litro_mini || ''}",` +
+                   `"${p.banda || ''}"\n`;
+          }
+          if (p.dias_tomate) {
+            csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.categoria || ''}",` +
+                   `"${p.senasa || ''}","${p.epa || ''}","TOMATE",` +
+                   `"${p.dias_tomate || ''}","${p.reingreso_tomate || ''}",` +
+                   `"${p.plagas_tomate || ''}","${p.dosis_maxima_tomate || ''}","${p.dosis_litro_tomate || ''}",` +
+                   `"${p.banda || ''}"\n`;
+          }
+        } else {
+          // Si hay filtro, exportar solo el cultivo seleccionado
+          const datos = cultivoFiltro === "mini" ? 
+            {dias: p.dias_mini, reingreso: p.reingreso_mini, plagas: p.plagas_mini, 
+             dosisMaxima: p.dosis_maxima_mini, dosisLitro: p.dosis_litro_mini, cultivo: "MINI PEPINO"} :
+            {dias: p.dias_tomate, reingreso: p.reingreso_tomate, plagas: p.plagas_tomate, 
+             dosisMaxima: p.dosis_maxima_tomate, dosisLitro: p.dosis_litro_tomate, cultivo: "TOMATE"};
+          
+          if (datos.dias || datos.reingreso || datos.plagas) {
+            csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.categoria || ''}",` +
+                   `"${p.senasa || ''}","${p.epa || ''}","${datos.cultivo}",` +
+                   `"${datos.dias || ''}","${datos.reingreso || ''}",` +
+                   `"${datos.plagas || ''}","${datos.dosisMaxima || ''}","${datos.dosisLitro || ''}",` +
+                   `"${p.banda || ''}"\n`;
+          }
+        }
       });
-      const blob = new Blob([csv], { type: "text/csv" });
+      
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "productos.csv";
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", "productos_quimicos.csv");
+      link.style.visibility = "hidden";
+      
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }
 
     // Exportar a Excel (simulado)
     function exportarExcel() {
-      const html = `
+      const cultivoFiltro = filtroCultivo.value;
+      
+      // Crear tabla HTML para exportar
+      let tablaHTML = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
-        <head><meta charset="UTF-8"></head>
-        <body>${document.querySelector("table").outerHTML}</body>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            td { mso-number-format:"\\@"; }
+          </style>
+        </head>
+        <body>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre Comercial</th>
+                <th>Ingredientes Activos</th>
+                <th>Categoría</th>
+                <th>Registro Senasa</th>
+                <th>Registro EPA</th>
+                <th>Cultivo</th>
+                <th>Días a Cosecha</th>
+                <th>Periodo de Reingreso</th>
+                <th>Plagas</th>
+                <th>Dosis Máxima</th>
+                <th>Dosis/Litro</th>
+                <th>Banda</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      productos.forEach(p => {
+        // Para exportar, incluimos ambos cultivos si no hay filtro
+        if (!cultivoFiltro) {
+          if (p.dias_mini) {
+            tablaHTML += `
+              <tr>
+                <td>${p.nombre || ''}</td>
+                <td>${p.ingredientes || ''}</td>
+                <td>${p.categoria || ''}</td>
+                <td>${p.senasa || ''}</td>
+                <td>${p.epa || ''}</td>
+                <td>MINI</td>
+                <td>${p.dias_mini || ''}</td>
+                <td>${p.reingreso_mini || ''}</td>
+                <td>${p.plagas_mini || ''}</td>
+                <td>${p.dosis_maxima_mini || ''}</td>
+                <td>${p.dosis_litro_mini || ''}</td>
+                <td>${p.banda || ''}</td>
+              </tr>
+            `;
+          }
+          if (p.dias_tomate) {
+            tablaHTML += `
+              <tr>
+                <td>${p.nombre || ''}</td>
+                <td>${p.ingredientes || ''}</td>
+                <td>${p.categoria || ''}</td>
+                <td>${p.senasa || ''}</td>
+                <td>${p.epa || ''}</td>
+                <td>TOMATE</td>
+                <td>${p.dias_tomate || ''}</td>
+                <td>${p.reingreso_tomate || ''}</td>
+                <td>${p.plagas_tomate || ''}</td>
+                <td>${p.dosis_maxima_tomate || ''}</td>
+                <td>${p.dosis_litro_tomate || ''}</td>
+                <td>${p.banda || ''}</td>
+              </tr>
+            `;
+          }
+        } else {
+          // Si hay filtro, exportar solo el cultivo seleccionado
+          const datos = cultivoFiltro === "mini" ? 
+            {dias: p.dias_mini, reingreso: p.reingreso_mini, plagas: p.plagas_mini, 
+             dosisMaxima: p.dosis_maxima_mini, dosisLitro: p.dosis_litro_mini, cultivo: "MINI PEPINO"} :
+            {dias: p.dias_tomate, reingreso: p.reingreso_tomate, plagas: p.plagas_tomate, 
+             dosisMaxima: p.dosis_maxima_tomate, dosisLitro: p.dosis_litro_tomate, cultivo: "TOMATE"};
+          
+          if (datos.dias || datos.reingreso || datos.plagas) {
+            tablaHTML += `
+              <tr>
+                <td>${p.nombre || ''}</td>
+                <td>${p.ingredientes || ''}</td>
+                <td>${p.categoria || ''}</td>
+                <td>${p.senasa || ''}</td>
+                <td>${p.epa || ''}</td>
+                <td>${datos.cultivo}</td>
+                <td>${datos.dias || ''}</td>
+                <td>${datos.reingreso || ''}</td>
+                <td>${datos.plagas || ''}</td>
+                <td>${datos.dosisMaxima || ''}</td>
+                <td>${datos.dosisLitro || ''}</td>
+                <td>${p.banda || ''}</td>
+              </tr>
+            `;
+          }
+        }
+      });
+      
+      tablaHTML += `
+            </tbody>
+          </table>
+        </body>
         </html>
       `;
-      const blob = new Blob([html], { type: "application/vnd.ms-excel" });
+      
+      const blob = new Blob([tablaHTML], { type: "application/vnd.ms-excel" });
       const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "productos.xls";
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", "productos_quimicos.xls");
+      link.style.visibility = "hidden";
+      
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }
 
     // Eventos
     buscador.addEventListener("input", filtrarProductos);
+    filtroCategoria.addEventListener("change", filtrarProductos);
+    filtroCultivo.addEventListener("change", filtrarProductos);
   </script>
-  <div class="footer">
-        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-        <p>Versión 2.0 - Módulo completo</p>
-    </div>
 </body>
 </html>
