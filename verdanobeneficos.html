@@ -38,6 +38,13 @@
       padding: 10px;
     }
     
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
     .controls-container {
       background-color: var(--white);
       padding: 15px;
@@ -98,6 +105,14 @@
     
     button:hover {
       background-color: var(--primary-hover);
+    }
+    
+    .btn-leyenda {
+      background-color: #5c6bc0;
+    }
+    
+    .btn-leyenda:hover {
+      background-color: #3f51b5;
     }
     
     .table-container {
@@ -162,6 +177,84 @@
       font-style: italic;
     }
     
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+    }
+    
+    .modal-section {
+      margin-bottom: 20px;
+    }
+    
+    .modal-section h3 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--light-border);
+      padding-bottom: 5px;
+    }
+    
+    .modal-list {
+      list-style-type: none;
+    }
+    
+    .modal-list li {
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+    
+    .modal-list li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--primary-color);
+    }
+    
+    .abejorros-acciones {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .accion-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       .filtros-container {
@@ -188,6 +281,11 @@
         padding: 8px 5px;
         font-size: 12px;
       }
+      
+      .header-container {
+        flex-direction: column;
+        gap: 10px;
+      }
     }
     
     @media (max-width: 480px) {
@@ -202,12 +300,21 @@
       .controls-container {
         padding: 10px;
       }
+      
+      .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h2>🌿 Evaluación de Organismos Benéficos</h2>
+  <div class="header-container">
+    <h2>🌿 Evaluación de Organismos Benéficos</h2>
+    <button class="btn-leyenda" onclick="mostrarLeyenda()"><span>📖</span> Leyenda</button>
+  </div>
 
   <div class="controls-container">
     <div class="filtros-container">
@@ -270,6 +377,47 @@
     <p>Versión 2.0 - Módulo completo</p>
   </div>
 
+  <!-- Modal de Leyenda -->
+  <div id="modalLeyenda" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarLeyenda()">&times;</span>
+      <h2>Leyenda</h2>
+      
+      <div class="modal-section">
+        <h3>Efectos</h3>
+        <ul class="modal-list">
+          <li><strong>1</strong> = inofensivo o ligeramente perjudicial &lt; 25% de reducción</li>
+          <li><strong>2</strong> = moderadamente perjudicial reducción del 25% - 50%</li>
+          <li><strong>3</strong> = reducción perjudicial del 50% - 75%</li>
+          <li><strong>4</strong> = muy perjudicial &gt; 75% de reducción</li>
+          <li><strong>5</strong> = efecto/persistencia desconocidos</li>
+        </ul>
+      </div>
+      
+      <div class="modal-section">
+        <h3>Abejorros</h3>
+        <div class="abejorros-acciones">
+          <div class="accion-item">
+            <input type="checkbox" disabled> 
+            <span>Ninguna acción</span>
+          </div>
+          <div class="accion-item">
+            <input type="checkbox" checked disabled> 
+            <span>Cubrir colmena</span>
+          </div>
+          <div class="accion-item">
+            <input type="checkbox" disabled> 
+            <span>Retirar</span>
+          </div>
+          <div class="accion-item">
+            <input type="checkbox" checked disabled> 
+            <span>Incompatible</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Configuración de Firebase
     const firebaseConfig = {
@@ -285,7 +433,25 @@
     const buscador = document.getElementById("buscador");
     const filtroCategoria = document.getElementById("filtro-categoria");
     const filtroBenefico = document.getElementById("filtro-benefico");
+    const modalLeyenda = document.getElementById("modalLeyenda");
     let registros = [];
+
+    // Función para mostrar el modal de leyenda
+    function mostrarLeyenda() {
+      modalLeyenda.style.display = "block";
+    }
+
+    // Función para cerrar el modal de leyenda
+    function cerrarLeyenda() {
+      modalLeyenda.style.display = "none";
+    }
+
+    // Cerrar el modal al hacer clic fuera de él
+    window.onclick = function(event) {
+      if (event.target == modalLeyenda) {
+        cerrarLeyenda();
+      }
+    }
 
     // Función para cargar datos de Firebase
     function cargarDatos() {
@@ -344,7 +510,6 @@
           (registro.colemani_adulto && registro.colemani_adulto !== "0") ||
           (registro.colemani_huevo && registro.colemani_huevo !== "0") ||
           (registro.colemani_ninfa && registro.colemani_ninfa !== "0") ||
-          (registro.abejorros_colonia && registro.abejorros_colonia !== "0") ||
           (registro.abejorros_accion && registro.abejorros_accion !== "ninguna")
         );
       } else {
@@ -380,7 +545,6 @@
             );
           case "abejorros":
             return (
-              (registro.abejorros_colonia && registro.abejorros_colonia !== "0") ||
               (registro.abejorros_accion && registro.abejorros_accion !== "ninguna")
             );
         }
@@ -473,7 +637,6 @@
             <td>${formatearValor(r.colemani_huevo)}</td>
             <td>${formatearValor(r.colemani_ninfa)}</td>
             <td>${r.colemani_persistencia || "-"}</td>
-            <td>${formatearValor(r.abejorros_colonia)}</td>
             <td>${r.abejorros_persistencia || "-"}</td>
             <td>${formatearAbejorrosAccion(r.abejorros_accion)}</td>
           `;
@@ -518,7 +681,6 @@
               break;
             case "abejorros":
               contenidoFila += `
-                <td>${formatearValor(r.abejorros_colonia)}</td>
                 <td>${r.abejorros_persistencia || "-"}</td>
                 <td>${formatearAbejorrosAccion(r.abejorros_accion)}</td>
               `;
@@ -546,7 +708,7 @@
           <th colspan="5">N. Cucumeris</th>
           <th colspan="5">Crizopa</th>
           <th colspan="5">Aphidius Colemani</th>
-          <th colspan="3">Abejorros</th>
+          <th colspan="2">Abejorros</th>
         `;
       } else {
         switch(beneficoFiltro) {
@@ -588,7 +750,6 @@
             break;
           case "abejorros":
             encabezados += `
-              <th>Colonia</th>
               <th>Persistencia</th>
               <th>Acción</th>
             `;
@@ -672,7 +833,7 @@
               "N.Cucumeris Larva,N.Cucumeris Adulto,N.Cucumeris Huevo,N.Cucumeris Ninfa,N.Cucumeris Persistencia," +
               "Crizopa Larva,Crizopa Adulto,Crizopa Huevo,Crizopa Ninfa,Crizopa Persistencia," +
               "A.Colemani Larva,A.Colemani Adulto,A.Colemani Huevo,A.Colemani Ninfa,A.Colemani Persistencia," +
-              "Abejorros Colonia,Abejorros Persistencia,Abejorros Acción\n";
+              "Abejorros Persistencia,Abejorros Acción\n";
               
         registrosFiltrados.forEach(r => {
           csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
@@ -680,7 +841,7 @@
                  `"${formatearValor(r.cucumeris_larva)}","${formatearValor(r.cucumeris_adulto)}","${formatearValor(r.cucumeris_huevo)}","${formatearValor(r.cucumeris_ninfa)}","${r.cucumeris_persistencia || ""}",` +
                  `"${formatearValor(r.crizopa_larva)}","${formatearValor(r.crizopa_adulto)}","${formatearValor(r.crizopa_huevo)}","${formatearValor(r.crizopa_ninfa)}","${r.crizopa_persistencia || ""}",` +
                  `"${formatearValor(r.colemani_larva)}","${formatearValor(r.colemani_adulto)}","${formatearValor(r.colemani_huevo)}","${formatearValor(r.colemani_ninfa)}","${r.colemani_persistencia || ""}",` +
-                 `"${formatearValor(r.abejorros_colonia)}","${r.abejorros_persistencia || ""}","${formatearAbejorrosAccion(r.abejorros_accion)}"\n`;
+                 `"${r.abejorros_persistencia || ""}","${formatearAbejorrosAccion(r.abejorros_accion)}"\n`;
         });
       } else {
         // CSV para un benéfico específico
@@ -714,10 +875,10 @@
             });
             break;
           case "abejorros":
-            csv = "Producto,Ingrediente,Colonia,Persistencia,Acción\n";
+            csv = "Producto,Ingrediente,Persistencia,Acción\n";
             registrosFiltrados.forEach(r => {
               csv += `"${r.producto || ""}","${r.ingrediente || ""}",` +
-                     `"${formatearValor(r.abejorros_colonia)}","${r.abejorros_persistencia || ""}","${formatearAbejorrosAccion(r.abejorros_accion)}"\n`;
+                     `"${r.abejorros_persistencia || ""}","${formatearAbejorrosAccion(r.abejorros_accion)}"\n`;
             });
             break;
         }
