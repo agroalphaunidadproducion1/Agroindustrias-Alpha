@@ -100,7 +100,7 @@
       border-collapse: collapse;
       width: 100%;
       background: var(--white);
-      min-width: 1100px;
+      min-width: 900px;
     }
     
     th, td {
@@ -120,17 +120,13 @@
       background-color: var(--table-hover);
     }
     
-    .btn-eliminar {
-      background: var(--danger);
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .btn-eliminar:hover {
-      background: var(--danger-hover);
+    .banda-color {
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      margin: 0 auto;
+      border: 1px solid #ddd;
     }
     
     .footer {
@@ -203,17 +199,14 @@
         <tr>
           <th>Nombre Comercial</th>
           <th>Ingredientes Activos</th>
-          <th>Categoría</th>
           <th>Registro Senasa</th>
           <th>Registro EPA</th>
-          <th>Cultivo</th>
           <th>Días a Cosecha</th>
           <th>Periodo de Reingreso</th>
           <th>Plagas</th>
           <th>Dosis Máxima</th>
           <th>Dosis/Litro</th>
           <th>Banda</th>
-          <th>Eliminar</th>
         </tr>
       </thead>
       <tbody id="tabla-productos"></tbody>
@@ -287,12 +280,34 @@
       mostrarProductos(resultados);
     }
 
+    // Función para obtener color según la banda (compatible con español e inglés)
+    function obtenerColorBanda(banda) {
+      if (!banda) return '#9E9E9E'; // Gris para bandas desconocidas
+      
+      const bandaLower = banda.toLowerCase();
+      
+      // Verde / Green
+      if (bandaLower.includes('verde') || bandaLower.includes('green')) return '#4CAF50';
+      
+      // Azul / Blue
+      if (bandaLower.includes('azul') || bandaLower.includes('blue')) return '#2196F3';
+      
+      // Amarilla / Yellow
+      if (bandaLower.includes('amarill') || bandaLower.includes('yellow')) return '#FFEB3B';
+      
+      // Roja / Red
+      if (bandaLower.includes('roja') || bandaLower.includes('rojo') || 
+          bandaLower.includes('red')) return '#F44336';
+      
+      return '#9E9E9E'; // Gris por defecto
+    }
+
     // Mostrar productos en tabla
     function mostrarProductos(lista) {
       tabla.innerHTML = lista.map(p => {
         // Determinar qué datos mostrar según el filtro de cultivo
         const cultivoFiltro = filtroCultivo.value;
-        let dias, reingreso, plagas, dosisMaxima, dosisLitro, cultivoTxt;
+        let dias, reingreso, plagas, dosisMaxima, dosisLitro;
         
         if (cultivoFiltro === "mini" || (!cultivoFiltro && p.dias_mini)) {
           dias = p.dias_mini;
@@ -300,14 +315,12 @@
           plagas = p.plagas_mini;
           dosisMaxima = p.dosis_maxima_mini;
           dosisLitro = p.dosis_litro_mini;
-          cultivoTxt = "MINI ";
         } else if (cultivoFiltro === "tomate" || (!cultivoFiltro && p.dias_tomate && !p.dias_mini)) {
           dias = p.dias_tomate;
           reingreso = p.reingreso_tomate;
           plagas = p.plagas_tomate;
           dosisMaxima = p.dosis_maxima_tomate;
           dosisLitro = p.dosis_litro_tomate;
-          cultivoTxt = "TOMATE";
         } else {
           // Si no hay filtro y hay datos para ambos cultivos, mostrar MINI por defecto
           dias = p.dias_mini || p.dias_tomate;
@@ -315,34 +328,26 @@
           plagas = p.plagas_mini || p.plagas_tomate;
           dosisMaxima = p.dosis_maxima_mini || p.dosis_maxima_tomate;
           dosisLitro = p.dosis_litro_mini || p.dosis_litro_tomate;
-          cultivoTxt = p.dias_mini ? "MINI" : "TOMATE";
         }
+        
+        // Obtener color para la banda
+        const colorBanda = obtenerColorBanda(p.banda);
         
         return `
           <tr>
             <td>${p.nombre || '-'}</td>
             <td>${p.ingredientes || '-'}</td>
-            <td>${p.categoria || '-'}</td>
             <td>${p.senasa || '-'}</td>
             <td>${p.epa || '-'}</td>
-            <td>${cultivoTxt}</td>
             <td>${dias || '-'}</td>
             <td>${reingreso || '-'}</td>
             <td>${plagas || '-'}</td>
             <td>${dosisMaxima || '-'}</td>
             <td>${dosisLitro || '-'}</td>
-            <td>${p.banda || '-'}</td>
-            <td><button class="btn-eliminar" onclick="eliminarProducto('${p.id}')">Eliminar</button></td>
+            <td><div class="banda-color" style="background-color: ${colorBanda}" title="${p.banda || 'Sin banda'}"></div></td>
           </tr>
         `;
       }).join('');
-    }
-
-    // Eliminar producto
-    function eliminarProducto(id) {
-      if (confirm("¿Está seguro de eliminar este producto?")) {
-        db.ref("productos/" + id).remove();
-      }
     }
 
     // Exportar a CSV
