@@ -24,6 +24,7 @@
             --text-color: #212529;
             --border-color: #dee2e6;
             --card-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            --beneficos-color: #7B1FA2; /* Color específico para benéficos */
         }
         
         * {
@@ -172,15 +173,53 @@
         
         .card-icon {
             font-size: 1.8rem;
-            color: var(--primary-color);
             margin-bottom: 8px;
         }
+        
+        /* Colores específicos para cada tipo de registro */
+        .card[onclick*="quimicos"] .card-icon { color: #D32F2F; }
+        .card[onclick*="asistencia"] .card-icon { color: #1976D2; }
+        .card[onclick*="actividades"] .card-icon { color: #ED6C02; }
+        .card[onclick*="cosecha"] .card-icon { color: #2E7D32; }
+        .card[onclick*="proyecciones"] .card-icon { color: #0288D1; }
+        .card[onclick*="beneficos"] .card-icon { color: var(--beneficos-color); }
         
         .card h3 {
             color: var(--primary-dark);
             font-size: 0.9rem;
             font-weight: 600;
             margin: 0;
+        }
+        
+        /* Icono personalizado para benéficos (crisopa/ácaro) */
+        .beneficos-icon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .beneficos-icon::before {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 16px;
+            background-color: var(--beneficos-color);
+            border-radius: 50% 50% 40% 40%;
+        }
+        
+        .beneficos-icon::after {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+            top: 6px;
+            left: 6px;
+            box-shadow: 12px 0 0 white;
         }
         
         .footer {
@@ -208,6 +247,24 @@
             
             .card-icon {
                 font-size: 1.5rem;
+            }
+            
+            .beneficos-icon {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .beneficos-icon::before {
+                width: 20px;
+                height: 14px;
+            }
+            
+            .beneficos-icon::after {
+                width: 5px;
+                height: 5px;
+                top: 5px;
+                left: 5px;
+                box-shadow: 10px 0 0 white;
             }
             
             .card h3 {
@@ -260,25 +317,25 @@
         
         <div class="cards-container">
             <!-- Botón de Químicos -->
-            <div class="card" onclick="navigateTo('ingresoquimicos.html')">
+            <div class="card" onclick="navigateTo('quimicos.html')">
                 <div class="card-icon"><i class="fas fa-flask"></i></div>
                 <h3>Químicos</h3>
             </div>
             
             <!-- Botón de Asistencia -->
-            <div class="card" onclick="navigateTo('registrarasistencia.html')">
+            <div class="card" onclick="navigateTo('asistencia.html')">
                 <div class="card-icon"><i class="fas fa-user-check"></i></div>
                 <h3>Asistencia</h3>
             </div>
             
             <!-- Botón de Actividades -->
-            <div class="card" onclick="navigateTo('registroactividades.html')">
+            <div class="card" onclick="navigateTo('actividades.html')">
                 <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
                 <h3>Actividades</h3>
             </div>
             
             <!-- Botón de Cosecha -->
-            <div class="card" onclick="navigateTo('ingresodanobeneficos.html')">
+            <div class="card" onclick="navigateTo('cosecha.html')">
                 <div class="card-icon"><i class="fas fa-apple-whole"></i></div>
                 <h3>Cosecha</h3>
             </div>
@@ -288,11 +345,13 @@
                 <div class="card-icon"><i class="fas fa-chart-line"></i></div>
                 <h3>Proyecciones</h3>
             </div>
-
-             <!-- Botón de Beneficios (NUEVO) -->
-            <div class="card" onclick="navigateTo('ingresodanobeneficos.html')">
-                <div class="card-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                <h3>Beneficos</h3>
+            
+            <!-- Botón de Benéficos con nuevo icono -->
+            <div class="card" onclick="navigateTo('beneficos.html')">
+                <div class="card-icon">
+                    <div class="beneficos-icon"></div>
+                </div>
+                <h3>Benéficos</h3>
             </div>
         </div>
     </div>
