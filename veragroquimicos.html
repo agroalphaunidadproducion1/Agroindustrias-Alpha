@@ -16,6 +16,8 @@
       --danger-hover: #b71c1c;
       --white: #ffffff;
       --modal-bg: rgba(0, 0, 0, 0.5);
+      --link-color: #1565c0;
+      --link-hover: #0d47a1;
     }
     
     * {
@@ -208,6 +210,30 @@
     
     .footer p {
       margin: 5px 0;
+    }
+    
+    /* Estilos para enlaces EPA */
+    .epa-link {
+      color: var(--link-color);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .epa-link:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
+    
+    .epa-link::after {
+      content: "↗";
+      font-size: 0.9em;
+    }
+    
+    .no-link {
+      color: #666;
     }
     
     /* Responsive */
@@ -425,6 +451,23 @@
       return '#9E9E9E'; // Gris por defecto
     }
 
+    // Función para crear enlace EPA
+    function crearEnlaceEPA(epa, enlaceEpa) {
+      if (!epa) return '<span class="no-link">-</span>';
+      
+      if (enlaceEpa) {
+        // Verificar si el enlace ya tiene protocolo, si no, agregar https://
+        let url = enlaceEpa;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+        }
+        
+        return `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${epa}</a>`;
+      }
+      
+      return `<span title="Sin enlace EPA">${epa}</span>`;
+    }
+
     // Mostrar productos en tabla
     function mostrarProductos(lista) {
       tabla.innerHTML = lista.map(p => {
@@ -456,6 +499,9 @@
         // Obtener color para la banda
         const colorBanda = obtenerColorBanda(p.banda);
         
+        // Crear enlace EPA
+        const enlaceEPA = crearEnlaceEPA(p.epa, p.enlace_epa);
+        
         return `
           <tr>
             <td>${p.nombre || '-'}</td>
@@ -465,7 +511,7 @@
             <td>${dosisLitro || '-'}</td>
             <td>${dias || '-'}</td>
             <td>${p.senasa || '-'}</td>
-            <td>${p.epa || '-'}</td>
+            <td>${enlaceEPA}</td>
             <td>${reingreso || '-'}</td>
             <td>${plagas || '-'}</td>
             <td>${dosisMaxima || '-'}</td>
