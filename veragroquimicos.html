@@ -279,15 +279,14 @@
           <th>Nombre Comercial</th>
           <th>Grupo Químico</th>
           <th>Familia Química</th>
-          <th>Ingredientes Activos</th>
+          <th>Ingrediente Activo</th>
+          <th>Dosis/Litro</th>
+          <th>Días a Cosecha</th>
           <th>Registro Senasa</th>
           <th>Registro EPA</th>
-          <th>Categoría</th>
-          <th>Días a Cosecha</th>
           <th>Periodo de Reingreso</th>
           <th>Plagas</th>
           <th>Dosis Máxima</th>
-          <th>Dosis/Litro</th>
           <th>Banda</th>
         </tr>
       </thead>
@@ -463,14 +462,13 @@
             <td>${p.grupo_quimico || '-'}</td>
             <td>${p.familia_quimica || '-'}</td>
             <td>${p.ingredientes || '-'}</td>
+            <td>${dosisLitro || '-'}</td>
+            <td>${dias || '-'}</td>
             <td>${p.senasa || '-'}</td>
             <td>${p.epa || '-'}</td>
-            <td>${p.categoria || '-'}</td>
-            <td>${dias || '-'}</td>
             <td>${reingreso || '-'}</td>
             <td>${plagas || '-'}</td>
             <td>${dosisMaxima || '-'}</td>
-            <td>${dosisLitro || '-'}</td>
             <td><div class="banda-color" style="background-color: ${colorBanda}" title="${p.banda || 'Sin banda'}"></div></td>
           </tr>
         `;
@@ -497,16 +495,14 @@
                 <th>Nombre Comercial</th>
                 <th>Grupo Químico</th>
                 <th>Familia Química</th>
-                <th>Ingredientes Activos</th>
+                <th>Ingrediente Activo</th>
+                <th>Dosis/Litro</th>
+                <th>Días a Cosecha</th>
                 <th>Registro Senasa</th>
                 <th>Registro EPA</th>
-                <th>Categoría</th>
-                <th>Cultivo</th>
-                <th>Días a Cosecha</th>
                 <th>Periodo de Reingreso</th>
                 <th>Plagas</th>
                 <th>Dosis Máxima</th>
-                <th>Dosis/Litro</th>
                 <th>Banda</th>
               </tr>
             </thead>
@@ -523,15 +519,13 @@
                 <td>${p.grupo_quimico || ''}</td>
                 <td>${p.familia_quimica || ''}</td>
                 <td>${p.ingredientes || ''}</td>
+                <td>${p.dosis_litro_mini || ''}</td>
+                <td>${p.dias_mini || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.epa || ''}</td>
-                <td>${p.categoria || ''}</td>
-                <td>MINI</td>
-                <td>${p.dias_mini || ''}</td>
                 <td>${p.reingreso_mini || ''}</td>
                 <td>${p.plagas_mini || ''}</td>
                 <td>${p.dosis_maxima_mini || ''}</td>
-                <td>${p.dosis_litro_mini || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
             `;
@@ -543,15 +537,13 @@
                 <td>${p.grupo_quimico || ''}</td>
                 <td>${p.familia_quimica || ''}</td>
                 <td>${p.ingredientes || ''}</td>
+                <td>${p.dosis_litro_tomate || ''}</td>
+                <td>${p.dias_tomate || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.epa || ''}</td>
-                <td>${p.categoria || ''}</td>
-                <td>TOMATE</td>
-                <td>${p.dias_tomate || ''}</td>
                 <td>${p.reingreso_tomate || ''}</td>
                 <td>${p.plagas_tomate || ''}</td>
                 <td>${p.dosis_maxima_tomate || ''}</td>
-                <td>${p.dosis_litro_tomate || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
             `;
@@ -571,15 +563,13 @@
                 <td>${p.grupo_quimico || ''}</td>
                 <td>${p.familia_quimica || ''}</td>
                 <td>${p.ingredientes || ''}</td>
+                <td>${datos.dosisLitro || ''}</td>
+                <td>${datos.dias || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.epa || ''}</td>
-                <td>${p.categoria || ''}</td>
-                <td>${datos.cultivo}</td>
-                <td>${datos.dias || ''}</td>
                 <td>${datos.reingreso || ''}</td>
                 <td>${datos.plagas || ''}</td>
                 <td>${datos.dosisMaxima || ''}</td>
-                <td>${datos.dosisLitro || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
             `;
