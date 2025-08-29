@@ -15,6 +15,7 @@
       --danger: #c62828;
       --danger-hover: #b71c1c;
       --white: #ffffff;
+      --modal-bg: rgba(0, 0, 0, 0.5);
     }
     
     * {
@@ -67,29 +68,93 @@
       font-size: 16px;
     }
     
-    .acciones {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    
-    .acciones a, .acciones button {
+    .menu-button {
       background: var(--primary-color);
       color: white;
+      border: none;
+      border-radius: 5px;
       padding: 10px 15px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      height: 40px;
+      width: 40px;
+    }
+    
+    .menu-button:hover {
+      background: var(--primary-hover);
+    }
+    
+    .menu-line {
+      height: 3px;
+      width: 100%;
+      background-color: white;
+      border-radius: 2px;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--modal-bg);
+      z-index: 1000;
+      justify-content: flex-end;
+    }
+    
+    .modal-content {
+      background-color: var(--white);
+      width: 200px;
+      height: 100%;
+      padding: 20px;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal-actions button {
+      background: var(--primary-color);
+      color: white;
+      padding: 12px;
       text-decoration: none;
       border-radius: 5px;
       border: none;
-      font-size: 14px;
+      font-size: 16px;
       cursor: pointer;
-      white-space: nowrap;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 10px;
+      justify-content: center;
     }
     
-    .acciones a:hover, .acciones button:hover {
+    .modal-actions button:hover {
       background: var(--primary-hover);
+    }
+    
+    .close-modal {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--primary-color);
     }
     
     .table-container {
@@ -154,11 +219,6 @@
       .filters-container {
         width: 100%;
       }
-      
-      .acciones {
-        width: 100%;
-        justify-content: center;
-      }
     }
   </style>
 </head>
@@ -191,10 +251,24 @@
         </select>
       </div>
     </div>
-    <div class="acciones">
-      <a href="formulario.html">➕ Agregar</a>
-      <button onclick="exportarExcel()">📊 Excel</button>
-      <button onclick="capturarTabla()">🖼️ Imagen</button>
+    <button class="menu-button" id="menu-button">
+      <div class="menu-line"></div>
+      <div class="menu-line"></div>
+      <div class="menu-line"></div>
+    </button>
+  </div>
+
+  <!-- Modal para acciones -->
+  <div class="modal" id="actions-modal">
+    <div class="modal-content">
+      <button class="close-modal" id="close-modal">&times;</button>
+      <div class="modal-actions">
+        <a href="formulario.html" style="display: contents;">
+          <button>➕ Agregar</button>
+        </a>
+        <button onclick="exportarExcel()">📊 Excel</button>
+        <button onclick="capturarTabla()">🖼️ Imagen</button>
+      </div>
     </div>
   </div>
 
@@ -248,8 +322,27 @@
     const filtroCategoria = document.getElementById("filtro-categoria");
     const filtroGrupo = document.getElementById("filtro-grupo");
     const filtroCultivo = document.getElementById("filtro-cultivo");
+    const menuButton = document.getElementById("menu-button");
+    const actionsModal = document.getElementById("actions-modal");
+    const closeModal = document.getElementById("close-modal");
+    
     let productos = [];
     let gruposQuimicos = new Set();
+
+    // Manejar el modal de acciones
+    menuButton.addEventListener("click", () => {
+      actionsModal.style.display = "flex";
+    });
+    
+    closeModal.addEventListener("click", () => {
+      actionsModal.style.display = "none";
+    });
+    
+    window.addEventListener("click", (event) => {
+      if (event.target === actionsModal) {
+        actionsModal.style.display = "none";
+      }
+    });
 
     // Cargar datos
     db.ref("productos").on("value", snapshot => {
@@ -512,6 +605,9 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      // Cerrar el modal después de la acción
+      actionsModal.style.display = "none";
     }
 
     // Capturar tabla como imagen
@@ -522,6 +618,9 @@
         link.href = canvas.toDataURL("image/png");
         link.click();
       });
+      
+      // Cerrar el modal después de la acción
+      actionsModal.style.display = "none";
     }
 
     // Eventos
