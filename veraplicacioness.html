@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Aplicaciones Agrícolas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #7cb342;
+            --accent-color: #ffa000;
+            --light-color: #f8f9fa;
+            --dark-color: #1b5e20;
+            --gray-color: #6c757d;
+            --border-radius: 6px;
+            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            
+            /* Colores para estados */
+            --color-borde: #dee2e6;
+            --color-fondo: #ffffff;
+            --texto-activa: #e65100;
+            --texto-vencida: #c62828;
+            --texto-libre: #2e7d32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f1f8e9, #e8f5e9);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--color-borde);
+        }
+        
+        header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        header p {
+            color: var(--gray-color);
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--color-fondo);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--color-borde);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        select, button {
+            padding: 10px 15px;
+            border: 1px solid var(--color-borde);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: white;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        button:hover {
+            background-color: var(--dark-color);
+        }
+        
+        .card {
+            background: var(--color-fondo);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .card-title {
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--color-borde);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            background-color: var(--color-fondo);
+            border: 1px solid var(--color-borde);
+            border-radius: var(--border-radius);
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--color-borde);
+        }
+        
+        th {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+            border-bottom: 2px solid var(--color-borde);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .invernadero-cell {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .cultivo-cell {
+            font-weight: 600;
+            color: var(--dark-color);
+            text-align: center;
+        }
+        
+        .libre-cell {
+            color: var(--texto-libre);
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .producto-cell {
+            font-weight: 500;
+        }
+        
+        .fecha-cell {
+            color: var(--gray-color);
+            font-size: 0.9em;
+        }
+        
+        .capillas-cell {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .capilla-pill {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .estado-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            display: inline-block;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .estado-activa {
+            background-color: #fff3e0;
+            color: var(--texto-activa);
+            border-color: #ffb74d;
+        }
+        
+        .estado-vencida {
+            background-color: #ffebee;
+            color: var(--texto-vencida);
+            border-color: #ef9a9a;
+        }
+        
+        .estado-libre {
+            background-color: #e8f5e9;
+            color: var(--texto-libre);
+            border-color: #a5d6a7;
+        }
+        
+        .actions-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            border: 1px solid var(--color-borde);
+        }
+        
+        .download-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: #f57c00;
+        }
+        
+        .download-btn:hover {
+            background-color: #f57c00;
+        }
+        
+        .share-btn {
+            background-color: #4285f4;
+            color: white;
+            border-color: #3367d6;
+        }
+        
+        .share-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1000;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+            background-color: var(--color-fondo);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--color-borde);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray-color);
+            font-style: italic;
+        }
+        
+        .leyenda {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-borde);
+        }
+        
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .leyenda-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            border: 1px solid var(--color-borde);
+        }
+        
+        /* Estilos para móviles */
+        .mobile-view {
+            display: none;
+        }
+        
+        .mobile-card {
+            background: var(--color-fondo);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--color-borde);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .mobile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--color-borde);
+        }
+        
+        .mobile-invernadero {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 15px;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .mobile-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .mobile-detail {
+            margin-bottom: 8px;
+        }
+        
+        .mobile-label {
+            font-weight: 600;
+            color: var(--gray-color);
+            font-size: 0.9em;
+        }
+        
+        .mobile-value {
+            font-size: 0.95em;
+        }
+        
+        .mobile-capillas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            select, button {
+                width: 100%;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .leyenda {
+                justify-content: flex-start;
+            }
+            
+            /* Ocultar tabla en móviles */
+            .desktop-view {
+                display: none;
+            }
+            
+            /* Mostrar vista móvil */
+            .mobile-view {
+                display: block;
+            }
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-seedling"></i> Visualizador de Aplicaciones</h1>
+            <p>Monitor de aplicaciones agrícolas por invernadero</p>
+        </header>
+        
+        <div class="controls">
+            <div class="filter-group">
+                <label for="cultivo-filter">Cultivo:</label>
+                <select id="cultivo-filter">
+                    <option value="todos">Todos</option>
+                    <option value="mini">Mini</option>
+                    <option value="tomate">Tomate</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="invernadero-filter">Invernadero:</label>
+                <select id="invernadero-filter">
+                    <option value="todos">Todos</option>
+                    <!-- Se llenará dinámicamente -->
+                </select>
+            </div>
+            
+            <div class="filter-group toggle-vencidas">
+                <label for="mostrar-vencidas">Mostrar vencidas:</label>
+                <label class="switch">
+                    <input type="checkbox" id="mostrar-vencidas">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <button id="actualizar-btn">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-table"></i> Aplicaciones por Invernadero</h2>
+            
+            <!-- Vista para escritorio -->
+            <div id="tabla-container" class="desktop-view">
+                <table id="tabla-aplicaciones">
+                    <thead>
+                        <tr>
+                            <th>Cultivo</th>
+                            <th>Invernadero</th>
+                            <th>Área (ha)</th>
+                            <th>Capillas aplicadas</th>
+                            <th>Producto</th>
+                            <th>Fecha aplicación</th>
+                            <th>Fecha libre</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aplicaciones-body">
+                        <!-- Los datos se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Vista para móviles -->
+            <div id="mobile-container" class="mobile-view">
+                <!-- Los datos móviles se cargarán aquí -->
+            </div>
+            
+            <div class="leyenda">
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background-color: #e8f5e9;"></div>
+                    <span>Libre</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background-color: #fff3e0;"></div>
+                    <span>Activa</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background-color: #ffebee;"></div>
+                    <span>Vencida</span>
+                </div>
+            </div>
+            
+            <div class="actions-container">
+                <button id="descargar-btn" class="action-btn download-btn">
+                    <i class="fas fa-download"></i> Descargar como Imagen
+                </button>
+                <button id="compartir-btn" class="action-btn share-btn">
+                    <i class="fas fa-share-alt"></i> Compartir
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Sistema Agrícola - Todos los derechos reservados</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        ¡Datos actualizados correctamente!
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Referencias a la base de datos
+        const applicationsRef = database.ref('aplicaciones');
+        
+        // Definir invernaderos por cultivo
+        const invernaderos = {
+            mini: ["9", "10", "11", "12", "33", "35", "37", "39"],
+            tomate: ["13", "14", "15", "16"]
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar filtro de invernaderos
+            cargarFiltroInvernaderos();
+            
+            // Cargar aplicaciones
+            cargarAplicaciones();
+            
+            // Configurar eventos
+            document.getElementById('cultivo-filter').addEventListener('change', function() {
+                cargarFiltroInvernaderos();
+                cargarAplicaciones();
+            });
+            
+            document.getElementById('invernadero-filter').addEventListener('change', cargarAplicaciones);
+            document.getElementById('mostrar-vencidas').addEventListener('change', cargarAplicaciones);
+            document.getElementById('actualizar-btn').addEventListener('click', cargarAplicaciones);
+            document.getElementById('descargar-btn').addEventListener('click', descargarComoImagen);
+            document.getElementById('compartir-btn').addEventListener('click', compartirAplicaciones);
+            
+            // Función para cargar el filtro de invernaderos según el cultivo seleccionado
+            function cargarFiltroInvernaderos() {
+                const cultivo = document.getElementById('cultivo-filter').value;
+                const invernaderoFilter = document.getElementById('invernadero-filter');
+                
+                // Limpiar opciones actuales
+                invernaderoFilter.innerHTML = '<option value="todos">Todos</option>';
+                
+                // Agregar invernaderos según el cultivo
+                if (cultivo === 'todos') {
+                    // Agregar todos los invernaderos de ambos cultivos
+                    invernaderos.mini.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `mini-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
+                    });
+                    
+                    invernaderos.tomate.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `tomate-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
+                    });
+                } else if (cultivo === 'mini') {
+                    invernaderos.mini.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `mini-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
+                    });
+                } else if (cultivo === 'tomate') {
+                    invernaderos.tomate.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `tomate-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
+                    });
+                }
+            }
+            
+            // Función para cargar las aplicaciones
+            function cargarAplicaciones() {
+                applicationsRef.orderByChild('timestamp').once('value')
+                .then((snapshot) => {
+                    const aplicaciones = snapshot.val();
+                    const aplicacionesBody = document.getElementById('aplicaciones-body');
+                    const mobileContainer = document.getElementById('mobile-container');
+                    const mostrarVencidas = document.getElementById('mostrar-vencidas').checked;
+                    const cultivoFiltro = document.getElementById('cultivo-filter').value;
+                    const invernaderoFiltro = document.getElementById('invernadero-filter').value;
+                    
+                    // Limpiar contenedores
+                    aplicacionesBody.innerHTML = '';
+                    mobileContainer.innerHTML = '';
+                    
+                    if (!aplicaciones) {
+                        aplicacionesBody.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones registradas</td></tr>';
+                        mobileContainer.innerHTML = '<div class="no-data">No hay aplicaciones registradas</div>';
+                        return;
+                    }
+                    
+                    // Obtener aplicaciones activas
+                    const aplicacionesActivas = {};
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    
+                    Object.keys(aplicaciones).forEach(key => {
+                        const app = aplicaciones[key];
+                        
+                        // Verificar si la aplicación está vencida
+                        const fechaLibre = new Date(app.fechaLibre.split('/').reverse().join('-'));
+                        const estaVencida = fechaLibre < hoy;
+                        
+                        // Si no mostrar vencidas, saltar las vencidas
+                        if (!mostrarVencidas && estaVencida) {
+                            return;
+                        }
+                        
+                        // Aplicar filtros
+                        if (cultivoFiltro !== 'todos' && app.cultivo !== cultivoFiltro) {
+                            return;
+                        }
+                        
+                        const appInvernaderoId = `${app.cultivo}-${app.invernadero}`;
+                        if (invernaderoFiltro !== 'todos' && appInvernaderoId !== invernaderoFiltro) {
+                            return;
+                        }
+                        
+                        // Agrupar aplicaciones por invernadero
+                        const invernaderoKey = `${app.cultivo}-${app.invernadero}`;
+                        if (!aplicacionesActivas[invernaderoKey]) {
+                            aplicacionesActivas[invernaderoKey] = [];
+                        }
+                        aplicacionesActivas[invernaderoKey].push({...app, estaVencida});
+                    });
+                    
+                    // Determinar qué invernaderos mostrar según los filtros
+                    let invernaderosAMostrar = [];
+                    
+                    if (cultivoFiltro === 'todos') {
+                        // Mostrar todos los invernaderos de ambos cultivos
+                        invernaderos.mini.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'mini', invernadero: inv});
+                        });
+                        invernaderos.tomate.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'tomate', invernadero: inv});
+                        });
+                    } else if (cultivoFiltro === 'mini') {
+                        invernaderos.mini.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'mini', invernadero: inv});
+                        });
+                    } else if (cultivoFiltro === 'tomate') {
+                        invernaderos.tomate.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'tomate', invernadero: inv});
+                        });
+                    }
+                    
+                    // Aplicar filtro de invernadero específico
+                    if (invernaderoFiltro !== 'todos') {
+                        const [cultivoF, invernaderoF] = invernaderoFiltro.split('-');
+                        invernaderosAMostrar = invernaderosAMostrar.filter(inv => 
+                            inv.cultivo === cultivoF && inv.invernadero === invernaderoF
+                        );
+                    }
+                    
+                    // Ordenar: primero mini, luego tomate
+                    invernaderosAMostrar.sort((a, b) => {
+                        if (a.cultivo === b.cultivo) {
+                            return parseInt(a.invernadero) - parseInt(b.invernadero);
+                        }
+                        return a.cultivo === 'mini' ? -1 : 1;
+                    });
+                    
+                    // Generar filas de la tabla para escritorio
+                    invernaderosAMostrar.forEach(inv => {
+                        const invernaderoKey = `${inv.cultivo}-${inv.invernadero}`;
+                        const aplicacionesInvernadero = aplicacionesActivas[invernaderoKey] || [];
+                        const rowspan = aplicacionesInvernadero.length > 0 ? aplicacionesInvernadero.length : 1;
+                        
+                        if (aplicacionesInvernadero.length === 0) {
+                            // Invernadero libre - SOLO "Libre" en la columna de Área
+                            const fila = document.createElement('tr');
+                            fila.innerHTML = `
+                                <td class="cultivo-cell" rowspan="${rowspan}">${inv.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
+                                <td class="invernadero-cell" rowspan="${rowspan}">${inv.invernadero}</td>
+                                <td class="libre-cell">Libre</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><span class="estado-badge estado-libre">Libre</span></td>
+                            `;
+                            aplicacionesBody.appendChild(fila);
+                            
+                            // Vista móvil para invernadero libre
+                            const mobileCard = document.createElement('div');
+                            mobileCard.className = 'mobile-card';
+                            mobileCard.innerHTML = `
+                                <div class="mobile-header">
+                                    <span class="mobile-cultivo">${inv.cultivo === 'mini' ? 'Mini' : 'Tomate'}</span>
+                                    <span class="mobile-invernadero">Inv ${inv.invernadero}</span>
+                                </div>
+                                <div class="mobile-details">
+                                    <div class="mobile-detail">
+                                        <div class="mobile-label">Área</div>
+                                        <div class="mobile-value libre-cell">Libre</div>
+                                    </div>
+                                    <div class="mobile-detail">
+                                        <div class="mobile-label">Estado</div>
+                                        <div class="mobile-value"><span class="estado-badge estado-libre">Libre</span></div>
+                                    </div>
+                                </div>
+                            `;
+                            mobileContainer.appendChild(mobileCard);
+                        } else {
+                            // Invernadero con aplicaciones
+                            aplicacionesInvernadero.forEach((aplicacion, index) => {
+                                // Formatear capillas aplicadas
+                                let capillasHTML = '';
+                                if (aplicacion.capillasAplicadasArray && aplicacion.capillasAplicadasArray.length > 0) {
+                                    aplicacion.capillasAplicadasArray.forEach(capilla => {
+                                        capillasHTML += `<span class="capilla-pill">${capilla}</span>`;
+                                    });
+                                } else if (aplicacion.capillasAplicadas) {
+                                    aplicacion.capillasAplicadas.split(',').forEach(capilla => {
+                                        capillasHTML += `<span class="capilla-pill">${capilla}</span>`;
+                                    });
+                                }
+                                
+                                // Determinar clase según estado
+                                const estadoTexto = aplicacion.estaVencida ? 'Vencida' : 'Activa';
+                                const estadoBadgeClase = aplicacion.estaVencida ? 'estado-vencida' : 'estado-activa';
+                                
+                                const fila = document.createElement('tr');
+                                if (index === 0) {
+                                    // Primera fila con rowspan
+                                    fila.innerHTML = `
+                                        <td class="cultivo-cell" rowspan="${rowspan}">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
+                                        <td class="invernadero-cell" rowspan="${rowspan}">${aplicacion.invernadero}</td>
+                                        <td>${aplicacion.area} ha</td>
+                                        <td class="capillas-cell">${capillasHTML}</td>
+                                        <td class="producto-cell">${aplicacion.producto}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaLibre}</td>
+                                        <td><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></td>
+                                    `;
+                                } else {
+                                    // Filas siguientes
+                                    fila.innerHTML = `
+                                        <td>${aplicacion.area} ha</td>
+                                        <td class="capillas-cell">${capillasHTML}</td>
+                                        <td class="producto-cell">${aplicacion.producto}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaLibre}</td>
+                                        <td><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></td>
+                                    `;
+                                }
+                                aplicacionesBody.appendChild(fila);
+                                
+                                // Vista móvil para aplicación
+                                const mobileCard = document.createElement('div');
+                                mobileCard.className = 'mobile-card';
+                                mobileCard.innerHTML = `
+                                    <div class="mobile-header">
+                                        <span class="mobile-cultivo">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</span>
+                                        <span class="mobile-invernadero">Inv ${aplicacion.invernadero}</span>
+                                    </div>
+                                    <div class="mobile-details">
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Área</div>
+                                            <div class="mobile-value">${aplicacion.area} ha</div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Estado</div>
+                                            <div class="mobile-value"><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Producto</div>
+                                            <div class="mobile-value">${aplicacion.producto}</div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Fecha aplicación</div>
+                                            <div class="mobile-value">${aplicacion.fechaAplicacion}</div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Fecha libre</div>
+                                            <div class="mobile-value">${aplicacion.fechaLibre}</div>
+                                        </div>
+                                        <div class="mobile-detail" style="grid-column: 1 / -1;">
+                                            <div class="mobile-label">Capillas aplicadas</div>
+                                            <div class="mobile-capillas">${capillasHTML}</div>
+                                        </div>
+                                    </div>
+                                `;
+                                mobileContainer.appendChild(mobileCard);
+                            });
+                        }
+                    });
+                    
+                    if (aplicacionesBody.innerHTML === '' && mobileContainer.innerHTML === '') {
+                        aplicacionesBody.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones que coincidan con los filtros</td></tr>';
+                        mobileContainer.innerHTML = '<div class="no-data">No hay aplicaciones que coincidan con los filtros</div>';
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading applications:", error);
+                    document.getElementById('aplicaciones-body').innerHTML = '<tr><td colspan="8" class="no-data">Error al cargar aplicaciones</td></tr>';
+                    document.getElementById('mobile-container').innerHTML = '<div class="no-data">Error al cargar aplicaciones</div>';
+                });
+            }
+            
+            // Función para descargar como imagen
+            function descargarComoImagen() {
+                const elemento = document.getElementById('tabla-container');
+                
+                html2canvas(elemento).then(canvas => {
+                    const enlace = document.createElement('a');
+                    enlace.download = 'aplicaciones_agricolas.png';
+                    enlace.href = canvas.toDataURL('image/png');
+                    enlace.click();
+                });
+            }
+            
+            // Función para compartir
+            function compartirAplicaciones() {
+                if (navigator.share) {
+                    // Usar la Web Share API si está disponible
+                    navigator.share({
+                        title: 'Aplicaciones Agrícolas',
+                        text: 'Información de aplicaciones agrícolas',
+                        url: window.location.href
+                    })
+                    .then(() => console.log('Contenido compartido exitosamente'))
+                    .catch((error) => console.log('Error al compartir:', error));
+                } else {
+                    // Alternativa para navegadores que no soportan la Web Share API
+                    alert('Para compartir, use la función de captura de pantalla de su dispositivo o la opción de descargar como imagen.');
+                }
+            }
+            
+            // Función para mostrar notificaciones
+            function showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                
+                if (type === 'error') {
+                    notification.style.backgroundColor = '#e53935';
+                } else {
+                    notification.style.backgroundColor = 'var(--primary-color)';
+                }
+                
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
