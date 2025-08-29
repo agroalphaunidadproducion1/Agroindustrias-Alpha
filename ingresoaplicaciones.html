@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Aplicación de Productos Agrícolas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #7cb342;
+            --accent-color: #ffa000;
+            --light-color: #f1f8e9;
+            --dark-color: #1b5e20;
+            --gray-color: #757575;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f1f8e9, #e8f5e9);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        header p {
+            color: var(--gray-color);
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-accent:hover {
+            background-color: #f57c00;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        .result-box {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .result-box h4 {
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+        
+        .info-text {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            margin-top: 5px;
+        }
+        
+        .readonly {
+            background-color: #f9f9f9;
+            color: #666;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-seedling"></i> Sistema de Aplicación de Productos</h1>
+            <p>Registro de aplicaciones agrícolas con cálculo automático de áreas y fechas</p>
+        </header>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-file-alt"></i> Datos de la Aplicación</h2>
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="applicationDate">Fecha de aplicación</label>
+                        <input type="date" id="applicationDate" class="form-control">
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="applicationTime">Hora de aplicación</label>
+                        <input type="time" id="applicationTime" class="form-control" value="12:00">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="cultivo">Cultivo</label>
+                        <select id="cultivo" class="form-control">
+                            <option value="">Seleccione un cultivo</option>
+                            <option value="mini">Mini</option>
+                            <option value="tomate">Tomate</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="invernadero">Invernadero</label>
+                        <select id="invernadero" class="form-control" disabled>
+                            <option value="">Primero seleccione un cultivo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="product">Producto</label>
+                <select id="product" class="form-control">
+                    <option value="">Cargando productos...</option>
+                </select>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="maxDose">Dosis máxima (kg/ha)</label>
+                        <input type="text" id="maxDose" class="form-control readonly" readonly>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="daysToHarvest">Días a cosecha</label>
+                        <input type="text" id="daysToHarvest" class="form-control readonly" readonly>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="area">Área (hectáreas) - Máximo 2 ha</label>
+                <input type="number" id="area" class="form-control" min="0.1" max="2" step="0.1" value="1.0">
+                <p class="info-text">Introduzca el área en hectáreas (máximo 2 ha)</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="chapels">Número de capillas</label>
+                <input type="number" id="chapels" class="form-control readonly" readonly>
+                <p class="info-text">Se calcula automáticamente: 1.94 ha = 36 capillas</p>
+            </div>
+            
+            <div class="result-box">
+                <h4>Fecha libre de aplicación</h4>
+                <div id="freeDate" class="result-value">Se calculará automáticamente</div>
+                <p class="info-text">Fecha de aplicación + Días a cosecha (si la aplicación fue después de las 12:00, se suma 1 día adicional)</p>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-col">
+                <button class="btn btn-block" id="save-btn">
+                    <i class="fas fa-save"></i> Guardar Aplicación
+                </button>
+            </div>
+            <div class="form-col">
+                <button class="btn btn-block btn-accent" id="calculate-btn">
+                    <i class="fas fa-calculator"></i> Calcular
+                </button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-history"></i> Aplicaciones Registradas</h2>
+            <div id="applications-list">
+                <p>Cargando aplicaciones previas...</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Sistema Agrícola - Todos los derechos reservados</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        ¡Cálculos realizados correctamente!
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Referencias a la base de datos
+        const productsRef = database.ref('productos');
+        const applicationsRef = database.ref('aplicaciones');
+        
+        // Definir invernaderos por cultivo
+        const invernaderos = {
+            mini: ["9", "10", "11", "12", "33", "35", "37", "39"],
+            tomate: ["13", "14", "15", "16"]
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Establecer fecha actual por defecto
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('applicationDate').value = formattedDate;
+            
+            // Configurar evento para cambio de cultivo
+            document.getElementById('cultivo').addEventListener('change', function() {
+                const cultivo = this.value;
+                const invernaderoSelect = document.getElementById('invernadero');
+                
+                // Habilitar y cargar invernaderos según el cultivo seleccionado
+                if (cultivo) {
+                    invernaderoSelect.disabled = false;
+                    invernaderoSelect.innerHTML = '<option value="">Seleccione un invernadero</option>';
+                    
+                    invernaderos[cultivo].forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = inv;
+                        option.textContent = `Invernadero ${inv}`;
+                        invernaderoSelect.appendChild(option);
+                    });
+                } else {
+                    invernaderoSelect.disabled = true;
+                    invernaderoSelect.innerHTML = '<option value="">Primero seleccione un cultivo</option>';
+                }
+            });
+            
+            // Cargar productos desde Firebase
+            loadProducts();
+            
+            // Cuando se selecciona un producto, cargar sus datos
+            document.getElementById('product').addEventListener('change', function() {
+                const productId = this.value;
+                const cultivo = document.getElementById('cultivo').value;
+                
+                if (productId && cultivo) {
+                    loadProductData(productId, cultivo);
+                } else if (productId) {
+                    showNotification('Primero seleccione un cultivo', 'error');
+                } else {
+                    document.getElementById('maxDose').value = '';
+                    document.getElementById('daysToHarvest').value = '';
+                }
+            });
+            
+            // Calcular capillas cuando cambia el área
+            const areaInput = document.getElementById('area');
+            areaInput.addEventListener('input', calculateChapels);
+            
+            // Botón de calcular
+            const calculateBtn = document.getElementById('calculate-btn');
+            calculateBtn.addEventListener('click', calculateAll);
+            
+            // Botón de guardar
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.addEventListener('click', saveApplication);
+            
+            // Cargar aplicaciones previas
+            loadApplications();
+            
+            // Calcular número de capillas
+            function calculateChapels() {
+                const area = parseFloat(areaInput.value) || 0;
+                // Fórmula: 1.94 ha = 36 capillas
+                const chapels = Math.round((area / 1.94) * 36);
+                document.getElementById('chapels').value = chapels;
+            }
+            
+            // Calcular todos los valores
+            function calculateAll() {
+                // Calcular capillas
+                calculateChapels();
+                
+                // Calcular fecha libre
+                const appDate = new Date(document.getElementById('applicationDate').value);
+                const appTime = document.getElementById('applicationTime').value;
+                const daysToHarvest = parseInt(document.getElementById('daysToHarvest').value) || 0;
+                
+                if (isNaN(appDate.getTime()) || daysToHarvest <= 0) {
+                    showNotification('Por favor, complete todos los campos correctamente', 'error');
+                    return;
+                }
+                
+                // Sumar días a cosecha
+                const freeDate = new Date(appDate);
+                freeDate.setDate(freeDate.getDate() + daysToHarvest);
+                
+                // Verificar si la aplicación fue después de las 12:00
+                const hour = parseInt(appTime.split(':')[0]);
+                if (hour >= 12) {
+                    freeDate.setDate(freeDate.getDate() + 1);
+                }
+                
+                // Formatear fecha
+                const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+                document.getElementById('freeDate').textContent = freeDate.toLocaleDateString('es-ES', options);
+                
+                showNotification('Cálculos realizados correctamente');
+            }
+            
+            // Cargar productos desde Firebase
+            function loadProducts() {
+                productsRef.once('value')
+                .then((snapshot) => {
+                    const products = snapshot.val();
+                    const productSelect = document.getElementById('product');
+                    
+                    // Limpiar select
+                    productSelect.innerHTML = '<option value="">Seleccione un producto</option>';
+                    
+                    // Llenar con productos de la base de datos
+                    if (products) {
+                        Object.keys(products).forEach(key => {
+                            const product = products[key];
+                            const option = document.createElement('option');
+                            option.value = key;
+                            option.textContent = product.nombre || `Producto ${key}`;
+                            productSelect.appendChild(option);
+                        });
+                    } else {
+                        productSelect.innerHTML = '<option value="">No hay productos disponibles</option>';
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading products:", error);
+                    document.getElementById('product').innerHTML = '<option value="">Error al cargar productos</option>';
+                });
+            }
+            
+            // Cargar datos de un producto específico según el cultivo
+            function loadProductData(productId, cultivo) {
+                productsRef.child(productId).once('value')
+                .then((snapshot) => {
+                    const product = snapshot.val();
+                    if (product) {
+                        // Obtener datos según el cultivo seleccionado
+                        const diasKey = cultivo === 'mini' ? 'dias_mini' : 'dias_tomate';
+                        const dosisKey = cultivo === 'mini' ? 'dosis_maxima_mini' : 'dosis_maxima_tomate';
+                        
+                        document.getElementById('maxDose').value = product[dosisKey] || 'N/A';
+                        document.getElementById('daysToHarvest').value = product[diasKey] || 'N/A';
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading product data:", error);
+                    showNotification('Error al cargar datos del producto', 'error');
+                });
+            }
+            
+            // Guardar aplicación en Firebase
+            function saveApplication() {
+                const cultivo = document.getElementById('cultivo').value;
+                const invernadero = document.getElementById('invernadero').value;
+                const productId = document.getElementById('product').value;
+                const applicationDate = document.getElementById('applicationDate').value;
+                const applicationTime = document.getElementById('applicationTime').value;
+                const area = document.getElementById('area').value;
+                const chapels = document.getElementById('chapels').value;
+                const freeDate = document.getElementById('freeDate').textContent;
+                
+                if (!cultivo || !invernadero || !productId || !applicationDate) {
+                    showNotification('Por favor, complete todos los campos obligatorios', 'error');
+                    return;
+                }
+                
+                // Obtener nombre del producto
+                const productName = document.getElementById('product').options[document.getElementById('product').selectedIndex].text;
+                
+                // Crear objeto de aplicación
+                const application = {
+                    cultivo: cultivo,
+                    invernadero: invernadero,
+                    producto: productName,
+                    productoId: productId,
+                    fechaAplicacion: applicationDate,
+                    horaAplicacion: applicationTime,
+                    area: area,
+                    capillas: chapels,
+                    fechaLibre: freeDate,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Guardar en Firebase
+                applicationsRef.push(application)
+                .then(() => {
+                    showNotification('Aplicación guardada correctamente');
+                    // Recargar la lista de aplicaciones
+                    loadApplications();
+                })
+                .catch((error) => {
+                    console.error("Error saving application:", error);
+                    showNotification('Error al guardar la aplicación', 'error');
+                });
+            }
+            
+            // Cargar aplicaciones previas desde Firebase
+            function loadApplications() {
+                applicationsRef.orderByChild('timestamp').limitToLast(5).once('value')
+                .then((snapshot) => {
+                    const applications = snapshot.val();
+                    const applicationsList = document.getElementById('applications-list');
+                    
+                    if (applications) {
+                        let html = '';
+                        Object.keys(applications).reverse().forEach(key => {
+                            const app = applications[key];
+                            html += `
+                                <div class="result-box" style="margin-bottom: 15px;">
+                                    <h4>${app.producto} - ${app.fechaAplicacion}</h4>
+                                    <p><strong>Cultivo:</strong> ${app.cultivo === 'mini' ? 'Mini' : 'Tomate'}</p>
+                                    <p><strong>Invernadero:</strong> ${app.invernadero}</p>
+                                    <p><strong>Área:</strong> ${app.area} ha</p>
+                                    <p><strong>Capillas:</strong> ${app.capillas}</p>
+                                    <p><strong>Fecha libre:</strong> ${app.fechaLibre}</p>
+                                </div>
+                            `;
+                        });
+                        applicationsList.innerHTML = html;
+                    } else {
+                        applicationsList.innerHTML = '<p>No hay aplicaciones registradas</p>';
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error loading applications:", error);
+                    document.getElementById('applications-list').innerHTML = '<p>Error al cargar aplicaciones</p>';
+                });
+            }
+            
+            // Función para mostrar notificaciones
+            function showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                
+                if (type === 'error') {
+                    notification.style.backgroundColor = '#e53935';
+                } else {
+                    notification.style.backgroundColor = 'var(--primary-color)';
+                }
+                
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Calcular valores iniciales
+            calculateChapels();
+        });
+    </script>
+</body>
+</html>
