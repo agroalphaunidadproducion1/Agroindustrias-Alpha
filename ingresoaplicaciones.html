@@ -166,6 +166,10 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            
+            .capillas-section {
+                flex-direction: column;
+            }
         }
         
         .result-box {
@@ -226,6 +230,90 @@
             color: #666;
         }
         
+        .capillas-container {
+            margin-top: 15px;
+        }
+        
+        .capillas-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .capillas-group {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 15px;
+        }
+        
+        .capillas-group h3 {
+            margin-bottom: 10px;
+            color: var(--dark-color);
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .capillas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .capilla-checkbox {
+            display: none;
+        }
+        
+        .capilla-label {
+            display: block;
+            padding: 8px;
+            text-align: center;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        
+        .capilla-checkbox:checked + .capilla-label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .capillas-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .capillas-actions button {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .selected-capillas {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: var(--border-radius);
+            min-height: 50px;
+        }
+        
+        .selected-capilla {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+        
         .loading {
             display: inline-block;
             width: 20px;
@@ -245,7 +333,7 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-seedling"></i> Sistema de Aplicación de Productos</h1>
-            <p>Registro de aplicaciones agrícolas con cálculo automático de áreas y fechas</p>
+            <p>Registro de aplicaciones agrícolas con selección de capillas</p>
         </header>
         
         <div class="card">
@@ -316,9 +404,40 @@
             </div>
             
             <div class="form-group">
-                <label for="chapels">Número de capillas</label>
-                <input type="number" id="chapels" class="form-control readonly" readonly>
-                <p class="info-text">Se calcula automáticamente: 1.94 ha = 36 capillas</p>
+                <label>Capillas aplicadas</label>
+                <div class="capillas-container">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="totalChapels">Total de capillas calculadas:</label>
+                            <input type="number" id="totalChapels" class="form-control readonly" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="capillas-section">
+                        <div class="capillas-group">
+                            <h3>Capillas Norte (1-18N)</h3>
+                            <div class="capillas-grid" id="capillasNorteGrid">
+                                <!-- Las capillas norte se generarán aquí -->
+                            </div>
+                        </div>
+                        
+                        <div class="capillas-group">
+                            <h3>Capillas Sur (1-18S)</h3>
+                            <div class="capillas-grid" id="capillasSurGrid">
+                                <!-- Las capillas sur se generarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="capillas-actions">
+                        <button id="seleccionarTodasBtn" class="btn">Seleccionar todas</button>
+                        <button id="deseleccionarTodasBtn" class="btn">Deseleccionar todas</button>
+                    </div>
+                    
+                    <div class="selected-capillas" id="selectedCapillas">
+                        <p class="info-text">No hay capillas seleccionadas</p>
+                    </div>
+                </div>
             </div>
             
             <div class="result-box">
@@ -377,6 +496,9 @@
             tomate: ["13", "14", "15", "16"]
         };
         
+        // Variables globales
+        let capillasSeleccionadas = [];
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Establecer fecha actual por defecto
             const today = new Date();
@@ -405,8 +527,16 @@
                 }
             });
             
+            // Calcular capillas cuando cambia el área
+            const areaInput = document.getElementById('area');
+            areaInput.addEventListener('input', calcularCapillas);
+            
+            // Configurar botones de capillas
+            document.getElementById('seleccionarTodasBtn').addEventListener('click', seleccionarTodasCapillas);
+            document.getElementById('deseleccionarTodasBtn').addEventListener('click', deseleccionarTodasCapillas);
+            
             // Cargar productos desde Firebase
-            loadProducts();
+            cargarProductos();
             
             // Cuando se selecciona un producto, cargar sus datos
             document.getElementById('product').addEventListener('change', function() {
@@ -414,42 +544,176 @@
                 const cultivo = document.getElementById('cultivo').value;
                 
                 if (productId && cultivo) {
-                    loadProductData(productId, cultivo);
+                    cargarDatosProducto(productId, cultivo);
                 } else if (productId) {
-                    showNotification('Primero seleccione un cultivo', 'error');
+                    mostrarNotificacion('Primero seleccione un cultivo', 'error');
                 } else {
                     document.getElementById('maxDose').value = '';
                     document.getElementById('daysToHarvest').value = '';
                 }
             });
             
-            // Calcular capillas cuando cambia el área
-            const areaInput = document.getElementById('area');
-            areaInput.addEventListener('input', calculateChapels);
-            
             // Botón de calcular
             const calculateBtn = document.getElementById('calculate-btn');
-            calculateBtn.addEventListener('click', calculateAll);
+            calculateBtn.addEventListener('click', calcularTodo);
             
             // Botón de guardar
             const saveBtn = document.getElementById('save-btn');
-            saveBtn.addEventListener('click', saveApplication);
+            saveBtn.addEventListener('click', guardarAplicacion);
             
             // Cargar aplicaciones previas
-            loadApplications();
+            cargarAplicaciones();
             
-            // Calcular número de capillas
-            function calculateChapels() {
+            // Calcular valores iniciales
+            calcularCapillas();
+            generarInterfazCapillas();
+            
+            // Función para calcular el número de capillas
+            function calcularCapillas() {
                 const area = parseFloat(areaInput.value) || 0;
                 // Fórmula: 1.94 ha = 36 capillas
                 const chapels = Math.round((area / 1.94) * 36);
-                document.getElementById('chapels').value = chapels;
+                document.getElementById('totalChapels').value = chapels;
             }
             
-            // Calcular todos los valores
-            function calculateAll() {
+            // Función para generar la interfaz de selección de capillas
+            function generarInterfazCapillas() {
+                const capillasNorteGrid = document.getElementById('capillasNorteGrid');
+                const capillasSurGrid = document.getElementById('capillasSurGrid');
+                
+                capillasNorteGrid.innerHTML = '';
+                capillasSurGrid.innerHTML = '';
+                
+                // Generar capillas Norte (1-18N) - TODAS DISPONIBLES
+                for (let i = 1; i <= 18; i++) {
+                    const capillaId = `${i}N`;
+                    const div = document.createElement('div');
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `capilla-${capillaId}`;
+                    checkbox.className = 'capilla-checkbox';
+                    checkbox.value = capillaId;
+                    checkbox.checked = capillasSeleccionadas.includes(capillaId);
+                    checkbox.addEventListener('change', function() {
+                        actualizarCapillasSeleccionadas();
+                    });
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `capilla-${capillaId}`;
+                    label.className = 'capilla-label';
+                    label.textContent = `${i}N`;
+                    
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    capillasNorteGrid.appendChild(div);
+                }
+                
+                // Generar capillas Sur (1-18S) - TODAS DISPONIBLES
+                for (let i = 1; i <= 18; i++) {
+                    const capillaId = `${i}S`;
+                    const div = document.createElement('div');
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `capilla-${capillaId}`;
+                    checkbox.className = 'capilla-checkbox';
+                    checkbox.value = capillaId;
+                    checkbox.checked = capillasSeleccionadas.includes(capillaId);
+                    checkbox.addEventListener('change', function() {
+                        actualizarCapillasSeleccionadas();
+                    });
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `capilla-${capillaId}`;
+                    label.className = 'capilla-label';
+                    label.textContent = `${i}S`;
+                    
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    capillasSurGrid.appendChild(div);
+                }
+                
+                actualizarCapillasSeleccionadas();
+            }
+            
+            // Función para actualizar la lista de capillas seleccionadas
+            function actualizarCapillasSeleccionadas() {
+                capillasSeleccionadas = [];
+                
+                // Obtener capillas norte seleccionadas
+                for (let i = 1; i <= 18; i++) {
+                    const checkbox = document.getElementById(`capilla-${i}N`);
+                    if (checkbox && checkbox.checked) {
+                        capillasSeleccionadas.push(checkbox.value);
+                    }
+                }
+                
+                // Obtener capillas sur seleccionadas
+                for (let i = 1; i <= 18; i++) {
+                    const checkbox = document.getElementById(`capilla-${i}S`);
+                    if (checkbox && checkbox.checked) {
+                        capillasSeleccionadas.push(checkbox.value);
+                    }
+                }
+                
+                // Actualizar la visualización
+                const selectedCapillasDiv = document.getElementById('selectedCapillas');
+                
+                if (capillasSeleccionadas.length === 0) {
+                    selectedCapillasDiv.innerHTML = '<p class="info-text">No hay capillas seleccionadas</p>';
+                    return;
+                }
+                
+                selectedCapillasDiv.innerHTML = '<p>Capillas seleccionadas:</p>';
+                
+                // Mostrar las capillas seleccionadas
+                capillasSeleccionadas.forEach(capilla => {
+                    const span = document.createElement('span');
+                    span.className = 'selected-capilla';
+                    span.textContent = capilla;
+                    selectedCapillasDiv.appendChild(span);
+                });
+            }
+            
+            // Función para seleccionar todas las capillas
+            function seleccionarTodasCapillas() {
+                // Seleccionar todas las capillas norte
+                for (let i = 1; i <= 18; i++) {
+                    const checkbox = document.getElementById(`capilla-${i}N`);
+                    if (checkbox) checkbox.checked = true;
+                }
+                
+                // Seleccionar todas las capillas sur
+                for (let i = 1; i <= 18; i++) {
+                    const checkbox = document.getElementById(`capilla-${i}S`);
+                    if (checkbox) checkbox.checked = true;
+                }
+                
+                actualizarCapillasSeleccionadas();
+            }
+            
+            // Función para deseleccionar todas las capillas
+            function deseleccionarTodasCapillas() {
+                // Deseleccionar todas las capillas norte
+                for (let i = 1; i <= 18; i++) {
+                    const checkbox = document.getElementById(`capilla-${i}N`);
+                    if (checkbox) checkbox.checked = false;
+                }
+                
+                // Deseleccionar todas las capillas sur
+                for (let i = 1; i <= 18; i++) {
+                    const checkbox = document.getElementById(`capilla-${i}S`);
+                    if (checkbox) checkbox.checked = false;
+                }
+                
+                actualizarCapillasSeleccionadas();
+            }
+            
+            // Función para calcular todos los valores
+            function calcularTodo() {
                 // Calcular capillas
-                calculateChapels();
+                calcularCapillas();
                 
                 // Calcular fecha libre
                 const appDate = new Date(document.getElementById('applicationDate').value);
@@ -457,7 +721,7 @@
                 const daysToHarvest = parseInt(document.getElementById('daysToHarvest').value) || 0;
                 
                 if (isNaN(appDate.getTime()) || daysToHarvest <= 0) {
-                    showNotification('Por favor, complete todos los campos correctamente', 'error');
+                    mostrarNotificacion('Por favor, complete todos los campos correctamente', 'error');
                     return;
                 }
                 
@@ -475,11 +739,11 @@
                 const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
                 document.getElementById('freeDate').textContent = freeDate.toLocaleDateString('es-ES', options);
                 
-                showNotification('Cálculos realizados correctamente');
+                mostrarNotificacion('Cálculos realizados correctamente');
             }
             
-            // Cargar productos desde Firebase
-            function loadProducts() {
+            // Función para cargar productos desde Firebase
+            function cargarProductos() {
                 productsRef.once('value')
                 .then((snapshot) => {
                     const products = snapshot.val();
@@ -507,8 +771,8 @@
                 });
             }
             
-            // Cargar datos de un producto específico según el cultivo
-            function loadProductData(productId, cultivo) {
+            // Función para cargar datos de un producto específico según el cultivo
+            function cargarDatosProducto(productId, cultivo) {
                 productsRef.child(productId).once('value')
                 .then((snapshot) => {
                     const product = snapshot.val();
@@ -523,23 +787,23 @@
                 })
                 .catch((error) => {
                     console.error("Error loading product data:", error);
-                    showNotification('Error al cargar datos del producto', 'error');
+                    mostrarNotificacion('Error al cargar datos del producto', 'error');
                 });
             }
             
-            // Guardar aplicación en Firebase
-            function saveApplication() {
+            // Función para guardar aplicación en Firebase
+            function guardarAplicacion() {
                 const cultivo = document.getElementById('cultivo').value;
                 const invernadero = document.getElementById('invernadero').value;
                 const productId = document.getElementById('product').value;
                 const applicationDate = document.getElementById('applicationDate').value;
                 const applicationTime = document.getElementById('applicationTime').value;
                 const area = document.getElementById('area').value;
-                const chapels = document.getElementById('chapels').value;
+                const totalChapels = document.getElementById('totalChapels').value;
                 const freeDate = document.getElementById('freeDate').textContent;
                 
-                if (!cultivo || !invernadero || !productId || !applicationDate) {
-                    showNotification('Por favor, complete todos los campos obligatorios', 'error');
+                if (!cultivo || !invernadero || !productId || !applicationDate || capillasSeleccionadas.length === 0) {
+                    mostrarNotificacion('Por favor, complete todos los campos obligatorios y seleccione al menos una capilla', 'error');
                     return;
                 }
                 
@@ -555,7 +819,9 @@
                     fechaAplicacion: applicationDate,
                     horaAplicacion: applicationTime,
                     area: area,
-                    capillas: chapels,
+                    totalCapillas: totalChapels,
+                    capillasAplicadas: capillasSeleccionadas.join(','),
+                    capillasAplicadasArray: capillasSeleccionadas,
                     fechaLibre: freeDate,
                     timestamp: new Date().toISOString()
                 };
@@ -563,18 +829,18 @@
                 // Guardar en Firebase
                 applicationsRef.push(application)
                 .then(() => {
-                    showNotification('Aplicación guardada correctamente');
+                    mostrarNotificacion('Aplicación guardada correctamente');
                     // Recargar la lista de aplicaciones
-                    loadApplications();
+                    cargarAplicaciones();
                 })
                 .catch((error) => {
                     console.error("Error saving application:", error);
-                    showNotification('Error al guardar la aplicación', 'error');
+                    mostrarNotificacion('Error al guardar la aplicación', 'error');
                 });
             }
             
-            // Cargar aplicaciones previas desde Firebase
-            function loadApplications() {
+            // Función para cargar aplicaciones previas desde Firebase
+            function cargarAplicaciones() {
                 applicationsRef.orderByChild('timestamp').limitToLast(5).once('value')
                 .then((snapshot) => {
                     const applications = snapshot.val();
@@ -590,7 +856,7 @@
                                     <p><strong>Cultivo:</strong> ${app.cultivo === 'mini' ? 'Mini' : 'Tomate'}</p>
                                     <p><strong>Invernadero:</strong> ${app.invernadero}</p>
                                     <p><strong>Área:</strong> ${app.area} ha</p>
-                                    <p><strong>Capillas:</strong> ${app.capillas}</p>
+                                    <p><strong>Capillas aplicadas:</strong> ${app.capillasAplicadas}</p>
                                     <p><strong>Fecha libre:</strong> ${app.fechaLibre}</p>
                                 </div>
                             `;
@@ -607,7 +873,7 @@
             }
             
             // Función para mostrar notificaciones
-            function showNotification(message, type = 'success') {
+            function mostrarNotificacion(message, type = 'success') {
                 const notification = document.getElementById('notification');
                 notification.textContent = message;
                 
@@ -623,9 +889,6 @@
                     notification.classList.remove('show');
                 }, 3000);
             }
-            
-            // Calcular valores iniciales
-            calculateChapels();
         });
     </script>
 </body>
