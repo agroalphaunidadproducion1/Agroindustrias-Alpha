@@ -164,6 +164,11 @@
       </div>
     </div>
     
+    <!-- Nuevo campo: Enlace EPA -->
+    <div class="form-group">
+      <input type="url" id="enlace_epa" placeholder="Enlace EPA (URL)" pattern="https?://.+" title="Ingrese una URL válida que comience con http:// o https://" />
+    </div>
+    
     <div class="form-group">
       <label for="categoria">Categoría:</label>
       <select id="categoria" required>
@@ -334,6 +339,7 @@
         ingredientes: document.getElementById("ingredientes").value,
         senasa: document.getElementById("senasa").value,
         epa: document.getElementById("epa").value,
+        enlace_epa: document.getElementById("enlace_epa").value, // Nuevo campo
         categoria: document.getElementById("categoria").value,
         // Nuevos campos químicos
         grupo_quimico: document.getElementById("grupo_quimico").value,
