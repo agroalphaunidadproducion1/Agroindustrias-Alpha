@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Actividades - Agro Alpha</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #1b5e20;
+            --accent-color: #7cb342;
+            --light-bg: #f1f8e9;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            padding-top: 20px;
+            padding-bottom: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: none;
+        }
+        
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 12px 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            border: none;
+            color: #000;
+        }
+        
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .filter-section {
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header text-center">
+            <h1><i class="fas fa-tasks me-2"></i>Administración de Actividades</h1>
+            <p class="lead">Agroalpha - Unidad de producción 1</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filter-section">
+            <h4 class="mb-3"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h4>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="filtro-cultivo" class="form-label">Cultivo:</label>
+                    <select class="form-select" id="filtro-cultivo">
+                        <option value="">Todos los cultivos</option>
+                        <option value="chile">Chile</option>
+                        <option value="tomate">Tomate</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="filtro-invernadero" class="form-label">Invernadero:</label>
+                    <select class="form-select" id="filtro-invernadero">
+                        <option value="">Todos los invernaderos</option>
+                        <option value="9">Invernadero 9</option>
+                        <option value="10">Invernadero 10</option>
+                        <option value="11">Invernadero 11</option>
+                        <option value="12">Invernadero 12</option>
+                        <option value="13">Invernadero 13</option>
+                        <option value="14">Invernadero 14</option>
+                        <option value="15">Invernadero 15</option>
+                        <option value="16">Invernadero 16</option>
+                        <option value="33">Invernadero 33</option>
+                        <option value="35">Invernadero 35</option>
+                        <option value="37">Invernadero 37</option>
+                        <option value="39">Invernadero 39</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="filtro-actividad" class="form-label">Actividad:</label>
+                    <select class="form-select" id="filtro-actividad">
+                        <option value="">Todas las actividades</option>
+                        <option value="Enguie">Enguie</option>
+                        <option value="Poda">Poda</option>
+                        <option value="Amarrado">Amarrado</option>
+                        <option value="Raleo">Raleo</option>
+                        <option value="Cosecha">Cosecha</option>
+                        <option value="Bajado">Bajado</option>
+                        <option value="Deshoje">Deshoje</option>
+                        <option value="Desbrote">Desbrote</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="filtro-fecha" class="form-label">Fecha:</label>
+                    <input type="date" class="form-control" id="filtro-fecha">
+                </div>
+            </div>
+            <div class="text-center">
+                <button id="btn-buscar" class="btn btn-primary me-2">
+                    <i class="fas fa-search me-2"></i>Buscar Actividades
+                </button>
+                <button id="btn-limpiar" class="btn btn-secondary">
+                    <i class="fas fa-eraser me-2"></i>Limpiar Filtros
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de actividades -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-white"><i class="fas fa-list me-2"></i>Actividades Registradas</h5>
+                <span id="contador-actividades" class="badge bg-light text-dark">0 actividades</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cultivo</th>
+                                <th>Invernadero</th>
+                                <th>Actividad</th>
+                                <th>Camas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-actividades">
+                            <tr>
+                                <td colspan="6" class="text-center py-4">Use los filtros y haga clic en "Buscar Actividades"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar actividad -->
+    <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Actividad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-editar">
+                        <input type="hidden" id="edit-id">
+                        <div class="mb-3">
+                            <label for="edit-fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="edit-fecha" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-cultivo" class="form-label">Cultivo</label>
+                            <select class="form-select" id="edit-cultivo" required>
+                                <option value="">Seleccionar cultivo</option>
+                                <option value="chile">Chile</option>
+                                <option value="tomate">Tomate</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-invernadero" class="form-label">Invernadero</label>
+                            <select class="form-select" id="edit-invernadero" required>
+                                <option value="">Seleccionar invernadero</option>
+                                <option value="9">Invernadero 9</option>
+                                <option value="10">Invernadero 10</option>
+                                <option value="11">Invernadero 11</option>
+                                <option value="12">Invernadero 12</option>
+                                <option value="13">Invernadero 13</option>
+                                <option value="14">Invernadero 14</option>
+                                <option value="15">Invernadero 15</option>
+                                <option value="16">Invernadero 16</option>
+                                <option value="33">Invernadero 33</option>
+                                <option value="35">Invernadero 35</option>
+                                <option value="37">Invernadero 37</option>
+                                <option value="39">Invernadero 39</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-actividad" class="form-label">Actividad</label>
+                            <select class="form-select" id="edit-actividad" required>
+                                <option value="">Seleccionar actividad</option>
+                                <option value="Enguie">Enguie</option>
+                                <option value="Poda">Poda</option>
+                                <option value="Amarrado">Amarrado</option>
+                                <option value="Raleo">Raleo</option>
+                                <option value="Cosecha">Cosecha</option>
+                                <option value="Bajado">Bajado</option>
+                                <option value="Deshoje">Deshoje</option>
+                                <option value="Desbrote">Desbrote</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-camas" class="form-label">Número de Camas</label>
+                            <input type="number" class="form-control" id="edit-camas" min="0" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-cambios">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar eliminación -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro de que desea eliminar esta actividad? Esta acción no se puede deshacer.</p>
+                    <p><strong>Detalles de la actividad:</strong></p>
+                    <ul id="detalles-eliminar">
+                        <!-- Los detalles se insertarán aquí con JavaScript -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-confirmar-eliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Configuración de Firebase con tu URL
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Variables globales
+        let actividadesData = [];
+        let actividadAEliminar = null;
+        let modalEditar = null;
+        let modalEliminar = null;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar modales de Bootstrap
+            modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
+            modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
+            
+            // Configurar event listeners
+            document.getElementById('btn-buscar').addEventListener('click', buscarActividades);
+            document.getElementById('btn-limpiar').addEventListener('click', limpiarFiltros);
+            document.getElementById('btn-guardar-cambios').addEventListener('click', guardarCambios);
+            document.getElementById('btn-confirmar-eliminar').addEventListener('click', confirmarEliminar);
+            
+            // Cargar todas las actividades al iniciar
+            buscarActividades();
+        });
+
+        // Buscar actividades con los filtros aplicados
+        function buscarActividades() {
+            const cultivo = document.getElementById('filtro-cultivo').value;
+            const invernadero = document.getElementById('filtro-invernadero').value;
+            const actividad = document.getElementById('filtro-actividad').value;
+            const fecha = document.getElementById('filtro-fecha').value;
+            
+            const actividadesRef = database.ref('actividades');
+            
+            actividadesRef.once('value').then((snapshot) => {
+                actividadesData = [];
+                
+                snapshot.forEach((childSnapshot) => {
+                    const activity = childSnapshot.val();
+                    activity.id = childSnapshot.key; // Guardar el ID de Firebase
+                    
+                    // Aplicar filtros
+                    let coincide = true;
+                    
+                    if (cultivo && activity.cultivo !== cultivo) {
+                        coincide = false;
+                    }
+                    
+                    if (invernadero && activity.invernadero !== invernadero) {
+                        coincide = false;
+                    }
+                    
+                    if (actividad && activity.actividad !== actividad) {
+                        coincide = false;
+                    }
+                    
+                    if (fecha && activity.fecha !== fecha) {
+                        coincide = false;
+                    }
+                    
+                    if (coincide) {
+                        actividadesData.push(activity);
+                    }
+                });
+                
+                // Ordenar por fecha (más reciente primero)
+                actividadesData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                
+                // Mostrar resultados
+                mostrarActividades(actividadesData);
+            }).catch((error) => {
+                console.error('Error al cargar actividades:', error);
+                alert('Error al cargar las actividades');
+            });
+        }
+
+        // Mostrar actividades en la tabla
+        function mostrarActividades(actividades) {
+            const tablaBody = document.getElementById('tabla-actividades');
+            const contador = document.getElementById('contador-actividades');
+            
+            contador.textContent = `${actividades.length} actividades`;
+            
+            if (actividades.length === 0) {
+                tablaBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">No se encontraron actividades con los filtros seleccionados</td></tr>';
+                return;
+            }
+            
+            tablaBody.innerHTML = '';
+            
+            actividades.forEach(actividad => {
+                const fila = document.createElement('tr');
+                
+                // Formatear fecha para mostrar
+                const fechaParts = actividad.fecha.split('-');
+                const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
+                
+                fila.innerHTML = `
+                    <td>${fechaFormateada}</td>
+                    <td>${actividad.cultivo === 'chile' ? 'Chile' : 'Tomate'}</td>
+                    <td>Invernadero ${actividad.invernadero}</td>
+                    <td>${actividad.actividad}</td>
+                    <td class="text-center">${actividad.camas || 0}</td>
+                    <td class="text-center">
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-warning btn-editar" data-id="${actividad.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-eliminar" data-id="${actividad.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                tablaBody.appendChild(fila);
+            });
+            
+            // Agregar event listeners a los botones de editar y eliminar
+            document.querySelectorAll('.btn-editar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    abrirModalEditar(id);
+                });
+            });
+            
+            document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    abrirModalEliminar(id);
+                });
+            });
+        }
+
+        // Limpiar filtros
+        function limpiarFiltros() {
+            document.getElementById('filtro-cultivo').value = '';
+            document.getElementById('filtro-invernadero').value = '';
+            document.getElementById('filtro-actividad').value = '';
+            document.getElementById('filtro-fecha').value = '';
+            
+            // Volver a cargar todas las actividades
+            buscarActividades();
+        }
+
+        // Abrir modal para editar actividad
+        function abrirModalEditar(id) {
+            const actividad = actividadesData.find(a => a.id === id);
+            
+            if (!actividad) {
+                alert('No se encontró la actividad');
+                return;
+            }
+            
+            // Llenar el formulario con los datos de la actividad
+            document.getElementById('edit-id').value = actividad.id;
+            document.getElementById('edit-fecha').value = actividad.fecha;
+            document.getElementById('edit-cultivo').value = actividad.cultivo;
+            document.getElementById('edit-invernadero').value = actividad.invernadero;
+            document.getElementById('edit-actividad').value = actividad.actividad;
+            document.getElementById('edit-camas').value = actividad.camas || 0;
+            
+            // Mostrar el modal
+            modalEditar.show();
+        }
+
+        // Guardar cambios de la actividad editada
+        function guardarCambios() {
+            const id = document.getElementById('edit-id').value;
+            const fecha = document.getElementById('edit-fecha').value;
+            const cultivo = document.getElementById('edit-cultivo').value;
+            const invernadero = document.getElementById('edit-invernadero').value;
+            const actividad = document.getElementById('edit-actividad').value;
+            const camas = document.getElementById('edit-camas').value;
+            
+            // Validar campos
+            if (!fecha || !cultivo || !invernadero || !actividad || camas === '') {
+                alert('Por favor complete todos los campos');
+                return;
+            }
+            
+            // Actualizar en Firebase
+            const updates = {};
+            updates[`/actividades/${id}`] = {
+                fecha: fecha,
+                cultivo: cultivo,
+                invernadero: invernadero,
+                actividad: actividad,
+                camas: parseInt(camas)
+            };
+            
+            database.ref().update(updates)
+                .then(() => {
+                    alert('Actividad actualizada correctamente');
+                    modalEditar.hide();
+                    buscarActividades(); // Recargar la tabla
+                })
+                .catch((error) => {
+                    console.error('Error al actualizar:', error);
+                    alert('Error al actualizar la actividad');
+                });
+        }
+
+        // Abrir modal para confirmar eliminación
+        function abrirModalEliminar(id) {
+            const actividad = actividadesData.find(a => a.id === id);
+            
+            if (!actividad) {
+                alert('No se encontró la actividad');
+                return;
+            }
+            
+            actividadAEliminar = id;
+            
+            // Formatear fecha para mostrar
+            const fechaParts = actividad.fecha.split('-');
+            const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
+            
+            // Mostrar detalles de la actividad a eliminar
+            document.getElementById('detalles-eliminar').innerHTML = `
+                <li>Fecha: ${fechaFormateada}</li>
+                <li>Cultivo: ${actividad.cultivo === 'chile' ? 'Chile' : 'Tomate'}</li>
+                <li>Invernadero: ${actividad.invernadero}</li>
+                <li>Actividad: ${actividad.actividad}</li>
+                <li>Camas: ${actividad.camas || 0}</li>
+            `;
+            
+            // Mostrar el modal
+            modalEliminar.show();
+        }
+
+        // Confirmar eliminación de actividad
+        function confirmarEliminar() {
+            if (!actividadAEliminar) return;
+            
+            database.ref(`actividades/${actividadAEliminar}`).remove()
+                .then(() => {
+                    alert('Actividad eliminada correctamente');
+                    modalEliminar.hide();
+                    actividadAEliminar = null;
+                    buscarActividades(); // Recargar la tabla
+                })
+                .catch((error) => {
+                    console.error('Error al eliminar:', error);
+                    alert('Error al eliminar la actividad');
+                });
+        }
+    </script>
+</body>
+</html>
