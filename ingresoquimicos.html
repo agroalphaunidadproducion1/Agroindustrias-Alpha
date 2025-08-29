@@ -126,6 +126,14 @@
       min-width: 200px;
     }
     
+    .quimica-section {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       .form-row {
@@ -167,6 +175,21 @@
         <option value="Herbicida">Herbicida</option>
         <option value="Bactericida">Bactericida</option>
       </select>
+    </div>
+    
+    <!-- Nueva sección para Grupo Químico y Familia Química -->
+    <div class="quimica-section">
+      <div class="cultivo-title">INFORMACIÓN QUÍMICA</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" id="grupo_quimico" placeholder="Grupo químico" required />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="familia_quimica" placeholder="Familia química" required />
+        </div>
+      </div>
     </div>
     
     <!-- Sección para MINI PEPINO -->
@@ -312,6 +335,9 @@
         senasa: document.getElementById("senasa").value,
         epa: document.getElementById("epa").value,
         categoria: document.getElementById("categoria").value,
+        // Nuevos campos químicos
+        grupo_quimico: document.getElementById("grupo_quimico").value,
+        familia_quimica: document.getElementById("familia_quimica").value,
         // Datos para MINI PEPINO
         dias_mini: document.getElementById("dias_mini").value,
         reingreso_mini: document.getElementById("reingreso_mini").value,
