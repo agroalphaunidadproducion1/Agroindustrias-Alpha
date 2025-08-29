@@ -54,12 +54,12 @@
       flex: 1;
     }
     
-    .search-container, .filter-container {
+    .filter-container {
       flex: 1;
       min-width: 200px;
     }
     
-    #buscador, #filtro-categoria, #filtro-cultivo {
+    #filtro-categoria, #filtro-grupo, #filtro-cultivo {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--light-border);
@@ -83,6 +83,9 @@
       font-size: 14px;
       cursor: pointer;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     
     .acciones a:hover, .acciones button:hover {
@@ -100,7 +103,7 @@
       border-collapse: collapse;
       width: 100%;
       background: var(--white);
-      min-width: 900px;
+      min-width: 1100px;
     }
     
     th, td {
@@ -164,18 +167,20 @@
 
   <div class="header-container">
     <div class="filters-container">
-      <div class="search-container">
-        <input type="text" id="buscador" placeholder="Buscar por nombre, ingrediente o plagas...">
-      </div>
       <div class="filter-container">
         <select id="filtro-categoria">
           <option value="">Todas las categorías</option>
           <option value="Insecticida">Insecticida</option>
           <option value="Fungicida">Fungicida</option>
           <option value="Aminoácido">Aminoácido</option>
-          <option value="Estimulador">Estimulador</option>
           <option value="Herbicida">Herbicida</option>
           <option value="Bactericida">Bactericida</option>
+        </select>
+      </div>
+      <div class="filter-container">
+        <select id="filtro-grupo">
+          <option value="">Todos los grupos</option>
+          <!-- Se llenará dinámicamente con JavaScript -->
         </select>
       </div>
       <div class="filter-container">
@@ -188,19 +193,22 @@
     </div>
     <div class="acciones">
       <a href="formulario.html">➕ Agregar</a>
-      <button onclick="exportarCSV()">📥 CSV</button>
       <button onclick="exportarExcel()">📊 Excel</button>
+      <button onclick="capturarTabla()">🖼️ Imagen</button>
     </div>
   </div>
 
   <div class="table-container">
-    <table>
+    <table id="tabla-productos-completa">
       <thead>
         <tr>
           <th>Nombre Comercial</th>
+          <th>Grupo Químico</th>
+          <th>Familia Química</th>
           <th>Ingredientes Activos</th>
           <th>Registro Senasa</th>
           <th>Registro EPA</th>
+          <th>Categoría</th>
           <th>Días a Cosecha</th>
           <th>Periodo de Reingreso</th>
           <th>Plagas</th>
@@ -221,6 +229,8 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <!-- html2canvas para capturar la tabla como imagen -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
@@ -235,36 +245,57 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const tabla = document.getElementById("tabla-productos");
-    const buscador = document.getElementById("buscador");
     const filtroCategoria = document.getElementById("filtro-categoria");
+    const filtroGrupo = document.getElementById("filtro-grupo");
     const filtroCultivo = document.getElementById("filtro-cultivo");
     let productos = [];
+    let gruposQuimicos = new Set();
 
     // Cargar datos
     db.ref("productos").on("value", snapshot => {
       productos = [];
+      gruposQuimicos.clear();
       snapshot.forEach(child => {
         const producto = child.val();
         producto.id = child.key;
         productos.push(producto);
+        
+        // Recopilar grupos químicos únicos
+        if (producto.grupo_quimico) {
+          gruposQuimicos.add(producto.grupo_quimico);
+        }
       });
+      
+      // Actualizar filtro de grupos químicos
+      actualizarFiltroGrupos();
       mostrarProductos(productos);
     });
 
+    // Actualizar el filtro de grupos químicos
+    function actualizarFiltroGrupos() {
+      // Limpiar opciones actuales excepto la primera
+      while (filtroGrupo.options.length > 1) {
+        filtroGrupo.remove(1);
+      }
+      
+      // Agregar grupos químicos únicos
+      gruposQuimicos.forEach(grupo => {
+        const option = document.createElement("option");
+        option.value = grupo;
+        option.textContent = grupo;
+        filtroGrupo.appendChild(option);
+      });
+    }
+
     // Filtrar productos
     function filtrarProductos() {
-      const termino = buscador.value.toLowerCase();
       const categoria = filtroCategoria.value;
+      const grupo = filtroGrupo.value;
       const cultivo = filtroCultivo.value;
       
       const resultados = productos.filter(p => {
-        const coincideTermino = 
-          (p.nombre && p.nombre.toLowerCase().includes(termino)) ||
-          (p.ingredientes && p.ingredientes.toLowerCase().includes(termino)) ||
-          (p.plagas_mini && p.plagas_mini.toLowerCase().includes(termino)) ||
-          (p.plagas_tomate && p.plagas_tomate.toLowerCase().includes(termino));
-        
         const coincideCategoria = !categoria || p.categoria === categoria;
+        const coincideGrupo = !grupo || p.grupo_quimico === grupo;
         
         // Filtro por cultivo
         let coincideCultivo = true;
@@ -274,7 +305,7 @@
           coincideCultivo = p.dias_tomate || p.reingreso_tomate || p.plagas_tomate;
         }
         
-        return coincideTermino && coincideCategoria && coincideCultivo;
+        return coincideCategoria && coincideGrupo && coincideCultivo;
       });
       
       mostrarProductos(resultados);
@@ -336,9 +367,12 @@
         return `
           <tr>
             <td>${p.nombre || '-'}</td>
+            <td>${p.grupo_quimico || '-'}</td>
+            <td>${p.familia_quimica || '-'}</td>
             <td>${p.ingredientes || '-'}</td>
             <td>${p.senasa || '-'}</td>
             <td>${p.epa || '-'}</td>
+            <td>${p.categoria || '-'}</td>
             <td>${dias || '-'}</td>
             <td>${reingreso || '-'}</td>
             <td>${plagas || '-'}</td>
@@ -348,59 +382,6 @@
           </tr>
         `;
       }).join('');
-    }
-
-    // Exportar a CSV
-    function exportarCSV() {
-      const cultivoFiltro = filtroCultivo.value;
-      let csv = "Nombre,Ingredientes,Categoría,Senasa,EPA,Cultivo,Días Cosecha,Reingreso,Plagas,Dosis Máx,Dosis/L,Banda\n";
-      
-      productos.forEach(p => {
-        // Para exportar, incluimos ambos cultivos si no hay filtro
-        if (!cultivoFiltro) {
-          if (p.dias_mini) {
-            csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.categoria || ''}",` +
-                   `"${p.senasa || ''}","${p.epa || ''}","MINI ",` +
-                   `"${p.dias_mini || ''}","${p.reingreso_mini || ''}",` +
-                   `"${p.plagas_mini || ''}","${p.dosis_maxima_mini || ''}","${p.dosis_litro_mini || ''}",` +
-                   `"${p.banda || ''}"\n`;
-          }
-          if (p.dias_tomate) {
-            csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.categoria || ''}",` +
-                   `"${p.senasa || ''}","${p.epa || ''}","TOMATE",` +
-                   `"${p.dias_tomate || ''}","${p.reingreso_tomate || ''}",` +
-                   `"${p.plagas_tomate || ''}","${p.dosis_maxima_tomate || ''}","${p.dosis_litro_tomate || ''}",` +
-                   `"${p.banda || ''}"\n`;
-          }
-        } else {
-          // Si hay filtro, exportar solo el cultivo seleccionado
-          const datos = cultivoFiltro === "mini" ? 
-            {dias: p.dias_mini, reingreso: p.reingreso_mini, plagas: p.plagas_mini, 
-             dosisMaxima: p.dosis_maxima_mini, dosisLitro: p.dosis_litro_mini, cultivo: "MINI PEPINO"} :
-            {dias: p.dias_tomate, reingreso: p.reingreso_tomate, plagas: p.plagas_tomate, 
-             dosisMaxima: p.dosis_maxima_tomate, dosisLitro: p.dosis_litro_tomate, cultivo: "TOMATE"};
-          
-          if (datos.dias || datos.reingreso || datos.plagas) {
-            csv += `"${p.nombre || ''}","${p.ingredientes || ''}","${p.categoria || ''}",` +
-                   `"${p.senasa || ''}","${p.epa || ''}","${datos.cultivo}",` +
-                   `"${datos.dias || ''}","${datos.reingreso || ''}",` +
-                   `"${datos.plagas || ''}","${datos.dosisMaxima || ''}","${datos.dosisLitro || ''}",` +
-                   `"${p.banda || ''}"\n`;
-          }
-        }
-      });
-      
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      
-      link.setAttribute("href", url);
-      link.setAttribute("download", "productos_quimicos.csv");
-      link.style.visibility = "hidden";
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
 
     // Exportar a Excel (simulado)
@@ -421,10 +402,12 @@
             <thead>
               <tr>
                 <th>Nombre Comercial</th>
+                <th>Grupo Químico</th>
+                <th>Familia Química</th>
                 <th>Ingredientes Activos</th>
-                <th>Categoría</th>
                 <th>Registro Senasa</th>
                 <th>Registro EPA</th>
+                <th>Categoría</th>
                 <th>Cultivo</th>
                 <th>Días a Cosecha</th>
                 <th>Periodo de Reingreso</th>
@@ -444,10 +427,12 @@
             tablaHTML += `
               <tr>
                 <td>${p.nombre || ''}</td>
+                <td>${p.grupo_quimico || ''}</td>
+                <td>${p.familia_quimica || ''}</td>
                 <td>${p.ingredientes || ''}</td>
-                <td>${p.categoria || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.epa || ''}</td>
+                <td>${p.categoria || ''}</td>
                 <td>MINI</td>
                 <td>${p.dias_mini || ''}</td>
                 <td>${p.reingreso_mini || ''}</td>
@@ -462,10 +447,12 @@
             tablaHTML += `
               <tr>
                 <td>${p.nombre || ''}</td>
+                <td>${p.grupo_quimico || ''}</td>
+                <td>${p.familia_quimica || ''}</td>
                 <td>${p.ingredientes || ''}</td>
-                <td>${p.categoria || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.epa || ''}</td>
+                <td>${p.categoria || ''}</td>
                 <td>TOMATE</td>
                 <td>${p.dias_tomate || ''}</td>
                 <td>${p.reingreso_tomate || ''}</td>
@@ -480,7 +467,7 @@
           // Si hay filtro, exportar solo el cultivo seleccionado
           const datos = cultivoFiltro === "mini" ? 
             {dias: p.dias_mini, reingreso: p.reingreso_mini, plagas: p.plagas_mini, 
-             dosisMaxima: p.dosis_maxima_mini, dosisLitro: p.dosis_litro_mini, cultivo: "MINI PEPINO"} :
+             dosisMaxima: p.dosis_maxima_mini, dosisLitro: p.dosis_litro_mini, cultivo: "MINI"} :
             {dias: p.dias_tomate, reingreso: p.reingreso_tomate, plagas: p.plagas_tomate, 
              dosisMaxima: p.dosis_maxima_tomate, dosisLitro: p.dosis_litro_tomate, cultivo: "TOMATE"};
           
@@ -488,10 +475,12 @@
             tablaHTML += `
               <tr>
                 <td>${p.nombre || ''}</td>
+                <td>${p.grupo_quimico || ''}</td>
+                <td>${p.familia_quimica || ''}</td>
                 <td>${p.ingredientes || ''}</td>
-                <td>${p.categoria || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.epa || ''}</td>
+                <td>${p.categoria || ''}</td>
                 <td>${datos.cultivo}</td>
                 <td>${datos.dias || ''}</td>
                 <td>${datos.reingreso || ''}</td>
@@ -525,9 +514,19 @@
       document.body.removeChild(link);
     }
 
+    // Capturar tabla como imagen
+    function capturarTabla() {
+      html2canvas(document.getElementById("tabla-productos-completa")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "tabla_productos.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
     // Eventos
-    buscador.addEventListener("input", filtrarProductos);
     filtroCategoria.addEventListener("change", filtrarProductos);
+    filtroGrupo.addEventListener("change", filtrarProductos);
     filtroCultivo.addEventListener("change", filtrarProductos);
   </script>
 </body>
