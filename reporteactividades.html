@@ -21,6 +21,7 @@
             padding-top: 20px;
             padding-bottom: 40px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
         }
         
         .header {
@@ -78,13 +79,27 @@
             margin-bottom: 20px;
         }
         
-        .camas-completas {
-            background-color: #fff9c4 !important; /* Cambiado a amarillo suave */
-            font-weight: bold;
+        /* Colores según porcentaje de cumplimiento */
+        .meta-0-30 {
+            background-color: #ffcdd2 !important; /* Rojo claro */
         }
         
-        .camas-casi-completas {
-            background-color: #fff9c4 !important; /* También cambiado a amarillo suave */
+        .meta-30-50 {
+            background-color: #fff9c4 !important; /* Amarillo claro */
+        }
+        
+        .meta-50-80 {
+            background-color: #c8e6c9 !important; /* Verde claro */
+        }
+        
+        .meta-80-100 {
+            background-color: #a5d6a7 !important; /* Verde medio */
+        }
+        
+        .meta-100 {
+            background-color: #66bb6a !important; /* Verde oscuro */
+            color: white;
+            font-weight: bold;
         }
         
         .cultivo-section {
@@ -96,6 +111,56 @@
             font-weight: 500;
         }
         
+        .rendimientos-table {
+            margin-top: 20px;
+        }
+
+        /* Botón flotante de notificaciones */
+        .floating-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .floating-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+        }
+        
+        .floating-btn i {
+            font-size: 1.2rem;
+        }
+        
+        /* Badge de notificaciones */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff5722;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -104,10 +169,23 @@
             .table-responsive {
                 font-size: 0.8rem;
             }
+            
+            .floating-btn {
+                top: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Botón flotante de notificaciones -->
+    <button class="floating-btn" data-bs-toggle="modal" data-bs-target="#notificacionesModal" id="btn-notificaciones">
+        <i class="fas fa-th"></i>
+        <span class="notification-badge d-none" id="notification-counter">0</span>
+    </button>
+
     <div class="container">
         <div class="header text-center">
             <h1><i class="fas fa-table me-2"></i>Reporte de Actividades</h1>
@@ -144,19 +222,41 @@
                     <h5 class="mb-0 text-white"><i class="fas fa-pepper-hot me-2"></i>Chile</h5>
                 </div>
                 <div class="card-body">
+                    <h6 class="mb-3">Actividades</h6>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Invernadero</th>
+                                    <th>Inv</th>
                                     <th>Enguie</th>
                                     <th>Poda</th>
                                     <th>Amarrado</th>
                                     <th>Raleo</th>
-                                    <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                    <th>Cosecha</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-chile">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h6 class="mb-3 mt-4">Rendimientos</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered rendimientos-table">
+                            <thead>
+                                <tr>
+                                    <th>Inv</th>
+                                    <th>Enguie</th>
+                                    <th>Poda</th>
+                                    <th>Amarrado</th>
+                                    <th>Raleo</th>
+                                    <th>Cosecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rendimientos-chile">
                                 <tr>
                                     <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
                                 </tr>
@@ -174,16 +274,17 @@
                     <h5 class="mb-0 text-white"><i class="fas fa-apple-alt me-2"></i>Tomate</h5>
                 </div>
                 <div class="card-body">
+                    <h6 class="mb-3">Actividades</h6>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Invernadero</th>
+                                    <th>Inv</th>
                                     <th>Enguie</th>
                                     <th>Bajado</th>
                                     <th>Deshoje</th>
                                     <th>Desbrote</th>
-                                    <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                    <th>Cosecha</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-tomate">
@@ -193,6 +294,49 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <h6 class="mb-3 mt-4">Rendimientos</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered rendimientos-table">
+                            <thead>
+                                <tr>
+                                    <th>Inv</th>
+                                    <th>Enguie</th>
+                                    <th>Bajado</th>
+                                    <th>Deshoje</th>
+                                    <th>Desbrote</th>
+                                    <th>Cosecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rendimientos-tomate">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Notificaciones -->
+    <div class="modal fade" id="notificacionesModal" tabindex="-1" aria-labelledby="notificacionesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="notificacionesModalLabel">
+                        <i class="fas fa-trophy me-2"></i>Metas Alcanzadas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="contenido-notificaciones">
+                        <p class="text-center">Cargando notificaciones...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -218,8 +362,8 @@
 
         // Definir actividades por cultivo (con cosecha al final)
         const actividadesPorCultivo = {
-            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'], // Cosecha movida al final
-            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha'] // Cosecha movida al final
+            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'],
+            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha']
         };
 
         // Definir invernaderos por cultivo
@@ -238,23 +382,40 @@
         // Variables globales
         let currentWeekDates = [];
         let semanaSeleccionada = null;
+        let notificaciones = [];
+        let ultimasMetasAlcanzadas = JSON.parse(localStorage.getItem('ultimasMetasAlcanzadas')) || {};
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar event listeners
             document.getElementById('btn-cargar').addEventListener('click', cargarDatos);
             
+            // Configurar evento para el botón de notificaciones
+            document.getElementById('btn-notificaciones').addEventListener('click', function() {
+                // Mostrar notificaciones cuando se abre el modal
+                setTimeout(mostrarNotificaciones, 500);
+            });
+            
             // Cargar selector de semanas
             cargarSemanas();
             
             // Generar tablas vacías
             generarTablasVacias();
+            
+            // Cargar datos automáticamente para la semana actual
+            setTimeout(() => {
+                if (semanaSeleccionada) {
+                    cargarDatos();
+                }
+            }, 1000);
         });
 
         // Generar tablas vacías
         function generarTablasVacias() {
             generarTablaCultivoVacia('tabla-chile', 'chile');
             generarTablaCultivoVacia('tabla-tomate', 'tomate');
+            generarTablaRendimientosVacia('rendimientos-chile', 'chile');
+            generarTablaRendimientosVacia('rendimientos-tomate', 'tomate');
         }
 
         // Generar tabla vacía para un cultivo
@@ -268,13 +429,42 @@
             invernaderos.forEach(inv => {
                 const fila = document.createElement('tr');
                 
-                // Celda de invernadero
+                // Celda de invernadero (solo número)
                 const tdInvernadero = document.createElement('td');
-                tdInvernadero.textContent = `Invernadero ${inv}`;
+                tdInvernadero.textContent = inv;
                 tdInvernadero.style.fontWeight = '600';
                 fila.appendChild(tdInvernadero);
                 
                 // Celdas de actividades (vacías)
+                for (let i = 0; i < 5; i++) {
+                    const td = document.createElement('td');
+                    td.textContent = '-';
+                    td.className = 'meta-cell';
+                    fila.appendChild(td);
+                }
+                
+                tablaBody.appendChild(fila);
+            });
+        }
+
+        // Generar tabla de rendimientos vacía
+        function generarTablaRendimientosVacia(tablaId, cultivo) {
+            const tablaBody = document.getElementById(tablaId);
+            tablaBody.innerHTML = '';
+            
+            const invernaderos = invernaderosPorCultivo[cultivo];
+            
+            // Agregar filas para cada invernadero
+            invernaderos.forEach(inv => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero (solo número)
+                const tdInvernadero = document.createElement('td');
+                tdInvernadero.textContent = inv;
+                tdInvernadero.style.fontWeight = '600';
+                fila.appendChild(tdInvernadero);
+                
+                // Celdas de rendimientos (vacías)
                 for (let i = 0; i < 5; i++) {
                     const td = document.createElement('td');
                     td.textContent = '-';
@@ -387,6 +577,44 @@
             return [year, month, day].join('-');
         }
 
+        // Verificar si se alcanzó la meta anteriormente
+        function seAlcanzoMetaAnteriormente(cultivo, invernadero, actividad) {
+            const clave = `${cultivo}-${invernadero}-${actividad}`;
+            return ultimasMetasAlcanzadas[clave] === true;
+        }
+
+        // Registrar que se alcanzó una meta
+        function registrarMetaAlcanzada(cultivo, invernadero, actividad) {
+            const clave = `${cultivo}-${invernadero}-${actividad}`;
+            ultimasMetasAlcanzadas[clave] = true;
+            
+            // Guardar en localStorage para persistencia
+            localStorage.setItem('ultimasMetasAlcanzadas', JSON.stringify(ultimasMetasAlcanzadas));
+        }
+
+        // Limpiar notificaciones antiguas (más de 1 semana)
+        function limpiarNotificacionesAntiguas() {
+            const unaSemanaEnMs = 7 * 24 * 60 * 60 * 1000; // 1 semana en milisegundos
+            const ahora = new Date().getTime();
+            
+            Object.keys(ultimasMetasAlcanzadas).forEach(clave => {
+                // Si no tenemos timestamp, lo eliminamos después de 1 semana
+                if (typeof ultimasMetasAlcanzadas[clave] === 'boolean') {
+                    // Convertir a formato con timestamp
+                    ultimasMetasAlcanzadas[clave] = {
+                        alcanzada: true,
+                        timestamp: ahora - (3 * 24 * 60 * 60 * 1000) // Hace 3 días por defecto
+                    };
+                } else if (ahora - ultimasMetasAlcanzadas[clave].timestamp > unaSemanaEnMs) {
+                    // Eliminar notificaciones con más de 1 semana
+                    delete ultimasMetasAlcanzadas[clave];
+                }
+            });
+            
+            // Guardar cambios
+            localStorage.setItem('ultimasMetasAlcanzadas', JSON.stringify(ultimasMetasAlcanzadas));
+        }
+
         // Cargar datos desde Firebase
         function cargarDatos() {
             if (!semanaSeleccionada) {
@@ -394,10 +622,20 @@
                 return;
             }
             
+            // Limpiar notificaciones antiguas
+            limpiarNotificacionesAntiguas();
+            
+            // Reiniciar notificaciones
+            notificaciones = [];
+            
             // Mostrar mensaje de carga
             document.getElementById('tabla-chile').innerHTML = 
                 '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
             document.getElementById('tabla-tomate').innerHTML = 
+                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
+            document.getElementById('rendimientos-chile').innerHTML = 
+                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
+            document.getElementById('rendimientos-tomate').innerHTML = 
                 '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
             
             const activitiesRef = database.ref('actividades');
@@ -415,11 +653,25 @@
                 
                 // Procesar y mostrar los datos
                 procesarDatos(actividadesData);
+                
+                // Actualizar contador de notificaciones
+                actualizarContadorNotificaciones();
+                
+                // Mostrar notificaciones automáticamente si hay metas alcanzadas
+                if (notificaciones.length > 0) {
+                    // Mostrar el modal automáticamente
+                    const modal = new bootstrap.Modal(document.getElementById('notificacionesModal'));
+                    modal.show();
+                }
             }).catch((error) => {
                 console.error('Error al cargar datos:', error);
                 document.getElementById('tabla-chile').innerHTML = 
                     '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
                 document.getElementById('tabla-tomate').innerHTML = 
+                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+                document.getElementById('rendimientos-chile').innerHTML = 
+                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+                document.getElementById('rendimientos-tomate').innerHTML = 
                     '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
             });
         }
@@ -427,12 +679,14 @@
         // Procesar datos para la tabla
         function procesarDatos(actividadesData) {
             // Procesar datos para Chile
-            const datosChile = procesarCultivo(actividadesData, 'chile');
+            const {datos: datosChile, rendimientos: rendimientosChile} = procesarCultivo(actividadesData, 'chile');
             generarTablaCultivo('tabla-chile', datosChile, 'chile');
+            generarTablaRendimientos('rendimientos-chile', rendimientosChile, 'chile');
             
             // Procesar datos para Tomate
-            const datosTomate = procesarCultivo(actividadesData, 'tomate');
+            const {datos: datosTomate, rendimientos: rendimientosTomate} = procesarCultivo(actividadesData, 'tomate');
             generarTablaCultivo('tabla-tomate', datosTomate, 'tomate');
+            generarTablaRendimientos('rendimientos-tomate', rendimientosTomate, 'tomate');
         }
 
         // Procesar datos para un cultivo específico
@@ -442,16 +696,21 @@
             
             // Estructura para almacenar los datos
             const datos = {};
+            const rendimientos = {};
             
             // Inicializar estructura
             invernaderos.forEach(inv => {
                 datos[inv] = {
                     actividades: {}
                 };
+                rendimientos[inv] = {
+                    actividades: {}
+                };
                 
                 // Inicializar cada actividad
                 actividades.forEach(act => {
                     datos[inv].actividades[act] = 0;
+                    rendimientos[inv].actividades[act] = 0;
                 });
             });
             
@@ -461,15 +720,36 @@
                     const inv = actividad.invernadero;
                     const act = actividad.actividad;
                     const camas = actividad.camas || 0;
+                    const rendimiento = actividad.rendimiento || 0;
                     
                     // Solo procesar si el invernadero y actividad son válidos
                     if (datos[inv] !== undefined && datos[inv].actividades[act] !== undefined) {
+                        // Si ya se alcanzó la meta anteriormente, reiniciar el conteo
+                        if (seAlcanzoMetaAnteriormente(cultivo, inv, act)) {
+                            datos[inv].actividades[act] = 0;
+                        }
+                        
                         datos[inv].actividades[act] += camas;
+                        rendimientos[inv].actividades[act] += rendimiento;
+                        
+                        // Verificar si se alcanzó la meta
+                        const meta = totalCamasPorInvernadero[inv];
+                        if (datos[inv].actividades[act] >= meta) {
+                            registrarMetaAlcanzada(cultivo, inv, act);
+                            notificaciones.push({
+                                cultivo: cultivo,
+                                invernadero: inv,
+                                actividad: act,
+                                camas: datos[inv].actividades[act],
+                                meta: meta,
+                                mensaje: `Invernadero ${inv} terminó su vuelta de ${act}`
+                            });
+                        }
                     }
                 }
             });
             
-            return datos;
+            return {datos, rendimientos};
         }
 
         // Generar tabla para un cultivo
@@ -484,9 +764,9 @@
             invernaderos.forEach(inv => {
                 const fila = document.createElement('tr');
                 
-                // Celda de invernadero
+                // Celda de invernadero (solo número)
                 const tdInvernadero = document.createElement('td');
-                tdInvernadero.textContent = `Invernadero ${inv}`;
+                tdInvernadero.textContent = inv;
                 tdInvernadero.style.fontWeight = '600';
                 fila.appendChild(tdInvernadero);
                 
@@ -495,15 +775,22 @@
                     const td = document.createElement('td');
                     const valor = datos[inv].actividades[act] || 0;
                     const meta = totalCamasPorInvernadero[inv];
+                    const porcentaje = meta > 0 ? (valor / meta) * 100 : 0;
                     
                     td.textContent = valor > 0 ? valor : '-';
                     td.className = 'meta-cell';
                     
-                    // Aplicar estilo si se alcanza la meta
-                    if (valor >= meta) {
-                        td.classList.add('camas-completas');
-                    } else if (valor >= meta * 0.8) {
-                        td.classList.add('camas-casi-completas');
+                    // Aplicar estilo según el porcentaje de cumplimiento
+                    if (porcentaje >= 100) {
+                        td.classList.add('meta-100');
+                    } else if (porcentaje >= 80) {
+                        td.classList.add('meta-80-100');
+                    } else if (porcentaje >= 50) {
+                        td.classList.add('meta-50-80');
+                    } else if (porcentaje >= 30) {
+                        td.classList.add('meta-30-50');
+                    } else if (porcentaje > 0) {
+                        td.classList.add('meta-0-30');
                     }
                     
                     fila.appendChild(td);
@@ -511,6 +798,86 @@
                 
                 tablaBody.appendChild(fila);
             });
+        }
+
+        // Generar tabla de rendimientos para un cultivo
+        function generarTablaRendimientos(tablaId, rendimientos, cultivo) {
+            const tablaBody = document.getElementById(tablaId);
+            tablaBody.innerHTML = '';
+            
+            const actividades = actividadesPorCultivo[cultivo];
+            const invernaderos = invernaderosPorCultivo[cultivo];
+            
+            // Agregar filas para cada invernadero
+            invernaderos.forEach(inv => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero (solo número)
+                const tdInvernadero = document.createElement('td');
+                tdInvernadero.textContent = inv;
+                tdInvernadero.style.fontWeight = '600';
+                fila.appendChild(tdInvernadero);
+                
+                // Celdas de rendimientos
+                actividades.forEach(act => {
+                    const td = document.createElement('td');
+                    const valor = rendimientos[inv].actividades[act] || 0;
+                    
+                    td.textContent = valor > 0 ? valor.toFixed(2) : '-';
+                    td.className = 'meta-cell';
+                    
+                    fila.appendChild(td);
+                });
+                
+                tablaBody.appendChild(fila);
+            });
+        }
+
+        // Actualizar contador de notificaciones
+        function actualizarContadorNotificaciones() {
+            const counter = document.getElementById('notification-counter');
+            if (notificaciones.length > 0) {
+                counter.textContent = notificaciones.length;
+                counter.classList.remove('d-none');
+            } else {
+                counter.classList.add('d-none');
+            }
+        }
+
+        // Mostrar notificaciones de metas alcanzadas
+        function mostrarNotificaciones() {
+            const contenido = document.getElementById('contenido-notificaciones');
+            contenido.innerHTML = '';
+            
+            if (notificaciones.length === 0) {
+                contenido.innerHTML = '<p class="text-center">No hay metas alcanzadas esta semana</p>';
+                return;
+            }
+            
+            const ul = document.createElement('ul');
+            ul.className = 'list-group';
+            
+            notificaciones.forEach(notif => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item list-group-item-success';
+                
+                const cultivoTexto = notif.cultivo === 'chile' ? 'Chile' : 'Tomate';
+                
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-trophy me-2"></i>
+                            <strong>${cultivoTexto} - ${notif.mensaje}</strong><br>
+                            <small>Total: ${notif.camas}/${notif.meta} camas</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">Meta alcanzada</span>
+                    </div>
+                `;
+                
+                ul.appendChild(li);
+            });
+            
+            contenido.appendChild(ul);
         }
     </script>
 </body>
