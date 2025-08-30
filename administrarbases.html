@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Bases de Datos - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <style>
+        :root {
+            --primary-color: #2E7D32;
+            --primary-light: #4CAF50;
+            --primary-dark: #1B5E20;
+            --admin-color: #1976D2;
+            --supervisor-color: #7B1FA2;
+            --grower-color: #D32F2F;
+            --digitador-color: #C2185B;
+            --tecnico-color: #0288D1;
+            --culturales-color: #5D4037;
+            --riego-color: #0097A7;
+            --invitado-color: #616161;
+            --personal-color: #9C27B0;
+            --database-color: #FF9800; /* Color específico para base de datos */
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --dark-gray: #343a40;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --card-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            --beneficos-color: #7B1FA2;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        
+        .brand-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .brand-text h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-right: 10px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            margin-top: 4px;
+        }
+        
+        .admin-badge { background-color: var(--admin-color); }
+        .supervisor-badge { background-color: var(--supervisor-color); }
+        .grower-badge { background-color: var(--grower-color); }
+        .digitador-badge { background-color: var(--digitador-color); }
+        .fitosanidad-badge { background-color: var(--tecnico-color); }
+        .culturales-badge { background-color: var(--culturales-color); }
+        .riego-badge { background-color: var(--riego-color); }
+        .invitado-badge { background-color: var(--invitado-color); }
+        
+        .logout-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        .page-title {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        /* Colores específicos para cada tipo de administración */
+        .card[onclick*="actividades"] .card-icon { color: #ED6C02; }
+        .card[onclick*="quimicos"] .card-icon { color: #D32F2F; }
+        .card[onclick*="basedatos"] .card-icon { color: var(--database-color); }
+        
+        .card h3 {
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--white);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        /* Estilos responsivos adicionales */
+        @media (max-width: 340px) {
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .card {
+                padding: 10px;
+                min-height: 110px;
+            }
+            
+            .card-icon {
+                font-size: 1.5rem;
+            }
+            
+            .card h3 {
+                font-size: 0.8rem;
+            }
+            
+            .brand-text h1 {
+                font-size: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Agroalpha</h1>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-details">
+                    <span id="user-name">Usuario</span>
+                    <span id="user-role" class="role-badge">Rol</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1 class="page-title">Administrar Bases de Datos</h1>
+        
+        <div class="cards-container">
+            <!-- Botón de Administrar Actividades -->
+            <div class="card" onclick="navigateTo('adminactividades.html')">
+                <div class="card-icon"><i class="fas fa-tasks"></i></div>
+                <h3>Administrar Actividades</h3>
+            </div>
+            
+            <!-- Botón de Administrar Químicos -->
+            <div class="card" onclick="navigateTo('adminquimicos.html')">
+                <div class="card-icon"><i class="fas fa-flask"></i></div>
+                <h3>Administrar Químicos</h3>
+            </div>
+            
+            <!-- Botón de Administrar Base de Datos -->
+            <div class="card" onclick="navigateTo('adminbasedatos.html')">
+                <div class="card-icon"><i class="fas fa-database"></i></div>
+                <h3>Administrar Base de Datos</h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para navegar a una página
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // Función para volver atrás
+        function goBack() {
+            window.history.back();
+        }
+        
+        // Verificar sesión al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Verificar si el usuario tiene permisos de administrador
+            if (userData.role !== 'Administrador') {
+                alert('No tienes permisos para acceder a esta sección.');
+                window.history.back();
+                return;
+            }
+            
+            // Mostrar información del usuario
+            displayUserInfo(userData);
+            
+            // Configurar eventos de los botones
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+        });
+        
+        // Mostrar información del usuario
+        function displayUserInfo(userData) {
+            document.getElementById('user-name').textContent = userData.name || userData.username;
+            
+            const roleBadge = document.getElementById('user-role');
+            roleBadge.textContent = userData.role;
+            roleBadge.className = 'role-badge ' + getBadgeClass(userData.role);
+        }
+        
+        // Obtener clase CSS para el badge según el rol
+        function getBadgeClass(role) {
+            const roleClasses = {
+                'Administrador': 'admin-badge',
+                'Supervisor': 'supervisor-badge',
+                'Grower': 'grower-badge',
+                'Digitador': 'digitador-badge',
+                'Técnico Fitosanidad': 'fitosanidad-badge',
+                'Técnico Prácticas Culturales': 'culturales-badge',
+                'Técnico Riego': 'riego-badge',
+                'Invitado': 'invitado-badge'
+            };
+            return roleClasses[role] || 'invitado-badge';
+        }
+        
+        // Cerrar sesión
+        function logout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <div class="footer">
+        <p>Agroalpha © 2025 | UP1</p>
+    </div>
+</body>
+</html>
