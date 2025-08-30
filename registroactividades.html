@@ -105,7 +105,7 @@
             color: #dc3545;
         }
         
-        .camas-input {
+        .camas-input, .rendimiento-input {
             max-width: 150px;
         }
         
@@ -131,6 +131,17 @@
             border: 1px solid #dee2e6;
         }
         
+        .actividad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .input-group-sm {
+            max-width: 300px;
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -145,7 +156,11 @@
                 font-size: 0.9rem;
             }
             
-            .camas-input {
+            .camas-input, .rendimiento-input {
+                max-width: 100%;
+            }
+            
+            .input-group-sm {
                 max-width: 100%;
             }
         }
@@ -223,7 +238,7 @@
                         </div>
                         
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitButton">
                                 <i class="fas fa-paper-plane me-2"></i>Enviar Actividades
                             </button>
                         </div>
@@ -268,6 +283,9 @@
             cultivo: null,
             invernadero: null
         };
+
+        // Control para evitar envíos duplicados
+        let isSubmitting = false;
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -402,13 +420,19 @@
                 const actividadDiv = document.createElement('div');
                 actividadDiv.className = 'actividad-item';
                 actividadDiv.innerHTML = `
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <label class="form-check-label fw-bold">${actividad}</label>
-                        </div>
-                        <div class="col-md-6">
+                    <div class="actividad-header">
+                        <label class="form-check-label fw-bold">${actividad}</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="camas-${actividad}" class="form-label">Nº de camas</label>
                             <input type="number" class="form-control camas-input" id="camas-${actividad}" 
-                                min="0" placeholder="Nº de camas (0 si no se realizó)" data-actividad="${actividad}">
+                                min="0" placeholder="0 si no se realizó" data-actividad="${actividad}">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="rendimiento-${actividad}" class="form-label">Rendimiento</label>
+                            <input type="number" class="form-control rendimiento-input" id="rendimiento-${actividad}" 
+                                min="0" step="0.01" placeholder="0 si no aplica" data-actividad="${actividad}">
                         </div>
                     </div>
                 `;
@@ -421,6 +445,12 @@
         function guardarActividades(e) {
             e.preventDefault();
             
+            // Prevenir envíos duplicados
+            if (isSubmitting) {
+                showAlert('Estamos procesando tu envío. Por favor espera...', 'info');
+                return false;
+            }
+            
             const fecha = document.getElementById('fecha').value;
             
             if (!preferenciasUsuario.cultivo || !preferenciasUsuario.invernadero) {
@@ -428,30 +458,41 @@
                 return;
             }
             
-            // Obtener actividades con camas > 0
+            // Obtener actividades con datos
             const actividadesParaGuardar = [];
             const actividades = actividadesPorCultivo[preferenciasUsuario.cultivo];
             
             actividades.forEach(actividad => {
                 const camasInput = document.getElementById(`camas-${actividad}`);
-                const camas = camasInput.value ? parseInt(camasInput.value) : 0;
+                const rendimientoInput = document.getElementById(`rendimiento-${actividad}`);
                 
-                if (camas > 0) {
+                const camas = camasInput.value ? parseInt(camasInput.value) : 0;
+                const rendimiento = rendimientoInput.value ? parseFloat(rendimientoInput.value) : 0;
+                
+                // Solo guardar si hay al menos un valor
+                if (camas > 0 || rendimiento > 0) {
                     actividadesParaGuardar.push({
                         fecha: fecha,
                         cultivo: preferenciasUsuario.cultivo,
                         invernadero: preferenciasUsuario.invernadero,
                         actividad: actividad,
                         camas: camas,
+                        rendimiento: rendimiento,
                         timestamp: new Date().toISOString()
                     });
                 }
             });
             
             if (actividadesParaGuardar.length === 0) {
-                showAlert('No hay actividades para guardar. Ingrese al menos un número de camas mayor a 0.', 'danger');
+                showAlert('No hay actividades para guardar. Ingrese al menos un valor en alguna actividad.', 'danger');
                 return;
             }
+            
+            // Deshabilitar botón para evitar envíos duplicados
+            isSubmitting = true;
+            const submitButton = document.getElementById('submitButton');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
             
             // Guardar en Firebase
             const activitiesRef = database.ref('actividades');
@@ -466,14 +507,25 @@
                 .then(() => {
                     showAlert(`${actividadesParaGuardar.length} actividades guardadas correctamente`, 'success');
                     
-                    // Limpiar campos de camas
+                    // Limpiar campos
                     actividades.forEach(actividad => {
                         document.getElementById(`camas-${actividad}`).value = '';
+                        document.getElementById(`rendimiento-${actividad}`).value = '';
                     });
+                    
+                    // Restablecer el estado del formulario
+                    isSubmitting = false;
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar Actividades';
                 })
                 .catch((error) => {
                     console.error('Error al guardar las actividades:', error);
                     showAlert('Error al guardar las actividades: ' + error.message, 'danger');
+                    
+                    // Restablecer el estado del formulario en caso de error
+                    isSubmitting = false;
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar Actividades';
                 });
         }
 
