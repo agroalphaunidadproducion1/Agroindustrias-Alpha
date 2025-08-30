@@ -34,7 +34,7 @@
         }
         
         .card {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12 rgba(0,0,0,0.1);
             margin-bottom: 20px;
             border-radius: 12px;
             border: none;
@@ -577,6 +577,25 @@
             return [year, month, day].join('-');
         }
 
+        // Obtener nombre del día en español
+        function getNombreDia(fecha) {
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            return dias[new Date(fecha).getDay()];
+        }
+
+        // Formatear fecha completa en español (ej: "viernes 29 de agosto")
+        function formatearFechaCompleta(fecha) {
+            const fechaObj = new Date(fecha);
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            
+            const diaSemana = dias[fechaObj.getDay()];
+            const dia = fechaObj.getDate();
+            const mes = meses[fechaObj.getMonth()];
+            
+            return `${diaSemana} ${dia} de ${mes}`;
+        }
+
         // Verificar si se alcanzó la meta anteriormente
         function seAlcanzoMetaAnteriormente(cultivo, invernadero, actividad) {
             const clave = `${cultivo}-${invernadero}-${actividad}`;
@@ -584,9 +603,14 @@
         }
 
         // Registrar que se alcanzó una meta
-        function registrarMetaAlcanzada(cultivo, invernadero, actividad) {
+        function registrarMetaAlcanzada(cultivo, invernadero, actividad, fecha) {
             const clave = `${cultivo}-${invernadero}-${actividad}`;
-            ultimasMetasAlcanzadas[clave] = true;
+            ultimasMetasAlcanzadas[clave] = {
+                alcanzada: true,
+                fecha: fecha,
+                fechaCompleta: formatearFechaCompleta(fecha),
+                timestamp: new Date(fecha).getTime() // Añadir timestamp para ordenar
+            };
             
             // Guardar en localStorage para persistencia
             localStorage.setItem('ultimasMetasAlcanzadas', JSON.stringify(ultimasMetasAlcanzadas));
@@ -601,11 +625,14 @@
                 // Si no tenemos timestamp, lo eliminamos después de 1 semana
                 if (typeof ultimasMetasAlcanzadas[clave] === 'boolean') {
                     // Convertir a formato con timestamp
+                    const fechaDefault = new Date(ahora - (3 * 24 * 60 * 60 * 1000)); // Hace 3 días por defecto
                     ultimasMetasAlcanzadas[clave] = {
                         alcanzada: true,
-                        timestamp: ahora - (3 * 24 * 60 * 60 * 1000) // Hace 3 días por defecto
+                        fecha: fechaDefault.toISOString().split('T')[0],
+                        fechaCompleta: formatearFechaCompleta(fechaDefault),
+                        timestamp: fechaDefault.getTime()
                     };
-                } else if (ahora - ultimasMetasAlcanzadas[clave].timestamp > unaSemanaEnMs) {
+                } else if (ahora - new Date(ultimasMetasAlcanzadas[clave].fecha).getTime() > unaSemanaEnMs) {
                     // Eliminar notificaciones con más de 1 semana
                     delete ultimasMetasAlcanzadas[clave];
                 }
@@ -654,6 +681,9 @@
                 // Procesar y mostrar los datos
                 procesarDatos(actividadesData);
                 
+                // Ordenar notificaciones por fecha (más recientes primero)
+                notificaciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                
                 // Actualizar contador de notificaciones
                 actualizarContadorNotificaciones();
                 
@@ -683,7 +713,7 @@
             generarTablaCultivo('tabla-chile', datosChile, 'chile');
             generarTablaRendimientos('rendimientos-chile', rendimientosChile, 'chile');
             
-            // Procesar datos para Tomate
+            // Processar datos para Tomate
             const {datos: datosTomate, rendimientos: rendimientosTomate} = procesarCultivo(actividadesData, 'tomate');
             generarTablaCultivo('tabla-tomate', datosTomate, 'tomate');
             generarTablaRendimientos('rendimientos-tomate', rendimientosTomate, 'tomate');
@@ -721,6 +751,7 @@
                     const act = actividad.actividad;
                     const camas = actividad.camas || 0;
                     const rendimiento = actividad.rendimiento || 0;
+                    const fecha = actividad.fecha;
                     
                     // Solo procesar si el invernadero y actividad son válidos
                     if (datos[inv] !== undefined && datos[inv].actividades[act] !== undefined) {
@@ -735,14 +766,17 @@
                         // Verificar si se alcanzó la meta
                         const meta = totalCamasPorInvernadero[inv];
                         if (datos[inv].actividades[act] >= meta) {
-                            registrarMetaAlcanzada(cultivo, inv, act);
+                            registrarMetaAlcanzada(cultivo, inv, act, fecha);
                             notificaciones.push({
                                 cultivo: cultivo,
                                 invernadero: inv,
                                 actividad: act,
                                 camas: datos[inv].actividades[act],
                                 meta: meta,
-                                mensaje: `Invernadero ${inv} terminó su vuelta de ${act}`
+                                fecha: fecha,
+                                fechaCompleta: formatearFechaCompleta(fecha),
+                                timestamp: new Date(fecha).getTime(),
+                                mensaje: `Invernadero ${inv} terminó su vuelta de ${act} el ${formatearFechaCompleta(fecha)}`
                             });
                         }
                     }
@@ -853,6 +887,9 @@
                 contenido.innerHTML = '<p class="text-center">No hay metas alcanzadas esta semana</p>';
                 return;
             }
+            
+            // Ordenar notificaciones por fecha (más recientes primero)
+            notificaciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
             
             const ul = document.createElement('ul');
             ul.className = 'list-group';
