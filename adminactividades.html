@@ -20,63 +20,61 @@
         
         body {
             background-color: var(--light-bg);
-            padding-top: 20px;
-            padding-bottom: 40px;
+            padding-top: 10px;
+            padding-bottom: 60px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 20px 0;
-            margin-bottom: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .card {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border-radius: 10px;
             border: none;
         }
         
         .card-header {
-            border-radius: 12px 12px 0 0 !important;
+            border-radius: 10px 10px 0 0 !important;
             font-weight: 600;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 12px 15px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
         }
         
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             border: none;
-            padding: 10px 20px;
+            padding: 8px 15px;
             font-weight: 600;
+            font-size: 0.9rem;
         }
         
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        .btn-danger {
-            background: var(--danger-color);
-            border: none;
-        }
-        
-        .btn-warning {
-            background: var(--warning-color);
-            border: none;
-            color: #000;
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 0.8rem;
         }
         
         .table th {
             background-color: var(--primary-color);
             color: white;
             text-align: center;
+            font-size: 0.85rem;
+            padding: 8px 5px;
+        }
+        
+        .table td {
+            padding: 8px 5px;
+            font-size: 0.85rem;
+            vertical-align: middle;
         }
         
         .table-responsive {
@@ -87,31 +85,107 @@
         .filter-section {
             background-color: #e8f5e9;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-section h4 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .form-label {
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        
+        .form-select, .form-control {
+            padding: 6px 10px;
+            font-size: 0.85rem;
         }
         
         .action-buttons {
             display: flex;
-            gap: 5px;
+            gap: 4px;
+            justify-content: center;
         }
         
         .modal-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
+            padding: 12px 15px;
         }
         
-        @media (max-width: 768px) {
+        .notification-badge {
+            position: fixed;
+            bottom: 70px;
+            right: 15px;
+            z-index: 1050;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+        
+        .notification-modal .modal-dialog {
+            max-width: 350px;
+        }
+        
+        .notification-item {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
+            }
+            
+            .header .lead {
+                font-size: 0.85rem;
             }
             
             .table-responsive {
                 font-size: 0.8rem;
             }
             
-            .action-buttons {
-                flex-direction: column;
+            .table th, .table td {
+                padding: 6px 3px;
+            }
+            
+            .btn-sm {
+                padding: 3px 5px;
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .container {
+                max-width: 95%;
+            }
+            
+            .filter-section .row {
+                display: flex;
+                flex-wrap: nowrap;
+            }
+            
+            .filter-section .col-md-3 {
+                flex: 1;
+                min-width: 0;
             }
         }
     </style>
@@ -119,44 +193,43 @@
 <body>
     <div class="container">
         <div class="header text-center">
-            <h1><i class="fas fa-tasks me-2"></i>Administración de Actividades</h1>
-            <p class="lead">Agroalpha - Unidad de producción 1</p>
+            <h1><i class="fas fa-tasks me-2"></i>Admin. Actividades</h1>
+            <p class="lead mb-0">Agroalpha - UP1</p>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filtros simplificados -->
         <div class="filter-section">
-            <h4 class="mb-3"><i class="fas fa-filter me-2"></i>Filtros de Búsqueda</h4>
             <div class="row">
-                <div class="col-md-3 mb-3">
+                <div class="col-md-3 mb-2">
                     <label for="filtro-cultivo" class="form-label">Cultivo:</label>
                     <select class="form-select" id="filtro-cultivo">
-                        <option value="">Todos los cultivos</option>
+                        <option value="">Todos</option>
                         <option value="chile">Chile</option>
                         <option value="tomate">Tomate</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-3 mb-2">
                     <label for="filtro-invernadero" class="form-label">Invernadero:</label>
                     <select class="form-select" id="filtro-invernadero">
-                        <option value="">Todos los invernaderos</option>
-                        <option value="9">Invernadero 9</option>
-                        <option value="10">Invernadero 10</option>
-                        <option value="11">Invernadero 11</option>
-                        <option value="12">Invernadero 12</option>
-                        <option value="13">Invernadero 13</option>
-                        <option value="14">Invernadero 14</option>
-                        <option value="15">Invernadero 15</option>
-                        <option value="16">Invernadero 16</option>
-                        <option value="33">Invernadero 33</option>
-                        <option value="35">Invernadero 35</option>
-                        <option value="37">Invernadero 37</option>
-                        <option value="39">Invernadero 39</option>
+                        <option value="">Todos</option>
+                        <option value="9">Inv 9</option>
+                        <option value="10">Inv 10</option>
+                        <option value="11">Inv 11</option>
+                        <option value="12">Inv 12</option>
+                        <option value="13">Inv 13</option>
+                        <option value="14">Inv 14</option>
+                        <option value="15">Inv 15</option>
+                        <option value="16">Inv 16</option>
+                        <option value="33">Inv 33</option>
+                        <option value="35">Inv 35</option>
+                        <option value="37">Inv 37</option>
+                        <option value="39">Inv 39</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-3 mb-2">
                     <label for="filtro-actividad" class="form-label">Actividad:</label>
                     <select class="form-select" id="filtro-actividad">
-                        <option value="">Todas las actividades</option>
+                        <option value="">Todas</option>
                         <option value="Enguie">Enguie</option>
                         <option value="Poda">Poda</option>
                         <option value="Amarrado">Amarrado</option>
@@ -167,35 +240,27 @@
                         <option value="Desbrote">Desbrote</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
+                <div class="col-md-3 mb-2">
                     <label for="filtro-fecha" class="form-label">Fecha:</label>
                     <input type="date" class="form-control" id="filtro-fecha">
                 </div>
-            </div>
-            <div class="text-center">
-                <button id="btn-buscar" class="btn btn-primary me-2">
-                    <i class="fas fa-search me-2"></i>Buscar Actividades
-                </button>
-                <button id="btn-limpiar" class="btn btn-secondary">
-                    <i class="fas fa-eraser me-2"></i>Limpiar Filtros
-                </button>
             </div>
         </div>
 
         <!-- Tabla de actividades -->
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-white"><i class="fas fa-list me-2"></i>Actividades Registradas</h5>
-                <span id="contador-actividades" class="badge bg-light text-dark">0 actividades</span>
+            <div class="card-header d-flex justify-content-between align-items-center py-2">
+                <h5 class="mb-0 text-white"><i class="fas fa-list me-2"></i>Actividades</h5>
+                <span id="contador-actividades" class="badge bg-light text-dark py-1">0 actividades</span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-2">
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered">
+                    <table class="table table-striped table-bordered table-sm mb-0">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
                                 <th>Cultivo</th>
-                                <th>Invernadero</th>
+                                <th>Inv</th>
                                 <th>Actividad</th>
                                 <th>Camas</th>
                                 <th>Acciones</th>
@@ -203,10 +268,35 @@
                         </thead>
                         <tbody id="tabla-actividades">
                             <tr>
-                                <td colspan="6" class="text-center py-4">Use los filtros y haga clic en "Buscar Actividades"</td>
+                                <td colspan="6" class="text-center py-3">Cargando actividades...</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de notificaciones -->
+    <div class="notification-badge" data-bs-toggle="modal" data-bs-target="#modalNotificaciones">
+        <i class="fas fa-bell"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-count">0</span>
+    </div>
+
+    <!-- Modal para notificaciones -->
+    <div class="modal fade notification-modal" id="modalNotificaciones" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title mb-0">Notificaciones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-2" id="notificaciones-body">
+                    <p class="text-center mb-0">No hay notificaciones recientes</p>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-sm btn-danger" id="btn-limpiar-notificaciones">Limpiar todo</button>
                 </div>
             </div>
         </div>
@@ -216,66 +306,70 @@
     <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Actividad</h5>
+                <div class="modal-header py-2">
+                    <h5 class="modal-title mb-0">Editar Actividad</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="form-editar">
                         <input type="hidden" id="edit-id">
-                        <div class="mb-3">
-                            <label for="edit-fecha" class="form-label">Fecha</label>
-                            <input type="date" class="form-control" id="edit-fecha" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label for="edit-fecha" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="edit-fecha" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="edit-cultivo" class="form-label">Cultivo</label>
+                                <select class="form-select" id="edit-cultivo" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="chile">Chile</option>
+                                    <option value="tomate">Tomate</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="edit-cultivo" class="form-label">Cultivo</label>
-                            <select class="form-select" id="edit-cultivo" required>
-                                <option value="">Seleccionar cultivo</option>
-                                <option value="chile">Chile</option>
-                                <option value="tomate">Tomate</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label for="edit-invernadero" class="form-label">Invernadero</label>
+                                <select class="form-select" id="edit-invernadero" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="9">Inv 9</option>
+                                    <option value="10">Inv 10</option>
+                                    <option value="11">Inv 11</option>
+                                    <option value="12">Inv 12</option>
+                                    <option value="13">Inv 13</option>
+                                    <option value="14">Inv 14</option>
+                                    <option value="15">Inv 15</option>
+                                    <option value="16">Inv 16</option>
+                                    <option value="33">Inv 33</option>
+                                    <option value="35">Inv 35</option>
+                                    <option value="37">Inv 37</option>
+                                    <option value="39">Inv 39</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="edit-actividad" class="form-label">Actividad</label>
+                                <select class="form-select" id="edit-actividad" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="Enguie">Enguie</option>
+                                    <option value="Poda">Poda</option>
+                                    <option value="Amarrado">Amarrado</option>
+                                    <option value="Raleo">Raleo</option>
+                                    <option value="Cosecha">Cosecha</option>
+                                    <option value="Bajado">Bajado</option>
+                                    <option value="Deshoje">Deshoje</option>
+                                    <option value="Desbrote">Desbrote</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="edit-invernadero" class="form-label">Invernadero</label>
-                            <select class="form-select" id="edit-invernadero" required>
-                                <option value="">Seleccionar invernadero</option>
-                                <option value="9">Invernadero 9</option>
-                                <option value="10">Invernadero 10</option>
-                                <option value="11">Invernadero 11</option>
-                                <option value="12">Invernadero 12</option>
-                                <option value="13">Invernadero 13</option>
-                                <option value="14">Invernadero 14</option>
-                                <option value="15">Invernadero 15</option>
-                                <option value="16">Invernadero 16</option>
-                                <option value="33">Invernadero 33</option>
-                                <option value="35">Invernadero 35</option>
-                                <option value="37">Invernadero 37</option>
-                                <option value="39">Invernadero 39</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-actividad" class="form-label">Actividad</label>
-                            <select class="form-select" id="edit-actividad" required>
-                                <option value="">Seleccionar actividad</option>
-                                <option value="Enguie">Enguie</option>
-                                <option value="Poda">Poda</option>
-                                <option value="Amarrado">Amarrado</option>
-                                <option value="Raleo">Raleo</option>
-                                <option value="Cosecha">Cosecha</option>
-                                <option value="Bajado">Bajado</option>
-                                <option value="Deshoje">Deshoje</option>
-                                <option value="Desbrote">Desbrote</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
+                        <div class="mb-2">
                             <label for="edit-camas" class="form-label">Número de Camas</label>
                             <input type="number" class="form-control" id="edit-camas" min="0" required>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btn-guardar-cambios">Guardar Cambios</button>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-sm btn-primary" id="btn-guardar-cambios">Guardar</button>
                 </div>
             </div>
         </div>
@@ -285,20 +379,20 @@
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                <div class="modal-header py-2">
+                    <h5 class="modal-title mb-0">Confirmar Eliminación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>¿Está seguro de que desea eliminar esta actividad? Esta acción no se puede deshacer.</p>
-                    <p><strong>Detalles de la actividad:</strong></p>
-                    <ul id="detalles-eliminar">
+                    <p class="mb-2">¿Está seguro de que desea eliminar esta actividad?</p>
+                    <p class="mb-2"><strong>Detalles:</strong></p>
+                    <ul id="detalles-eliminar" class="mb-0">
                         <!-- Los detalles se insertarán aquí con JavaScript -->
                     </ul>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="btn-confirmar-eliminar">Eliminar</button>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-sm btn-danger" id="btn-confirmar-eliminar">Eliminar</button>
                 </div>
             </div>
         </div>
@@ -327,6 +421,7 @@
         let actividadAEliminar = null;
         let modalEditar = null;
         let modalEliminar = null;
+        let notificaciones = JSON.parse(localStorage.getItem('notificaciones_actividades')) || [];
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -335,14 +430,41 @@
             modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
             
             // Configurar event listeners
-            document.getElementById('btn-buscar').addEventListener('click', buscarActividades);
-            document.getElementById('btn-limpiar').addEventListener('click', limpiarFiltros);
+            document.getElementById('filtro-cultivo').addEventListener('change', buscarActividades);
+            document.getElementById('filtro-invernadero').addEventListener('change', buscarActividades);
+            document.getElementById('filtro-actividad').addEventListener('change', buscarActividades);
+            document.getElementById('filtro-fecha').addEventListener('change', buscarActividades);
             document.getElementById('btn-guardar-cambios').addEventListener('click', guardarCambios);
             document.getElementById('btn-confirmar-eliminar').addEventListener('click', confirmarEliminar);
+            document.getElementById('btn-limpiar-notificaciones').addEventListener('click', limpiarNotificaciones);
+            
+            // Verificar y limpiar notificaciones a las 12 PM
+            verificarNotificaciones();
             
             // Cargar todas las actividades al iniciar
             buscarActividades();
+            
+            // Configurar listener para cambios en tiempo real
+            configurarListenerTiempoReal();
+            
+            // Actualizar contador de notificaciones
+            actualizarContadorNotificaciones();
         });
+
+        // Configurar listener para cambios en tiempo real
+        function configurarListenerTiempoReal() {
+            const actividadesRef = database.ref('actividades');
+            
+            actividadesRef.on('child_added', (snapshot) => {
+                const nuevaActividad = snapshot.val();
+                
+                // Agregar notificación
+                agregarNotificacion(`Nueva actividad agregada: ${nuevaActividad.actividad} en Inv ${nuevaActividad.invernadero}`);
+                
+                // Recargar actividades si estamos en la página
+                buscarActividades();
+            });
+        }
 
         // Buscar actividades con los filtros aplicados
         function buscarActividades() {
@@ -391,7 +513,7 @@
                 mostrarActividades(actividadesData);
             }).catch((error) => {
                 console.error('Error al cargar actividades:', error);
-                alert('Error al cargar las actividades');
+                mostrarMensajeError('Error al cargar las actividades');
             });
         }
 
@@ -403,7 +525,7 @@
             contador.textContent = `${actividades.length} actividades`;
             
             if (actividades.length === 0) {
-                tablaBody.innerHTML = '<tr><td colspan="6" class="text-center py-4">No se encontraron actividades con los filtros seleccionados</td></tr>';
+                tablaBody.innerHTML = '<tr><td colspan="6" class="text-center py-3">No se encontraron actividades</td></tr>';
                 return;
             }
             
@@ -416,10 +538,13 @@
                 const fechaParts = actividad.fecha.split('-');
                 const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
                 
+                // Abreviar nombre del cultivo
+                const cultivoAbr = actividad.cultivo === 'chile' ? 'Chile' : 'Tomate';
+                
                 fila.innerHTML = `
                     <td>${fechaFormateada}</td>
-                    <td>${actividad.cultivo === 'chile' ? 'Chile' : 'Tomate'}</td>
-                    <td>Invernadero ${actividad.invernadero}</td>
+                    <td>${cultivoAbr}</td>
+                    <td class="text-center">${actividad.invernadero}</td>
                     <td>${actividad.actividad}</td>
                     <td class="text-center">${actividad.camas || 0}</td>
                     <td class="text-center">
@@ -453,23 +578,12 @@
             });
         }
 
-        // Limpiar filtros
-        function limpiarFiltros() {
-            document.getElementById('filtro-cultivo').value = '';
-            document.getElementById('filtro-invernadero').value = '';
-            document.getElementById('filtro-actividad').value = '';
-            document.getElementById('filtro-fecha').value = '';
-            
-            // Volver a cargar todas las actividades
-            buscarActividades();
-        }
-
         // Abrir modal para editar actividad
         function abrirModalEditar(id) {
             const actividad = actividadesData.find(a => a.id === id);
             
             if (!actividad) {
-                alert('No se encontró la actividad');
+                mostrarMensajeError('No se encontró la actividad');
                 return;
             }
             
@@ -496,7 +610,7 @@
             
             // Validar campos
             if (!fecha || !cultivo || !invernadero || !actividad || camas === '') {
-                alert('Por favor complete todos los campos');
+                mostrarMensajeError('Por favor complete todos los campos');
                 return;
             }
             
@@ -512,13 +626,16 @@
             
             database.ref().update(updates)
                 .then(() => {
-                    alert('Actividad actualizada correctamente');
+                    // Agregar notificación
+                    agregarNotificacion(`Actividad actualizada: ${actividad} en Inv ${invernadero}`);
+                    
+                    mostrarMensajeExito('Actividad actualizada correctamente');
                     modalEditar.hide();
                     buscarActividades(); // Recargar la tabla
                 })
                 .catch((error) => {
                     console.error('Error al actualizar:', error);
-                    alert('Error al actualizar la actividad');
+                    mostrarMensajeError('Error al actualizar la actividad');
                 });
         }
 
@@ -527,7 +644,7 @@
             const actividad = actividadesData.find(a => a.id === id);
             
             if (!actividad) {
-                alert('No se encontró la actividad');
+                mostrarMensajeError('No se encontró la actividad');
                 return;
             }
             
@@ -537,10 +654,13 @@
             const fechaParts = actividad.fecha.split('-');
             const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
             
+            // Abreviar nombre del cultivo
+            const cultivoAbr = actividad.cultivo === 'chile' ? 'Chile' : 'Tomate';
+            
             // Mostrar detalles de la actividad a eliminar
             document.getElementById('detalles-eliminar').innerHTML = `
                 <li>Fecha: ${fechaFormateada}</li>
-                <li>Cultivo: ${actividad.cultivo === 'chile' ? 'Chile' : 'Tomate'}</li>
+                <li>Cultivo: ${cultivoAbr}</li>
                 <li>Invernadero: ${actividad.invernadero}</li>
                 <li>Actividad: ${actividad.actividad}</li>
                 <li>Camas: ${actividad.camas || 0}</li>
@@ -556,15 +676,109 @@
             
             database.ref(`actividades/${actividadAEliminar}`).remove()
                 .then(() => {
-                    alert('Actividad eliminada correctamente');
+                    // Agregar notificación
+                    const actividad = actividadesData.find(a => a.id === actividadAEliminar);
+                    if (actividad) {
+                        agregarNotificacion(`Actividad eliminada: ${actividad.actividad} en Inv ${actividad.invernadero}`);
+                    }
+                    
+                    mostrarMensajeExito('Actividad eliminada correctamente');
                     modalEliminar.hide();
                     actividadAEliminar = null;
                     buscarActividades(); // Recargar la tabla
                 })
                 .catch((error) => {
                     console.error('Error al eliminar:', error);
-                    alert('Error al eliminar la actividad');
+                    mostrarMensajeError('Error al eliminar la actividad');
                 });
+        }
+
+        // Funciones para notificaciones
+        function agregarNotificacion(mensaje) {
+            const nuevaNotificacion = {
+                id: Date.now(),
+                mensaje: mensaje,
+                fecha: new Date().toLocaleString('es-ES'),
+                leida: false
+            };
+            
+            notificaciones.unshift(nuevaNotificacion);
+            guardarNotificaciones();
+            actualizarContadorNotificaciones();
+            mostrarNotificaciones();
+        }
+
+        function mostrarNotificaciones() {
+            const notificacionesBody = document.getElementById('notificaciones-body');
+            
+            if (notificaciones.length === 0) {
+                notificacionesBody.innerHTML = '<p class="text-center mb-0">No hay notificaciones recientes</p>';
+                return;
+            }
+            
+            let html = '';
+            notificaciones.forEach(notif => {
+                html += `
+                    <div class="notification-item">
+                        <div class="d-flex justify-content-between">
+                            <span>${notif.mensaje}</span>
+                        </div>
+                        <div class="notification-time">${notif.fecha}</div>
+                    </div>
+                `;
+            });
+            
+            notificacionesBody.innerHTML = html;
+        }
+
+        function limpiarNotificaciones() {
+            notificaciones = [];
+            guardarNotificaciones();
+            actualizarContadorNotificaciones();
+            mostrarNotificaciones();
+        }
+
+        function guardarNotificaciones() {
+            localStorage.setItem('notificaciones_actividades', JSON.stringify(notificaciones));
+        }
+
+        function actualizarContadorNotificaciones() {
+            const countElement = document.getElementById('notification-count');
+            countElement.textContent = notificaciones.length;
+            
+            if (notificaciones.length === 0) {
+                countElement.style.display = 'none';
+            } else {
+                countElement.style.display = 'block';
+            }
+        }
+
+        function verificarNotificaciones() {
+            const ahora = new Date();
+            const horaActual = ahora.getHours();
+            
+            // Si son las 12 PM o más tarde, limpiar notificaciones
+            if (horaActual >= 12) {
+                // Verificar si ya limpiamos hoy
+                const ultimaLimpieza = localStorage.getItem('ultima_limpieza_notificaciones');
+                const hoy = ahora.toDateString();
+                
+                if (ultimaLimpieza !== hoy) {
+                    limpiarNotificaciones();
+                    localStorage.setItem('ultima_limpieza_notificaciones', hoy);
+                }
+            }
+        }
+
+        // Funciones de utilidad
+        function mostrarMensajeExito(mensaje) {
+            // Podría implementarse un toast o alerta bonita
+            alert(mensaje);
+        }
+
+        function mostrarMensajeError(mensaje) {
+            // Podría implementarse un toast o alerta bonita
+            alert(mensaje);
         }
     </script>
 </body>
