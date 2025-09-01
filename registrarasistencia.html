@@ -59,6 +59,12 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
+        .btn-action {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+        
         .attendance-table {
             width: 100%;
             border-collapse: collapse;
@@ -148,6 +154,19 @@
             background-color: var(--secondary-color);
         }
         
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
         @media (max-width: 768px) {
             .header {
                 padding: 15px 0;
@@ -169,6 +188,11 @@
             .attendance-table th, .attendance-table td {
                 padding: 8px 5px;
             }
+            
+            .btn-action {
+                padding: 4px 6px;
+                font-size: 0.7rem;
+            }
         }
         
         @media (max-width: 576px) {
@@ -178,6 +202,11 @@
             
             .header p.lead {
                 font-size: 1rem;
+            }
+            
+            .btn-action {
+                padding: 3px 5px;
+                font-size: 0.65rem;
             }
         }
     </style>
@@ -380,6 +409,58 @@
         </div>
     </div>
 
+    <!-- Modal para mover empleado -->
+    <div class="modal fade" id="moveEmployeeModal" tabindex="-1" aria-labelledby="moveEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moveEmployeeModalLabel">Mover Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro que desea mover al empleado <strong id="employeeName"></strong>?</p>
+                    <div class="mb-3">
+                        <label for="currentAreaDisplay" class="form-label">Área actual:</label>
+                        <input type="text" class="form-control" id="currentAreaDisplay" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newAreaSelect" class="form-label">Seleccionar nuevo invernadero/área:</label>
+                        <select class="form-select" id="newAreaSelect">
+                            <option value="">Seleccione un área...</option>
+                            <!-- Opciones se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmMove">Mover Empleado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar empleado -->
+    <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteEmployeeModalLabel">Eliminar Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro que desea eliminar al empleado <strong id="deleteEmployeeName"></strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Esta acción no se puede deshacer. El empleado será eliminado completamente del sistema.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar Empleado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -422,6 +503,7 @@
         let savedAttendance = {};
         let currentArea = '';
         let allAreas = [];
+        let currentEmployeeForAction = null;
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -461,6 +543,10 @@
             // Botones de acción
             document.getElementById('mark-all-present').addEventListener('click', markAllPresent);
             document.getElementById('save-attendance').addEventListener('click', saveAttendance);
+            
+            // Event listeners para modales
+            document.getElementById('confirmMove').addEventListener('click', moveEmployee);
+            document.getElementById('confirmDelete').addEventListener('click', deleteEmployee);
         }
 
         // Cargar empleados desde Firebase
@@ -518,6 +604,40 @@
                 }
                 
                 areaSelect.appendChild(option);
+            });
+            
+            // También cargar selector de áreas para mover empleados
+            loadMoveAreaSelector();
+        }
+        
+        // Cargar selector de áreas para mover empleados
+        function loadMoveAreaSelector() {
+            const moveAreaSelect = document.getElementById('newAreaSelect');
+            moveAreaSelect.innerHTML = '<option value="">Seleccione un área...</option>';
+            
+            // Ordenar áreas
+            const sortedAreas = Array.from(allAreas).sort((a, b) => {
+                // Poner áreas especiales primero
+                const isSpecialA = isNaN(a);
+                const isSpecialB = isNaN(b);
+                
+                if (isSpecialA && !isSpecialB) return -1;
+                if (!isSpecialA && isSpecialB) return 1;
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+            
+            sortedAreas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                
+                // Mostrar nombre apropiado
+                if (area === 'Fitosanidad' || area === 'Riego' || area === 'Acopio' || area === 'Áreas Verdes') {
+                    option.textContent = area;
+                } else {
+                    option.textContent = 'Invernadero ' + area;
+                }
+                
+                moveAreaSelect.appendChild(option);
             });
         }
 
@@ -665,12 +785,18 @@
                         </div>
                     </td>
                     <td class="text-center">
+                        <button class="btn btn-sm btn-primary btn-action move-employee-btn" data-employee-id="${employee.id}">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-action delete-employee-btn" data-employee-id="${employee.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
                         ${employee.temporal ? 
-                            `<button class="btn btn-sm btn-danger remove-temporal-btn" data-employee-id="${employee.id}">
-                                <i class="fas fa-trash"></i>
+                            `<button class="btn btn-sm btn-warning btn-action remove-temporal-btn" data-employee-id="${employee.id}">
+                                <i class="fas fa-times"></i>
                             </button>` : 
                             (employee.invernaderos && employee.invernaderos.includes(currentArea) ? '' :
-                            `<button class="btn btn-sm btn-info add-temporal-btn" data-employee-id="${employee.id}">
+                            `<button class="btn btn-sm btn-info btn-action add-temporal-btn" data-employee-id="${employee.id}">
                                 <i class="fas fa-plus"></i>
                             </button>`)
                         }
@@ -694,6 +820,30 @@
                     
                     // Actualizar contadores
                     updateCounters();
+                });
+            });
+            
+            // Añadir event listeners a los botones de mover empleado
+            document.querySelectorAll('.move-employee-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const employeeId = this.dataset.employeeId;
+                    const employee = allEmployees.find(e => e.id === employeeId);
+                    
+                    if (employee) {
+                        showMoveModal(employee);
+                    }
+                });
+            });
+            
+            // Añadir event listeners a los botones de eliminar empleado
+            document.querySelectorAll('.delete-employee-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const employeeId = this.dataset.employeeId;
+                    const employee = allEmployees.find(e => e.id === employeeId);
+                    
+                    if (employee) {
+                        showDeleteModal(employee);
+                    }
                 });
             });
             
@@ -749,6 +899,137 @@
                     absentBtn.classList.add('btn-danger');
                 }
             }
+        }
+
+        // Mostrar modal para mover empleado
+        function showMoveModal(employee) {
+            currentEmployeeForAction = employee;
+            
+            // Configurar modal
+            document.getElementById('employeeName').textContent = `${employee.nombre} (${employee.codigo})`;
+            
+            // Mostrar área actual
+            const currentAreaDisplay = document.getElementById('currentAreaDisplay');
+            if (employee.invernaderos && employee.invernaderos.length > 0) {
+                currentAreaDisplay.value = employee.invernaderos.map(area => {
+                    if (area === 'Fitosanidad' || area === 'Riego' || area === 'Acopio' || area === 'Áreas Verdes') {
+                        return area;
+                    } else {
+                        return 'Invernadero ' + area;
+                    }
+                }).join(', ');
+            } else {
+                currentAreaDisplay.value = 'Sin área asignada';
+            }
+            
+            // Resetear selector de nueva área
+            document.getElementById('newAreaSelect').value = '';
+            
+            // Mostrar modal
+            const moveModal = new bootstrap.Modal(document.getElementById('moveEmployeeModal'));
+            moveModal.show();
+        }
+
+        // Mostrar modal para eliminar empleado
+        function showDeleteModal(employee) {
+            currentEmployeeForAction = employee;
+            
+            // Configurar modal
+            document.getElementById('deleteEmployeeName').textContent = `${employee.nombre} (${employee.codigo})`;
+            
+            // Mostrar modal
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
+            deleteModal.show();
+        }
+
+        // Mover empleado a otro invernadero/área
+        function moveEmployee() {
+            const newArea = document.getElementById('newAreaSelect').value;
+            
+            if (!newArea) {
+                alert('Por favor seleccione un área destino');
+                return;
+            }
+            
+            if (!currentEmployeeForAction) {
+                alert('Error: No se ha seleccionado un empleado');
+                return;
+            }
+            
+            // Verificar si el empleado ya está en esta área
+            if (currentEmployeeForAction.invernaderos && currentEmployeeForAction.invernaderos.includes(newArea)) {
+                alert('El empleado ya está asignado a esta área');
+                return;
+            }
+            
+            // Actualizar el empleado en Firebase
+            const employeeRef = personalRef.child(currentEmployeeForAction.id);
+            
+            // Obtener las áreas actuales del empleado
+            const currentAreas = currentEmployeeForAction.invernaderos || [];
+            
+            // Agregar la nueva área
+            const updatedAreas = [...currentAreas, newArea];
+            
+            // Actualizar en Firebase
+            employeeRef.update({ invernaderos: updatedAreas })
+                .then(() => {
+                    alert(`Empleado movido exitosamente a la nueva área`);
+                    
+                    // Actualizar la lista local de empleados
+                    const employeeIndex = allEmployees.findIndex(e => e.id === currentEmployeeForAction.id);
+                    if (employeeIndex !== -1) {
+                        allEmployees[employeeIndex].invernaderos = updatedAreas;
+                    }
+                    
+                    // Recargar la lista de asistencia si estamos en el área actual
+                    if (currentArea) {
+                        filterEmployeesByArea(currentArea);
+                    }
+                    
+                    // Cerrar modal
+                    const moveModal = bootstrap.Modal.getInstance(document.getElementById('moveEmployeeModal'));
+                    moveModal.hide();
+                })
+                .catch((error) => {
+                    console.error('Error al mover empleado:', error);
+                    alert('Error al mover empleado. Por favor, intente nuevamente.');
+                });
+        }
+
+        // Eliminar empleado
+        function deleteEmployee() {
+            if (!currentEmployeeForAction) {
+                alert('Error: No se ha seleccionado un empleado');
+                return;
+            }
+            
+            // Confirmación adicional
+            if (!confirm('¿Está completamente seguro de que desea eliminar permanentemente a este empleado?')) {
+                return;
+            }
+            
+            // Eliminar el empleado de Firebase
+            personalRef.child(currentEmployeeForAction.id).remove()
+                .then(() => {
+                    alert('Empleado eliminado exitosamente');
+                    
+                    // Actualizar la lista local de empleados
+                    allEmployees = allEmployees.filter(e => e.id !== currentEmployeeForAction.id);
+                    
+                    // Recargar la lista de asistencia si estamos en el área actual
+                    if (currentArea) {
+                        filterEmployeesByArea(currentArea);
+                    }
+                    
+                    // Cerrar modal
+                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEmployeeModal'));
+                    deleteModal.hide();
+                })
+                .catch((error) => {
+                    console.error('Error al eliminar empleado:', error);
+                    alert('Error al eliminar empleado. Por favor, intente nuevamente.');
+                });
         }
 
         // Marcar todos como presentes
