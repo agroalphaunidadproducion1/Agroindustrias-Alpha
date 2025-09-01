@@ -21,7 +21,6 @@
             padding-top: 20px;
             padding-bottom: 40px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            position: relative;
         }
         
         .header {
@@ -116,52 +115,6 @@
         .rendimientos-table {
             margin-top: 20px;
         }
-
-        /* Botón flotante de notificaciones */
-        .floating-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            border: none;
-        }
-        
-        .floating-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-        }
-        
-        .floating-btn i {
-            font-size: 1.2rem;
-        }
-        
-        /* Badge de notificaciones */
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #ff5722;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
         
         /* Ajustes para móviles */
         @media (max-width: 768px) {
@@ -179,42 +132,27 @@
                 min-width: 60px;
             }
             
-            .floating-btn {
-                top: 15px;
-                right: 15px;
-                width: 45px;
-                height: 45px;
-            }
-            
             .card-header h5 {
                 font-size: 1rem;
             }
-            
-            .btn-clean {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.8rem;
-            }
-        }
-
-        /* Estilo para el botón de limpiar notificaciones */
-        .btn-clean {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            border: none;
-            color: white;
         }
         
-        .btn-clean:hover {
-            background: linear-gradient(135deg, #d32f2f, #f44336);
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- Botón flotante de notificaciones -->
-    <button class="floating-btn" data-bs-toggle="modal" data-bs-target="#notificacionesModal" id="btn-notificaciones">
-        <i class="fas fa-th"></i>
-        <span class="notification-badge d-none" id="notification-counter">0</span>
-    </button>
-
     <div class="container">
         <div class="header text-center">
             <h1><i class="fas fa-table me-2"></i>Reporte de Actividades</h1>
@@ -266,7 +204,7 @@
                             </thead>
                             <tbody id="tabla-chile">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -287,7 +225,7 @@
                             </thead>
                             <tbody id="rendimientos-chile">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -318,7 +256,7 @@
                             </thead>
                             <tbody id="tabla-tomate">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -339,36 +277,11 @@
                             </thead>
                             <tbody id="rendimientos-tomate">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en Cargar Datos</td>
+                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Notificaciones -->
-    <div class="modal fade" id="notificacionesModal" tabindex="-1" aria-labelledby="notificacionesModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="notificacionesModalLabel">
-                        <i class="fas fa-trophy me-2"></i>Metas Alcanzadas
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="contenido-notificaciones">
-                        <p class="text-center">Cargando notificaciones...</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-clean" id="btn-limpiar-notificaciones">
-                        <i class="fas fa-trash me-1"></i> Limpiar Todas
-                    </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -414,28 +327,15 @@
         // Variables globales
         let currentWeekDates = [];
         let semanaSeleccionada = null;
-        let notificaciones = [];
-        let ultimasMetasAlcanzadas = JSON.parse(localStorage.getItem('ultimasMetasAlcanzadas')) || {};
+        let actividadesPrevias = {};
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar event listeners
             document.getElementById('btn-cargar').addEventListener('click', cargarDatos);
             
-            // Configurar evento para el botón de notificaciones
-            document.getElementById('btn-notificaciones').addEventListener('click', function() {
-                // Mostrar notificaciones cuando se abre el modal
-                setTimeout(mostrarNotificaciones, 500);
-            });
-            
-            // Configurar evento para el botón de limpiar notificaciones
-            document.getElementById('btn-limpiar-notificaciones').addEventListener('click', limpiarTodasNotificaciones);
-            
             // Cargar selector de semanas
             cargarSemanas();
-            
-            // Generar tablas vacías
-            generarTablasVacias();
             
             // Cargar datos automáticamente para la semana actual
             setTimeout(() => {
@@ -444,90 +344,6 @@
                 }
             }, 1000);
         });
-
-        // Limpiar todas las notificaciones
-        function limpiarTodasNotificaciones() {
-            if (confirm('¿Estás seguro de que deseas eliminar todas las notificaciones?')) {
-                ultimasMetasAlcanzadas = {};
-                localStorage.setItem('ultimasMetasAlcanzadas', JSON.stringify(ultimasMetasAlcanzadas));
-                notificaciones = [];
-                
-                // Actualizar contador
-                actualizarContadorNotificaciones();
-                
-                // Actualizar contenido del modal
-                mostrarNotificaciones();
-                
-                // Recargar datos para actualizar las tablas
-                cargarDatos();
-            }
-        }
-
-        // Generar tablas vacías
-        function generarTablasVacias() {
-            generarTablaCultivoVacia('tabla-chile', 'chile');
-            generarTablaCultivoVacia('tabla-tomate', 'tomate');
-            generarTablaRendimientosVacia('rendimientos-chile', 'chile');
-            generarTablaRendimientosVacia('rendimientos-tomate', 'tomate');
-        }
-
-        // Generar tabla vacía para un cultivo
-        function generarTablaCultivoVacia(tablaId, cultivo) {
-            const tablaBody = document.getElementById(tablaId);
-            tablaBody.innerHTML = '';
-            
-            const invernaderos = invernaderosPorCultivo[cultivo];
-            
-            // Agregar filas para cada invernadero
-            invernaderos.forEach(inv => {
-                const fila = document.createElement('tr');
-                
-                // Celda de invernadero (solo número)
-                const tdInvernadero = document.createElement('td');
-                tdInvernadero.textContent = inv;
-                tdInvernadero.style.fontWeight = '600';
-                fila.appendChild(tdInvernadero);
-                
-                // Celdas de actividades (vacías)
-                for (let i = 0; i < 5; i++) {
-                    const td = document.createElement('td');
-                    td.textContent = '-';
-                    td.className = 'meta-cell';
-                    fila.appendChild(td);
-                }
-                
-                tablaBody.appendChild(fila);
-            });
-        }
-
-        // Generar tabla de rendimientos vacía
-        function generarTablaRendimientosVacia(tablaId, cultivo) {
-            const tablaBody = document.getElementById(tablaId);
-            tablaBody.innerHTML = '';
-            
-            const invernaderos = invernaderosPorCultivo[cultivo];
-            
-            // Agregar filas para cada invernadero
-            invernaderos.forEach(inv => {
-                const fila = document.createElement('tr');
-                
-                // Celda de invernadero (solo número)
-                const tdInvernadero = document.createElement('td');
-                tdInvernadero.textContent = inv;
-                tdInvernadero.style.fontWeight = '600';
-                fila.appendChild(tdInvernadero);
-                
-                // Celdas de rendimientos (vacías)
-                for (let i = 0; i < 5; i++) {
-                    const td = document.createElement('td');
-                    td.textContent = '-';
-                    td.className = 'meta-cell';
-                    fila.appendChild(td);
-                }
-                
-                tablaBody.appendChild(fila);
-            });
-        }
 
         // Cargar selector de semanas
         function cargarSemanas() {
@@ -555,6 +371,7 @@
             selector.addEventListener('change', function() {
                 semanaSeleccionada = this.value;
                 updateWeekDates(semanaSeleccionada);
+                cargarDatos(); // Cargar datos automáticamente al cambiar semana
             });
         }
 
@@ -630,71 +447,6 @@
             return [year, month, day].join('-');
         }
 
-        // Obtener nombre del día en español
-        function getNombreDia(fecha) {
-            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-            return dias[new Date(fecha).getDay()];
-        }
-
-        // Formatear fecha completa en español (ej: "viernes 29 de agosto")
-        function formatearFechaCompleta(fecha) {
-            const fechaObj = new Date(fecha);
-            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-            
-            const diaSemana = dias[fechaObj.getDay()];
-            const dia = fechaObj.getDate();
-            const mes = meses[fechaObj.getMonth()];
-            
-            return `${diaSemana} ${dia} de ${mes}`;
-        }
-
-        // Verificar si se alcanzó la meta anteriormente
-        function seAlcanzoMetaAnteriormente(cultivo, invernadero, actividad) {
-            const clave = `${cultivo}-${invernadero}-${actividad}`;
-            return ultimasMetasAlcanzadas[clave] === true;
-        }
-
-        // Registrar que se alcanzó una meta
-        function registrarMetaAlcanzada(cultivo, invernadero, actividad, fecha) {
-            const clave = `${cultivo}-${invernadero}-${actividad}`;
-            ultimasMetasAlcanzadas[clave] = {
-                alcanzada: true,
-                fecha: fecha,
-                fechaCompleta: formatearFechaCompleta(fecha),
-                timestamp: new Date(fecha).getTime() // Añadir timestamp para ordenar
-            };
-            
-            // Guardar en localStorage para persistencia
-            localStorage.setItem('ultimasMetasAlcanzadas', JSON.stringify(ultimasMetasAlcanzadas));
-        }
-
-        // Limpiar notificaciones antiguas (más de 1 semana)
-        function limpiarNotificacionesAntiguas() {
-            const unaSemanaEnMs = 7 * 24 * 60 * 60 * 1000; // 1 semana en milisegundos
-            const ahora = new Date().getTime();
-            
-            Object.keys(ultimasMetasAlcanzadas).forEach(clave => {
-                // Si no tenemos timestamp, lo eliminamos después de 1 semana
-                if (typeof ultimasMetasAlcanzadas[clave] === 'boolean') {
-                    // Convertir a formato con timestamp
-                    const fechaDefault = new Date(ahora - (3 * 24 * 60 * 60 * 1000)); // Hace 3 días por defecto
-                    ultimasMetasAlcanzadas[clave] = {
-                        alcanzada: true,
-                        fecha: fechaDefault.toISOString().split('T')[0],
-                        fechaCompleta: formatearFechaCompleta(fechaDefault),
-                        timestamp: fechaDefault.getTime()
-                    };
-                } else if (ahora - new Date(ultimasMetasAlcanzadas[clave].fecha).getTime() > unaSemanaEnMs) {
-                    // Eliminar notificaciones con más de 1 semana
-                    delete ultimasMetasAlcanzadas[clave];
-                }
-            });
-            
-            // Guardar cambios
-            localStorage.setItem('ultimasMetasAlcanzadas', JSON.stringify(ultimasMetasAlcanzadas));
-        }
-
         // Cargar datos desde Firebase
         function cargarDatos() {
             if (!semanaSeleccionada) {
@@ -702,21 +454,11 @@
                 return;
             }
             
-            // Limpiar notificaciones antiguas
-            limpiarNotificacionesAntiguas();
-            
-            // Reiniciar notificaciones
-            notificaciones = [];
-            
-            // Mostrar mensaje de carga
-            document.getElementById('tabla-chile').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
-            document.getElementById('tabla-tomate').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
-            document.getElementById('rendimientos-chile').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
-            document.getElementById('rendimientos-tomate').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4">Cargando datos...</td></tr>';
+            // Mostrar estado de carga
+            const btnCargar = document.getElementById('btn-cargar');
+            const originalText = btnCargar.innerHTML;
+            btnCargar.innerHTML = '<span class="loading-spinner"></span> Cargando...';
+            btnCargar.disabled = true;
             
             const activitiesRef = database.ref('actividades');
             
@@ -734,18 +476,9 @@
                 // Procesar y mostrar los datos
                 procesarDatos(actividadesData);
                 
-                // Ordenar notificaciones por fecha (más recientes primero)
-                notificaciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-                
-                // Actualizar contador de notificaciones
-                actualizarContadorNotificaciones();
-                
-                // Mostrar notificaciones automáticamente si hay metas alcanzadas
-                if (notificaciones.length > 0) {
-                    // Mostrar el modal automáticamente
-                    const modal = new bootstrap.Modal(document.getElementById('notificacionesModal'));
-                    modal.show();
-                }
+                // Restaurar botón
+                btnCargar.innerHTML = originalText;
+                btnCargar.disabled = false;
             }).catch((error) => {
                 console.error('Error al cargar datos:', error);
                 document.getElementById('tabla-chile').innerHTML = 
@@ -756,6 +489,10 @@
                     '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
                 document.getElementById('rendimientos-tomate').innerHTML = 
                     '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+                
+                // Restaurar botón
+                btnCargar.innerHTML = originalText;
+                btnCargar.disabled = false;
             });
         }
 
@@ -770,6 +507,9 @@
             const {datos: datosTomate, rendimientos: rendimientosTomate} = procesarCultivo(actividadesData, 'tomate');
             generarTablaCultivo('tabla-tomate', datosTomate, 'tomate');
             generarTablaRendimientos('rendimientos-tomate', rendimientosTomate, 'tomate');
+            
+            // Guardar actividades previas para la próxima semana
+            guardarActividadesPrevias(datosChile, datosTomate);
         }
 
         // Procesar datos para un cultivo específico
@@ -792,7 +532,9 @@
                 
                 // Inicializar cada actividad
                 actividades.forEach(act => {
-                    datos[inv].actividades[act] = 0;
+                    // Cargar datos previos si existen
+                    const clave = `${cultivo}-${inv}-${act}`;
+                    datos[inv].actividades[act] = actividadesPrevias[clave] || 0;
                     rendimientos[inv].actividades[act] = 0;
                 });
             });
@@ -804,39 +546,50 @@
                     const act = actividad.actividad;
                     const camas = actividad.camas || 0;
                     const rendimiento = actividad.rendimiento || 0;
-                    const fecha = actividad.fecha;
                     
                     // Solo procesar si el invernadero y actividad son válidos
                     if (datos[inv] !== undefined && datos[inv].actividades[act] !== undefined) {
-                        // Si ya se alcanzó la meta anteriormente, reiniciar el conteo
-                        if (seAlcanzoMetaAnteriormente(cultivo, inv, act)) {
-                            datos[inv].actividades[act] = 0;
-                        }
-                        
                         datos[inv].actividades[act] += camas;
                         rendimientos[inv].actividades[act] += rendimiento;
-                        
-                        // Verificar si se alcanzó la meta
-                        const meta = totalCamasPorInvernadero[inv];
-                        if (datos[inv].actividades[act] >= meta) {
-                            registrarMetaAlcanzada(cultivo, inv, act, fecha);
-                            notificaciones.push({
-                                cultivo: cultivo,
-                                invernadero: inv,
-                                actividad: act,
-                                camas: datos[inv].actividades[act],
-                                meta: meta,
-                                fecha: fecha,
-                                fechaCompleta: formatearFechaCompleta(fecha),
-                                timestamp: new Date(fecha).getTime(),
-                                mensaje: `Invernadero ${inv} terminó su vuelta de ${act} el ${formatearFechaCompleta(fecha)}`
-                            });
-                        }
                     }
                 }
             });
             
             return {datos, rendimientos};
+        }
+
+        // Guardar actividades previas para la próxima semana
+        function guardarActividadesPrevias(datosChile, datosTomate) {
+            // Reiniciar actividades previas
+            actividadesPrevias = {};
+            
+            // Guardar datos de Chile
+            Object.keys(datosChile).forEach(inv => {
+                Object.keys(datosChile[inv].actividades).forEach(act => {
+                    const valor = datosChile[inv].actividades[act];
+                    const meta = totalCamasPorInvernadero[inv];
+                    
+                    // Solo guardar actividades no completadas
+                    if (valor < meta) {
+                        const clave = `chile-${inv}-${act}`;
+                        actividadesPrevias[clave] = valor;
+                    }
+                });
+            });
+            
+            // Guardar datos de Tomate
+            Object.keys(datosTomate).forEach(inv => {
+                Object.keys(datosTomate[inv].actividades).forEach(act => {
+                    const valor = datosTomate[inv].actividades[act];
+                    const meta = totalCamasPorInvernadero[inv];
+                    
+                    // Solo guardar actividades no completadas
+                    if (valor < meta) {
+                        const clave = `tomate-${inv}-${act}`;
+                        actividadesPrevias[clave] = valor;
+                    }
+                });
+            });
         }
 
         // Generar tabla para un cultivo
@@ -918,56 +671,6 @@
                 
                 tablaBody.appendChild(fila);
             });
-        }
-
-        // Actualizar contador de notificaciones
-        function actualizarContadorNotificaciones() {
-            const counter = document.getElementById('notification-counter');
-            if (notificaciones.length > 0) {
-                counter.textContent = notificaciones.length;
-                counter.classList.remove('d-none');
-            } else {
-                counter.classList.add('d-none');
-            }
-        }
-
-        // Mostrar notificaciones de metas alcanzadas
-        function mostrarNotificaciones() {
-            const contenido = document.getElementById('contenido-notificaciones');
-            contenido.innerHTML = '';
-            
-            if (notificaciones.length === 0) {
-                contenido.innerHTML = '<p class="text-center">No hay metas alcanzadas esta semana</p>';
-                return;
-            }
-            
-            // Ordenar notificaciones por fecha (más recientes primero)
-            notificaciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-            
-            const ul = document.createElement('ul');
-            ul.className = 'list-group';
-            
-            notificaciones.forEach(notif => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item list-group-item-success';
-                
-                const cultivoTexto = notif.cultivo === 'chile' ? 'Chile' : 'Tomate';
-                
-                li.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fas fa-trophy me-2"></i>
-                            <strong>${cultivoTexto} - ${notif.mensaje}</strong><br>
-                            <small>Total: ${notif.camas}/${notif.meta} camas</small>
-                        </div>
-                        <span class="badge bg-success rounded-pill">Meta alcanzada</span>
-                    </div>
-                `;
-                
-                ul.appendChild(li);
-            });
-            
-            contenido.appendChild(ul);
         }
     </script>
 </body>
