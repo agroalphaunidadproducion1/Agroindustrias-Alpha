@@ -167,6 +167,16 @@
             border-radius: 12px 12px 0 0;
         }
         
+        .caporal-badge {
+            background-color: #ffc107;
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
         @media (max-width: 768px) {
             .header {
                 padding: 15px 0;
@@ -419,6 +429,12 @@
                 </div>
                 <div class="modal-body">
                     <p>¿Está seguro que desea mover al empleado <strong id="employeeName"></strong>?</p>
+                    
+                    <div class="alert alert-info" id="move-restrictions-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="restrictions-text"></span>
+                    </div>
+                    
                     <div class="mb-3">
                         <label for="currentAreaDisplay" class="form-label">Área actual:</label>
                         <input type="text" class="form-control" id="currentAreaDisplay" readonly>
@@ -764,6 +780,7 @@
             
             filteredEmployees.forEach(employee => {
                 const isPresent = savedAttendance[employee.id] === true;
+                const isCaporal = employee.puesto && employee.puesto.toLowerCase().includes('caporal');
                 const row = document.createElement('tr');
                 
                 if (employee.temporal) {
@@ -771,7 +788,10 @@
                 }
                 
                 row.innerHTML = `
-                    <td>${employee.nombre || '-'}</td>
+                    <td>
+                        ${employee.nombre || '-'}
+                        ${isCaporal ? '<span class="caporal-badge">Caporal</span>' : ''}
+                    </td>
                     <td>${employee.codigo || '-'}</td>
                     <td>${employee.puesto || '-'}</td>
                     <td class="text-center">
@@ -908,6 +928,16 @@
             // Configurar modal
             document.getElementById('employeeName').textContent = `${employee.nombre} (${employee.codigo})`;
             
+            // Mostrar información de restricciones según el puesto
+            const isCaporal = employee.puesto && employee.puesto.toLowerCase().includes('caporal');
+            const restrictionsInfo = document.getElementById('restrictions-text');
+            
+            if (isCaporal) {
+                restrictionsInfo.textContent = 'Este empleado es Caporal y puede tener múltiples invernaderos asignados. Al agregar uno nuevo, se mantendrán los existentes.';
+            } else {
+                restrictionsInfo.textContent = 'Este empleado solo puede tener un invernadero asignado. Al seleccionar uno nuevo, se eliminará automáticamente del anterior.';
+            }
+            
             // Mostrar área actual
             const currentAreaDisplay = document.getElementById('currentAreaDisplay');
             if (employee.invernaderos && employee.invernaderos.length > 0) {
@@ -962,19 +992,31 @@
                 return;
             }
             
-            // Actualizar el empleado en Firebase
-            const employeeRef = personalRef.child(currentEmployeeForAction.id);
+            // Determinar si es caporal (puede tener múltiples invernaderos)
+            const isCaporal = currentEmployeeForAction.puesto && 
+                              currentEmployeeForAction.puesto.toLowerCase().includes('caporal');
             
             // Obtener las áreas actuales del empleado
             const currentAreas = currentEmployeeForAction.invernaderos || [];
             
-            // Agregar la nueva área
-            const updatedAreas = [...currentAreas, newArea];
+            // Preparar las áreas actualizadas
+            let updatedAreas;
+            
+            if (isCaporal) {
+                // Caporal: mantener áreas existentes y agregar la nueva
+                updatedAreas = [...currentAreas, newArea];
+            } else {
+                // No caporal: reemplazar todas las áreas por la nueva
+                updatedAreas = [newArea];
+            }
+            
+            // Actualizar el empleado en Firebase
+            const employeeRef = personalRef.child(currentEmployeeForAction.id);
             
             // Actualizar en Firebase
             employeeRef.update({ invernaderos: updatedAreas })
                 .then(() => {
-                    alert(`Empleado movido exitosamente a la nueva área`);
+                    alert(`Empleado ${isCaporal ? 'agregado a nueva área' : 'movido'} exitosamente`);
                     
                     // Actualizar la lista local de empleados
                     const employeeIndex = allEmployees.findIndex(e => e.id === currentEmployeeForAction.id);
