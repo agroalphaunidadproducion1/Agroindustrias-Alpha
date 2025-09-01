@@ -34,10 +34,11 @@
         }
         
         .card {
-            box-shadow: 0 4px 12 rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             border-radius: 12px;
             border: none;
+            overflow: hidden;
         }
         
         .card-header {
@@ -65,6 +66,7 @@
             background-color: var(--primary-color);
             color: white;
             text-align: center;
+            white-space: nowrap;
         }
         
         .table-responsive {
@@ -161,6 +163,7 @@
             font-weight: bold;
         }
         
+        /* Ajustes para móviles */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -168,6 +171,12 @@
             
             .table-responsive {
                 font-size: 0.8rem;
+                overflow-x: auto;
+            }
+            
+            .table th, .table td {
+                padding: 0.4rem;
+                min-width: 60px;
             }
             
             .floating-btn {
@@ -176,6 +185,26 @@
                 width: 45px;
                 height: 45px;
             }
+            
+            .card-header h5 {
+                font-size: 1rem;
+            }
+            
+            .btn-clean {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Estilo para el botón de limpiar notificaciones */
+        .btn-clean {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            border: none;
+            color: white;
+        }
+        
+        .btn-clean:hover {
+            background: linear-gradient(135deg, #d32f2f, #f44336);
         }
     </style>
 </head>
@@ -336,6 +365,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-clean" id="btn-limpiar-notificaciones">
+                        <i class="fas fa-trash me-1"></i> Limpiar Todas
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -396,6 +428,9 @@
                 setTimeout(mostrarNotificaciones, 500);
             });
             
+            // Configurar evento para el botón de limpiar notificaciones
+            document.getElementById('btn-limpiar-notificaciones').addEventListener('click', limpiarTodasNotificaciones);
+            
             // Cargar selector de semanas
             cargarSemanas();
             
@@ -409,6 +444,24 @@
                 }
             }, 1000);
         });
+
+        // Limpiar todas las notificaciones
+        function limpiarTodasNotificaciones() {
+            if (confirm('¿Estás seguro de que deseas eliminar todas las notificaciones?')) {
+                ultimasMetasAlcanzadas = {};
+                localStorage.setItem('ultimasMetasAlcanzadas', JSON.stringify(ultimasMetasAlcanzadas));
+                notificaciones = [];
+                
+                // Actualizar contador
+                actualizarContadorNotificaciones();
+                
+                // Actualizar contenido del modal
+                mostrarNotificaciones();
+                
+                // Recargar datos para actualizar las tablas
+                cargarDatos();
+            }
+        }
 
         // Generar tablas vacías
         function generarTablasVacias() {
