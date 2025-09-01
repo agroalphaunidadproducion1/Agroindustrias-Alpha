@@ -710,7 +710,46 @@
           <th colspan="5">Aphidius Colemani</th>
           <th colspan="2">Abejorros</th>
         `;
+        
+        // Agregar fila secundaria con los encabezados detallados
+        const filaSecundaria = document.createElement("tr");
+        let encabezadosSecundarios = `
+          <th></th>
+          <th></th>
+        `;
+        
+        // Encabezados para cada organismo
+        for (let i = 0; i < 4; i++) {
+          encabezadosSecundarios += `
+            <th>Larva</th>
+            <th>Adulto</th>
+            <th>Huevo</th>
+            <th>Ninfa</th>
+            <th>Persistencia</th>
+          `;
+        }
+        
+        // Encabezados para abejorros
+        encabezadosSecundarios += `
+          <th>Persistencia</th>
+          <th>Acción</th>
+        `;
+        
+        filaSecundaria.innerHTML = encabezadosSecundarios;
+        
+        // Limpiar encabezados existentes
+        tablaHeader.innerHTML = encabezados;
+        
+        // Agregar la fila secundaria
+        const thead = document.querySelector("#tablaRegistros thead");
+        if (thead.children.length > 1) {
+          thead.removeChild(thead.children[1]);
+        }
+        thead.appendChild(filaSecundaria);
+        
+        return;
       } else {
+        // Para un organismo específico, crear solo una fila de encabezados
         switch(beneficoFiltro) {
           case "swirskii":
             encabezados += `
@@ -755,9 +794,14 @@
             `;
             break;
         }
+        
+        // Limpiar encabezados existentes y eliminar fila secundaria si existe
+        tablaHeader.innerHTML = encabezados;
+        const thead = document.querySelector("#tablaRegistros thead");
+        if (thead.children.length > 1) {
+          thead.removeChild(thead.children[1]);
+        }
       }
-      
-      tablaHeader.innerHTML = encabezados;
     }
 
     // Formatear valores numéricos
