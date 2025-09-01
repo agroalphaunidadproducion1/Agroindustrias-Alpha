@@ -6,6 +6,7 @@
   <title>Evaluación de Organismos Benéficos</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     :root {
       --primary-color: #2e7d32;
@@ -43,6 +44,11 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
+    }
+    
+    .header-buttons {
+      display: flex;
+      gap: 10px;
     }
     
     .controls-container {
@@ -113,6 +119,14 @@
     
     .btn-leyenda:hover {
       background-color: #3f51b5;
+    }
+    
+    .btn-descarga {
+      background-color: #7b1fa2;
+    }
+    
+    .btn-descarga:hover {
+      background-color: #6a1b9a;
     }
     
     .table-container {
@@ -201,6 +215,10 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     
+    .modal-small {
+      max-width: 400px;
+    }
+    
     .close {
       color: #aaa;
       float: right;
@@ -255,6 +273,31 @@
       gap: 8px;
     }
     
+    .descarga-opciones {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .descarga-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background-color: #f5f5f5;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .descarga-btn:hover {
+      background-color: #e8f5e9;
+    }
+    
+    .descarga-icono {
+      font-size: 20px;
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       .filtros-container {
@@ -286,6 +329,11 @@
         flex-direction: column;
         gap: 10px;
       }
+      
+      .header-buttons {
+        width: 100%;
+        justify-content: center;
+      }
     }
     
     @media (max-width: 480px) {
@@ -306,6 +354,10 @@
         margin: 10% auto;
         padding: 15px;
       }
+      
+      .header-buttons {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
@@ -313,7 +365,10 @@
 
   <div class="header-container">
     <h2>🌿 Evaluación de Organismos Benéficos</h2>
-    <button class="btn-leyenda" onclick="mostrarLeyenda()"><span>📖</span> Leyenda</button>
+    <div class="header-buttons">
+      <button class="btn-leyenda" onclick="mostrarLeyenda()"><span>📖</span> Leyenda</button>
+      <button class="btn-descarga" onclick="mostrarModalDescargas()"><span>📥</span> Descargar</button>
+    </div>
   </div>
 
   <div class="controls-container">
@@ -347,11 +402,6 @@
         <label class="filtro-label" for="buscador">Buscar:</label>
         <input type="text" id="buscador" placeholder="Producto o ingrediente...">
       </div>
-    </div>
-
-    <div class="acciones">
-      <button onclick="window.print()"><span>🖨️</span> Imprimir</button>
-      <button onclick="descargarCSV()"><span>📥</span> CSV</button>
     </div>
   </div>
 
@@ -418,6 +468,31 @@
     </div>
   </div>
 
+  <!-- Modal de Descargas -->
+  <div id="modalDescargas" class="modal">
+    <div class="modal-content modal-small">
+      <span class="close" onclick="cerrarModalDescargas()">&times;</span>
+      <h2>Opciones de Descarga</h2>
+      
+      <div class="descarga-opciones">
+        <div class="descarga-btn" onclick="descargarCSV()">
+          <span class="descarga-icono">📊</span>
+          <span>Descargar como CSV</span>
+        </div>
+        
+        <div class="descarga-btn" onclick="descargarImagen()">
+          <span class="descarga-icono">🖼️</span>
+          <span>Descargar como Imagen</span>
+        </div>
+        
+        <div class="descarga-btn" onclick="window.print()">
+          <span class="descarga-icono">🖨️</span>
+          <span>Imprimir Tabla</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Configuración de Firebase
     const firebaseConfig = {
@@ -434,6 +509,7 @@
     const filtroCategoria = document.getElementById("filtro-categoria");
     const filtroBenefico = document.getElementById("filtro-benefico");
     const modalLeyenda = document.getElementById("modalLeyenda");
+    const modalDescargas = document.getElementById("modalDescargas");
     let registros = [];
 
     // Función para mostrar el modal de leyenda
@@ -446,10 +522,23 @@
       modalLeyenda.style.display = "none";
     }
 
+    // Función para mostrar el modal de descargas
+    function mostrarModalDescargas() {
+      modalDescargas.style.display = "block";
+    }
+
+    // Función para cerrar el modal de descargas
+    function cerrarModalDescargas() {
+      modalDescargas.style.display = "none";
+    }
+
     // Cerrar el modal al hacer clic fuera de él
     window.onclick = function(event) {
       if (event.target == modalLeyenda) {
         cerrarLeyenda();
+      }
+      if (event.target == modalDescargas) {
+        cerrarModalDescargas();
       }
     }
 
@@ -935,6 +1024,24 @@
       link.href = URL.createObjectURL(blob);
       link.download = `evaluacion_beneficos_${fecha}.csv`;
       link.click();
+      
+      // Cerrar el modal después de descargar
+      cerrarModalDescargas();
+    }
+
+    // Descargar tabla como imagen
+    function descargarImagen() {
+      html2canvas(document.querySelector(".table-container")).then(canvas => {
+        const link = document.createElement("a");
+        const fecha = new Date().toISOString().split('T')[0];
+        
+        link.href = canvas.toDataURL("image/png");
+        link.download = `evaluacion_beneficos_${fecha}.png`;
+        link.click();
+        
+        // Cerrar el modal después de descargar
+        cerrarModalDescargas();
+      });
     }
 
     // Event listeners
