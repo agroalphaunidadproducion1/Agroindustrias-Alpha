@@ -3,858 +3,311 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Actividades - Agro Alpha</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <title>Sistema Unida Producción 1 Agroalpha - En Mantenimiento</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2e7d32;
-            --secondary-color: #1b5e20;
-            --accent-color: #7cb342;
-            --light-bg: #f1f8e9;
-        }
-        
-        body {
-            background-color: var(--light-bg);
-            padding-top: 20px;
-            padding-bottom: 40px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px 0;
-            margin-bottom: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        body {
+            background: linear-gradient(135deg, #1a2e35 0%, #0d5c3e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
-        .card {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border-radius: 12px;
-            border: none;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            border-radius: 12px 12px 0 0 !important;
-            font-weight: 600;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 12px 15px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            padding: 10px 20px;
-            font-weight: 600;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        .table th {
-            background-color: var(--primary-color);
-            color: white;
+        .container {
+            max-width: 900px;
+            width: 100%;
             text-align: center;
-            white-space: nowrap;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
         
-        .table-responsive {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .filter-section {
-            background-color: #e8f5e9;
-            border-radius: 8px;
-            padding: 15px;
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-bottom: 20px;
         }
         
-        /* Colores según porcentaje de cumplimiento */
-        .meta-0-30 {
-            background-color: #ffcdd2 !important; /* Rojo claro */
+        .logo-icon {
+            font-size: 3rem;
+            color: #4CAF50;
+            margin-right: 15px;
         }
         
-        .meta-30-50 {
-            background-color: #fff9c4 !important; /* Amarillo claro */
+        .logo-text {
+            text-align: left;
         }
         
-        .meta-50-80 {
-            background-color: #c8e6c9 !important; /* Verde claro */
+        .logo-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.1;
         }
         
-        .meta-80-100 {
-            background-color: #a5d6a7 !important; /* Verde medio */
-        }
-        
-        .meta-100 {
-            background-color: #66bb6a !important; /* Verde oscuro */
-            color: white;
-            font-weight: bold;
-        }
-        
-        .cultivo-section {
-            margin-bottom: 30px;
-        }
-        
-        .meta-cell {
-            text-align: center;
+        .logo-subtitle {
+            font-size: 1.3rem;
+            color: #4CAF50;
             font-weight: 500;
         }
         
-        .rendimientos-table {
-            margin-top: 20px;
+        h1 {
+            font-size: 2.5rem;
+            margin: 25px 0;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
         }
         
-        .actividades-subtitle {
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid var(--accent-color);
-        }
-        
-        /* Ajustes para móviles */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .table-responsive {
-                font-size: 0.8rem;
-                overflow-x: auto;
-            }
-            
-            .table th, .table td {
-                padding: 0.4rem;
-                min-width: 60px;
-            }
-            
-            .card-header h5 {
-                font-size: 1rem;
-            }
-        }
-        
-        .loading-spinner {
+        .status {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            border: 1px solid #FFC107;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: #e0f2e0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
-        .alert-info {
-            background-color: #e3f2fd;
-            border-color: #bbdefb;
-            color: #0d47a1;
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            width: 200px;
+            transition: transform 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature i {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .feature h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .notify-form {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4CAF50;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #c8e6c9;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #a5d6a7;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #388E3C;
+        }
+        
+        .contact-info {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .contact-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+        
+        .contact-info p {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #a5d6a7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .logo-title {
+                font-size: 1.8rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .feature {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header text-center">
-            <h1><i class="fas fa-table me-2"></i>Reporte de Actividades</h1>
-            <p class="lead">Agroalpha - Unidad de producción 1</p>
-        </div>
-
-        <!-- Filtros -->
-        <div class="filter-section">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="semana-select" class="form-label"><strong>Semana:</strong></label>
-                    <select class="form-select" id="semana-select">
-                        <option value="">Cargando semanas...</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label"><strong>Rango de fechas:</strong></label>
-                    <div id="rango-fechas" class="form-control" style="background-color: white; height: 38px; display: flex; align-items: center;">
-                        Seleccione una semana
-                    </div>
-                </div>
-            </div>
-            <div class="text-center">
-                <button id="btn-cargar" class="btn btn-primary">
-                    <i class="fas fa-filter me-2"></i>Cargar Datos
-                </button>
-            </div>
-        </div>
-
-        <!-- Sección Chile -->
-        <div class="cultivo-section">
-            <div class="card">
-                <div class="card-header bg-success">
-                    <h5 class="mb-0 text-white"><i class="fas fa-pepper-hot me-2"></i>Chile</h5>
-                </div>
-                <div class="card-body">
-                    <div class="actividades-subtitle">Actividades</div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Inv</th>
-                                    <th>Enguie</th>
-                                    <th>Poda</th>
-                                    <th>Amarrado</th>
-                                    <th>Raleo</th>
-                                    <th>Cosecha</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-chile">
-                                <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="actividades-subtitle">Rendimientos</div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered rendimientos-table">
-                            <thead>
-                                <tr>
-                                    <th>Inv</th>
-                                    <th>Enguie</th>
-                                    <th>Poda</th>
-                                    <th>Amarrado</th>
-                                    <th>Raleo</th>
-                                    <th>Cosecha</th>
-                                </tr>
-                            </thead>
-                            <tbody id="rendimientos-chile">
-                                <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sección Tomate -->
-        <div class="cultivo-section">
-            <div class="card">
-                <div class="card-header bg-danger">
-                    <h5 class="mb-0 text-white"><i class="fas fa-apple-alt me-2"></i>Tomate</h5>
-                </div>
-                <div class="card-body">
-                    <div class="actividades-subtitle">Actividades</div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Inv</th>
-                                    <th>Enguie</th>
-                                    <th>Bajado</th>
-                                    <th>Deshoje</th>
-                                    <th>Desbrote</th>
-                                    <th>Cosecha</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-tomate">
-                                <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="actividades-subtitle">Rendimientos</div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered rendimientos-table">
-                            <thead>
-                                <tr>
-                                    <th>Inv</th>
-                                    <th>Enguie</th>
-                                    <th>Bajado</th>
-                                    <th>Deshoje</th>
-                                    <th>Desbrote</th>
-                                    <th>Cosecha</th>
-                                </tr>
-                            </thead>
-                            <tbody id="rendimientos-tomate">
-                                <tr>
-                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div class="logo">
+            <i class="fas fa-tractor logo-icon"></i>
+            <div class="logo-text">
+                <div class="logo-title">AGROALPHA</div>
+                <div class="logo-subtitle">Sistema Unida Producción 1</div>
             </div>
         </div>
         
-        <!-- Información sobre actividades pendientes -->
-        <div class="alert alert-info mt-4" id="info-pendientes" style="display: none;">
-            <i class="fas fa-info-circle me-2"></i>
-            <span id="texto-pendientes"></span>
+        <div class="status">SISTEMA EN MANTENIMIENTO</div>
+        
+        <h1>Estamos mejorando nuestro sistema</h1>
+        
+        <p>Nuestro equipo está trabajando para realizar actualizaciones y mejoras en el sistema. Estaremos de vuelta muy pronto con una experiencia mejorada y nuevas funcionalidades.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-cogs"></i>
+                <h3>Actualización de Sistema</h3>
+            </div>
+            <div class="feature">
+                <i class="fas fa-bolt"></i>
+                <h3>Mejora de Rendimiento</h3>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Refuerzo de Seguridad</h3>
+            </div>
+        </div>
+        
+        <div class="notify-form">
+            <h3 class="form-title">Notificarme cuando el sistema esté disponible</h3>
+            <form id="notification-form">
+                <div class="form-group">
+                    <label for="name">Nombre completo</label>
+                    <input type="text" id="name" placeholder="Ingresa tu nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" placeholder="Ingresa tu correo electrónico" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensaje (opcional)</label>
+                    <textarea id="message" rows="3" placeholder="Déjanos saber si hay algo en lo que podamos ayudarte"></textarea>
+                </div>
+                <button type="submit"><i class="fas fa-bell"></i> Notificarme</button>
+            </form>
+        </div>
+        
+        <div class="contact-info">
+            <h3>Para emergencias durante el mantenimiento</h3>
+            <p><i class="fas fa-envelope"></i> soporte@agroalpha.com</p>
+            <p><i class="fas fa-phone"></i> +504 88897202</p>
+            <p><i class="fas fa-clock"></i> Horario de atención: Lunes a Viernes 7:00 - 16:00</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2025 Agroalpha - Sistema Unida Producción 1. Todos los derechos reservados.</p>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <!-- Firebase Database -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
     <script>
-        // Configuración de Firebase con tu URL
-        const firebaseConfig = {
-            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com"
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Definir actividades por cultivo (con cosecha al final)
-        const actividadesPorCultivo = {
-            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'],
-            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha']
-        };
-
-        // Definir invernaderos por cultivo
-        const invernaderosPorCultivo = {
-            chile: ['9', '10', '11', '12', '33', '35', '37', '39'],
-            tomate: ['13', '14', '15', '16']
-        };
-
-        // Total de camas por invernadero
-        const totalCamasPorInvernadero = {
-            '9': 274, '10': 270, '11': 274, '12': 274,
-            '33': 274, '35': 274, '37': 284, '39': 284,
-            '13': 274, '14': 274, '15': 274, '16': 274
-        };
-
-        // Variables globales
-        let currentWeekDates = [];
-        let semanaSeleccionada = null;
-        let semanaAnterior = null;
-        let actividadesPendientes = {};
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar event listeners
-            document.getElementById('btn-cargar').addEventListener('click', cargarDatos);
+        // Manejo del formulario
+        document.getElementById('notification-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            // Cargar selector de semanas
-            cargarSemanas();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
             
-            // Cargar datos automáticamente para la semana actual
-            setTimeout(() => {
-                if (semanaSeleccionada) {
-                    cargarDatos();
-                }
-            }, 1000);
+            // Aquí normalmente se enviarían los datos a un servidor
+            // Para este ejemplo, solo mostraremos una alerta
+            alert(`Gracias ${name}. Te notificaremos al correo ${email} cuando nuestro sistema esté disponible.`);
+            
+            // Limpiar el formulario
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('message').value = '';
         });
-
-        // Cargar selector de semanas
-        function cargarSemanas() {
-            const selector = document.getElementById('semana-select');
-            selector.innerHTML = '';
-            
-            // Obtener el año actual
-            const currentYear = new Date().getFullYear();
-            
-            // Generar opciones para las 52 semanas del año
-            for (let week = 1; week <= 52; week++) {
-                const option = document.createElement('option');
-                option.value = week;
-                option.textContent = `Semana ${week} - ${currentYear}`;
-                selector.appendChild(option);
-            }
-            
-            // Seleccionar la semana actual por defecto
-            const currentWeek = getWeekNumber(new Date());
-            selector.value = currentWeek;
-            semanaSeleccionada = currentWeek;
-            updateWeekDates(currentWeek);
-            
-            // Configurar evento change para el selector de semanas
-            selector.addEventListener('change', function() {
-                semanaSeleccionada = this.value;
-                updateWeekDates(semanaSeleccionada);
-            });
-        }
-
-        // Obtener el número de semana de una fecha (formato ISO)
-        function getWeekNumber(date) {
-            date = new Date(date);
-            date.setHours(0, 0, 0, 0);
-            
-            // Thursday in current week decides the year.
-            date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-            
-            // January 4 is always in week 1.
-            const week1 = new Date(date.getFullYear(), 0, 4);
-            
-            // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-            return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-        }
-
-        // Actualizar el rango de fechas según la semana seleccionada
-        function updateWeekDates(weekNumber) {
-            if (!weekNumber) return;
-            
-            const year = new Date().getFullYear();
-            
-            // Obtener el primer día (lunes) de la semana
-            const firstDay = getFirstDayOfWeek(weekNumber, year);
-            
-            // Guardar las fechas de la semana (lunes a sábado)
-            currentWeekDates = [];
-            for (let i = 0; i < 6; i++) {
-                const date = new Date(firstDay);
-                date.setDate(firstDay.getDate() + i);
-                currentWeekDates.push(formatDate(date));
-            }
-            
-            // Mostrar el rango de fechas
-            const lastDay = new Date(firstDay);
-            lastDay.setDate(firstDay.getDate() + 5);
-            
-            const options = { day: '2-digit', month: '2-digit' };
-            const startFormatted = firstDay.toLocaleDateString('es-ES', options);
-            const endFormatted = lastDay.toLocaleDateString('es-ES', options);
-            
-            document.getElementById('rango-fechas').textContent = 
-                `${startFormatted} al ${endFormatted} de ${year}`;
-        }
-
-        // Obtener el primer día (lunes) de una semana específica
-        function getFirstDayOfWeek(week, year) {
-            const simple = new Date(year, 0, 1 + (week - 1) * 7);
-            const dayOfWeek = simple.getDay();
-            const ISOweekStart = simple;
-            
-            if (dayOfWeek <= 4) {
-                ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-            } else {
-                ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-            }
-            
-            return ISOweekStart;
-        }
-
-        // Formatear fecha como YYYY-MM-DD
-        function formatDate(date) {
-            const d = new Date(date);
-            let month = '' + (d.getMonth() + 1);
-            let day = '' + d.getDate();
-            const year = d.getFullYear();
-            
-            if (month.length < 2) month = '0' + month;
-            if (day.length < 2) day = '0' + day;
-            
-            return [year, month, day].join('-');
-        }
-
-        // Cargar datos desde Firebase
-        function cargarDatos() {
-            if (!semanaSeleccionada) {
-                alert('Por favor seleccione una semana');
-                return;
-            }
-            
-            // Verificar si hay cambio de semana
-            if (semanaAnterior && semanaAnterior != semanaSeleccionada) {
-                // Hay cambio de semana, cargar actividades pendientes
-                cargarActividadesPendientes();
-                return;
-            }
-            
-            // Mostrar estado de carga
-            const btnCargar = document.getElementById('btn-cargar');
-            const originalText = btnCargar.innerHTML;
-            btnCargar.innerHTML = '<span class="loading-spinner"></span> Cargando...';
-            btnCargar.disabled = true;
-            
-            const activitiesRef = database.ref('actividades');
-            
-            activitiesRef.once('value').then((snapshot) => {
-                const actividadesData = [];
-                
-                snapshot.forEach((childSnapshot) => {
-                    const activity = childSnapshot.val();
-                    // Filtrar por fecha (solo actividades de la semana seleccionada)
-                    if (currentWeekDates.includes(activity.fecha)) {
-                        actividadesData.push(activity);
-                    }
-                });
-                
-                // Procesar y mostrar los datos
-                procesarDatos(actividadesData);
-                
-                // Guardar la semana actual para futuras comparaciones
-                semanaAnterior = semanaSeleccionada;
-                
-                // Restaurar botón
-                btnCargar.innerHTML = originalText;
-                btnCargar.disabled = false;
-            }).catch((error) => {
-                console.error('Error al cargar datos:', error);
-                mostrarError();
-                
-                // Restaurar botón
-                btnCargar.innerHTML = originalText;
-                btnCargar.disabled = false;
-            });
-        }
-
-        // Cargar actividades pendientes de la semana anterior
-        function cargarActividadesPendientes() {
-            // Obtener datos de la semana anterior
-            const semanaAnteriorNum = parseInt(semanaAnterior);
-            const year = new Date().getFullYear();
-            
-            // Obtener fechas de la semana anterior
-            const firstDayAnterior = getFirstDayOfWeek(semanaAnteriorNum, year);
-            const weekDatesAnterior = [];
-            for (let i = 0; i < 6; i++) {
-                const date = new Date(firstDayAnterior);
-                date.setDate(firstDayAnterior.getDate() + i);
-                weekDatesAnterior.push(formatDate(date));
-            }
-            
-            const activitiesRef = database.ref('actividades');
-            
-            activitiesRef.once('value').then((snapshot) => {
-                const actividadesData = [];
-                
-                snapshot.forEach((childSnapshot) => {
-                    const activity = childSnapshot.val();
-                    // Filtrar por fecha (solo actividades de la semana anterior)
-                    if (weekDatesAnterior.includes(activity.fecha)) {
-                        actividadesData.push(activity);
-                    }
-                });
-                
-                // Procesar datos para obtener actividades pendientes
-                procesarActividadesPendientes(actividadesData);
-                
-                // Ahora cargar datos de la semana actual
-                cargarDatosSemanaActual();
-            }).catch((error) => {
-                console.error('Error al cargar actividades pendientes:', error);
-                // Si hay error, cargar datos de la semana actual sin pendientes
-                cargarDatosSemanaActual();
-            });
-        }
-
-        // Cargar datos de la semana actual (después de procesar pendientes)
-        function cargarDatosSemanaActual() {
-            const activitiesRef = database.ref('actividades');
-            
-            activitiesRef.once('value').then((snapshot) => {
-                const actividadesData = [];
-                
-                snapshot.forEach((childSnapshot) => {
-                    const activity = childSnapshot.val();
-                    // Filtrar por fecha (solo actividades de la semana seleccionada)
-                    if (currentWeekDates.includes(activity.fecha)) {
-                        actividadesData.push(activity);
-                    }
-                });
-                
-                // Procesar y mostrar los datos (incluyendo pendientes)
-                procesarDatos(actividadesData, true);
-                
-                // Guardar la semana actual para futuras comparaciones
-                semanaAnterior = semanaSeleccionada;
-                
-                // Restaurar botón
-                const btnCargar = document.getElementById('btn-cargar');
-                btnCargar.innerHTML = '<i class="fas fa-filter me-2"></i>Cargar Datos';
-                btnCargar.disabled = false;
-            }).catch((error) => {
-                console.error('Error al cargar datos:', error);
-                mostrarError();
-                
-                // Restaurar botón
-                const btnCargar = document.getElementById('btn-cargar');
-                btnCargar.innerHTML = '<i class="fas fa-filter me-2"></i>Cargar Datos';
-                btnCargar.disabled = false;
-            });
-        }
-
-        // Procesar actividades pendientes de la semana anterior
-        function procesarActividadesPendientes(actividadesData) {
-            actividadesPendientes = {};
-            
-            // Procesar Chile
-            const {datos: datosChile} = procesarCultivo(actividadesData, 'chile');
-            Object.keys(datosChile).forEach(inv => {
-                Object.keys(datosChile[inv].actividades).forEach(act => {
-                    const valor = datosChile[inv].actividades[act] || 0;
-                    const meta = totalCamasPorInvernadero[inv];
-                    
-                    // Solo guardar actividades no completadas
-                    if (valor < meta) {
-                        const clave = `chile-${inv}-${act}`;
-                        actividadesPendientes[clave] = {
-                            valor: valor,
-                            meta: meta,
-                            pendiente: meta - valor
-                        };
-                    }
-                });
-            });
-            
-            // Procesar Tomate
-            const {datos: datosTomate} = procesarCultivo(actividadesData, 'tomate');
-            Object.keys(datosTomate).forEach(inv => {
-                Object.keys(datosTomate[inv].actividades).forEach(act => {
-                    const valor = datosTomate[inv].actividades[act] || 0;
-                    const meta = totalCamasPorInvernadero[inv];
-                    
-                    // Solo guardar actividades no completadas
-                    if (valor < meta) {
-                        const clave = `tomate-${inv}-${act}`;
-                        actividadesPendientes[clave] = {
-                            valor: valor,
-                            meta: meta,
-                            pendiente: meta - valor
-                        };
-                    }
-                });
-            });
-            
-            // Mostrar información sobre actividades pendientes
-            mostrarInfoPendientes();
-        }
-
-        // Mostrar información sobre actividades pendientes
-        function mostrarInfoPendientes() {
-            const infoElement = document.getElementById('info-pendientes');
-            const textoElement = document.getElementById('texto-pendientes');
-            
-            const totalPendientes = Object.keys(actividadesPendientes).length;
-            
-            if (totalPendientes > 0) {
-                textoElement.textContent = `Se han detectado ${totalPendientes} actividades pendientes de la semana anterior que se han cargado a esta semana.`;
-                infoElement.style.display = 'block';
-            } else {
-                infoElement.style.display = 'none';
-            }
-        }
-
-        // Procesar datos para la tabla
-        function procesarDatos(actividadesData, incluirPendientes = false) {
-            // Procesar datos para Chile
-            const {datos: datosChile, rendimientos: rendimientosChile} = procesarCultivo(actividadesData, 'chile', incluirPendientes);
-            generarTablaCultivo('tabla-chile', datosChile, 'chile');
-            generarTablaRendimientos('rendimientos-chile', rendimientosChile, 'chile');
-            
-            // Processar datos para Tomate
-            const {datos: datosTomate, rendimientos: rendimientosTomate} = procesarCultivo(actividadesData, 'tomate', incluirPendientes);
-            generarTablaCultivo('tabla-tomate', datosTomate, 'tomate');
-            generarTablaRendimientos('rendimientos-tomate', rendimientosTomate, 'tomate');
-        }
-
-        // Procesar datos para un cultivo específico
-        function procesarCultivo(actividadesData, cultivo, incluirPendientes = false) {
-            const invernaderos = invernaderosPorCultivo[cultivo];
-            const actividades = actividadesPorCultivo[cultivo];
-            
-            // Estructura para almacenar los datos
-            const datos = {};
-            const rendimientos = {};
-            
-            // Inicializar estructura
-            invernaderos.forEach(inv => {
-                datos[inv] = {
-                    actividades: {}
-                };
-                rendimientos[inv] = {
-                    actividades: {}
-                };
-                
-                // Inicializar cada actividad
-                actividades.forEach(act => {
-                    datos[inv].actividades[act] = 0;
-                    rendimientos[inv].actividades[act] = 0;
-                });
-            });
-            
-            // Procesar cada actividad
-            actividadesData.forEach(actividad => {
-                if (actividad.cultivo === cultivo) {
-                    const inv = actividad.invernadero;
-                    const act = actividad.actividad;
-                    const camas = actividad.camas || 0;
-                    const rendimiento = actividad.rendimiento || 0;
-                    
-                    // Solo procesar si el invernadero y actividad son válidos
-                    if (datos[inv] !== undefined && datos[inv].actividades[act] !== undefined) {
-                        // Para actividades, sumar las camas
-                        datos[inv].actividades[act] += camas;
-                        
-                        // Para rendimientos, mantener solo el último valor (no sumar)
-                        if (actividad.fecha) {
-                            // Solo actualizar si es la fecha más reciente
-                            const fechaActual = new Date(actividad.fecha);
-                            const fechaExistente = rendimientos[inv].actividades[act].fecha ? new Date(rendimientos[inv].actividades[act].fecha) : new Date(0);
-                            
-                            if (fechaActual >= fechaExistente) {
-                                rendimientos[inv].actividades[act] = {
-                                    valor: rendimiento,
-                                    fecha: actividad.fecha
-                                };
-                            }
-                        } else {
-                            // Si no hay fecha, mantener el valor actual
-                            rendimientos[inv].actividades[act] = {
-                                valor: rendimiento,
-                                fecha: ''
-                            };
-                        }
-                    }
-                }
-            });
-            
-            // Si hay pendientes de la semana anterior, agregarlos
-            if (incluirPendientes) {
-                Object.keys(actividadesPendientes).forEach(clave => {
-                    const partes = clave.split('-');
-                    const cultivoPendiente = partes[0];
-                    const invPendiente = partes[1];
-                    const actPendiente = partes[2];
-                    
-                    if (cultivoPendiente === cultivo && datos[invPendiente] !== undefined) {
-                        datos[invPendiente].actividades[actPendiente] += actividadesPendientes[clave].pendiente;
-                    }
-                });
-            }
-            
-            // Convertir los objetos de rendimiento a valores simples para la visualización
-            const rendimientosSimplificados = {};
-            invernaderos.forEach(inv => {
-                rendimientosSimplificados[inv] = {
-                    actividades: {}
-                };
-                
-                actividades.forEach(act => {
-                    if (rendimientos[inv].actividades[act] && typeof rendimientos[inv].actividades[act] === 'object') {
-                        rendimientosSimplificados[inv].actividades[act] = rendimientos[inv].actividades[act].valor || 0;
-                    } else {
-                        rendimientosSimplificados[inv].actividades[act] = rendimientos[inv].actividades[act] || 0;
-                    }
-                });
-            });
-            
-            return {datos, rendimientos: rendimientosSimplificados};
-        }
-
-        // Generar tabla para un cultivo
-        function generarTablaCultivo(tablaId, datos, cultivo) {
-            const tablaBody = document.getElementById(tablaId);
-            tablaBody.innerHTML = '';
-            
-            const actividades = actividadesPorCultivo[cultivo];
-            const invernaderos = invernaderosPorCultivo[cultivo];
-            
-            // Agregar filas para cada invernadero
-            invernaderos.forEach(inv => {
-                const fila = document.createElement('tr');
-                
-                // Celda de invernadero (solo número)
-                const tdInvernadero = document.createElement('td');
-                tdInvernadero.textContent = inv;
-                tdInvernadero.style.fontWeight = '600';
-                fila.appendChild(tdInvernadero);
-                
-                // Celdas de actividades
-                actividades.forEach(act => {
-                    const td = document.createElement('td');
-                    const valor = datos[inv].actividades[act] || 0;
-                    const meta = totalCamasPorInvernadero[inv];
-                    const porcentaje = meta > 0 ? (valor / meta) * 100 : 0;
-                    
-                    td.textContent = valor > 0 ? valor : '-';
-                    td.className = 'meta-cell';
-                    
-                    // Aplicar estilo según el porcentaje de cumplimiento
-                    if (porcentaje >= 100) {
-                        td.classList.add('meta-100');
-                    } else if (porcentaje >= 80) {
-                        td.classList.add('meta-80-100');
-                    } else if (porcentaje >= 50) {
-                        td.classList.add('meta-50-80');
-                    } else if (porcentaje >= 30) {
-                        td.classList.add('meta-30-50');
-                    } else if (porcentaje > 0) {
-                        td.classList.add('meta-0-30');
-                    }
-                    
-                    fila.appendChild(td);
-                });
-                
-                tablaBody.appendChild(fila);
-            });
-        }
-
-        // Generar tabla de rendimientos para un cultivo
-        function generarTablaRendimientos(tablaId, rendimientos, cultivo) {
-            const tablaBody = document.getElementById(tablaId);
-            tablaBody.innerHTML = '';
-            
-            const actividades = actividadesPorCultivo[cultivo];
-            const invernaderos = invernaderosPorCultivo[cultivo];
-            
-            // Agregar filas para cada invernadero
-            invernaderos.forEach(inv => {
-                const fila = document.createElement('tr');
-                
-                // Celda de invernadero (solo número)
-                const tdInvernadero = document.createElement('td');
-                tdInvernadero.textContent = inv;
-                tdInvernadero.style.fontWeight = '600';
-                fila.appendChild(tdInvernadero);
-                
-                // Celdas de rendimientos
-                actividades.forEach(act => {
-                    const td = document.createElement('td');
-                    const valor = rendimientos[inv].actividades[act] || 0;
-                    
-                    td.textContent = valor > 0 ? valor.toFixed(2) : '-';
-                    td.className = 'meta-cell';
-                    
-                    fila.appendChild(td);
-                });
-                
-                tablaBody.appendChild(fila);
-            });
-        }
-
-        // Mostrar mensaje de error
-        function mostrarError() {
-            document.getElementById('tabla-chile').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
-            document.getElementById('tabla-tomate').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
-            document.getElementById('rendimientos-chile').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
-            document.getElementById('rendimientos-tomate').innerHTML = 
-                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
-        }
     </script>
 </body>
 </html>
