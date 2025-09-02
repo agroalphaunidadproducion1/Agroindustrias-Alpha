@@ -138,6 +138,23 @@
             margin-bottom: 10px;
         }
         
+        .actividad-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .vuelta-badge {
+            font-size: 0.85rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
         .input-group-sm {
             max-width: 300px;
         }
@@ -278,6 +295,22 @@
             tomate: ['Cosecha', 'Enguie', 'Bajado', 'Deshoje', 'Desbrote']
         };
 
+        // Definir metas de camas por invernadero
+        const metasCamas = {
+            '9': 274,
+            '10': 270,
+            '11': 274,
+            '12': 274,
+            '13': 274,
+            '14': 274,
+            '15': 274,
+            '16': 274,
+            '33': 276,
+            '35': 276,
+            '37': 284,
+            '39': 284
+        };
+
         // Preferencias de usuario
         let preferenciasUsuario = {
             cultivo: null,
@@ -415,6 +448,7 @@
             if (!preferenciasUsuario.cultivo) return;
             
             const actividades = actividadesPorCultivo[preferenciasUsuario.cultivo];
+            const metaCamas = metasCamas[preferenciasUsuario.invernadero] || 0;
             
             actividades.forEach(actividad => {
                 const actividadDiv = document.createElement('div');
@@ -422,6 +456,10 @@
                 actividadDiv.innerHTML = `
                     <div class="actividad-header">
                         <label class="form-check-label fw-bold">${actividad}</label>
+                        <span class="vuelta-badge" id="vuelta-badge-${actividad}">Vuelta: Cargando...</span>
+                    </div>
+                    <div class="actividad-info" id="info-${actividad}">
+                        <div>Meta: ${metaCamas} camas | Progreso: Cargando...</div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-2">
@@ -438,7 +476,67 @@
                 `;
                 
                 container.appendChild(actividadDiv);
+                
+                // Cargar información de vueltas para esta actividad
+                cargarInfoVueltas(actividad, metaCamas);
             });
+        }
+
+        // Cargar información de vueltas desde Firebase
+        function cargarInfoVueltas(actividad, metaCamas) {
+            const invernadero = preferenciasUsuario.invernadero;
+            
+            if (!invernadero) return;
+            
+            // Referencia a las actividades en Firebase
+            const actividadesRef = database.ref('actividades');
+            
+            // Consultar actividades para este invernadero y actividad específica
+            actividadesRef.orderByChild('invernadero').equalTo(invernadero).once('value')
+                .then(snapshot => {
+                    let totalCamas = 0;
+                    let vueltaActual = 1;
+                    let conteoCosecha = 0;
+                    
+                    snapshot.forEach(childSnapshot => {
+                        const actividadData = childSnapshot.val();
+                        
+                        if (actividadData.actividad === actividad) {
+                            if (actividad === 'Cosecha') {
+                                // Para cosecha, solo contamos el número de registros
+                                conteoCosecha++;
+                            } else {
+                                // Para otras actividades, sumamos camas
+                                totalCamas += actividadData.camas || 0;
+                                
+                                // Calcular vuelta actual basada en la meta
+                                if (metaCamas > 0) {
+                                    vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Actualizar la interfaz
+                    const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
+                    const infoElement = document.getElementById(`info-${actividad}`);
+                    
+                    if (actividad === 'Cosecha') {
+                        badgeElement.textContent = `Cosecha #${conteoCosecha + 1}`;
+                        infoElement.innerHTML = `<div>Número de cosecha: ${conteoCosecha + 1}</div>`;
+                    } else {
+                        const camasEnVueltaActual = totalCamas % metaCamas;
+                        badgeElement.textContent = `Vuelta: ${vueltaActual}`;
+                        infoElement.innerHTML = `
+                            <div>Meta: ${metaCamas} camas | Progreso: ${camasEnVueltaActual}/${metaCamas} camas</div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar información de vueltas:', error);
+                    const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
+                    badgeElement.textContent = 'Error al cargar';
+                });
         }
 
         // Guardar todas las actividades en Firebase
@@ -511,6 +609,12 @@
                     actividades.forEach(actividad => {
                         document.getElementById(`camas-${actividad}`).value = '';
                         document.getElementById(`rendimiento-${actividad}`).value = '';
+                    });
+                    
+                    // Actualizar información de vueltas
+                    const metaCamas = metasCamas[preferenciasUsuario.invernadero] || 0;
+                    actividades.forEach(actividad => {
+                        cargarInfoVueltas(actividad, metaCamas);
                     });
                     
                     // Restablecer el estado del formulario
