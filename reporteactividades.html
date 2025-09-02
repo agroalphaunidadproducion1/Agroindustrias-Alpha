@@ -116,6 +116,14 @@
             margin-top: 20px;
         }
         
+        .actividades-subtitle {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
         /* Ajustes para móviles */
         @media (max-width: 768px) {
             .header h1 {
@@ -149,6 +157,12 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #bbdefb;
+            color: #0d47a1;
         }
     </style>
 </head>
@@ -189,7 +203,7 @@
                     <h5 class="mb-0 text-white"><i class="fas fa-pepper-hot me-2"></i>Chile</h5>
                 </div>
                 <div class="card-body">
-                    <h6 class="mb-3">Actividades</h6>
+                    <div class="actividades-subtitle">Actividades</div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
@@ -204,13 +218,13 @@
                             </thead>
                             <tbody id="tabla-chile">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <h6 class="mb-3 mt-4">Rendimientos</h6>
+                    <div class="actividades-subtitle">Rendimientos</div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered rendimientos-table">
                             <thead>
@@ -225,7 +239,7 @@
                             </thead>
                             <tbody id="rendimientos-chile">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -241,7 +255,7 @@
                     <h5 class="mb-0 text-white"><i class="fas fa-apple-alt me-2"></i>Tomate</h5>
                 </div>
                 <div class="card-body">
-                    <h6 class="mb-3">Actividades</h6>
+                    <div class="actividades-subtitle">Actividades</div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
@@ -256,13 +270,13 @@
                             </thead>
                             <tbody id="tabla-tomate">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <h6 class="mb-3 mt-4">Rendimientos</h6>
+                    <div class="actividades-subtitle">Rendimientos</div>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered rendimientos-table">
                             <thead>
@@ -277,13 +291,19 @@
                             </thead>
                             <tbody id="rendimientos-tomate">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">Cargando datos...</td>
+                                    <td colspan="6" class="text-center py-4">Seleccione una semana y haga clic en "Cargar Datos"</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Información sobre actividades pendientes -->
+        <div class="alert alert-info mt-4" id="info-pendientes" style="display: none;">
+            <i class="fas fa-info-circle me-2"></i>
+            <span id="texto-pendientes"></span>
         </div>
     </div>
 
@@ -327,7 +347,8 @@
         // Variables globales
         let currentWeekDates = [];
         let semanaSeleccionada = null;
-        let actividadesPrevias = {};
+        let semanaAnterior = null;
+        let actividadesPendientes = {};
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -371,7 +392,6 @@
             selector.addEventListener('change', function() {
                 semanaSeleccionada = this.value;
                 updateWeekDates(semanaSeleccionada);
-                cargarDatos(); // Cargar datos automáticamente al cambiar semana
             });
         }
 
@@ -454,6 +474,13 @@
                 return;
             }
             
+            // Verificar si hay cambio de semana
+            if (semanaAnterior && semanaAnterior != semanaSeleccionada) {
+                // Hay cambio de semana, cargar actividades pendientes
+                cargarActividadesPendientes();
+                return;
+            }
+            
             // Mostrar estado de carga
             const btnCargar = document.getElementById('btn-cargar');
             const originalText = btnCargar.innerHTML;
@@ -476,19 +503,15 @@
                 // Procesar y mostrar los datos
                 procesarDatos(actividadesData);
                 
+                // Guardar la semana actual para futuras comparaciones
+                semanaAnterior = semanaSeleccionada;
+                
                 // Restaurar botón
                 btnCargar.innerHTML = originalText;
                 btnCargar.disabled = false;
             }).catch((error) => {
                 console.error('Error al cargar datos:', error);
-                document.getElementById('tabla-chile').innerHTML = 
-                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
-                document.getElementById('tabla-tomate').innerHTML = 
-                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
-                document.getElementById('rendimientos-chile').innerHTML = 
-                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
-                document.getElementById('rendimientos-tomate').innerHTML = 
-                    '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+                mostrarError();
                 
                 // Restaurar botón
                 btnCargar.innerHTML = originalText;
@@ -496,24 +519,158 @@
             });
         }
 
+        // Cargar actividades pendientes de la semana anterior
+        function cargarActividadesPendientes() {
+            // Obtener datos de la semana anterior
+            const semanaAnteriorNum = parseInt(semanaAnterior);
+            const year = new Date().getFullYear();
+            
+            // Obtener fechas de la semana anterior
+            const firstDayAnterior = getFirstDayOfWeek(semanaAnteriorNum, year);
+            const weekDatesAnterior = [];
+            for (let i = 0; i < 6; i++) {
+                const date = new Date(firstDayAnterior);
+                date.setDate(firstDayAnterior.getDate() + i);
+                weekDatesAnterior.push(formatDate(date));
+            }
+            
+            const activitiesRef = database.ref('actividades');
+            
+            activitiesRef.once('value').then((snapshot) => {
+                const actividadesData = [];
+                
+                snapshot.forEach((childSnapshot) => {
+                    const activity = childSnapshot.val();
+                    // Filtrar por fecha (solo actividades de la semana anterior)
+                    if (weekDatesAnterior.includes(activity.fecha)) {
+                        actividadesData.push(activity);
+                    }
+                });
+                
+                // Procesar datos para obtener actividades pendientes
+                procesarActividadesPendientes(actividadesData);
+                
+                // Ahora cargar datos de la semana actual
+                cargarDatosSemanaActual();
+            }).catch((error) => {
+                console.error('Error al cargar actividades pendientes:', error);
+                // Si hay error, cargar datos de la semana actual sin pendientes
+                cargarDatosSemanaActual();
+            });
+        }
+
+        // Cargar datos de la semana actual (después de procesar pendientes)
+        function cargarDatosSemanaActual() {
+            const activitiesRef = database.ref('actividades');
+            
+            activitiesRef.once('value').then((snapshot) => {
+                const actividadesData = [];
+                
+                snapshot.forEach((childSnapshot) => {
+                    const activity = childSnapshot.val();
+                    // Filtrar por fecha (solo actividades de la semana seleccionada)
+                    if (currentWeekDates.includes(activity.fecha)) {
+                        actividadesData.push(activity);
+                    }
+                });
+                
+                // Procesar y mostrar los datos (incluyendo pendientes)
+                procesarDatos(actividadesData, true);
+                
+                // Guardar la semana actual para futuras comparaciones
+                semanaAnterior = semanaSeleccionada;
+                
+                // Restaurar botón
+                const btnCargar = document.getElementById('btn-cargar');
+                btnCargar.innerHTML = '<i class="fas fa-filter me-2"></i>Cargar Datos';
+                btnCargar.disabled = false;
+            }).catch((error) => {
+                console.error('Error al cargar datos:', error);
+                mostrarError();
+                
+                // Restaurar botón
+                const btnCargar = document.getElementById('btn-cargar');
+                btnCargar.innerHTML = '<i class="fas fa-filter me-2"></i>Cargar Datos';
+                btnCargar.disabled = false;
+            });
+        }
+
+        // Procesar actividades pendientes de la semana anterior
+        function procesarActividadesPendientes(actividadesData) {
+            actividadesPendientes = {};
+            
+            // Procesar Chile
+            const {datos: datosChile} = procesarCultivo(actividadesData, 'chile');
+            Object.keys(datosChile).forEach(inv => {
+                Object.keys(datosChile[inv].actividades).forEach(act => {
+                    const valor = datosChile[inv].actividades[act] || 0;
+                    const meta = totalCamasPorInvernadero[inv];
+                    
+                    // Solo guardar actividades no completadas
+                    if (valor < meta) {
+                        const clave = `chile-${inv}-${act}`;
+                        actividadesPendientes[clave] = {
+                            valor: valor,
+                            meta: meta,
+                            pendiente: meta - valor
+                        };
+                    }
+                });
+            });
+            
+            // Procesar Tomate
+            const {datos: datosTomate} = procesarCultivo(actividadesData, 'tomate');
+            Object.keys(datosTomate).forEach(inv => {
+                Object.keys(datosTomate[inv].actividades).forEach(act => {
+                    const valor = datosTomate[inv].actividades[act] || 0;
+                    const meta = totalCamasPorInvernadero[inv];
+                    
+                    // Solo guardar actividades no completadas
+                    if (valor < meta) {
+                        const clave = `tomate-${inv}-${act}`;
+                        actividadesPendientes[clave] = {
+                            valor: valor,
+                            meta: meta,
+                            pendiente: meta - valor
+                        };
+                    }
+                });
+            });
+            
+            // Mostrar información sobre actividades pendientes
+            mostrarInfoPendientes();
+        }
+
+        // Mostrar información sobre actividades pendientes
+        function mostrarInfoPendientes() {
+            const infoElement = document.getElementById('info-pendientes');
+            const textoElement = document.getElementById('texto-pendientes');
+            
+            const totalPendientes = Object.keys(actividadesPendientes).length;
+            
+            if (totalPendientes > 0) {
+                textoElement.textContent = `Se han detectado ${totalPendientes} actividades pendientes de la semana anterior que se han cargado a esta semana.`;
+                infoElement.style.display = 'block';
+            } else {
+                infoElement.style.display = 'none';
+            }
+        }
+
         // Procesar datos para la tabla
-        function procesarDatos(actividadesData) {
+        function procesarDatos(actividadesData, incluirPendientes = false) {
             // Procesar datos para Chile
-            const {datos: datosChile, rendimientos: rendimientosChile} = procesarCultivo(actividadesData, 'chile');
+            const {datos: datosChile, rendimientos: rendimientosChile} = procesarCultivo(actividadesData, 'chile', incluirPendientes);
             generarTablaCultivo('tabla-chile', datosChile, 'chile');
             generarTablaRendimientos('rendimientos-chile', rendimientosChile, 'chile');
             
             // Processar datos para Tomate
-            const {datos: datosTomate, rendimientos: rendimientosTomate} = procesarCultivo(actividadesData, 'tomate');
+            const {datos: datosTomate, rendimientos: rendimientosTomate} = procesarCultivo(actividadesData, 'tomate', incluirPendientes);
             generarTablaCultivo('tabla-tomate', datosTomate, 'tomate');
             generarTablaRendimientos('rendimientos-tomate', rendimientosTomate, 'tomate');
-            
-            // Guardar actividades previas para la próxima semana
-            guardarActividadesPrevias(datosChile, datosTomate);
         }
 
         // Procesar datos para un cultivo específico
-        function procesarCultivo(actividadesData, cultivo) {
+        function procesarCultivo(actividadesData, cultivo, incluirPendientes = false) {
             const invernaderos = invernaderosPorCultivo[cultivo];
             const actividades = actividadesPorCultivo[cultivo];
             
@@ -532,9 +689,7 @@
                 
                 // Inicializar cada actividad
                 actividades.forEach(act => {
-                    // Cargar datos previos si existen
-                    const clave = `${cultivo}-${inv}-${act}`;
-                    datos[inv].actividades[act] = actividadesPrevias[clave] || 0;
+                    datos[inv].actividades[act] = 0;
                     rendimientos[inv].actividades[act] = 0;
                 });
             });
@@ -549,47 +704,63 @@
                     
                     // Solo procesar si el invernadero y actividad son válidos
                     if (datos[inv] !== undefined && datos[inv].actividades[act] !== undefined) {
+                        // Para actividades, sumar las camas
                         datos[inv].actividades[act] += camas;
-                        rendimientos[inv].actividades[act] += rendimiento;
+                        
+                        // Para rendimientos, mantener solo el último valor (no sumar)
+                        if (actividad.fecha) {
+                            // Solo actualizar si es la fecha más reciente
+                            const fechaActual = new Date(actividad.fecha);
+                            const fechaExistente = rendimientos[inv].actividades[act].fecha ? new Date(rendimientos[inv].actividades[act].fecha) : new Date(0);
+                            
+                            if (fechaActual >= fechaExistente) {
+                                rendimientos[inv].actividades[act] = {
+                                    valor: rendimiento,
+                                    fecha: actividad.fecha
+                                };
+                            }
+                        } else {
+                            // Si no hay fecha, mantener el valor actual
+                            rendimientos[inv].actividades[act] = {
+                                valor: rendimiento,
+                                fecha: ''
+                            };
+                        }
                     }
                 }
             });
             
-            return {datos, rendimientos};
-        }
-
-        // Guardar actividades previas para la próxima semana
-        function guardarActividadesPrevias(datosChile, datosTomate) {
-            // Reiniciar actividades previas
-            actividadesPrevias = {};
-            
-            // Guardar datos de Chile
-            Object.keys(datosChile).forEach(inv => {
-                Object.keys(datosChile[inv].actividades).forEach(act => {
-                    const valor = datosChile[inv].actividades[act];
-                    const meta = totalCamasPorInvernadero[inv];
+            // Si hay pendientes de la semana anterior, agregarlos
+            if (incluirPendientes) {
+                Object.keys(actividadesPendientes).forEach(clave => {
+                    const partes = clave.split('-');
+                    const cultivoPendiente = partes[0];
+                    const invPendiente = partes[1];
+                    const actPendiente = partes[2];
                     
-                    // Solo guardar actividades no completadas
-                    if (valor < meta) {
-                        const clave = `chile-${inv}-${act}`;
-                        actividadesPrevias[clave] = valor;
+                    if (cultivoPendiente === cultivo && datos[invPendiente] !== undefined) {
+                        datos[invPendiente].actividades[actPendiente] += actividadesPendientes[clave].pendiente;
+                    }
+                });
+            }
+            
+            // Convertir los objetos de rendimiento a valores simples para la visualización
+            const rendimientosSimplificados = {};
+            invernaderos.forEach(inv => {
+                rendimientosSimplificados[inv] = {
+                    actividades: {}
+                };
+                
+                actividades.forEach(act => {
+                    if (rendimientos[inv].actividades[act] && typeof rendimientos[inv].actividades[act] === 'object') {
+                        rendimientosSimplificados[inv].actividades[act] = rendimientos[inv].actividades[act].valor || 0;
+                    } else {
+                        rendimientosSimplificados[inv].actividades[act] = rendimientos[inv].actividades[act] || 0;
                     }
                 });
             });
             
-            // Guardar datos de Tomate
-            Object.keys(datosTomate).forEach(inv => {
-                Object.keys(datosTomate[inv].actividades).forEach(act => {
-                    const valor = datosTomate[inv].actividades[act];
-                    const meta = totalCamasPorInvernadero[inv];
-                    
-                    // Solo guardar actividades no completadas
-                    if (valor < meta) {
-                        const clave = `tomate-${inv}-${act}`;
-                        actividadesPrevias[clave] = valor;
-                    }
-                });
-            });
+            return {datos, rendimientos: rendimientosSimplificados};
         }
 
         // Generar tabla para un cultivo
@@ -671,6 +842,18 @@
                 
                 tablaBody.appendChild(fila);
             });
+        }
+
+        // Mostrar mensaje de error
+        function mostrarError() {
+            document.getElementById('tabla-chile').innerHTML = 
+                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+            document.getElementById('tabla-tomate').innerHTML = 
+                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+            document.getElementById('rendimientos-chile').innerHTML = 
+                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
+            document.getElementById('rendimientos-tomate').innerHTML = 
+                '<tr><td colspan="6" class="text-center py-4 text-danger">Error al cargar los datos</td></tr>';
         }
     </script>
 </body>
