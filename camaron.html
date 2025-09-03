@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registros - Sistema Agroalpha</title>
+    <title>Parámetros y Calidad - Sistema Agroalpha</title>
     <link rel="icon" type="image/png" href="icon-192.png">
     <style>
         :root {
@@ -18,14 +18,15 @@
             --culturales-color: #5D4037;
             --riego-color: #0097A7;
             --invitado-color: #616161;
-            --personal-color: #9C27B0; /* Color específico para personal */
+            --personal-color: #9C27B0;
+            --parametros-color: #7B1FA2; /* Color para parámetros */
+            --agua-color: #0097A7; /* Color para calidad del agua */
             --light-gray: #f8f9fa;
             --white: #ffffff;
             --dark-gray: #343a40;
             --text-color: #212529;
             --border-color: #dee2e6;
             --card-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            --beneficos-color: #7B1FA2; /* Color específico para benéficos */
         }
         
         * {
@@ -178,50 +179,14 @@
         }
         
         /* Colores específicos para cada tipo de registro */
-        .card[onclick*="quimicos"] .card-icon { color: #D32F2F; }
-        .card[onclick*="asistencia"] .card-icon { color: #1976D2; }
-        .card[onclick*="actividades"] .card-icon { color: #ED6C02; }
-        .card[onclick*="cosecha"] .card-icon { color: #2E7D32; }
-        .card[onclick*="proyecciones"] .card-icon { color: #0288D1; }
-        .card[onclick*="personal"] .card-icon { color: var(--personal-color); }
-        .card[onclick*="beneficos"] .card-icon { color: var(--beneficos-color); }
+        .card[onclick*="parametros"] .card-icon { color: var(--parametros-color); }
+        .card[onclick*="calidad-agua"] .card-icon { color: var(--agua-color); }
         
         .card h3 {
             color: var(--primary-dark);
             font-size: 0.9rem;
             font-weight: 600;
             margin: 0;
-        }
-        
-        /* Icono personalizado para benéficos (crisopa/ácaro) */
-        .beneficos-icon {
-            position: relative;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .beneficos-icon::before {
-            content: "";
-            position: absolute;
-            width: 24px;
-            height: 16px;
-            background-color: var(--beneficos-color);
-            border-radius: 50% 50% 40% 40%;
-        }
-        
-        .beneficos-icon::after {
-            content: "";
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background-color: white;
-            border-radius: 50%;
-            top: 6px;
-            left: 6px;
-            box-shadow: 12px 0 0 white;
         }
         
         .footer {
@@ -249,24 +214,6 @@
             
             .card-icon {
                 font-size: 1.5rem;
-            }
-            
-            .beneficos-icon {
-                width: 35px;
-                height: 35px;
-            }
-            
-            .beneficos-icon::before {
-                width: 20px;
-                height: 14px;
-            }
-            
-            .beneficos-icon::after {
-                width: 5px;
-                height: 5px;
-                top: 5px;
-                left: 5px;
-                box-shadow: 10px 0 0 white;
             }
             
             .card h3 {
@@ -315,51 +262,19 @@
     
     <!-- Contenido principal -->
     <div class="main-content">
-        <h1 class="page-title">Registros</h1>
+        <h1 class="page-title">Parámetros y Calidad</h1>
         
         <div class="cards-container">
-            <!-- Botón de Químicos -->
-            <div class="card" onclick="navigateTo('ingresoquimicos.html')">
-                <div class="card-icon"><i class="fas fa-flask"></i></div>
-                <h3>Químicos</h3>
+            <!-- Botón de Parámetros -->
+            <div class="card" onclick="navigateTo('parametros.html')">
+                <div class="card-icon"><i class="fas fa-sliders-h"></i></div>
+                <h3>Parámetros</h3>
             </div>
             
-            <!-- Botón de Asistencia -->
-            <div class="card" onclick="navigateTo('registrarasistencia.html')">
-                <div class="card-icon"><i class="fas fa-user-check"></i></div>
-                <h3>Asistencia</h3>
-            </div>
-            
-            <!-- Botón de Actividades -->
-            <div class="card" onclick="navigateTo('registroactividades.html')">
-                <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
-                <h3>Actividades</h3>
-            </div>
-            
-            <!-- Botón de Cosecha -->
-            <div class="card" onclick="navigateTo('Registrocosecha.html')">
-                <div class="card-icon"><i class="fas fa-apple-whole"></i></div>
-                <h3>Cosecha</h3>
-            </div>
-            
-            <!-- Botón de Proyecciones -->
-            <div class="card" onclick="navigateTo('proyecciones.html')">
-                <div class="card-icon"><i class="fas fa-chart-line"></i></div>
-                <h3>Proyecciones</h3>
-            </div>
-            
-            <!-- Botón de Agregar Personal (NUEVO) -->
-            <div class="card" onclick="navigateTo('registropersonal.html')">
-                <div class="card-icon"><i class="fas fa-user-plus"></i></div>
-                <h3>Agregar Personal</h3>
-            </div>
-            
-            <!-- Botón de Benéficos -->
-            <div class="card" onclick="navigateTo('ingresodanobeneficos.html')">
-                <div class="card-icon">
-                    <div class="beneficos-icon"></div>
-                </div>
-                <h3>Benéficos</h3>
+            <!-- Botón de Calidad del Agua -->
+            <div class="card" onclick="navigateTo('calidad-agua.html')">
+                <div class="card-icon"><i class="fas fa-tint"></i></div>
+                <h3>Calidad del Agua</h3>
             </div>
         </div>
     </div>
