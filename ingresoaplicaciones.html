@@ -3,21 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Aplicación de Productos Agrícolas</title>
+    <title>Visualizador de Aplicaciones Agrícolas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #2e7d32;
             --secondary-color: #7cb342;
             --accent-color: #ffa000;
-            --light-color: #f1f8e9;
+            --light-color: #f8f9fa;
             --dark-color: #1b5e20;
-            --gray-color: #757575;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --gray-color: #6c757d;
+            --border-radius: 6px;
+            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
+            
+            /* Colores para estados */
+            --color-borde: #dee2e6;
+            --color-fondo: #ffffff;
+            --texto-activa: #e65100;
+            --texto-vencida: #c62828;
+            --texto-libre: #2e7d32;
         }
         
         * {
@@ -37,7 +45,7 @@
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -48,6 +56,7 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
+            border: 1px solid var(--color-borde);
         }
         
         header h1 {
@@ -61,134 +70,205 @@
             font-size: 1.1rem;
         }
         
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--color-fondo);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--color-borde);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        select, button {
+            padding: 10px 15px;
+            border: 1px solid var(--color-borde);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: white;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        button:hover {
+            background-color: var(--dark-color);
+        }
+        
         .card {
-            background: white;
+            background: var(--color-fondo);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             padding: 25px;
             margin-bottom: 25px;
-            transition: var(--transition);
-        }
-        
-        .card:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            border: 1px solid var(--color-borde);
         }
         
         .card-title {
             color: var(--dark-color);
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
+            border-bottom: 1px solid var(--color-borde);
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
-        }
-        
-        .form-control {
+        table {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+            border-collapse: collapse;
+            min-width: 800px;
+            background-color: var(--color-fondo);
+            border: 1px solid var(--color-borde);
             border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: var(--transition);
         }
         
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--color-borde);
         }
         
-        .form-row {
+        th {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+            border-bottom: 2px solid var(--color-borde);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .invernadero-cell {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .cultivo-cell {
+            font-weight: 600;
+            color: var(--dark-color);
+            text-align: center;
+        }
+        
+        .libre-cell {
+            color: var(--texto-libre);
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .producto-cell {
+            font-weight: 500;
+        }
+        
+        .fecha-cell {
+            color: var(--gray-color);
+            font-size: 0.9em;
+        }
+        
+        .capillas-cell {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 5px;
         }
         
-        .form-col {
-            flex: 1;
+        .capilla-pill {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            border: 1px solid var(--color-borde);
         }
         
-        .btn {
+        .estado-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
             display: inline-block;
-            padding: 12px 25px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .estado-activa {
+            background-color: #fff3e0;
+            color: var(--texto-activa);
+            border-color: #ffb74d;
+        }
+        
+        .estado-vencida {
+            background-color: #ffebee;
+            color: var(--texto-vencida);
+            border-color: #ef9a9a;
+        }
+        
+        .estado-libre {
+            background-color: #e8f5e9;
+            color: var(--texto-libre);
+            border-color: #a5d6a7;
+        }
+        
+        .actions-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
             border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 16px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             transition: var(--transition);
+            border: 1px solid var(--color-borde);
         }
         
-        .btn:hover {
-            background-color: var(--dark-color);
-            transform: translateY(-2px);
-        }
-        
-        .btn-block {
-            display: block;
-            width: 100%;
-        }
-        
-        .btn-accent {
+        .download-btn {
             background-color: var(--accent-color);
+            color: white;
+            border-color: #f57c00;
         }
         
-        .btn-accent:hover {
+        .download-btn:hover {
             background-color: #f57c00;
         }
         
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .share-btn {
+            background-color: #4285f4;
+            color: white;
+            border-color: #3367d6;
         }
         
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .capillas-section {
-                flex-direction: column;
-            }
-        }
-        
-        .result-box {
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-top: 10px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .result-box h4 {
-            color: var(--dark-color);
-            margin-bottom: 10px;
-        }
-        
-        .result-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--primary-color);
+        .share-btn:hover {
+            background-color: #3367d6;
         }
         
         .notification {
@@ -204,6 +284,7 @@
             opacity: 0;
             transition: var(--transition);
             z-index: 1000;
+            border: 1px solid var(--color-borde);
         }
         
         .notification.show {
@@ -217,253 +298,354 @@
             padding: 20px;
             color: var(--gray-color);
             font-size: 0.9rem;
-        }
-        
-        .info-text {
-            font-size: 0.9rem;
-            color: var(--gray-color);
-            margin-top: 5px;
-        }
-        
-        .readonly {
-            background-color: #f9f9f9;
-            color: #666;
-        }
-        
-        .capillas-container {
-            margin-top: 15px;
-        }
-        
-        .capillas-section {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .capillas-group {
-            flex: 1;
-            border: 1px solid #ddd;
+            background-color: var(--color-fondo);
             border-radius: var(--border-radius);
-            padding: 15px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--color-borde);
         }
         
-        .capillas-group h3 {
-            margin-bottom: 10px;
-            color: var(--dark-color);
+        .no-data {
             text-align: center;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
+            padding: 20px;
+            color: var(--gray-color);
+            font-style: italic;
         }
         
-        .capillas-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-            gap: 8px;
-            margin-top: 10px;
+        .leyenda {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-borde);
         }
         
-        .capilla-checkbox {
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .leyenda-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            border: 1px solid var(--color-borde);
+        }
+        
+        /* Estilos para móviles */
+        .mobile-view {
             display: none;
         }
         
-        .capilla-label {
-            display: block;
-            padding: 8px;
-            text-align: center;
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
+        .mobile-card {
+            background: var(--color-fondo);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--color-borde);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .mobile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--color-borde);
+        }
+        
+        .mobile-invernadero {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 15px;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .mobile-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .mobile-detail {
+            margin-bottom: 8px;
+        }
+        
+        .mobile-label {
+            font-weight: 600;
+            color: var(--gray-color);
+            font-size: 0.9em;
+        }
+        
+        .mobile-value {
+            font-size: 0.95em;
+        }
+        
+        .mobile-capillas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            select, button {
+                width: 100%;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .leyenda {
+                justify-content: flex-start;
+            }
+            
+            /* Ocultar tabla en móviles */
+            .desktop-view {
+                display: none;
+            }
+            
+            /* Mostrar vista móvil */
+            .mobile-view {
+                display: block;
+            }
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid var(--color-borde);
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Modal para instrucciones de descarga */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--color-borde);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
             border-radius: var(--border-radius);
             cursor: pointer;
-            transition: var(--transition);
-            font-size: 14px;
+            font-weight: 600;
         }
         
-        .capilla-checkbox:checked + .capilla-label {
+        .modal-primary {
             background-color: var(--primary-color);
             color: white;
-            border-color: var(--primary-color);
-        }
-        
-        .capillas-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-        
-        .capillas-actions button {
-            padding: 8px 12px;
-            font-size: 14px;
-        }
-        
-        .selected-capillas {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #e8f5e9;
-            border-radius: var(--border-radius);
-            min-height: 50px;
-        }
-        
-        .selected-capilla {
-            display: inline-block;
-            padding: 5px 10px;
-            margin: 5px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 15px;
-            font-size: 14px;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            border: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-seedling"></i> Sistema de Aplicación de Productos</h1>
-            <p>Registro de aplicaciones agrícolas con selección de capillas</p>
+            <h1><i class="fas fa-seedling"></i> Visualizador de Aplicaciones</h1>
+            <p>Monitor de aplicaciones agrícolas por invernadero</p>
         </header>
         
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-file-alt"></i> Datos de la Aplicación</h2>
-            
-            <div class="form-row">
-                <div class="form-col">
-                    <div class="form-group">
-                        <label for="applicationDate">Fecha de aplicación</label>
-                        <input type="date" id="applicationDate" class="form-control">
-                    </div>
-                </div>
-                <div class="form-col">
-                    <div class="form-group">
-                        <label for="applicationTime">Hora de aplicación</label>
-                        <input type="time" id="applicationTime" class="form-control" value="12:00">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-col">
-                    <div class="form-group">
-                        <label for="cultivo">Cultivo</label>
-                        <select id="cultivo" class="form-control">
-                            <option value="">Seleccione un cultivo</option>
-                            <option value="mini">Mini</option>
-                            <option value="tomate">Tomate</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-col">
-                    <div class="form-group">
-                        <label for="invernadero">Invernadero</label>
-                        <select id="invernadero" class="form-control" disabled>
-                            <option value="">Primero seleccione un cultivo</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="product">Producto</label>
-                <select id="product" class="form-control">
-                    <option value="">Cargando productos...</option>
+        <div class="controls">
+            <div class="filter-group">
+                <label for="cultivo-filter">Cultivo:</label>
+                <select id="cultivo-filter">
+                    <option value="todos">Todos</option>
+                    <option value="mini">Mini</option>
+                    <option value="tomate">Tomate</option>
                 </select>
             </div>
             
-            <div class="form-row">
-                <div class="form-col">
-                    <div class="form-group">
-                        <label for="maxDose">Dosis máxima (kg/ha)</label>
-                        <input type="text" id="maxDose" class="form-control readonly" readonly>
-                    </div>
-                </div>
-                <div class="form-col">
-                    <div class="form-group">
-                        <label for="daysToHarvest">Días a cosecha</label>
-                        <input type="text" id="daysToHarvest" class="form-control readonly" readonly>
-                    </div>
-                </div>
+            <div class="filter-group">
+                <label for="invernadero-filter">Invernadero:</label>
+                <select id="invernadero-filter">
+                    <option value="todos">Todos</option>
+                    <!-- Se llenará dinámicamente -->
+                </select>
             </div>
             
-            <div class="form-group">
-                <label for="area">Área (hectáreas) - Máximo 2 ha</label>
-                <input type="number" id="area" class="form-control" min="0.1" max="2" step="0.1" value="1.0">
-                <p class="info-text">Introduzca el área en hectáreas (máximo 2 ha)</p>
+            <div class="filter-group toggle-vencidas">
+                <label for="mostrar-vencidas">Mostrar vencidas:</label>
+                <label class="switch">
+                    <input type="checkbox" id="mostrar-vencidas">
+                    <span class="slider"></span>
+                </label>
             </div>
             
-            <div class="form-group">
-                <label>Capillas aplicadas</label>
-                <div class="capillas-container">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="totalChapels">Total de capillas calculadas:</label>
-                            <input type="number" id="totalChapels" class="form-control readonly" readonly>
-                        </div>
-                    </div>
-                    
-                    <div class="capillas-section">
-                        <div class="capillas-group">
-                            <h3>Capillas Norte (1-18N)</h3>
-                            <div class="capillas-grid" id="capillasNorteGrid">
-                                <!-- Las capillas norte se generarán aquí -->
-                            </div>
-                        </div>
-                        
-                        <div class="capillas-group">
-                            <h3>Capillas Sur (1-18S)</h3>
-                            <div class="capillas-grid" id="capillasSurGrid">
-                                <!-- Las capillas sur se generarán aquí -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="capillas-actions">
-                        <button id="seleccionarTodasBtn" class="btn">Seleccionar todas</button>
-                        <button id="deseleccionarTodasBtn" class="btn">Deseleccionar todas</button>
-                    </div>
-                    
-                    <div class="selected-capillas" id="selectedCapillas">
-                        <p class="info-text">No hay capillas seleccionadas</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="result-box">
-                <h4>Fecha libre de aplicación</h4>
-                <div id="freeDate" class="result-value">Se calculará automáticamente</div>
-                <p class="info-text">Fecha de aplicación + Días a cosecha (si la aplicación fue después de las 12:00, se suma 1 día adicional)</p>
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-col">
-                <button class="btn btn-block" id="save-btn">
-                    <i class="fas fa-save"></i> Guardar Aplicación
-                </button>
-            </div>
-            <div class="form-col">
-                <button class="btn btn-block btn-accent" id="calculate-btn">
-                    <i class="fas fa-calculator"></i> Calcular
-                </button>
-            </div>
+            <button id="actualizar-btn">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
         </div>
         
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-history"></i> Aplicaciones Registradas</h2>
-            <div id="applications-list">
-                <p>Cargando aplicaciones previas...</p>
+            <h2 class="card-title"><i class="fas fa-table"></i> Aplicaciones por Invernadero</h2>
+            
+            <!-- Vista para escritorio -->
+            <div id="tabla-container" class="desktop-view">
+                <table id="tabla-aplicaciones">
+                    <thead>
+                        <tr>
+                            <th>Cultivo</th>
+                            <th>Invernadero</th>
+                            <th>Área (ha)</th>
+                            <th>Capillas aplicadas</th>
+                            <th>Producto</th>
+                            <th>Fecha aplicación</th>
+                            <th>Fecha libre</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aplicaciones-body">
+                        <!-- Los datos se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Vista para móviles -->
+            <div id="mobile-container" class="mobile-view">
+                <!-- Los datos móviles se cargarán aquí -->
+            </div>
+            
+            <div class="leyenda">
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background-color: #e8f5e9;"></div>
+                    <span>Libre</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background-color: #fff3e0;"></div>
+                    <span>Activa</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color" style="background-color: #ffebee;"></div>
+                    <span>Vencida</span>
+                </div>
+            </div>
+            
+            <div class="actions-container">
+                <button id="descargar-btn" class="action-btn download-btn">
+                    <i class="fas fa-download"></i> Descargar como Imagen
+                </button>
+                <button id="compartir-btn" class="action-btn share-btn">
+                    <i class="fas fa-share-alt"></i> Compartir
+                </button>
             </div>
         </div>
         
@@ -473,7 +655,29 @@
     </div>
     
     <div class="notification" id="notification">
-        ¡Cálculos realizados correctamente!
+        ¡Datos actualizados correctamente!
+    </div>
+
+    <!-- Modal para instrucciones de descarga -->
+    <div class="modal" id="download-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Instrucciones para guardar</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Para guardar la imagen en tu dispositivo:</p>
+                <ol>
+                    <li>Mantén presionada la imagen que se abrirá</li>
+                    <li>Selecciona la opción "Guardar imagen" o "Descargar"</li>
+                    <li>Si usas iOS, es posible que necesites usar la función de captura de pantalla</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="confirm-download">Continuar</button>
+                <button class="modal-btn close-modal">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -487,7 +691,6 @@
         const database = firebase.database();
         
         // Referencias a la base de datos
-        const productsRef = database.ref('productos');
         const applicationsRef = database.ref('aplicaciones');
         
         // Definir invernaderos por cultivo
@@ -496,389 +699,375 @@
             tomate: ["13", "14", "15", "16"]
         };
         
-        // Variables globales
-        let capillasSeleccionadas = [];
-        
         document.addEventListener('DOMContentLoaded', function() {
-            // Establecer fecha actual por defecto
-            const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
-            document.getElementById('applicationDate').value = formattedDate;
+            // Cargar filtro de invernaderos
+            cargarFiltroInvernaderos();
             
-            // Configurar evento para cambio de cultivo
-            document.getElementById('cultivo').addEventListener('change', function() {
-                const cultivo = this.value;
-                const invernaderoSelect = document.getElementById('invernadero');
-                
-                // Habilitar y cargar invernaderos según el cultivo seleccionado
-                if (cultivo) {
-                    invernaderoSelect.disabled = false;
-                    invernaderoSelect.innerHTML = '<option value="">Seleccione un invernadero</option>';
-                    
-                    invernaderos[cultivo].forEach(inv => {
-                        const option = document.createElement('option');
-                        option.value = inv;
-                        option.textContent = `Invernadero ${inv}`;
-                        invernaderoSelect.appendChild(option);
-                    });
-                } else {
-                    invernaderoSelect.disabled = true;
-                    invernaderoSelect.innerHTML = '<option value="">Primero seleccione un cultivo</option>';
-                }
-            });
-            
-            // Calcular capillas cuando cambia el área
-            const areaInput = document.getElementById('area');
-            areaInput.addEventListener('input', calcularCapillas);
-            
-            // Configurar botones de capillas
-            document.getElementById('seleccionarTodasBtn').addEventListener('click', seleccionarTodasCapillas);
-            document.getElementById('deseleccionarTodasBtn').addEventListener('click', deseleccionarTodasCapillas);
-            
-            // Cargar productos desde Firebase
-            cargarProductos();
-            
-            // Cuando se selecciona un producto, cargar sus datos
-            document.getElementById('product').addEventListener('change', function() {
-                const productId = this.value;
-                const cultivo = document.getElementById('cultivo').value;
-                
-                if (productId && cultivo) {
-                    cargarDatosProducto(productId, cultivo);
-                } else if (productId) {
-                    mostrarNotificacion('Primero seleccione un cultivo', 'error');
-                } else {
-                    document.getElementById('maxDose').value = '';
-                    document.getElementById('daysToHarvest').value = '';
-                }
-            });
-            
-            // Botón de calcular
-            const calculateBtn = document.getElementById('calculate-btn');
-            calculateBtn.addEventListener('click', calcularTodo);
-            
-            // Botón de guardar
-            const saveBtn = document.getElementById('save-btn');
-            saveBtn.addEventListener('click', guardarAplicacion);
-            
-            // Cargar aplicaciones previas
+            // Cargar aplicaciones
             cargarAplicaciones();
             
-            // Calcular valores iniciales
-            calcularCapillas();
-            generarInterfazCapillas();
+            // Configurar eventos
+            document.getElementById('cultivo-filter').addEventListener('change', function() {
+                cargarFiltroInvernaderos();
+                cargarAplicaciones();
+            });
             
-            // Función para calcular el número de capillas
-            function calcularCapillas() {
-                const area = parseFloat(areaInput.value) || 0;
-                // Fórmula: 1.94 ha = 36 capillas
-                const chapels = Math.round((area / 1.94) * 36);
-                document.getElementById('totalChapels').value = chapels;
-            }
+            document.getElementById('invernadero-filter').addEventListener('change', cargarAplicaciones);
+            document.getElementById('mostrar-vencidas').addEventListener('change', cargarAplicaciones);
+            document.getElementById('actualizar-btn').addEventListener('click', cargarAplicaciones);
+            document.getElementById('descargar-btn').addEventListener('click', iniciarDescarga);
+            document.getElementById('compartir-btn').addEventListener('click', compartirAplicaciones);
             
-            // Función para generar la interfaz de selección de capillas
-            function generarInterfazCapillas() {
-                const capillasNorteGrid = document.getElementById('capillasNorteGrid');
-                const capillasSurGrid = document.getElementById('capillasSurGrid');
+            // Configurar eventos del modal
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('download-modal').style.display = 'none';
+                });
+            });
+            
+            document.getElementById('confirm-download').addEventListener('click', descargarComoImagen);
+            
+            // Función para cargar el filtro de invernaderos según el cultivo seleccionado
+            function cargarFiltroInvernaderos() {
+                const cultivo = document.getElementById('cultivo-filter').value;
+                const invernaderoFilter = document.getElementById('invernadero-filter');
                 
-                capillasNorteGrid.innerHTML = '';
-                capillasSurGrid.innerHTML = '';
+                // Limpiar opciones actuales
+                invernaderoFilter.innerHTML = '<option value="todos">Todos</option>';
                 
-                // Generar capillas Norte (1-18N) - TODAS DISPONIBLES
-                for (let i = 1; i <= 18; i++) {
-                    const capillaId = `${i}N`;
-                    const div = document.createElement('div');
-                    
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = `capilla-${capillaId}`;
-                    checkbox.className = 'capilla-checkbox';
-                    checkbox.value = capillaId;
-                    checkbox.checked = capillasSeleccionadas.includes(capillaId);
-                    checkbox.addEventListener('change', function() {
-                        actualizarCapillasSeleccionadas();
+                // Agregar invernaderos según el cultivo
+                if (cultivo === 'todos') {
+                    // Agregar todos los invernaderos de ambos cultivos
+                    invernaderos.mini.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `mini-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
                     });
                     
-                    const label = document.createElement('label');
-                    label.htmlFor = `capilla-${capillaId}`;
-                    label.className = 'capilla-label';
-                    label.textContent = `${i}N`;
-                    
-                    div.appendChild(checkbox);
-                    div.appendChild(label);
-                    capillasNorteGrid.appendChild(div);
-                }
-                
-                // Generar capillas Sur (1-18S) - TODAS DISPONIBLES
-                for (let i = 1; i <= 18; i++) {
-                    const capillaId = `${i}S`;
-                    const div = document.createElement('div');
-                    
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = `capilla-${capillaId}`;
-                    checkbox.className = 'capilla-checkbox';
-                    checkbox.value = capillaId;
-                    checkbox.checked = capillasSeleccionadas.includes(capillaId);
-                    checkbox.addEventListener('change', function() {
-                        actualizarCapillasSeleccionadas();
+                    invernaderos.tomate.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `tomate-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
                     });
-                    
-                    const label = document.createElement('label');
-                    label.htmlFor = `capilla-${capillaId}`;
-                    label.className = 'capilla-label';
-                    label.textContent = `${i}S`;
-                    
-                    div.appendChild(checkbox);
-                    div.appendChild(label);
-                    capillasSurGrid.appendChild(div);
+                } else if (cultivo === 'mini') {
+                    invernaderos.mini.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `mini-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
+                    });
+                } else if (cultivo === 'tomate') {
+                    invernaderos.tomate.forEach(inv => {
+                        const option = document.createElement('option');
+                        option.value = `tomate-${inv}`;
+                        option.textContent = `Inv ${inv}`;
+                        invernaderoFilter.appendChild(option);
+                    });
                 }
-                
-                actualizarCapillasSeleccionadas();
             }
             
-            // Función para actualizar la lista de capillas seleccionadas
-            function actualizarCapillasSeleccionadas() {
-                capillasSeleccionadas = [];
-                
-                // Obtener capillas norte seleccionadas
-                for (let i = 1; i <= 18; i++) {
-                    const checkbox = document.getElementById(`capilla-${i}N`);
-                    if (checkbox && checkbox.checked) {
-                        capillasSeleccionadas.push(checkbox.value);
-                    }
-                }
-                
-                // Obtener capillas sur seleccionadas
-                for (let i = 1; i <= 18; i++) {
-                    const checkbox = document.getElementById(`capilla-${i}S`);
-                    if (checkbox && checkbox.checked) {
-                        capillasSeleccionadas.push(checkbox.value);
-                    }
-                }
-                
-                // Actualizar la visualización
-                const selectedCapillasDiv = document.getElementById('selectedCapillas');
-                
-                if (capillasSeleccionadas.length === 0) {
-                    selectedCapillasDiv.innerHTML = '<p class="info-text">No hay capillas seleccionadas</p>';
-                    return;
-                }
-                
-                selectedCapillasDiv.innerHTML = '<p>Capillas seleccionadas:</p>';
-                
-                // Mostrar las capillas seleccionadas
-                capillasSeleccionadas.forEach(capilla => {
-                    const span = document.createElement('span');
-                    span.className = 'selected-capilla';
-                    span.textContent = capilla;
-                    selectedCapillasDiv.appendChild(span);
-                });
-            }
-            
-            // Función para seleccionar todas las capillas
-            function seleccionarTodasCapillas() {
-                // Seleccionar todas las capillas norte
-                for (let i = 1; i <= 18; i++) {
-                    const checkbox = document.getElementById(`capilla-${i}N`);
-                    if (checkbox) checkbox.checked = true;
-                }
-                
-                // Seleccionar todas las capillas sur
-                for (let i = 1; i <= 18; i++) {
-                    const checkbox = document.getElementById(`capilla-${i}S`);
-                    if (checkbox) checkbox.checked = true;
-                }
-                
-                actualizarCapillasSeleccionadas();
-            }
-            
-            // Función para deseleccionar todas las capillas
-            function deseleccionarTodasCapillas() {
-                // Deseleccionar todas las capillas norte
-                for (let i = 1; i <= 18; i++) {
-                    const checkbox = document.getElementById(`capilla-${i}N`);
-                    if (checkbox) checkbox.checked = false;
-                }
-                
-                // Deseleccionar todas las capillas sur
-                for (let i = 1; i <= 18; i++) {
-                    const checkbox = document.getElementById(`capilla-${i}S`);
-                    if (checkbox) checkbox.checked = false;
-                }
-                
-                actualizarCapillasSeleccionadas();
-            }
-            
-            // Función para calcular todos los valores
-            function calcularTodo() {
-                // Calcular capillas
-                calcularCapillas();
-                
-                // Calcular fecha libre
-                const appDate = new Date(document.getElementById('applicationDate').value);
-                const appTime = document.getElementById('applicationTime').value;
-                const daysToHarvest = parseInt(document.getElementById('daysToHarvest').value) || 0;
-                
-                if (isNaN(appDate.getTime()) || daysToHarvest <= 0) {
-                    mostrarNotificacion('Por favor, complete todos los campos correctamente', 'error');
-                    return;
-                }
-                
-                // Sumar días a cosecha
-                const freeDate = new Date(appDate);
-                freeDate.setDate(freeDate.getDate() + daysToHarvest);
-                
-                // Verificar si la aplicación fue después de las 12:00
-                const hour = parseInt(appTime.split(':')[0]);
-                if (hour >= 12) {
-                    freeDate.setDate(freeDate.getDate() + 1);
-                }
-                
-                // Formatear fecha
-                const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-                document.getElementById('freeDate').textContent = freeDate.toLocaleDateString('es-ES', options);
-                
-                mostrarNotificacion('Cálculos realizados correctamente');
-            }
-            
-            // Función para cargar productos desde Firebase
-            function cargarProductos() {
-                productsRef.once('value')
-                .then((snapshot) => {
-                    const products = snapshot.val();
-                    const productSelect = document.getElementById('product');
-                    
-                    // Limpiar select
-                    productSelect.innerHTML = '<option value="">Seleccione un producto</option>';
-                    
-                    // Llenar con productos de la base de datos
-                    if (products) {
-                        Object.keys(products).forEach(key => {
-                            const product = products[key];
-                            const option = document.createElement('option');
-                            option.value = key;
-                            option.textContent = product.nombre || `Producto ${key}`;
-                            productSelect.appendChild(option);
-                        });
-                    } else {
-                        productSelect.innerHTML = '<option value="">No hay productos disponibles</option>';
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error loading products:", error);
-                    document.getElementById('product').innerHTML = '<option value="">Error al cargar productos</option>';
-                });
-            }
-            
-            // Función para cargar datos de un producto específico según el cultivo
-            function cargarDatosProducto(productId, cultivo) {
-                productsRef.child(productId).once('value')
-                .then((snapshot) => {
-                    const product = snapshot.val();
-                    if (product) {
-                        // Obtener datos según el cultivo seleccionado
-                        const diasKey = cultivo === 'mini' ? 'dias_mini' : 'dias_tomate';
-                        const dosisKey = cultivo === 'mini' ? 'dosis_maxima_mini' : 'dosis_maxima_tomate';
-                        
-                        document.getElementById('maxDose').value = product[dosisKey] || 'N/A';
-                        document.getElementById('daysToHarvest').value = product[diasKey] || 'N/A';
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error loading product data:", error);
-                    mostrarNotificacion('Error al cargar datos del producto', 'error');
-                });
-            }
-            
-            // Función para guardar aplicación en Firebase
-            function guardarAplicacion() {
-                const cultivo = document.getElementById('cultivo').value;
-                const invernadero = document.getElementById('invernadero').value;
-                const productId = document.getElementById('product').value;
-                const applicationDate = document.getElementById('applicationDate').value;
-                const applicationTime = document.getElementById('applicationTime').value;
-                const area = document.getElementById('area').value;
-                const totalChapels = document.getElementById('totalChapels').value;
-                const freeDate = document.getElementById('freeDate').textContent;
-                
-                if (!cultivo || !invernadero || !productId || !applicationDate || capillasSeleccionadas.length === 0) {
-                    mostrarNotificacion('Por favor, complete todos los campos obligatorios y seleccione al menos una capilla', 'error');
-                    return;
-                }
-                
-                // Obtener nombre del producto
-                const productName = document.getElementById('product').options[document.getElementById('product').selectedIndex].text;
-                
-                // Crear objeto de aplicación
-                const application = {
-                    cultivo: cultivo,
-                    invernadero: invernadero,
-                    producto: productName,
-                    productoId: productId,
-                    fechaAplicacion: applicationDate,
-                    horaAplicacion: applicationTime,
-                    area: area,
-                    totalCapillas: totalChapels,
-                    capillasAplicadas: capillasSeleccionadas.join(','),
-                    capillasAplicadasArray: capillasSeleccionadas,
-                    fechaLibre: freeDate,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // Guardar en Firebase
-                applicationsRef.push(application)
-                .then(() => {
-                    mostrarNotificacion('Aplicación guardada correctamente');
-                    // Recargar la lista de aplicaciones
-                    cargarAplicaciones();
-                })
-                .catch((error) => {
-                    console.error("Error saving application:", error);
-                    mostrarNotificacion('Error al guardar la aplicación', 'error');
-                });
-            }
-            
-            // Función para cargar aplicaciones previas desde Firebase
+            // Función para cargar las aplicaciones
             function cargarAplicaciones() {
-                applicationsRef.orderByChild('timestamp').limitToLast(5).once('value')
+                applicationsRef.orderByChild('timestamp').once('value')
                 .then((snapshot) => {
-                    const applications = snapshot.val();
-                    const applicationsList = document.getElementById('applications-list');
+                    const aplicaciones = snapshot.val();
+                    const aplicacionesBody = document.getElementById('aplicaciones-body');
+                    const mobileContainer = document.getElementById('mobile-container');
+                    const mostrarVencidas = document.getElementById('mostrar-vencidas').checked;
+                    const cultivoFiltro = document.getElementById('cultivo-filter').value;
+                    const invernaderoFiltro = document.getElementById('invernadero-filter').value;
                     
-                    if (applications) {
-                        let html = '';
-                        Object.keys(applications).reverse().forEach(key => {
-                            const app = applications[key];
-                            html += `
-                                <div class="result-box" style="margin-bottom: 15px;">
-                                    <h4>${app.producto} - ${app.fechaAplicacion}</h4>
-                                    <p><strong>Cultivo:</strong> ${app.cultivo === 'mini' ? 'Mini' : 'Tomate'}</p>
-                                    <p><strong>Invernadero:</strong> ${app.invernadero}</p>
-                                    <p><strong>Área:</strong> ${app.area} ha</p>
-                                    <p><strong>Capillas aplicadas:</strong> ${app.capillasAplicadas}</p>
-                                    <p><strong>Fecha libre:</strong> ${app.fechaLibre}</p>
+                    // Limpiar contenedores
+                    aplicacionesBody.innerHTML = '';
+                    mobileContainer.innerHTML = '';
+                    
+                    if (!aplicaciones) {
+                        aplicacionesBody.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones registradas</td></tr>';
+                        mobileContainer.innerHTML = '<div class="no-data">No hay aplicaciones registradas</div>';
+                        return;
+                    }
+                    
+                    // Obtener aplicaciones activas
+                    const aplicacionesActivas = {};
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    
+                    Object.keys(aplicaciones).forEach(key => {
+                        const app = aplicaciones[key];
+                        
+                        // Verificar si la aplicación está vencida
+                        const fechaLibre = new Date(app.fechaLibre.split('/').reverse().join('-'));
+                        const estaVencida = fechaLibre < hoy;
+                        
+                        // Si no mostrar vencidas, saltar las vencidas
+                        if (!mostrarVencidas && estaVencida) {
+                            return;
+                        }
+                        
+                        // Aplicar filtros
+                        if (cultivoFiltro !== 'todos' && app.cultivo !== cultivoFiltro) {
+                            return;
+                        }
+                        
+                        const appInvernaderoId = `${app.cultivo}-${app.invernadero}`;
+                        if (invernaderoFiltro !== 'todos' && appInvernaderoId !== invernaderoFiltro) {
+                            return;
+                        }
+                        
+                        // Agrupar aplicaciones por invernadero
+                        const invernaderoKey = `${app.cultivo}-${app.invernadero}`;
+                        if (!aplicacionesActivas[invernaderoKey]) {
+                            aplicacionesActivas[invernaderoKey] = [];
+                        }
+                        aplicacionesActivas[invernaderoKey].push({...app, estaVencida});
+                    });
+                    
+                    // Determinar qué invernaderos mostrar según los filtros
+                    let invernaderosAMostrar = [];
+                    
+                    if (cultivoFiltro === 'todos') {
+                        // Mostrar todos los invernaderos de ambos cultivos
+                        invernaderos.mini.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'mini', invernadero: inv});
+                        });
+                        invernaderos.tomate.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'tomate', invernadero: inv});
+                        });
+                    } else if (cultivoFiltro === 'mini') {
+                        invernaderos.mini.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'mini', invernadero: inv});
+                        });
+                    } else if (cultivoFiltro === 'tomate') {
+                        invernaderos.tomate.forEach(inv => {
+                            invernaderosAMostrar.push({cultivo: 'tomate', invernadero: inv});
+                        });
+                    }
+                    
+                    // Aplicar filtro de invernadero específico
+                    if (invernaderoFiltro !== 'todos') {
+                        const [cultivoF, invernaderoF] = invernaderoFiltro.split('-');
+                        invernaderosAMostrar = invernaderosAMostrar.filter(inv => 
+                            inv.cultivo === cultivoF && inv.invernadero === invernaderoF
+                        );
+                    }
+                    
+                    // Ordenar: primero mini, luego tomate
+                    invernaderosAMostrar.sort((a, b) => {
+                        if (a.cultivo === b.cultivo) {
+                            return parseInt(a.invernadero) - parseInt(b.invernadero);
+                        }
+                        return a.cultivo === 'mini' ? -1 : 1;
+                    });
+                    
+                    // Generar filas de la tabla para escritorio
+                    invernaderosAMostrar.forEach(inv => {
+                        const invernaderoKey = `${inv.cultivo}-${inv.invernadero}`;
+                        const aplicacionesInvernadero = aplicacionesActivas[invernaderoKey] || [];
+                        const rowspan = aplicacionesInvernadero.length > 0 ? aplicacionesInvernadero.length : 1;
+                        
+                        if (aplicacionesInvernadero.length === 0) {
+                            // Invernadero libre - SOLO "Libre" en la columna de Área
+                            const fila = document.createElement('tr');
+                            fila.innerHTML = `
+                                <td class="cultivo-cell" rowspan="${rowspan}">${inv.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
+                                <td class="invernadero-cell" rowspan="${rowspan}">${inv.invernadero}</td>
+                                <td class="libre-cell">Libre</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><span class="estado-badge estado-libre">Libre</span></td>
+                            `;
+                            aplicacionesBody.appendChild(fila);
+                            
+                            // Vista móvil para invernadero libre
+                            const mobileCard = document.createElement('div');
+                            mobileCard.className = 'mobile-card';
+                            mobileCard.innerHTML = `
+                                <div class="mobile-header">
+                                    <span class="mobile-cultivo">${inv.cultivo === 'mini' ? 'Mini' : 'Tomate'}</span>
+                                    <span class="mobile-invernadero">Inv ${inv.invernadero}</span>
+                                </div>
+                                <div class="mobile-details">
+                                    <div class="mobile-detail">
+                                        <div class="mobile-label">Área</div>
+                                        <div class="mobile-value libre-cell">Libre</div>
+                                    </div>
+                                    <div class="mobile-detail">
+                                        <div class="mobile-label">Estado</div>
+                                        <div class="mobile-value"><span class="estado-badge estado-libre">Libre</span></div>
+                                    </div>
                                 </div>
                             `;
-                        });
-                        applicationsList.innerHTML = html;
-                    } else {
-                        applicationsList.innerHTML = '<p>No hay aplicaciones registradas</p>';
+                            mobileContainer.appendChild(mobileCard);
+                        } else {
+                            // Invernadero con aplicaciones
+                            aplicacionesInvernadero.forEach((aplicacion, index) => {
+                                // Formatear capillas aplicadas
+                                let capillasHTML = '';
+                                if (aplicacion.capillasAplicadasArray && aplicacion.capillasAplicadasArray.length > 0) {
+                                    aplicacion.capillasAplicadasArray.forEach(capilla => {
+                                        capillasHTML += `<span class="capilla-pill">${capilla}</span>`;
+                                    });
+                                } else if (aplicacion.capillasAplicadas) {
+                                    aplicacion.capillasAplicadas.split(',').forEach(capilla => {
+                                        capillasHTML += `<span class="capilla-pill">${capilla}</span>`;
+                                    });
+                                }
+                                
+                                // Determinar clase según estado
+                                const estadoTexto = aplicacion.estaVencida ? 'Vencida' : 'Activa';
+                                const estadoBadgeClase = aplicacion.estaVencida ? 'estado-vencida' : 'estado-activa';
+                                
+                                const fila = document.createElement('tr');
+                                if (index === 0) {
+                                    // Primera fila con rowspan
+                                    fila.innerHTML = `
+                                        <td class="cultivo-cell" rowspan="${rowspan}">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
+                                        <td class="invernadero-cell" rowspan="${rowspan}">${aplicacion.invernadero}</td>
+                                        <td>${aplicacion.area} ha</td>
+                                        <td class="capillas-cell">${capillasHTML}</td>
+                                        <td class="producto-cell">${aplicacion.producto}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaLibre}</td>
+                                        <td><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></td>
+                                    `;
+                                } else {
+                                    // Filas siguientes
+                                    fila.innerHTML = `
+                                        <td>${aplicacion.area} ha</td>
+                                        <td class="capillas-cell">${capillasHTML}</td>
+                                        <td class="producto-cell">${aplicacion.producto}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaLibre}</td>
+                                        <td><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></td>
+                                    `;
+                                }
+                                aplicacionesBody.appendChild(fila);
+                                
+                                // Vista móvil para aplicación
+                                const mobileCard = document.createElement('div');
+                                mobileCard.className = 'mobile-card';
+                                mobileCard.innerHTML = `
+                                    <div class="mobile-header">
+                                        <span class="mobile-cultivo">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</span>
+                                        <span class="mobile-invernadero">Inv ${aplicacion.invernadero}</span>
+                                    </div>
+                                    <div class="mobile-details">
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Área</div>
+                                            <div class="mobile-value">${aplicacion.area} ha</div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Estado</div>
+                                            <div class="mobile-value"><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Producto</div>
+                                            <div class="mobile-value">${aplicacion.producto}</div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Fecha aplicación</div>
+                                            <div class="mobile-value">${aplicacion.fechaAplicacion}</div>
+                                        </div>
+                                        <div class="mobile-detail">
+                                            <div class="mobile-label">Fecha libre</div>
+                                            <div class="mobile-value">${aplicacion.fechaLibre}</div>
+                                        </div>
+                                        <div class="mobile-detail" style="grid-column: 1 / -1;">
+                                            <div class="mobile-label">Capillas aplicadas</div>
+                                            <div class="mobile-capillas">${capillasHTML}</div>
+                                        </div>
+                                    </div>
+                                `;
+                                mobileContainer.appendChild(mobileCard);
+                            });
+                        }
+                    });
+                    
+                    if (aplicacionesBody.innerHTML === '' && mobileContainer.innerHTML === '') {
+                        aplicacionesBody.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones que coincidan con los filtros</td></tr>';
+                        mobileContainer.innerHTML = '<div class="no-data">No hay aplicaciones que coincidan con los filtros</div>';
                     }
                 })
                 .catch((error) => {
                     console.error("Error loading applications:", error);
-                    document.getElementById('applications-list').innerHTML = '<p>Error al cargar aplicaciones</p>';
+                    document.getElementById('aplicaciones-body').innerHTML = '<tr><td colspan="8" class="no-data">Error al cargar aplicaciones</td></tr>';
+                    document.getElementById('mobile-container').innerHTML = '<div class="no-data">Error al cargar aplicaciones</div>';
                 });
             }
             
+            // Función para iniciar el proceso de descarga
+            function iniciarDescarga() {
+                // En dispositivos móviles, mostrar instrucciones
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    document.getElementById('download-modal').style.display = 'flex';
+                } else {
+                    // En escritorio, descargar directamente
+                    descargarComoImagen();
+                }
+            }
+            
+            // Función para descargar como imagen
+            function descargarComoImagen() {
+                // Ocultar el modal si está visible
+                document.getElementById('download-modal').style.display = 'none';
+                
+                // Determinar qué vista capturar (escritorio o móvil)
+                const elemento = document.getElementById('tabla-container').offsetWidth > 0 ? 
+                    document.getElementById('tabla-container') : 
+                    document.getElementById('mobile-container');
+                
+                html2canvas(elemento).then(canvas => {
+                    try {
+                        // Intentar el método estándar
+                        const enlace = document.createElement('a');
+                        enlace.download = 'aplicaciones_agricolas.png';
+                        enlace.href = canvas.toDataURL('image/png');
+                        document.body.appendChild(enlace);
+                        enlace.click();
+                        document.body.removeChild(enlace);
+                    } catch (error) {
+                        // Si falla, mostrar la imagen para que el usuario la guarde manualmente
+                        const img = canvas.toDataURL('image/png');
+                        const ventana = window.open();
+                        ventana.document.write('<img src="' + img + '" />');
+                        showNotification('La imagen se ha abierto en una nueva ventana. Guárdala manualmente.', 'info');
+                    }
+                }).catch(error => {
+                    console.error('Error al generar la imagen:', error);
+                    showNotification('Error al generar la imagen. Intenta nuevamente.', 'error');
+                });
+            }
+            
+            // Función para compartir
+            function compartirAplicaciones() {
+                if (navigator.share) {
+                    // Usar la Web Share API si está disponible
+                    navigator.share({
+                        title: 'Aplicaciones Agrícolas',
+                        text: 'Información de aplicaciones agrícolas',
+                        url: window.location.href
+                    })
+                    .then(() => console.log('Contenido compartido exitosamente'))
+                    .catch((error) => console.log('Error al compartir:', error));
+                } else {
+                    // Alternativa para navegadores que no soportan la Web Share API
+                    alert('Para compartir, use la función de captura de pantalla de su dispositivo o la opción de descargar como imagen.');
+                }
+            }
+            
             // Función para mostrar notificaciones
-            function mostrarNotificacion(message, type = 'success') {
+            function showNotification(message, type = 'success') {
                 const notification = document.getElementById('notification');
                 notification.textContent = message;
                 
                 if (type === 'error') {
                     notification.style.backgroundColor = '#e53935';
+                } else if (type === 'info') {
+                    notification.style.backgroundColor = '#2196f3';
                 } else {
                     notification.style.backgroundColor = 'var(--primary-color)';
                 }
