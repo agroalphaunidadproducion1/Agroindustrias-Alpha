@@ -17,6 +17,7 @@
             --light-bg: #e8f5e9;
             --header-color: #1b5e20;
             --table-header: #2e7d32;
+            --completed-color: #4caf50;
         }
         
         body {
@@ -103,6 +104,21 @@
             margin-bottom: 20px;
         }
         
+        .completed {
+            background-color: rgba(76, 175, 80, 0.2) !important;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .completed::after {
+            content: "✓";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+            color: var(--completed-color);
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -119,6 +135,10 @@
             .info-hover .tooltip-info {
                 white-space: normal;
                 width: 150px;
+            }
+            
+            .completed::after {
+                font-size: 8px;
             }
         }
     </style>
@@ -357,13 +377,18 @@
                     if (datosActividad.length > 0) {
                         // Calcular total de camas para esta actividad
                         const totalCamas = datosActividad.reduce((sum, item) => sum + (item.camas || 0), 0);
+                        const metaCamas = metasCamas[invernadero] || 0;
                         
                         if (actividad === 'Cosecha') {
                             // Para cosecha, mostrar el total de camas de la última cosecha
                             const ultimaCosecha = datosActividad[datosActividad.length - 1];
                             celda.textContent = ultimaCosecha.camas || 0;
+                            
+                            // Verificar si se completó una vuelta (múltiplo de la meta)
+                            if (ultimaCosecha.camas >= metaCamas) {
+                                celda.classList.add('completed');
+                            }
                         } else {
-                            const metaCamas = metasCamas[invernadero] || 0;
                             const vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
                             const camasVueltaActual = totalCamas % metaCamas;
                             
@@ -378,6 +403,11 @@
                                     </div>
                                 </div>
                             `;
+                            
+                            // Verificar si se completó una vuelta (múltiplo de la meta)
+                            if (camasVueltaActual === 0 && totalCamas > 0) {
+                                celda.classList.add('completed');
+                            }
                         }
                     } else {
                         celda.innerHTML = '<span class="text-muted">-</span>';
