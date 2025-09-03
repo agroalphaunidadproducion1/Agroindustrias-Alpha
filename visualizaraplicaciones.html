@@ -163,7 +163,6 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
             background-color: var(--color-fondo);
             border: 1px solid var(--color-borde);
             border-radius: var(--border-radius);
@@ -178,8 +177,6 @@
         th {
             background-color: #e9ecef;
             color: var(--dark-color);
-            position: sticky;
-            top: 0;
             font-weight: 600;
             border-bottom: 2px solid var(--color-borde);
         }
@@ -329,60 +326,10 @@
         }
         
         /* Estilos para móviles */
-        .mobile-view {
+        .mobile-table-container {
             display: none;
-        }
-        
-        .mobile-card {
-            background: var(--color-fondo);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid var(--color-borde);
-            box-shadow: var(--box-shadow);
-        }
-        
-        .mobile-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--color-borde);
-        }
-        
-        .mobile-invernadero {
-            background-color: #e9ecef;
-            color: var(--dark-color);
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 15px;
-            border: 1px solid var(--color-borde);
-        }
-        
-        .mobile-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .mobile-detail {
-            margin-bottom: 8px;
-        }
-        
-        .mobile-label {
-            font-weight: 600;
-            color: var(--gray-color);
-            font-size: 0.9em;
-        }
-        
-        .mobile-value {
-            font-size: 0.95em;
-        }
-        
-        .mobile-capillas {
-            margin-top: 5px;
-            font-size: 0.9em;
+            width: 100%;
+            overflow-x: auto;
         }
         
         @media (max-width: 768px) {
@@ -425,14 +372,24 @@
                 justify-content: flex-start;
             }
             
-            /* Ocultar tabla en móviles */
+            /* Ocultar tabla de escritorio en móviles */
             .desktop-view {
                 display: none;
             }
             
-            /* Mostrar vista móvil */
-            .mobile-view {
+            /* Mostrar tabla móvil */
+            .mobile-table-container {
                 display: block;
+            }
+            
+            /* Ajustar tabla para móviles */
+            table {
+                min-width: 700px; /* Ancho mínimo para que se vea bien en móviles */
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 14px;
             }
         }
         
@@ -630,9 +587,25 @@
                 </table>
             </div>
             
-            <!-- Vista para móviles -->
-            <div id="mobile-container" class="mobile-view">
-                <!-- Los datos móviles se cargarán aquí -->
+            <!-- Vista para móviles (tabla) -->
+            <div class="mobile-table-container">
+                <table id="tabla-aplicaciones-mobile">
+                    <thead>
+                        <tr>
+                            <th>Cultivo</th>
+                            <th>Invernadero</th>
+                            <th>Área (ha)</th>
+                            <th>Capillas</th>
+                            <th>Producto</th>
+                            <th>Fecha app</th>
+                            <th>Fecha libre</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aplicaciones-body-mobile">
+                        <!-- Los datos se cargarán aquí -->
+                    </tbody>
+                </table>
             </div>
             
             <div class="actions-container">
@@ -665,7 +638,7 @@
                 <p>Para guardar la imagen en tu dispositivo:</p>
                 <ol>
                     <li>Mantén presionada la imagen que se abrirá</li>
-                    <li>Selecciona la opción "Guardar imagen" o "Descargar"</li>
+                    <li>Selecciona la opción "Guardar imagen" or "Descargar"</li>
                     <li>Si usas iOS, es posible que necesites usar la función de captura de pantalla</li>
                 </ol>
             </div>
@@ -770,18 +743,18 @@
                 .then((snapshot) => {
                     const aplicaciones = snapshot.val();
                     const aplicacionesBody = document.getElementById('aplicaciones-body');
-                    const mobileContainer = document.getElementById('mobile-container');
+                    const aplicacionesBodyMobile = document.getElementById('aplicaciones-body-mobile');
                     const mostrarVencidas = document.getElementById('mostrar-vencidas').checked;
                     const cultivoFiltro = document.getElementById('cultivo-filter').value;
                     const invernaderoFiltro = document.getElementById('invernadero-filter').value;
                     
                     // Limpiar contenedores
                     aplicacionesBody.innerHTML = '';
-                    mobileContainer.innerHTML = '';
+                    aplicacionesBodyMobile.innerHTML = '';
                     
                     if (!aplicaciones) {
                         aplicacionesBody.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones registradas</td></tr>';
-                        mobileContainer.innerHTML = '<div class="no-data">No hay aplicaciones registradas</div>';
+                        aplicacionesBodyMobile.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones registradas</td></tr>';
                         return;
                     }
                     
@@ -857,7 +830,7 @@
                         return a.cultivo === 'mini' ? -1 : 1;
                     });
                     
-                    // Generar filas de la tabla para escritorio
+                    // Generar filas de la tabla para escritorio y móvil
                     invernaderosAMostrar.forEach(inv => {
                         const invernaderoKey = `${inv.cultivo}-${inv.invernadero}`;
                         const aplicacionesInvernadero = aplicacionesActivas[invernaderoKey] || [];
@@ -878,26 +851,19 @@
                             `;
                             aplicacionesBody.appendChild(fila);
                             
-                            // Vista móvil para invernadero libre
-                            const mobileCard = document.createElement('div');
-                            mobileCard.className = 'mobile-card';
-                            mobileCard.innerHTML = `
-                                <div class="mobile-header">
-                                    <span class="mobile-cultivo">${inv.cultivo === 'mini' ? 'Mini' : 'Tomate'}</span>
-                                    <span class="mobile-invernadero">Inv ${inv.invernadero}</span>
-                                </div>
-                                <div class="mobile-details">
-                                    <div class="mobile-detail">
-                                        <div class="mobile-label">Área</div>
-                                        <div class="mobile-value libre-cell">Libre</div>
-                                    </div>
-                                    <div class="mobile-detail">
-                                        <div class="mobile-label">Estado</div>
-                                        <div class="mobile-value"><span class="estado-badge estado-libre">Libre</span></div>
-                                    </div>
-                                </div>
+                            // Para móvil
+                            const filaMobile = document.createElement('tr');
+                            filaMobile.innerHTML = `
+                                <td class="cultivo-cell" rowspan="${rowspan}">${inv.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
+                                <td class="invernadero-cell" rowspan="${rowspan}">${inv.invernadero}</td>
+                                <td class="libre-cell">Libre</td>
+                                <td class="capillas-cell"></td>
+                                <td class="producto-cell"></td>
+                                <td class="fecha-cell"></td>
+                                <td class="fecha-cell"></td>
+                                <td><span class="estado-badge estado-libre">Libre</span></td>
                             `;
-                            mobileContainer.appendChild(mobileCard);
+                            aplicacionesBodyMobile.appendChild(filaMobile);
                         } else {
                             // Invernadero con aplicaciones
                             aplicacionesInvernadero.forEach((aplicacion, index) => {
@@ -919,6 +885,7 @@
                                 const estadoTexto = aplicacion.estaVencida ? 'Vencida' : 'Activa';
                                 const estadoBadgeClase = aplicacion.estaVencida ? 'estado-vencida' : 'estado-activa';
                                 
+                                // Para escritorio
                                 const fila = document.createElement('tr');
                                 if (index === 0) {
                                     // Primera fila con rowspan
@@ -945,56 +912,45 @@
                                 }
                                 aplicacionesBody.appendChild(fila);
                                 
-                                // Vista móvil para aplicación
-                                const mobileCard = document.createElement('div');
-                                mobileCard.className = 'mobile-card';
-                                
-                                mobileCard.innerHTML = `
-                                    <div class="mobile-header">
-                                        <span class="mobile-cultivo">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</span>
-                                        <span class="mobile-invernadero">Inv ${aplicacion.invernadero}</span>
-                                    </div>
-                                    <div class="mobile-details">
-                                        <div class="mobile-detail">
-                                            <div class="mobile-label">Área</div>
-                                            <div class="mobile-value">${aplicacion.area} ha</div>
-                                        </div>
-                                        <div class="mobile-detail">
-                                            <div class="mobile-label">Estado</div>
-                                            <div class="mobile-value"><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></div>
-                                        </div>
-                                        <div class="mobile-detail">
-                                            <div class="mobile-label">Producto</div>
-                                            <div class="mobile-value">${aplicacion.producto}</div>
-                                        </div>
-                                        <div class="mobile-detail">
-                                            <div class="mobile-label">Fecha aplicación</div>
-                                            <div class="mobile-value">${aplicacion.fechaAplicacion}</div>
-                                        </div>
-                                        <div class="mobile-detail">
-                                            <div class="mobile-label">Fecha libre</div>
-                                            <div class="mobile-value">${aplicacion.fechaLibre}</div>
-                                        </div>
-                                        <div class="mobile-detail" style="grid-column: 1 / -1;">
-                                            <div class="mobile-label">Capillas aplicadas</div>
-                                            <div class="mobile-capillas">${capillasTexto}</div>
-                                        </div>
-                                    </div>
-                                `;
-                                mobileContainer.appendChild(mobileCard);
+                                // Para móvil
+                                const filaMobile = document.createElement('tr');
+                                if (index === 0) {
+                                    // Primera fila con rowspan
+                                    filaMobile.innerHTML = `
+                                        <td class="cultivo-cell" rowspan="${rowspan}">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
+                                        <td class="invernadero-cell" rowspan="${rowspan}">${aplicacion.invernadero}</td>
+                                        <td>${aplicacion.area} ha</td>
+                                        <td class="capillas-cell">${capillasTexto}</td>
+                                        <td class="producto-cell">${aplicacion.producto}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaLibre}</td>
+                                        <td><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></td>
+                                    `;
+                                } else {
+                                    // Filas siguientes
+                                    filaMobile.innerHTML = `
+                                        <td>${aplicacion.area} ha</td>
+                                        <td class="capillas-cell">${capillasTexto}</td>
+                                        <td class="producto-cell">${aplicacion.producto}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
+                                        <td class="fecha-cell">${aplicacion.fechaLibre}</td>
+                                        <td><span class="estado-badge ${estadoBadgeClase}">${estadoTexto}</span></td>
+                                    `;
+                                }
+                                aplicacionesBodyMobile.appendChild(filaMobile);
                             });
                         }
                     });
                     
-                    if (aplicacionesBody.innerHTML === '' && mobileContainer.innerHTML === '') {
+                    if (aplicacionesBody.innerHTML === '' && aplicacionesBodyMobile.innerHTML === '') {
                         aplicacionesBody.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones que coincidan con los filtros</td></tr>';
-                        mobileContainer.innerHTML = '<div class="no-data">No hay aplicaciones que coincidan con los filtros</div>';
+                        aplicacionesBodyMobile.innerHTML = '<tr><td colspan="8" class="no-data">No hay aplicaciones que coincidan con los filtros</td></tr>';
                     }
                 })
                 .catch((error) => {
                     console.error("Error loading applications:", error);
                     document.getElementById('aplicaciones-body').innerHTML = '<tr><td colspan="8" class="no-data">Error al cargar aplicaciones</td></tr>';
-                    document.getElementById('mobile-container').innerHTML = '<div class="no-data">Error al cargar aplicaciones</div>';
+                    document.getElementById('aplicaciones-body-mobile').innerHTML = '<tr><td colspan="8" class="no-data">Error al cargar aplicaciones</td></tr>';
                 });
             }
             
@@ -1017,7 +973,7 @@
                 // Determinar qué vista capturar (escritorio o móvil)
                 const elemento = document.getElementById('tabla-container').offsetWidth > 0 ? 
                     document.getElementById('tabla-container') : 
-                    document.getElementById('mobile-container');
+                    document.querySelector('.mobile-table-container');
                 
                 html2canvas(elemento).then(canvas => {
                     try {
