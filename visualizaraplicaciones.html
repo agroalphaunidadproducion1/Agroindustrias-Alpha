@@ -51,7 +51,7 @@
         
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding: 20px;
             background-color: white;
             border-radius: var(--border-radius);
@@ -122,14 +122,42 @@
             border: 1px solid var(--color-borde);
         }
         
-        .card-title {
-            color: var(--dark-color);
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--color-borde);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .card-title {
+            color: var(--dark-color);
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        
+        .leyenda {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .leyenda-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            border: 1px solid var(--color-borde);
         }
         
         table {
@@ -189,19 +217,8 @@
         }
         
         .capillas-cell {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        
-        .capilla-pill {
-            background-color: #e9ecef;
-            color: var(--dark-color);
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            white-space: nowrap;
-            border: 1px solid var(--color-borde);
+            max-width: 200px;
+            font-size: 0.95em;
         }
         
         .estado-badge {
@@ -311,32 +328,6 @@
             font-style: italic;
         }
         
-        .leyenda {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--color-borde);
-        }
-        
-        .leyenda-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-        }
-        
-        .leyenda-color {
-            width: 15px;
-            height: 15px;
-            border-radius: 3px;
-            border: 1px solid var(--color-borde);
-        }
-        
         /* Estilos para móviles */
         .mobile-view {
             display: none;
@@ -390,10 +381,8 @@
         }
         
         .mobile-capillas {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
             margin-top: 5px;
+            font-size: 0.9em;
         }
         
         @media (max-width: 768px) {
@@ -425,6 +414,11 @@
             
             header h1 {
                 font-size: 1.8rem;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
             
             .leyenda {
@@ -487,6 +481,74 @@
         input:checked + .slider:before {
             transform: translateX(26px);
         }
+
+        /* Modal para instrucciones de descarga */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--color-borde);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .modal-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -528,7 +590,24 @@
         </div>
         
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-table"></i> Aplicaciones por Invernadero</h2>
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-table"></i> Aplicaciones por Invernadero</h2>
+                
+                <div class="leyenda">
+                    <div class="leyenda-item">
+                        <div class="leyenda-color" style="background-color: #e8f5e9;"></div>
+                        <span>Libre</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-color" style="background-color: #fff3e0;"></div>
+                        <span>Activa</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-color" style="background-color: #ffebee;"></div>
+                        <span>Vencida</span>
+                    </div>
+                </div>
+            </div>
             
             <!-- Vista para escritorio -->
             <div id="tabla-container" class="desktop-view">
@@ -556,21 +635,6 @@
                 <!-- Los datos móviles se cargarán aquí -->
             </div>
             
-            <div class="leyenda">
-                <div class="leyenda-item">
-                    <div class="leyenda-color" style="background-color: #e8f5e9;"></div>
-                    <span>Libre</span>
-                </div>
-                <div class="leyenda-item">
-                    <div class="leyenda-color" style="background-color: #fff3e0;"></div>
-                    <span>Activa</span>
-                </div>
-                <div class="leyenda-item">
-                    <div class="leyenda-color" style="background-color: #ffebee;"></div>
-                    <span>Vencida</span>
-                </div>
-            </div>
-            
             <div class="actions-container">
                 <button id="descargar-btn" class="action-btn download-btn">
                     <i class="fas fa-download"></i> Descargar como Imagen
@@ -588,6 +652,28 @@
     
     <div class="notification" id="notification">
         ¡Datos actualizados correctamente!
+    </div>
+
+    <!-- Modal para instrucciones de descarga -->
+    <div class="modal" id="download-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Instrucciones para guardar</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Para guardar la imagen en tu dispositivo:</p>
+                <ol>
+                    <li>Mantén presionada la imagen que se abrirá</li>
+                    <li>Selecciona la opción "Guardar imagen" o "Descargar"</li>
+                    <li>Si usas iOS, es posible que necesites usar la función de captura de pantalla</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="confirm-download">Continuar</button>
+                <button class="modal-btn close-modal">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -625,8 +711,17 @@
             document.getElementById('invernadero-filter').addEventListener('change', cargarAplicaciones);
             document.getElementById('mostrar-vencidas').addEventListener('change', cargarAplicaciones);
             document.getElementById('actualizar-btn').addEventListener('click', cargarAplicaciones);
-            document.getElementById('descargar-btn').addEventListener('click', descargarComoImagen);
+            document.getElementById('descargar-btn').addEventListener('click', iniciarDescarga);
             document.getElementById('compartir-btn').addEventListener('click', compartirAplicaciones);
+            
+            // Configurar eventos del modal
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('download-modal').style.display = 'none';
+                });
+            });
+            
+            document.getElementById('confirm-download').addEventListener('click', descargarComoImagen);
             
             // Función para cargar el filtro de invernaderos según el cultivo seleccionado
             function cargarFiltroInvernaderos() {
@@ -775,10 +870,10 @@
                                 <td class="cultivo-cell" rowspan="${rowspan}">${inv.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
                                 <td class="invernadero-cell" rowspan="${rowspan}">${inv.invernadero}</td>
                                 <td class="libre-cell">Libre</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td class="capillas-cell"></td>
+                                <td class="producto-cell"></td>
+                                <td class="fecha-cell"></td>
+                                <td class="fecha-cell"></td>
                                 <td><span class="estado-badge estado-libre">Libre</span></td>
                             `;
                             aplicacionesBody.appendChild(fila);
@@ -806,16 +901,18 @@
                         } else {
                             // Invernadero con aplicaciones
                             aplicacionesInvernadero.forEach((aplicacion, index) => {
-                                // Formatear capillas aplicadas
-                                let capillasHTML = '';
+                                // Formatear capillas aplicadas como texto separado por comas
+                                let capillasTexto = '';
+                                let capillasArray = [];
+                                
                                 if (aplicacion.capillasAplicadasArray && aplicacion.capillasAplicadasArray.length > 0) {
-                                    aplicacion.capillasAplicadasArray.forEach(capilla => {
-                                        capillasHTML += `<span class="capilla-pill">${capilla}</span>`;
-                                    });
+                                    capillasArray = aplicacion.capillasAplicadasArray;
                                 } else if (aplicacion.capillasAplicadas) {
-                                    aplicacion.capillasAplicadas.split(',').forEach(capilla => {
-                                        capillasHTML += `<span class="capilla-pill">${capilla}</span>`;
-                                    });
+                                    capillasArray = aplicacion.capillasAplicadas.split(',');
+                                }
+                                
+                                if (capillasArray.length > 0) {
+                                    capillasTexto = capillasArray.map(c => c.trim()).join(', ');
                                 }
                                 
                                 // Determinar clase según estado
@@ -829,7 +926,7 @@
                                         <td class="cultivo-cell" rowspan="${rowspan}">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
                                         <td class="invernadero-cell" rowspan="${rowspan}">${aplicacion.invernadero}</td>
                                         <td>${aplicacion.area} ha</td>
-                                        <td class="capillas-cell">${capillasHTML}</td>
+                                        <td class="capillas-cell">${capillasTexto}</td>
                                         <td class="producto-cell">${aplicacion.producto}</td>
                                         <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
                                         <td class="fecha-cell">${aplicacion.fechaLibre}</td>
@@ -839,7 +936,7 @@
                                     // Filas siguientes
                                     fila.innerHTML = `
                                         <td>${aplicacion.area} ha</td>
-                                        <td class="capillas-cell">${capillasHTML}</td>
+                                        <td class="capillas-cell">${capillasTexto}</td>
                                         <td class="producto-cell">${aplicacion.producto}</td>
                                         <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
                                         <td class="fecha-cell">${aplicacion.fechaLibre}</td>
@@ -851,6 +948,7 @@
                                 // Vista móvil para aplicación
                                 const mobileCard = document.createElement('div');
                                 mobileCard.className = 'mobile-card';
+                                
                                 mobileCard.innerHTML = `
                                     <div class="mobile-header">
                                         <span class="mobile-cultivo">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</span>
@@ -879,7 +977,7 @@
                                         </div>
                                         <div class="mobile-detail" style="grid-column: 1 / -1;">
                                             <div class="mobile-label">Capillas aplicadas</div>
-                                            <div class="mobile-capillas">${capillasHTML}</div>
+                                            <div class="mobile-capillas">${capillasTexto}</div>
                                         </div>
                                     </div>
                                 `;
@@ -900,15 +998,46 @@
                 });
             }
             
+            // Función para iniciar el proceso de descarga
+            function iniciarDescarga() {
+                // En dispositivos móviles, mostrar instrucciones
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    document.getElementById('download-modal').style.display = 'flex';
+                } else {
+                    // En escritorio, descargar directamente
+                    descargarComoImagen();
+                }
+            }
+            
             // Función para descargar como imagen
             function descargarComoImagen() {
-                const elemento = document.getElementById('tabla-container');
+                // Ocultar el modal si está visible
+                document.getElementById('download-modal').style.display = 'none';
+                
+                // Determinar qué vista capturar (escritorio o móvil)
+                const elemento = document.getElementById('tabla-container').offsetWidth > 0 ? 
+                    document.getElementById('tabla-container') : 
+                    document.getElementById('mobile-container');
                 
                 html2canvas(elemento).then(canvas => {
-                    const enlace = document.createElement('a');
-                    enlace.download = 'aplicaciones_agricolas.png';
-                    enlace.href = canvas.toDataURL('image/png');
-                    enlace.click();
+                    try {
+                        // Intentar el método estándar
+                        const enlace = document.createElement('a');
+                        enlace.download = 'aplicaciones_agricolas.png';
+                        enlace.href = canvas.toDataURL('image/png');
+                        document.body.appendChild(enlace);
+                        enlace.click();
+                        document.body.removeChild(enlace);
+                    } catch (error) {
+                        // Si falla, mostrar la imagen para que el usuario la guarde manualmente
+                        const img = canvas.toDataURL('image/png');
+                        const ventana = window.open();
+                        ventana.document.write('<img src="' + img + '" />');
+                        showNotification('La imagen se ha abierto en una nueva ventana. Guárdala manualmente.', 'info');
+                    }
+                }).catch(error => {
+                    console.error('Error al generar la imagen:', error);
+                    showNotification('Error al generar la imagen. Intenta nuevamente.', 'error');
                 });
             }
             
@@ -936,6 +1065,8 @@
                 
                 if (type === 'error') {
                     notification.style.backgroundColor = '#e53935';
+                } else if (type === 'info') {
+                    notification.style.backgroundColor = '#2196f3';
                 } else {
                     notification.style.backgroundColor = 'var(--primary-color)';
                 }
