@@ -453,7 +453,7 @@
 
         // Configurar listener para cambios en tiempo real
         function configurarListenerTiempoReal() {
-            const actividadesRef = database.ref('actividades');
+            const actividadesRef = database.ref('unidad_produccion_1/actividades');
             
             actividadesRef.on('child_added', (snapshot) => {
                 const nuevaActividad = snapshot.val();
@@ -473,7 +473,7 @@
             const actividad = document.getElementById('filtro-actividad').value;
             const fecha = document.getElementById('filtro-fecha').value;
             
-            const actividadesRef = database.ref('actividades');
+            const actividadesRef = database.ref('unidad_produccion_1/actividades');
             
             actividadesRef.once('value').then((snapshot) => {
                 actividadesData = [];
@@ -616,7 +616,7 @@
             
             // Actualizar en Firebase
             const updates = {};
-            updates[`/actividades/${id}`] = {
+            updates[`/unidad_produccion_1/actividades/${id}`] = {
                 fecha: fecha,
                 cultivo: cultivo,
                 invernadero: invernadero,
@@ -674,7 +674,7 @@
         function confirmarEliminar() {
             if (!actividadAEliminar) return;
             
-            database.ref(`actividades/${actividadAEliminar}`).remove()
+            database.ref(`unidad_produccion_1/actividades/${actividadAEliminar}`).remove()
                 .then(() => {
                     // Agregar notificación
                     const actividad = actividadesData.find(a => a.id === actividadAEliminar);
