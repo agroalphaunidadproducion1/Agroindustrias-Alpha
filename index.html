@@ -151,15 +151,40 @@
             align-items: center;
         }
         
-        .remember-me input {
-            width: auto;
-            margin-right: 8px;
+        /* ESTILOS MODIFICADOS PARA LA FLECHA EN LUGAR DEL CHECKBOX */
+        .remember-me input[type="checkbox"] {
+            display: none;
         }
         
         .remember-me label {
             margin: 0;
             color: var(--text-light);
             font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me label::before {
+            content: "→"; /* Flecha inicial */
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: var(--light-gray);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            line-height: 22px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .remember-me input[type="checkbox"]:checked + label::before {
+            content: "✓"; /* Checkmark cuando está seleccionado */
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
         }
         
         .forgot-password {
@@ -168,6 +193,7 @@
             font-size: 14px;
             transition: color 0.3s;
             white-space: nowrap;
+            cursor: pointer;
         }
         
         .forgot-password:hover {
@@ -277,6 +303,7 @@
             color: var(--primary-color);
             text-decoration: none;
             transition: color 0.3s;
+            cursor: pointer;
         }
         
         .footer a:hover {
@@ -284,13 +311,96 @@
             text-decoration: underline;
         }
         
+        /* Modal para recuperación de contraseña */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideIn 0.3s;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: var(--error-color);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-text {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+        
+        .contact-info {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .contact-icon {
+            margin-right: 10px;
+            color: var(--primary-color);
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
         @keyframes pulse {
@@ -332,6 +442,10 @@
             .splash-text {
                 font-size: 20px;
             }
+            
+            .modal-content {
+                padding: 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -361,6 +475,12 @@
             
             .splash-text {
                 font-size: 18px;
+            }
+            
+            .modal-content {
+                padding: 15px;
+                margin: 10px;
+                width: calc(100% - 20px);
             }
         }
         
@@ -417,7 +537,7 @@
                     <input type="checkbox" id="remember">
                     <label for="remember">Recordarme</label>
                 </div>
-                <a href="#" class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
+                <a class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
             </div>
             
             <button type="submit" id="loginButton">
@@ -429,7 +549,55 @@
         
         <div class="footer">
             <p>Sistema Agroalpha © 2025 | Versión 2.1</p>
-            <p>Unidad de Producción 1 - <a href="#" id="helpLink">Ayuda Técnica</a></p>
+            <p>Unidad de Producción 1 - <a id="helpLink">Ayuda Técnica</a></p>
+        </div>
+    </div>
+
+    <!-- Modal para recuperación de contraseña -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 class="modal-title">Recuperar Contraseña</h2>
+            <p class="modal-text">Por favor contacte al administrador del sistema para restablecer su contraseña.</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span>Teléfono: +504 88897202</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">✉️</span>
+                    <span>Email: soporteunidad1@agroalpha.com</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">🕒</span>
+                    <span>Horario: Lunes a Viernes 8:00 - 17:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ayuda técnica -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeHelpModal">&times;</span>
+            <h2 class="modal-title">Ayuda Técnica</h2>
+            <p class="modal-text">Para asistencia técnica, contacte al departamento de sistemas:</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span>Teléfono: +504 88897202</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">✉️</span>
+                    <span>Email: soporteunidad1@agroalpha.com</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">🕒</span>
+                    <span>Horario: Lunes a Viernes 7:00 - 16:00</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -480,16 +648,35 @@
                 loginUser();
             });
             
-            // Manejar clic en "Olvidó su contraseña"
+            // Manejar clic en "Olvidó su contraseña" - MODIFICADO
             document.getElementById('forgotPassword').addEventListener('click', function(e) {
                 e.preventDefault();
-                alert('Por favor contacte al administrador del sistema para restablecer su contraseña.\n\nTeléfono: +123456789\nEmail: soporte@agroalpha.com');
+                document.getElementById('passwordModal').style.display = 'flex';
             });
             
-            // Manejar clic en ayuda
+            // Manejar clic en ayuda - MODIFICADO
             document.getElementById('helpLink').addEventListener('click', function(e) {
                 e.preventDefault();
-                alert('Para asistencia técnica, contacte al departamento de sistemas:\n\nTeléfono: +123456789\nEmail: soporte@agroalpha.com\nHorario: Lunes a Viernes 8:00 - 17:00');
+                document.getElementById('helpModal').style.display = 'flex';
+            });
+            
+            // Cerrar modales
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.getElementById('passwordModal').style.display = 'none';
+            });
+            
+            document.getElementById('closeHelpModal').addEventListener('click', function() {
+                document.getElementById('helpModal').style.display = 'none';
+            });
+            
+            // Cerrar modal al hacer clic fuera del contenido
+            window.addEventListener('click', function(e) {
+                if (e.target === document.getElementById('passwordModal')) {
+                    document.getElementById('passwordModal').style.display = 'none';
+                }
+                if (e.target === document.getElementById('helpModal')) {
+                    document.getElementById('helpModal').style.display = 'none';
+                }
             });
         });
         
@@ -661,5 +848,4 @@
         }
     </script>
 </body>
-
 </html>
