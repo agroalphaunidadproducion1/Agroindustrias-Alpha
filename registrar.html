@@ -18,14 +18,15 @@
             --culturales-color: #5D4037;
             --riego-color: #0097A7;
             --invitado-color: #616161;
-            --personal-color: #9C27B0; /* Color específico para personal */
+            --personal-color: #9C27B0;
+            --beneficos-color: #7B1FA2;
+            --aplicaciones-color: #FF9800; /* Nuevo color para aplicaciones */
             --light-gray: #f8f9fa;
             --white: #ffffff;
             --dark-gray: #343a40;
             --text-color: #212529;
             --border-color: #dee2e6;
             --card-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            --beneficos-color: #7B1FA2; /* Color específico para benéficos */
         }
         
         * {
@@ -179,6 +180,7 @@
         
         /* Colores específicos para cada tipo de registro */
         .card[onclick*="quimicos"] .card-icon { color: #D32F2F; }
+        .card[onclick*="aplicaciones"] .card-icon { color: var(--aplicaciones-color); } /* Nuevo estilo para aplicaciones */
         .card[onclick*="asistencia"] .card-icon { color: #1976D2; }
         .card[onclick*="actividades"] .card-icon { color: #ED6C02; }
         .card[onclick*="cosecha"] .card-icon { color: #2E7D32; }
@@ -324,6 +326,12 @@
                 <h3>Químicos</h3>
             </div>
             
+            <!-- NUEVO: Botón de Aplicaciones de Químicos -->
+            <div class="card" onclick="navigateTo('aplicacionesquimicos.html')">
+                <div class="card-icon"><i class="fas fa-spray-can"></i></div>
+                <h3>Aplicaciones Químicos</h3>
+            </div>
+            
             <!-- Botón de Asistencia -->
             <div class="card" onclick="navigateTo('registrarasistencia.html')">
                 <div class="card-icon"><i class="fas fa-user-check"></i></div>
@@ -348,7 +356,7 @@
                 <h3>Proyecciones</h3>
             </div>
             
-            <!-- Botón de Agregar Personal (NUEVO) -->
+            <!-- Botón de Agregar Personal -->
             <div class="card" onclick="navigateTo('registropersonal.html')">
                 <div class="card-icon"><i class="fas fa-user-plus"></i></div>
                 <h3>Agregar Personal</h3>
