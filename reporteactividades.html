@@ -143,11 +143,11 @@
                                 <thead>
                                     <tr>
                                         <th>Inv</th>
-                                        <th>Cosecha</th>
                                         <th>Enguie</th>
                                         <th>Bajado</th>
                                         <th>Deshoje</th>
                                         <th>Desbrote</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaResumenTomate">
@@ -171,11 +171,11 @@
                                 <thead>
                                     <tr>
                                         <th>Inv</th>
-                                        <th>Cosecha</th>
                                         <th>Enguie</th>
                                         <th>Bajado</th>
                                         <th>Deshoje</th>
                                         <th>Desbrote</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaRendimientosTomate">
@@ -201,11 +201,11 @@
                                 <thead>
                                     <tr>
                                         <th>Inv</th>
-                                        <th>Cosecha</th>
                                         <th>Enguie</th>
                                         <th>Poda</th>
                                         <th>Amarrado</th>
                                         <th>Raleo</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaResumenChile">
@@ -229,11 +229,11 @@
                                 <thead>
                                     <tr>
                                         <th>Inv</th>
-                                        <th>Cosecha</th>
                                         <th>Enguie</th>
                                         <th>Poda</th>
                                         <th>Amarrado</th>
                                         <th>Raleo</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaRendimientosChile">
@@ -271,10 +271,10 @@
             tomate: ['13', '14', '15', '16']
         };
 
-        // Definir actividades por cultivo
+        // Definir actividades por cultivo (con cosecha al final)
         const actividadesPorCultivo = {
-            chile: ['Cosecha', 'Enguie', 'Poda', 'Amarrado', 'Raleo'],
-            tomate: ['Cosecha', 'Enguie', 'Bajado', 'Deshoje', 'Desbrote']
+            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'],
+            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha']
         };
 
         // Definir metas de camas por invernadero
