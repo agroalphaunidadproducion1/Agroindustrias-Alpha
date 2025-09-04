@@ -276,6 +276,19 @@
             color: var(--dark-color);
         }
         
+        .fecha-libre-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: var(--border-radius);
+            border: 1px solid #bbdefb;
+        }
+        
+        .fecha-libre-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -351,16 +364,35 @@
                     
                     <div class="form-column">
                         <div class="form-group">
-                            <label for="dias-reentry">Periodo de reingreso (días)</label>
-                            <input type="number" id="dias-reentry" readonly>
+                            <label for="reingreso">Periodo de reingreso</label>
+                            <input type="text" id="reingreso" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="fecha-aplicacion">Fecha de aplicación <span class="required">*</span></label>
+                            <input type="date" id="fecha-aplicacion" required>
+                            <div class="error-message" id="fecha-aplicacion-error">Por favor seleccione una fecha de aplicación</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="hora-aplicacion">Hora de aplicación <span class="required">*</span></label>
+                            <input type="time" id="hora-aplicacion" required>
+                            <div class="error-message" id="hora-aplicacion-error">Por favor seleccione una hora de aplicación</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="fecha-aplicacion">Fecha de aplicación <span class="required">*</span></label>
-                    <input type="date" id="fecha-aplicacion" required>
-                    <div class="error-message" id="fecha-aplicacion-error">Por favor seleccione una fecha de aplicación</div>
+                    <div class="fecha-libre-info">
+                        <p><strong>Fecha libre calculada:</strong> <span id="fecha-libre-texto">--/--/----</span></p>
+                        <p><strong>Nota:</strong> La fecha libre se calcula considerando el mayor período entre días a cosecha y período de reingreso.</p>
+                    </div>
                 </div>
                 
                 <div class="capillas-section">
@@ -443,7 +475,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Cargar eventos y configuraciones iniciales
             configurarEventos();
-            configurarFechaActual();
+            configurarFechaHoraActual();
             cargarProductos();
             cargarCapillas();
             
@@ -470,10 +502,34 @@
                     } else {
                         // Datos de ejemplo si no hay productos en la base de datos
                         productos = [
-                            { nombre: "Fungicida XZ-200", diasCosecha: 3, diasReentry: 5 },
-                            { nombre: "Herbicida GreenGrow", diasCosecha: 7, diasReentry: 10 },
-                            { nombre: "Insecticida BioProtect", diasCosecha: 1, diasReentry: 3 },
-                            { nombre: "Fertilizante CropBoost", diasCosecha: 0, diasReentry: 1 }
+                            { 
+                                nombre: "Fungicida XZ-200", 
+                                dias_mini: 3, 
+                                dias_tomate: 5,
+                                reingreso_mini: "5 días",
+                                reingreso_tomate: "7 días"
+                            },
+                            { 
+                                nombre: "Herbicida GreenGrow", 
+                                dias_mini: 7, 
+                                dias_tomate: 10,
+                                reingreso_mini: "10 días",
+                                reingreso_tomate: "14 días"
+                            },
+                            { 
+                                nombre: "Insecticida BioProtect", 
+                                dias_mini: 1, 
+                                dias_tomate: 2,
+                                reingreso_mini: "3 días",
+                                reingreso_tomate: "5 días"
+                            },
+                            { 
+                                nombre: "Fertilizante CropBoost", 
+                                dias_mini: 0, 
+                                dias_tomate: 0,
+                                reingreso_mini: "1 día",
+                                reingreso_tomate: "1 día"
+                            }
                         ];
                         
                         productos.forEach((producto, index) => {
@@ -556,21 +612,19 @@
                         invernaderoSelect.disabled = true;
                         invernaderoSelect.innerHTML = '<option value="">Primero seleccione un cultivo</option>';
                     }
+                    
+                    // Actualizar días a cosecha si hay un producto seleccionado
+                    actualizarDatosProducto();
                 });
                 
                 // Evento para cambiar el producto
                 document.getElementById('producto').addEventListener('change', function() {
-                    const productoIndex = this.value;
-                    
-                    if (productoIndex !== "" && productos[productoIndex]) {
-                        const producto = productos[productoIndex];
-                        document.getElementById('dias-cosecha').value = producto.diasCosecha || 0;
-                        document.getElementById('dias-reentry').value = producto.diasReentry || 0;
-                    } else {
-                        document.getElementById('dias-cosecha').value = "";
-                        document.getElementById('dias-reentry').value = "";
-                    }
+                    actualizarDatosProducto();
                 });
+                
+                // Eventos para actualizar la fecha libre cuando cambien fecha, hora o producto
+                document.getElementById('fecha-aplicacion').addEventListener('change', calcularFechaLibre);
+                document.getElementById('hora-aplicacion').addEventListener('change', calcularFechaLibre);
                 
                 // Evento para el formulario
                 document.getElementById('aplicacion-form').addEventListener('submit', function(e) {
@@ -584,14 +638,71 @@
                     document.getElementById('invernadero').disabled = true;
                     document.getElementById('invernadero').innerHTML = '<option value="">Primero seleccione un cultivo</option>';
                     document.getElementById('dias-cosecha').value = "";
-                    document.getElementById('dias-reentry').value = "";
+                    document.getElementById('reingreso').value = "";
                     document.getElementById('area').value = "";
+                    document.getElementById('fecha-libre-texto').textContent = "--/--/----";
                     document.querySelectorAll('.capilla-checkbox').forEach(cb => {
                         cb.checked = false;
                     });
                     ocultarErrores();
-                    configurarFechaActual();
+                    configurarFechaHoraActual();
                 });
+            }
+            
+            // Función para actualizar los datos del producto según el cultivo seleccionado
+            function actualizarDatosProducto() {
+                const cultivo = document.getElementById('cultivo').value;
+                const productoIndex = document.getElementById('producto').value;
+                
+                if (cultivo && productoIndex !== "" && productos[productoIndex]) {
+                    const producto = productos[productoIndex];
+                    
+                    // Obtener días a cosecha según el cultivo
+                    const diasCosecha = cultivo === 'mini' ? 
+                        producto.dias_mini || 0 : 
+                        producto.dias_tomate || 0;
+                    
+                    // Obtener período de reingreso según el cultivo
+                    const reingreso = cultivo === 'mini' ? 
+                        producto.reingreso_mini || "" : 
+                        producto.reingreso_tomate || "";
+                    
+                    document.getElementById('dias-cosecha').value = diasCosecha;
+                    document.getElementById('reingreso').value = reingreso;
+                    
+                    // Calcular fecha libre
+                    calcularFechaLibre();
+                } else {
+                    document.getElementById('dias-cosecha').value = "";
+                    document.getElementById('reingreso').value = "";
+                    document.getElementById('fecha-libre-texto').textContent = "--/--/----";
+                }
+            }
+            
+            // Función para calcular la fecha libre
+            function calcularFechaLibre() {
+                const fechaAplicacion = document.getElementById('fecha-aplicacion').value;
+                const horaAplicacion = document.getElementById('hora-aplicacion').value;
+                const diasCosecha = parseInt(document.getElementById('dias-cosecha').value) || 0;
+                const reingreso = document.getElementById('reingreso').value;
+                
+                if (fechaAplicacion && horaAplicacion && !isNaN(diasCosecha) && reingreso) {
+                    // Extraer el número de días del período de reingreso
+                    const diasReentry = parseInt(reingreso) || 0;
+                    
+                    // Usar el mayor período entre días a cosecha y reingreso
+                    const diasTotales = Math.max(diasCosecha, diasReentry);
+                    
+                    // Calcular fecha libre
+                    const fechaLibre = new Date(fechaAplicacion + 'T' + horaAplicacion);
+                    fechaLibre.setDate(fechaLibre.getDate() + diasTotales);
+                    
+                    // Formatear fecha libre para mostrar
+                    const fechaLibreFormateada = formatDate(fechaLibre);
+                    document.getElementById('fecha-libre-texto').textContent = fechaLibreFormateada;
+                } else {
+                    document.getElementById('fecha-libre-texto').textContent = "--/--/----";
+                }
             }
             
             // Función para calcular el área basada en las capillas seleccionadas
@@ -601,11 +712,14 @@
                 document.getElementById('area').value = area.toFixed(3);
             }
             
-            // Función para configurar la fecha actual como fecha de aplicación por defecto
-            function configurarFechaActual() {
+            // Función para configurar la fecha y hora actual como valores por defecto
+            function configurarFechaHoraActual() {
                 const hoy = new Date();
                 const fechaFormateada = hoy.toISOString().split('T')[0];
+                const horaFormateada = hoy.toTimeString().substring(0, 5);
+                
                 document.getElementById('fecha-aplicacion').value = fechaFormateada;
+                document.getElementById('hora-aplicacion').value = horaFormateada;
             }
             
             // Función para guardar la aplicación en Firebase
@@ -617,8 +731,9 @@
                     const productoIndex = document.getElementById('producto').value;
                     const producto = productos[productoIndex];
                     const fechaAplicacion = document.getElementById('fecha-aplicacion').value;
+                    const horaAplicacion = document.getElementById('hora-aplicacion').value;
                     const diasCosecha = document.getElementById('dias-cosecha').value;
-                    const diasReentry = document.getElementById('dias-reentry').value;
+                    const reingreso = document.getElementById('reingreso').value;
                     const area = document.getElementById('area').value;
                     
                     // Obtener capillas seleccionadas
@@ -627,9 +742,16 @@
                         capillasSeleccionadas.push(cb.value);
                     });
                     
+                    // Extraer el número de días del período de reingreso
+                    const diasReentry = reingreso ? parseInt(reingreso) : 0;
+                    
+                    // Usar el mayor período entre días a cosecha y reingreso
+                    const diasTotales = Math.max(parseInt(diasCosecha) || 0, diasReentry);
+                    
                     // Calcular fecha libre
-                    const fechaLibre = new Date(fechaAplicacion);
-                    fechaLibre.setDate(fechaLibre.getDate() + parseInt(diasReentry));
+                    const fechaHoraAplicacion = new Date(fechaAplicacion + 'T' + horaAplicacion);
+                    const fechaLibre = new Date(fechaHoraAplicacion);
+                    fechaLibre.setDate(fechaLibre.getDate() + diasTotales);
                     const fechaLibreFormateada = formatDate(fechaLibre);
                     
                     // Crear objeto de aplicación
@@ -639,8 +761,9 @@
                         area: parseFloat(area),
                         producto: producto.nombre,
                         fechaAplicacion: formatDate(new Date(fechaAplicacion)),
+                        horaAplicacion: horaAplicacion,
                         fechaLibre: fechaLibreFormateada,
-                        diasReentry: parseInt(diasReentry),
+                        diasReentry: diasTotales,
                         capillasAplicadas: capillasSeleccionadas.join(','),
                         capillasAplicadasArray: capillasSeleccionadas,
                         timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -654,12 +777,13 @@
                             document.getElementById('invernadero').disabled = true;
                             document.getElementById('invernadero').innerHTML = '<option value="">Primero seleccione un cultivo</option>';
                             document.getElementById('dias-cosecha').value = "";
-                            document.getElementById('dias-reentry').value = "";
+                            document.getElementById('reingreso').value = "";
                             document.getElementById('area').value = "";
+                            document.getElementById('fecha-libre-texto').textContent = "--/--/----";
                             document.querySelectorAll('.capilla-checkbox').forEach(cb => {
                                 cb.checked = false;
                             });
-                            configurarFechaActual();
+                            configurarFechaHoraActual();
                         })
                         .catch((error) => {
                             console.error('Error al guardar:', error);
@@ -698,6 +822,13 @@
                 const fechaAplicacion = document.getElementById('fecha-aplicacion').value;
                 if (!fechaAplicacion) {
                     mostrarError('fecha-aplicacion-error');
+                    esValido = false;
+                }
+                
+                // Validar hora de aplicación
+                const horaAplicacion = document.getElementById('hora-aplicacion').value;
+                if (!horaAplicacion) {
+                    mostrarError('hora-aplicacion-error');
                     esValido = false;
                 }
                 
