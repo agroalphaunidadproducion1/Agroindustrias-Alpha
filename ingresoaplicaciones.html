@@ -391,7 +391,7 @@
                 <div class="form-group">
                     <div class="fecha-libre-info">
                         <p><strong>Fecha libre calculada:</strong> <span id="fecha-libre-texto">--/--/----</span></p>
-                        <p><strong>Nota:</strong> La fecha libre se calcula considerando el mayor período entre días a cosecha y período de reingreso.</p>
+                        <p><strong>Nota:</strong> La fecha libre se calcula sumando los días a cosecha a la fecha de aplicación. Si la hora es PM, se suma un día adicional.</p>
                     </div>
                 </div>
                 
@@ -546,7 +546,7 @@
                 });
             }
             
-            // Función para cargar las capillas (Norte 1-18, Sur 1-18)
+            // Función para cargar las capillas (Norte 1-18, Sur 1-18) en formato 1N, 2S, etc.
             function cargarCapillas() {
                 const capillasNorte = document.getElementById('capillas-norte');
                 const capillasSur = document.getElementById('capillas-sur');
@@ -555,24 +555,24 @@
                 capillasNorte.innerHTML = '';
                 capillasSur.innerHTML = '';
                 
-                // Agregar capillas Norte (1-18)
+                // Agregar capillas Norte (1-18) en formato 1N, 2N, etc.
                 for (let i = 1; i <= 18; i++) {
                     const capillaDiv = document.createElement('div');
                     capillaDiv.className = 'checkbox-item';
                     capillaDiv.innerHTML = `
-                        <input type="checkbox" class="capilla-checkbox" id="capilla-n-${i}" value="N${i}">
-                        <label for="capilla-n-${i}">Norte ${i}</label>
+                        <input type="checkbox" class="capilla-checkbox" id="capilla-n-${i}" value="${i}N">
+                        <label for="capilla-n-${i}">${i}N</label>
                     `;
                     capillasNorte.appendChild(capillaDiv);
                 }
                 
-                // Agregar capillas Sur (1-18)
+                // Agregar capillas Sur (1-18) en formato 1S, 2S, etc.
                 for (let i = 1; i <= 18; i++) {
                     const capillaDiv = document.createElement('div');
                     capillaDiv.className = 'checkbox-item';
                     capillaDiv.innerHTML = `
-                        <input type="checkbox" class="capilla-checkbox" id="capilla-s-${i}" value="S${i}">
-                        <label for="capilla-s-${i}">Sur ${i}</label>
+                        <input type="checkbox" class="capilla-checkbox" id="capilla-s-${i}" value="${i}S">
+                        <label for="capilla-s-${i}">${i}S</label>
                     `;
                     capillasSur.appendChild(capillaDiv);
                 }
@@ -679,22 +679,22 @@
                 }
             }
             
-            // Función para calcular la fecha libre
+            // Función para calcular la fecha libre (solo con días a cosecha)
             function calcularFechaLibre() {
                 const fechaAplicacion = document.getElementById('fecha-aplicacion').value;
                 const horaAplicacion = document.getElementById('hora-aplicacion').value;
                 const diasCosecha = parseInt(document.getElementById('dias-cosecha').value) || 0;
-                const reingreso = document.getElementById('reingreso').value;
                 
-                if (fechaAplicacion && horaAplicacion && !isNaN(diasCosecha) && reingreso) {
-                    // Extraer el número de días del período de reingreso
-                    const diasReentry = parseInt(reingreso) || 0;
-                    
-                    // Usar el mayor período entre días a cosecha y reingreso
-                    const diasTotales = Math.max(diasCosecha, diasReentry);
-                    
-                    // Calcular fecha libre
+                if (fechaAplicacion && horaAplicacion && !isNaN(diasCosecha)) {
+                    // Calcular fecha libre usando solo los días a cosecha
                     const fechaLibre = new Date(fechaAplicacion + 'T' + horaAplicacion);
+                    
+                    // Verificar si la hora es PM (12:00 PM o posterior)
+                    const hora = parseInt(horaAplicacion.split(':')[0]);
+                    const esPm = hora >= 12;
+                    
+                    // Sumar días a cosecha + 1 día adicional si es PM
+                    const diasTotales = diasCosecha + (esPm ? 1 : 0);
                     fechaLibre.setDate(fechaLibre.getDate() + diasTotales);
                     
                     // Formatear fecha libre para mostrar
@@ -733,7 +733,6 @@
                     const fechaAplicacion = document.getElementById('fecha-aplicacion').value;
                     const horaAplicacion = document.getElementById('hora-aplicacion').value;
                     const diasCosecha = document.getElementById('dias-cosecha').value;
-                    const reingreso = document.getElementById('reingreso').value;
                     const area = document.getElementById('area').value;
                     
                     // Obtener capillas seleccionadas
@@ -742,14 +741,16 @@
                         capillasSeleccionadas.push(cb.value);
                     });
                     
-                    // Extraer el número de días del período de reingreso
-                    const diasReentry = reingreso ? parseInt(reingreso) : 0;
-                    
-                    // Usar el mayor período entre días a cosecha y reingreso
-                    const diasTotales = Math.max(parseInt(diasCosecha) || 0, diasReentry);
-                    
-                    // Calcular fecha libre
+                    // Calcular fecha libre usando solo los días a cosecha
                     const fechaHoraAplicacion = new Date(fechaAplicacion + 'T' + horaAplicacion);
+                    
+                    // Verificar si la hora es PM (12:00 PM o posterior)
+                    const hora = parseInt(horaAplicacion.split(':')[0]);
+                    const esPm = hora >= 12;
+                    
+                    // Sumar días a cosecha + 1 día adicional si es PM
+                    const diasTotales = parseInt(diasCosecha) + (esPm ? 1 : 0);
+                    
                     const fechaLibre = new Date(fechaHoraAplicacion);
                     fechaLibre.setDate(fechaLibre.getDate() + diasTotales);
                     const fechaLibreFormateada = formatDate(fechaLibre);
