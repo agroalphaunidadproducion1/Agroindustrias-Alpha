@@ -392,10 +392,16 @@
                             const vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
                             const camasVueltaActual = totalCamas % metaCamas;
                             
-                            // Mostrar solo el número de camas, sin la meta
+                            // Mostrar el número de camas (si completó vuelta, mostrar total en lugar de 0)
+                            let camasAMostrar = camasVueltaActual;
+                            if (camasVueltaActual === 0 && totalCamas > 0) {
+                                camasAMostrar = totalCamas; // Mostrar el total en lugar de 0
+                                celda.classList.add('completed');
+                            }
+                            
                             celda.innerHTML = `
                                 <div class="info-hover">
-                                    ${camasVueltaActual}
+                                    ${camasAMostrar}
                                     <div class="tooltip-info">
                                         Vuelta ${vueltaActual}<br>
                                         Progreso: ${Math.min(100, (totalCamas / metaCamas) * 100).toFixed(1)}%<br>
@@ -403,11 +409,6 @@
                                     </div>
                                 </div>
                             `;
-                            
-                            // Verificar si se completó una vuelta (múltiplo de la meta)
-                            if (camasVueltaActual === 0 && totalCamas > 0) {
-                                celda.classList.add('completed');
-                            }
                         }
                     } else {
                         celda.innerHTML = '<span class="text-muted">-</span>';
