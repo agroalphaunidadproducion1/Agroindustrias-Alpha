@@ -730,7 +730,7 @@
                     const invernadero = document.getElementById('invernadero').value;
                     const productoIndex = document.getElementById('producto').value;
                     const producto = productos[productoIndex];
-                    const fechaAplicacion = document.getElementById('fecha-aplicacion').value;
+                    const fechaAplicacionInput = document.getElementById('fecha-aplicacion').value;
                     const horaAplicacion = document.getElementById('hora-aplicacion').value;
                     const diasCosecha = document.getElementById('dias-cosecha').value;
                     const area = document.getElementById('area').value;
@@ -742,7 +742,7 @@
                     });
                     
                     // Calcular fecha libre usando solo los días a cosecha
-                    const fechaHoraAplicacion = new Date(fechaAplicacion + 'T' + horaAplicacion);
+                    const fechaHoraAplicacion = new Date(fechaAplicacionInput + 'T' + horaAplicacion);
                     
                     // Verificar si la hora es PM (12:00 PM o posterior)
                     const hora = parseInt(horaAplicacion.split(':')[0]);
@@ -755,13 +755,13 @@
                     fechaLibre.setDate(fechaLibre.getDate() + diasTotales);
                     const fechaLibreFormateada = formatDate(fechaLibre);
                     
-                    // Crear objeto de aplicación
+                    // Crear objeto de aplicación - Mantener la fecha exacta seleccionada
                     const aplicacion = {
                         cultivo,
                         invernadero,
                         area: parseFloat(area),
                         producto: producto.nombre,
-                        fechaAplicacion: formatDate(new Date(fechaAplicacion)),
+                        fechaAplicacion: formatDateInput(fechaAplicacionInput), // Usar la fecha exacta del input
                         horaAplicacion: horaAplicacion,
                         fechaLibre: fechaLibreFormateada,
                         diasReentry: diasTotales,
@@ -861,6 +861,12 @@
                 const day = String(date.getDate()).padStart(2, '0');
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            
+            // Función para formatear fecha desde input (yyyy-mm-dd a dd/mm/aaaa)
+            function formatDateInput(dateString) {
+                const [year, month, day] = dateString.split('-');
                 return `${day}/${month}/${year}`;
             }
             
