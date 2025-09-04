@@ -5,79 +5,248 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Cosecha Semanal</title>
     <style>
+        :root {
+            --primary-dark: #1b4332;
+            --primary: #2d6a4f;
+            --primary-light: #40916c;
+            --accent: #74c69d;
+            --light-bg: #f8f9fa;
+            --text-dark: #212529;
+            --text-light: #f8f9fa;
+            --border: #dee2e6;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 15px;
             line-height: 1.6;
+            background-color: #f5f7f9;
+            color: var(--text-dark);
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-        }
-        .form-container {
-            max-width: 800px;
+        
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
         }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
         .form-group {
             margin-bottom: 15px;
         }
+        
         label {
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 0.9rem;
         }
+        
         input, select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            border: 1px solid var(--border);
             border-radius: 4px;
-            box-sizing: border-box;
+            font-size: 1rem;
         }
-        .row {
-            display: flex;
+        
+        input[readonly] {
+            background-color: #f0f0f0;
+        }
+        
+        .production-section {
+            margin-top: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .production-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 15px;
         }
-        .col {
-            flex: 1;
+        
+        .production-card {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            background-color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        button {
-            background-color: #4CAF50;
+        
+        .production-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .invernadero-id {
+            font-weight: bold;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+        }
+        
+        .cultivo-type {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .cultivo-mini {
+            background-color: #d8f3dc;
+            color: #1b4332;
+        }
+        
+        .cultivo-tomate {
+            background-color: #ffe5d9;
+            color: #9c4d25;
+        }
+        
+        .cantidad-input {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 12px;
+        }
+        
+        .cantidad-input::placeholder {
+            color: #adb5bd;
+            font-weight: normal;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary-dark);
             color: white;
-            padding: 10px 15px;
+            padding: 14px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        table {
+            font-size: 1.1rem;
             width: 100%;
-            border-collapse: collapse;
+            margin-top: 25px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary);
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 4px;
             margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .success-message {
-            color: green;
-            margin-top: 10px;
+            text-align: center;
             font-weight: bold;
         }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-            font-weight: bold;
+        
+        .success {
+            background-color: #d8f3dc;
+            color: #1b4332;
+            border: 1px solid #b7e4c7;
+        }
+        
+        .error {
+            background-color: #ffe5d9;
+            color: #9c4d25;
+            border: 1px solid #ffcfb6;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            padding: 15px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .production-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+            
+            .production-card {
+                padding: 12px;
+            }
         }
     </style>
     <!-- Firebase SDK -->
@@ -85,87 +254,151 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="form-container">
-        <h1>Producción semanal Unidad 1</h1>
+    <div class="container">
+        <header>
+            <h1>Producción Semanal Unidad 1</h1>
+            <p>Sistema de registro de cosecha</p>
+        </header>
         
-        <form id="cosechaForm">
-            <div class="row">
-                <div class="col">
+        <div class="form-container">
+            <div class="info-box">
+                <p><strong>Configuración de cultivos:</strong></p>
+                <p>• Invernaderos 9, 10, 11, 12, 33, 35, 37, 39: Cultivo Mini</p>
+                <p>• Invernaderos 13, 14, 15, 16: Cultivo Tomate</p>
+            </div>
+            
+            <form id="cosechaForm">
+                <div class="form-grid">
                     <div class="form-group">
-                        <label for="semana">Semana (semana actual del año):</label>
+                        <label for="semana">Semana (actual):</label>
                         <input type="number" id="semana" name="semana" min="1" max="52" required>
                     </div>
-                </div>
-                <div class="col">
+                    
                     <div class="form-group">
                         <label for="fecha">Fecha:</label>
                         <input type="date" id="fecha" name="fecha" required>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="dia">Día (automático):</label>
+                        <input type="text" id="dia" name="dia" readonly>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="dia">Día:</label>
-                <select id="dia" name="dia" required>
-                    <option value="">Seleccione un día</option>
-                    <option value="Lunes">Lunes</option>
-                    <option value="Martes">Martes</option>
-                    <option value="Miércoles">Miércoles</option>
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                    <option value="Sábado">Sábado</option>
-                    <option value="Domingo">Domingo</option>
-                </select>
-            </div>
-            
-            <h3>Registro de producción</h3>
-            
-            <table id="produccionTable">
-                <thead>
-                    <tr>
-                        <th>Invernadero</th>
-                        <th>Cultivo</th>
-                        <th>Cantidad (kg)</th>
-                        <th>Observaciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <select name="invernadero[]" required>
-                                <option value="">Seleccione</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="33">33</option>
-                                <option value="35">35</option>
-                                <option value="37">37</option>
-                                <option value="39">39</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select name="cultivo[]" required>
-                                <option value="">Seleccione</option>
-                                <option value="Mini">Mini</option>
-                                <option value="Tomate">Tomate</option>
-                            </select>
-                        </td>
-                        <td><input type="number" name="cantidad[]" min="0" step="0.1" required></td>
-                        <td><input type="text" name="observaciones[]"></td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <button type="button" id="addRow">Añadir fila</button>
-            <button type="submit">Guardar registro</button>
-            
-            <div id="message"></div>
-        </form>
+                
+                <div class="production-section">
+                    <h3 class="section-title">Registro de Producción</h3>
+                    
+                    <div class="production-grid">
+                        <!-- Invernaderos Mini -->
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 9</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_9_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 10</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_10_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 11</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_11_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 12</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_12_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 33</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_33_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 35</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_35_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 37</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_37_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 39</span>
+                                <span class="cultivo-type cultivo-mini">Mini</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_39_mini" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <!-- Invernaderos Tomate -->
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 13</span>
+                                <span class="cultivo-type cultivo-tomate">Tomate</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_13_tomate" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 14</span>
+                                <span class="cultivo-type cultivo-tomate">Tomate</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_14_tomate" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 15</span>
+                                <span class="cultivo-type cultivo-tomate">Tomate</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_15_tomate" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                        
+                        <div class="production-card">
+                            <div class="card-header">
+                                <span class="invernadero-id">Invernadero 16</span>
+                                <span class="cultivo-type cultivo-tomate">Tomate</span>
+                            </div>
+                            <input type="number" class="cantidad-input" name="cantidad_16_tomate" min="0" step="0.1" placeholder="Ingrese kg" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">Guardar Registro</button>
+                
+                <div id="message" class="message"></div>
+            </form>
+        </div>
+        
+        <footer>
+            <p>Sistema Agroalpha © 2025 | Unidad Producción 1</p>
+            <p>Versión 2.4 - Campos vacíos por defecto</p>
+        </footer>
     </div>
 
     <script>
@@ -178,7 +411,13 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        // Establecer semana actual del año
+        // Función para obtener el nombre del día en español
+        function obtenerDiaEnEspanol(fecha) {
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            return dias[fecha.getDay()];
+        }
+        
+        // Establecer semana actual del año y fecha actual
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             const startDate = new Date(today.getFullYear(), 0, 1);
@@ -187,47 +426,12 @@
             
             document.getElementById('semana').value = weekNumber;
             document.getElementById('fecha').valueAsDate = today;
+            document.getElementById('dia').value = obtenerDiaEnEspanol(today);
             
-            // Establecer día actual
-            const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-            const dayName = daysOfWeek[today.getDay()];
-            document.getElementById('dia').value = dayName;
-            
-            // Añadir fila a la tabla
-            document.getElementById('addRow').addEventListener('click', function() {
-                const tbody = document.querySelector('#produccionTable tbody');
-                const newRow = document.createElement('tr');
-                
-                newRow.innerHTML = `
-                    <td>
-                        <select name="invernadero[]" required>
-                            <option value="">Seleccione</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="15">15</option>
-                            <option value="16">16</option>
-                            <option value="33">33</option>
-                            <option value="35">35</option>
-                            <option value="37">37</option>
-                            <option value="39">39</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="cultivo[]" required>
-                            <option value="">Seleccione</option>
-                            <option value="Mini">Mini</option>
-                            <option value="Tomate">Tomate</option>
-                        </select>
-                    </td>
-                    <td><input type="number" name="cantidad[]" min="0" step="0.1" required></td>
-                    <td><input type="text" name="observaciones[]"></td>
-                `;
-                
-                tbody.appendChild(newRow);
+            // Actualizar el día cuando cambia la fecha
+            document.getElementById('fecha').addEventListener('change', function() {
+                const fechaSeleccionada = new Date(this.value);
+                document.getElementById('dia').value = obtenerDiaEnEspanol(fechaSeleccionada);
             });
             
             // Manejar envío del formulario
@@ -235,7 +439,7 @@
                 e.preventDefault();
                 const messageDiv = document.getElementById('message');
                 messageDiv.innerHTML = '';
-                messageDiv.className = '';
+                messageDiv.className = 'message';
                 
                 // Obtener datos del formulario
                 const semana = document.getElementById('semana').value;
@@ -243,20 +447,43 @@
                 const dia = document.getElementById('dia').value;
                 
                 // Obtener datos de producción
-                const invernaderos = document.getElementsByName('invernadero[]');
-                const cultivos = document.getElementsByName('cultivo[]');
-                const cantidades = document.getElementsByName('cantidad[]');
-                const observaciones = document.getElementsByName('observaciones[]');
-                
                 const produccion = [];
                 
-                for (let i = 0; i < invernaderos.length; i++) {
-                    produccion.push({
-                        invernadero: invernaderos[i].value,
-                        cultivo: cultivos[i].value,
-                        cantidad: parseFloat(cantidades[i].value),
-                        observaciones: observaciones[i].value
-                    });
+                // Lista de invernaderos y sus cultivos
+                const invernaderosMini = [9, 10, 11, 12, 33, 35, 37, 39];
+                const invernaderosTomate = [13, 14, 15, 16];
+                
+                // Recopilar datos de los invernaderos Mini
+                for (const invernadero of invernaderosMini) {
+                    const cantidadInput = document.querySelector(`input[name="cantidad_${invernadero}_mini"]`);
+                    
+                    if (cantidadInput && cantidadInput.value !== "" && parseFloat(cantidadInput.value) >= 0) {
+                        produccion.push({
+                            invernadero: invernadero.toString(),
+                            cultivo: "Mini",
+                            cantidad: parseFloat(cantidadInput.value)
+                        });
+                    }
+                }
+                
+                // Recopilar datos de los invernaderos Tomate
+                for (const invernadero of invernaderosTomate) {
+                    const cantidadInput = document.querySelector(`input[name="cantidad_${invernadero}_tomate"]`);
+                    
+                    if (cantidadInput && cantidadInput.value !== "" && parseFloat(cantidadInput.value) >= 0) {
+                        produccion.push({
+                            invernadero: invernadero.toString(),
+                            cultivo: "Tomate",
+                            cantidad: parseFloat(cantidadInput.value)
+                        });
+                    }
+                }
+                
+                // Verificar que haya al menos un registro de producción
+                if (produccion.length === 0) {
+                    messageDiv.textContent = 'Error: Debe ingresar al menos una cantidad de producción';
+                    messageDiv.className = 'message error';
+                    return;
                 }
                 
                 // Crear objeto de datos
@@ -275,25 +502,20 @@
                 nuevoRegistroRef.set(registroData)
                     .then(() => {
                         messageDiv.textContent = 'Registro guardado correctamente en Firebase';
-                        messageDiv.className = 'success-message';
-                        document.getElementById('cosechaForm').reset();
+                        messageDiv.className = 'message success';
                         
-                        // Restablecer la tabla (dejar solo una fila)
-                        const tbody = document.querySelector('#produccionTable tbody');
-                        tbody.innerHTML = '';
-                        document.getElementById('addRow').click();
+                        // Limpiar solo los campos de cantidad
+                        const cantidadInputs = document.querySelectorAll('.cantidad-input');
+                        cantidadInputs.forEach(input => {
+                            input.value = '';
+                        });
                     })
                     .catch((error) => {
                         messageDiv.textContent = 'Error al guardar el registro: ' + error.message;
-                        messageDiv.className = 'error-message';
+                        messageDiv.className = 'message error';
                     });
             });
         });
     </script>
-
-    <div class="footer">
-        <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-        <p>Versión 2.0 - Módulo completo</p>
-    </div>
 </body>
 </html>
