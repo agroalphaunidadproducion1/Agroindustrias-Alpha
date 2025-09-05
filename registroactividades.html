@@ -607,8 +607,9 @@
                     
                     // Para cosecha, guardar el número de cosecha
                     if (actividad === 'Cosecha') {
-                        const conteoCosecha = parseInt(badgeElement.getAttribute('data-conteo-cosecha') || 0);
-                        actividadData.numeroCosecha = conteoCosecha + 1;
+                        // Obtener el número de cosecha del badge (ya incluye el +1)
+                        const numeroCosecha = parseInt(badgeElement.textContent.split('#')[1]);
+                        actividadData.numeroCosecha = numeroCosecha;
                     } else {
                         // Para otras actividades, calcular y guardar la vuelta
                         const totalCamasAnterior = parseInt(badgeElement.getAttribute('data-total-camas') || 0);
