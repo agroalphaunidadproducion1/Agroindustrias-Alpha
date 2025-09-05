@@ -372,7 +372,7 @@
             'D': ['13', '14', '15', '16', 'Fitosanidad', 'Riego'],
             'I': ['33', '35', 'Fitosanidad', 'Riego'],
             'J': ['37', '39', 'Fitosanidad', 'Riego'],
-            'otras-areas': ['Acopio', 'Áreas Verdes']
+            'otras-areas': ['Mantenimiento', 'Áreas Verdes', 'Vivero']  // Cambiado a las áreas solicitadas
         };
 
         // Variables para almacenar selecciones
@@ -454,14 +454,14 @@
                 const item = document.createElement('div');
                 
                 // Aplicar clase especial para áreas especiales
-                if (invernadero === 'Fitosanidad' || invernadero === 'Riego' || invernadero === 'Acopio' || invernadero === 'Áreas Verdes') {
+                if (invernadero === 'Fitosanidad' || invernadero === 'Riego' || invernadero === 'Mantenimiento' || invernadero === 'Áreas Verdes' || invernadero === 'Vivero') {
                     item.className = 'invernadero-item area-special';
                 } else {
                     item.className = 'invernadero-item';
                 }
                 
                 // Mostrar nombre apropiado
-                if (invernadero === 'Fitosanidad' || invernadero === 'Riego' || invernadero === 'Acopio' || invernadero === 'Áreas Verdes') {
+                if (invernadero === 'Fitosanidad' || invernadero === 'Riego' || invernadero === 'Mantenimiento' || invernadero === 'Áreas Verdes' || invernadero === 'Vivero') {
                     item.textContent = invernadero;
                 } else {
                     item.textContent = 'Invernadero ' + invernadero;
@@ -559,7 +559,7 @@
             if (invernaderosSeleccionados.length > 0) {
                 // Mostrar nombres apropiados según el tipo
                 const nombresMostrar = invernaderosSeleccionados.map(i => {
-                    if (i === 'Fitosanidad' || i === 'Riego' || i === 'Acopio' || i === 'Áreas Verdes') {
+                    if (i === 'Fitosanidad' || i === 'Riego' || i === 'Mantenimiento' || i === 'Áreas Verdes' || i === 'Vivero') {
                         return i;
                     } else {
                         return 'Invernadero ' + i;
