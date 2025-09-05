@@ -20,6 +20,7 @@
             --invitado-color: #616161;
             --gerente-color: #FF9800;
             --camaron-color: #607D8B;
+            --jefe-vivero-color: #009688; /* Color para Jefe de Vivero */
             --light-gray: #f8f9fa;
             --white: #ffffff;
             --dark-gray: #343a40;
@@ -105,6 +106,7 @@
         .invitado-badge { background-color: var(--invitado-color); }
         .gerente-badge { background-color: var(--gerente-color); }
         .camaron-badge { background-color: var(--camaron-color); }
+        .jefe-vivero-badge { background-color: var(--jefe-vivero-color); } /* Nuevo estilo para Jefe de Vivero */
         
         .logout-btn {
             background-color: rgba(255, 255, 255, 0.2);
@@ -330,7 +332,8 @@
                 'Invitado': 'invitado-badge',
                 'Gerente de Producción': 'gerente-badge',
                 'Gerente General': 'gerente-badge',
-                'Camaron': 'camaron-badge'
+                'Camaron': 'camaron-badge',
+                'Jefe de Vivero': 'jefe-vivero-badge' // Nuevo rol agregado
             };
             return roleClasses[role] || 'invitado-badge';
         }
@@ -357,6 +360,12 @@
                     { icon: 'fa-eye', title: 'Visualizar Aplicaciones', link: 'visualizaraplicaciones.html' }
                 ],
                 'Supervisor': [
+                    { icon: 'fa-user-check', title: 'Asistencia', link: 'registrarasistencia.html' },
+                    { icon: 'fa-clipboard-list', title: 'Actividades', link: 'registroactividades.html' },
+                    { icon: 'fa-list-check', title: 'Ver Actividades', link: 'reporteactividades.html' },
+                    { icon: 'fa-clipboard-check', title: 'Ver Asistencias', link: 'reporteasistencia.html' }
+                ],
+                'Jefe de Vivero': [ // Nuevo rol con los mismos accesos que Supervisor
                     { icon: 'fa-user-check', title: 'Asistencia', link: 'registrarasistencia.html' },
                     { icon: 'fa-clipboard-list', title: 'Actividades', link: 'registroactividades.html' },
                     { icon: 'fa-list-check', title: 'Ver Actividades', link: 'reporteactividades.html' },
@@ -476,6 +485,4 @@
     </div>
 </body>
 </html>
-
-
 
