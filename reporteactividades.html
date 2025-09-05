@@ -285,10 +285,10 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Definir invernaderos por cultivo
+        // Definir invernaderos por cultivo (agregado vivero al tomate)
         const invernaderosPorCultivo = {
             chile: ['9', '10', '11', '12', '33', '35', '37', '39'],
-            tomate: ['13', '14', '15', '16']
+            tomate: ['13', '14', '15', '16', 'vivero'] // Vivero agregado después del 16
         };
 
         // Definir actividades por cultivo (con cosecha al final)
@@ -297,7 +297,7 @@
             tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha']
         };
 
-        // Definir metas de camas por invernadero
+        // Definir metas de camas por invernadero (agregada meta para vivero: 64 camas)
         const metasCamas = {
             '9': 274,
             '10': 270,
@@ -310,7 +310,8 @@
             '33': 276,
             '35': 276,
             '37': 284,
-            '39': 284
+            '39': 284,
+            'vivero': 64  // Nueva meta para el vivero
         };
 
         // Variables globales
@@ -361,7 +362,7 @@
                 
                 // Celda de invernadero (abreviado)
                 const celdaInvernadero = document.createElement('td');
-                celdaInvernadero.textContent = invernadero;
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
                 celdaInvernadero.classList.add('fw-bold');
                 fila.appendChild(celdaInvernadero);
                 
@@ -434,7 +435,7 @@
                 
                 // Celda de invernadero (abreviado)
                 const celdaInvernadero = document.createElement('td');
-                celdaInvernadero.textContent = invernadero;
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
                 celdaInvernadero.classList.add('fw-bold');
                 fila.appendChild(celdaInvernadero);
                 
