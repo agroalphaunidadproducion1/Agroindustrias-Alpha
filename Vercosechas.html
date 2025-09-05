@@ -13,6 +13,8 @@
             --dark-gray: #757575;
             --white: #ffffff;
             --projection-color: #2196F3;
+            --mini-color: #4CAF50;
+            --tomate-color: #FF5722;
         }
         
         body {
@@ -197,6 +199,43 @@
             color: #f44336;
         }
         
+        .cultivo-section {
+            margin-bottom: 30px;
+        }
+        
+        .cultivo-title {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .mini-title {
+            background-color: var(--mini-color);
+        }
+        
+        .tomate-title {
+            background-color: var(--tomate-color);
+        }
+        
+        .mini-row {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        
+        .tomate-row {
+            background-color: rgba(255, 87, 34, 0.1);
+        }
+        
+        .totals-table {
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .totals-table th {
+            background-color: var(--projection-color);
+        }
+        
         @media (max-width: 768px) {
             .filters {
                 flex-direction: column;
@@ -282,8 +321,7 @@
 
     <div class="footer">
         <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-        <p>Versión 2.0 - Módulo completo</p>
-        <p><a href="proyecciones.html">Ir al formulario de proyecciones</a></p>
+        <p>Versión 2.5 - Columna de cultivo ocultada</p>
     </div>
 
     <script>
@@ -295,6 +333,25 @@
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        
+        // Función para formatear números con separadores de miles y decimales
+        function formatNumber(num, decimals = 2) {
+            if (num === null || num === undefined) return '0';
+            
+            // Redondear a los decimales especificados
+            const rounded = Number(num).toFixed(decimals);
+            
+            // Separar parte entera y decimal
+            const parts = rounded.toString().split('.');
+            let entera = parts[0];
+            const decimal = parts.length > 1 ? parts[1] : '';
+            
+            // Agregar separadores de miles
+            entera = entera.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            // Devolver el número formateado
+            return decimal ? `${entera}.${decimal}` : entera;
+        }
         
         document.addEventListener('DOMContentLoaded', function() {
             // Referencias a la base de datos
@@ -308,6 +365,7 @@
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
+                if (year === currentYear) option.selected = true;
                 yearSelect.appendChild(option);
             }
             
@@ -319,6 +377,15 @@
                 option.textContent = `Semana ${week}`;
                 weekSelect.appendChild(option);
             }
+            
+            // Obtener semana actual
+            const today = new Date();
+            const startDate = new Date(today.getFullYear(), 0, 1);
+            const days = Math.floor((today - startDate) / (24 * 60 * 60 * 1000));
+            const currentWeek = Math.ceil(days / 7);
+            
+            // Seleccionar semana actual por defecto
+            weekSelect.value = currentWeek;
             
             // Manejar el botón de filtrar
             document.getElementById('filterButton').addEventListener('click', function() {
@@ -371,18 +438,12 @@
                                     semana: registro.semana,
                                     invernadero: item.invernadero,
                                     cultivo: item.cultivo,
-                                    cantidad: 0,
-                                    observaciones: []
+                                    cantidad: 0
                                 };
                             }
                             
                             // Acumular cantidades
                             resumenSemanal[clave].cantidad += parseFloat(item.cantidad) || 0;
-                            
-                            // Agregar observaciones si existen
-                            if (item.observaciones) {
-                                resumenSemanal[clave].observaciones.push(item.observaciones);
-                            }
                             
                             // Sumar a totales por cultivo
                             if (item.cultivo === 'Mini' || item.cultivo === 'Tomate') {
@@ -394,7 +455,7 @@
                         });
                     });
                     
-                    // Convertir el objeto de resumen en un array para mostrarlo
+                    // Convertir el objeto de resumen en an array para mostrarlo
                     const registrosResumidos = Object.values(resumenSemanal);
                     
                     // Cargar datos de proyecciones
@@ -484,133 +545,169 @@
                     semanaTitle.textContent = `Semana ${semana}`;
                     semanaDiv.appendChild(semanaTitle);
                     
-                    // Crear tabla para la semana
-                    const table = document.createElement('table');
-                    const thead = document.createElement('thead');
-                    const tbody = document.createElement('tbody');
+                    // Separar registros por cultivo
+                    const registrosMini = registrosPorSemana[semana].filter(r => r.cultivo === 'Mini');
+                    const registrosTomate = registrosPorSemana[semana].filter(r => r.cultivo === 'Tomate');
                     
-                    // Encabezados de tabla
-                    thead.innerHTML = `
+                    // Ordenar invernaderos numéricamente
+                    registrosMini.sort((a, b) => parseInt(a.invernadero) - parseInt(b.invernadero));
+                    registrosTomate.sort((a, b) => parseInt(a.invernadero) - parseInt(b.invernadero));
+                    
+                    // Sección Mini
+                    if (registrosMini.length > 0) {
+                        const miniSection = document.createElement('div');
+                        miniSection.className = 'cultivo-section';
+                        
+                        const miniTitle = document.createElement('div');
+                        miniTitle.className = 'cultivo-title mini-title';
+                        miniTitle.textContent = 'Cultivo Mini';
+                        miniSection.appendChild(miniTitle);
+                        
+                        // Crear tabla para Mini
+                        const miniTable = document.createElement('table');
+                        const miniThead = document.createElement('thead');
+                        const miniTbody = document.createElement('tbody');
+                        
+                        // Encabezados de tabla (sin columna de cultivo)
+                        miniThead.innerHTML = `
+                            <tr>
+                                <th>Invernadero</th>
+                                <th>Cantidad Total (kg)</th>
+                            </tr>
+                        `;
+                        
+                        // Llenar tabla con registros Mini
+                        registrosMini.forEach(registro => {
+                            const row = document.createElement('tr');
+                            row.className = 'mini-row';
+                            row.innerHTML = `
+                                <td>${registro.invernadero}</td>
+                                <td>${formatNumber(registro.cantidad)}</td>
+                            `;
+                            miniTbody.appendChild(row);
+                        });
+                        
+                        miniTable.appendChild(miniThead);
+                        miniTable.appendChild(miniTbody);
+                        miniSection.appendChild(miniTable);
+                        semanaDiv.appendChild(miniSection);
+                    }
+                    
+                    // Sección Tomate
+                    if (registrosTomate.length > 0) {
+                        const tomateSection = document.createElement('div');
+                        tomateSection.className = 'cultivo-section';
+                        
+                        const tomateTitle = document.createElement('div');
+                        tomateTitle.className = 'cultivo-title tomate-title';
+                        tomateTitle.textContent = 'Cultivo Tomate';
+                        tomateSection.appendChild(tomateTitle);
+                        
+                        // Crear tabla para Tomate
+                        const tomateTable = document.createElement('table');
+                        const tomateThead = document.createElement('thead');
+                        const tomateTbody = document.createElement('tbody');
+                        
+                        // Encabezados de tabla (sin columna de cultivo)
+                        tomateThead.innerHTML = `
+                            <tr>
+                                <th>Invernadero</th>
+                                <th>Cantidad Total (kg)</th>
+                            </tr>
+                        `;
+                        
+                        // Llenar tabla con registros Tomate
+                        registrosTomate.forEach(registro => {
+                            const row = document.createElement('tr');
+                            row.className = 'tomate-row';
+                            row.innerHTML = `
+                                <td>${registro.invernadero}</td>
+                                <td>${formatNumber(registro.cantidad)}</td>
+                            `;
+                            tomateTbody.appendChild(row);
+                        });
+                        
+                        tomateTable.appendChild(tomateThead);
+                        tomateTable.appendChild(tomateTbody);
+                        tomateSection.appendChild(tomateTable);
+                        semanaDiv.appendChild(tomateSection);
+                    }
+                    
+                    // Tabla de totales con proyecciones y diferencias
+                    const totalMini = registrosMini.reduce((sum, r) => sum + r.cantidad, 0);
+                    const totalTomate = registrosTomate.reduce((sum, r) => sum + r.cantidad, 0);
+                    const totalGeneral = totalMini + totalTomate;
+                    
+                    const totalProyeccionMini = proyecciones[`${semana}_Mini`] || 0;
+                    const totalProyeccionTomate = proyecciones[`${semana}_Tomate`] || 0;
+                    const totalProyeccionGeneral = totalProyeccionMini + totalProyeccionTomate;
+                    
+                    const diferenciaMini = totalMini - totalProyeccionMini;
+                    const diferenciaTomate = totalTomate - totalProyeccionTomate;
+                    const diferenciaGeneral = totalGeneral - totalProyeccionGeneral;
+                    
+                    const totalsTable = document.createElement('table');
+                    totalsTable.className = 'totals-table';
+                    const totalsThead = document.createElement('thead');
+                    const totalsTbody = document.createElement('tbody');
+                    
+                    // Encabezados de tabla de totales
+                    totalsThead.innerHTML = `
                         <tr>
-                            <th>Invernadero</th>
                             <th>Cultivo</th>
-                            <th>Cantidad Total (kg)</th>
-                            <th>Observaciones</th>
-                            <th class="projection-header">Proyección (kg)</th>
-                            <th class="projection-header">Diferencia (kg)</th>
+                            <th>Total Real (kg)</th>
+                            <th>Proyección (kg)</th>
+                            <th>Diferencia (kg)</th>
+                            <th>Desempeño</th>
                         </tr>
                     `;
                     
-                    // Totales por cultivo en la semana
-                    const totalSemana = { Mini: 0, Tomate: 0 };
-                    const totalProyeccionSemana = { 
-                        Mini: proyecciones[`${semana}_Mini`] || 0, 
-                        Tomate: proyecciones[`${semana}_Tomate`] || 0 
-                    };
-                    
-                    // Primero contar cuántos invernaderos hay por cultivo para distribuir las proyecciones
-                    const invernaderosPorCultivo = {};
-                    registrosPorSemana[semana].forEach(registro => {
-                        if (!invernaderosPorCultivo[registro.cultivo]) {
-                            invernaderosPorCultivo[registro.cultivo] = new Set();
-                        }
-                        invernaderosPorCultivo[registro.cultivo].add(registro.invernadero);
-                    });
-                    
-                    // Llenar tabla con registros resumidos
-                    registrosPorSemana[semana].forEach(registro => {
-                        const proyeccionKey = `${registro.semana}_${registro.cultivo}`;
-                        const proyeccionTotal = proyecciones[proyeccionKey] || 0;
-                        
-                        // Calcular proyección por invernadero (distribuir el total)
-                        const numInvernaderos = invernaderosPorCultivo[registro.cultivo] ? invernaderosPorCultivo[registro.cultivo].size : 1;
-                        const proyeccionPorInvernadero = proyeccionTotal / numInvernaderos;
-                        
-                        const diferencia = registro.cantidad - proyeccionPorInvernadero;
-                        
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${registro.invernadero}</td>
-                            <td>${registro.cultivo}</td>
-                            <td>${registro.cantidad.toFixed(2)}</td>
-                            <td>${registro.observaciones.filter(obs => obs).join(', ') || '-'}</td>
-                            <td class="projection-row">${proyeccionPorInvernadero.toFixed(2)}</td>
-                            <td class="${diferencia >= 0 ? 'positive' : 'negative'}">
-                                ${diferencia.toFixed(2)}
-                                <div class="comparison">
-                                    ${proyeccionPorInvernadero > 0 ? `${(diferencia/proyeccionPorInvernadero*100).toFixed(1)}%` : '-'}
-                                </div>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                        
-                        // Sumar a totales de la semana
-                        if (registro.cultivo === 'Mini' || registro.cultivo === 'Tomate') {
-                            totalSemana[registro.cultivo] += parseFloat(registro.cantidad) || 0;
-                        }
-                    });
-                    
-                    // Agregar fila de totales
-                    const totalRow = document.createElement('tr');
-                    totalRow.className = 'total-row';
-                    const totalReal = totalSemana.Mini + totalSemana.Tomate;
-                    const totalProyeccion = totalProyeccionSemana.Mini + totalProyeccionSemana.Tomate;
-                    const totalDiferencia = totalReal - totalProyeccion;
-                    
-                    totalRow.innerHTML = `
-                        <td colspan="2">Total Semana ${semana}</td>
-                        <td>${totalReal.toFixed(2)}</td>
-                        <td></td>
-                        <td class="projection-row">${totalProyeccion.toFixed(2)}</td>
-                        <td class="${totalDiferencia >= 0 ? 'positive' : 'negative'}">
-                            ${totalDiferencia.toFixed(2)}
-                            <div class="comparison">
-                                ${totalProyeccion > 0 ? `${(totalDiferencia/totalProyeccion*100).toFixed(1)}%` : '-'}
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(totalRow);
-                    
-                    // Agregar filas de totales por cultivo
+                    // Fila Mini
                     const miniRow = document.createElement('tr');
                     miniRow.className = 'total-row';
-                    const miniDiferencia = totalSemana.Mini - totalProyeccionSemana.Mini;
                     miniRow.innerHTML = `
-                        <td></td>
                         <td>Mini</td>
-                        <td>${totalSemana.Mini.toFixed(2)}</td>
-                        <td></td>
-                        <td class="projection-row">${totalProyeccionSemana.Mini.toFixed(2)}</td>
-                        <td class="${miniDiferencia >= 0 ? 'positive' : 'negative'}">
-                            ${miniDiferencia.toFixed(2)}
-                            <div class="comparison">
-                                ${totalProyeccionSemana.Mini > 0 ? `${(miniDiferencia/totalProyeccionSemana.Mini*100).toFixed(1)}%` : '-'}
-                            </div>
+                        <td>${formatNumber(totalMini)}</td>
+                        <td class="projection-row">${formatNumber(totalProyeccionMini)}</td>
+                        <td class="${diferenciaMini >= 0 ? 'positive' : 'negative'}">${formatNumber(diferenciaMini)}</td>
+                        <td class="${diferenciaMini >= 0 ? 'positive' : 'negative'}">
+                            ${totalProyeccionMini > 0 ? `${(diferenciaMini/totalProyeccionMini*100).toFixed(1)}%` : '-'}
                         </td>
                     `;
-                    tbody.appendChild(miniRow);
+                    totalsTbody.appendChild(miniRow);
                     
+                    // Fila Tomate
                     const tomateRow = document.createElement('tr');
                     tomateRow.className = 'total-row';
-                    const tomateDiferencia = totalSemana.Tomate - totalProyeccionSemana.Tomate;
                     tomateRow.innerHTML = `
-                        <td></td>
                         <td>Tomate</td>
-                        <td>${totalSemana.Tomate.toFixed(2)}</td>
-                        <td></td>
-                        <td class="projection-row">${totalProyeccionSemana.Tomate.toFixed(2)}</td>
-                        <td class="${tomateDiferencia >= 0 ? 'positive' : 'negative'}">
-                            ${tomateDiferencia.toFixed(2)}
-                            <div class="comparison">
-                                ${totalProyeccionSemana.Tomate > 0 ? `${(tomateDiferencia/totalProyeccionSemana.Tomate*100).toFixed(1)}%` : '-'}
-                            </div>
+                        <td>${formatNumber(totalTomate)}</td>
+                        <td class="projection-row">${formatNumber(totalProyeccionTomate)}</td>
+                        <td class="${diferenciaTomate >= 0 ? 'positive' : 'negative'}">${formatNumber(diferenciaTomate)}</td>
+                        <td class="${diferenciaTomate >= 0 ? 'positive' : 'negative'}">
+                            ${totalProyeccionTomate > 0 ? `${(diferenciaTomate/totalProyeccionTomate*100).toFixed(1)}%` : '-'}
                         </td>
                     `;
-                    tbody.appendChild(tomateRow);
+                    totalsTbody.appendChild(tomateRow);
                     
-                    table.appendChild(thead);
-                    table.appendChild(tbody);
-                    semanaDiv.appendChild(table);
+                    // Fila General
+                    const generalRow = document.createElement('tr');
+                    generalRow.className = 'total-row';
+                    generalRow.innerHTML = `
+                        <td><strong>Total General</strong></td>
+                        <td><strong>${formatNumber(totalGeneral)}</strong></td>
+                        <td class="projection-row"><strong>${formatNumber(totalProyeccionGeneral)}</strong></td>
+                        <td class="${diferenciaGeneral >= 0 ? 'positive' : 'negative'}"><strong>${formatNumber(diferenciaGeneral)}</strong></td>
+                        <td class="${diferenciaGeneral >= 0 ? 'positive' : 'negative'}">
+                            <strong>${totalProyeccionGeneral > 0 ? `${(diferenciaGeneral/totalProyeccionGeneral*100).toFixed(1)}%` : '-'}</strong>
+                        </td>
+                    `;
+                    totalsTbody.appendChild(generalRow);
+                    
+                    totalsTable.appendChild(totalsThead);
+                    totalsTable.appendChild(totalsTbody);
+                    semanaDiv.appendChild(totalsTable);
+                    
                     weekResults.appendChild(semanaDiv);
                 }
                 
@@ -629,11 +726,11 @@
                 const miniDiferenciaTotal = cultivosTotales.Mini - proyeccionesTotales.Mini;
                 miniCard.innerHTML = `
                     <h3>Total Mini</h3>
-                    <p>${cultivosTotales.Mini.toFixed(2)} kg</p>
+                    <p>${formatNumber(cultivosTotales.Mini)} kg</p>
                     <div style="margin-top: 10px;">
-                        <small>Proyección: ${proyeccionesTotales.Mini.toFixed(2)} kg</small>
+                        <small>Proyección: ${formatNumber(proyeccionesTotales.Mini)} kg</small>
                         <div class="${miniDiferenciaTotal >= 0 ? 'positive' : 'negative'}" style="font-weight: bold;">
-                            ${miniDiferenciaTotal >= 0 ? '+' : ''}${miniDiferenciaTotal.toFixed(2)} kg
+                            ${miniDiferenciaTotal >= 0 ? '+' : ''}${formatNumber(miniDiferenciaTotal)} kg
                             ${proyeccionesTotales.Mini > 0 ? `(${(miniDiferenciaTotal/proyeccionesTotales.Mini*100).toFixed(1)}%)` : ''}
                         </div>
                     </div>
@@ -644,11 +741,11 @@
                 const tomateDiferenciaTotal = cultivosTotales.Tomate - proyeccionesTotales.Tomate;
                 tomateCard.innerHTML = `
                     <h3>Total Tomate</h3>
-                    <p>${cultivosTotales.Tomate.toFixed(2)} kg</p>
+                    <p>${formatNumber(cultivosTotales.Tomate)} kg</p>
                     <div style="margin-top: 10px;">
-                        <small>Proyección: ${proyeccionesTotales.Tomate.toFixed(2)} kg</small>
+                        <small>Proyección: ${formatNumber(proyeccionesTotales.Tomate)} kg</small>
                         <div class="${tomateDiferenciaTotal >= 0 ? 'positive' : 'negative'}" style="font-weight: bold;">
-                            ${tomateDiferenciaTotal >= 0 ? '+' : ''}${tomateDiferenciaTotal.toFixed(2)} kg
+                            ${tomateDiferenciaTotal >= 0 ? '+' : ''}${formatNumber(tomateDiferenciaTotal)} kg
                             ${proyeccionesTotales.Tomate > 0 ? `(${(tomateDiferenciaTotal/proyeccionesTotales.Tomate*100).toFixed(1)}%)` : ''}
                         </div>
                     </div>
@@ -661,11 +758,11 @@
                 const totalDiferenciaGeneral = totalGeneral - totalProyeccionGeneral;
                 totalCard.innerHTML = `
                     <h3>Total General</h3>
-                    <p>${totalGeneral.toFixed(2)} kg</p>
+                    <p>${formatNumber(totalGeneral)} kg</p>
                     <div style="margin-top: 10px;">
-                        <small>Proyección: ${totalProyeccionGeneral.toFixed(2)} kg</small>
+                        <small>Proyección: ${formatNumber(totalProyeccionGeneral)} kg</small>
                         <div class="${totalDiferenciaGeneral >= 0 ? 'positive' : 'negative'}" style="font-weight: bold;">
-                            ${totalDiferenciaGeneral >= 0 ? '+' : ''}${totalDiferenciaGeneral.toFixed(2)} kg
+                            ${totalDiferenciaGeneral >= 0 ? '+' : ''}${formatNumber(totalDiferenciaGeneral)} kg
                             ${totalProyeccionGeneral > 0 ? `(${(totalDiferenciaGeneral/totalProyeccionGeneral*100).toFixed(1)}%)` : ''}
                         </div>
                     </div>
