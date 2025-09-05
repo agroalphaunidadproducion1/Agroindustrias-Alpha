@@ -239,13 +239,8 @@
                 <div class="col-md-6 mb-3">
                     <label class="form-label"><strong>Rango de fechas:</strong></label>
                     <div id="rango-fechas" class="form-control" style="background-color: white; height: 38px; display: flex; align-items: center;">
-                        Seleccione una semana
+                        Cargando...
                     </div>
-                </div>
-                <div class="col-12 text-center">
-                    <button class="btn btn-primary" id="btn-generar">
-                        <i class="fas fa-filter me-2"></i>Generar Reporte Semanal
-                    </button>
                 </div>
             </div>
         </div>
@@ -266,7 +261,7 @@
                         </thead>
                         <tbody id="chile-table-body">
                             <tr>
-                                <td colspan="8" class="text-center">Seleccione una semana y haga clic en Generar Reporte</td>
+                                <td colspan="8" class="text-center">Cargando datos de asistencia...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -296,7 +291,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="chile-resumen">
-                                                <tr><td colspan="2" class="text-center">Seleccione una semana</td></tr>
+                                                <tr><td colspan="2" class="text-center">Cargando...</td></tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -324,7 +319,7 @@
                         </thead>
                         <tbody id="tomate-table-body">
                             <tr>
-                                <td colspan="8" class="text-center">Seleccione una semana y haga clic en Generar Reporte</td>
+                                <td colspan="8" class="text-center">Cargando datos de asistencia...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -354,7 +349,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="tomate-resumen">
-                                                <tr><td colspan="2" class="text-center">Seleccione una semana</td></tr>
+                                                <tr><td colspan="2" class="text-center">Cargando...</td></tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -404,57 +399,95 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            // Configurar event listeners
-            document.getElementById('btn-generar').addEventListener('click', loadReportData);
-            
             // Cargar datos iniciales
             loadEmployees();
-            loadWeeksSelector();
+            loadWeeksSelector().then(() => {
+                // Una vez cargado el selector, seleccionar automáticamente la última semana
+                selectLatestWeekWithData();
+            });
         });
 
         // Cargar selector de semanas
         function loadWeeksSelector() {
-            const selector = document.getElementById('semana-select');
-            selector.innerHTML = '';
-            
-            // Obtener el año actual
+            return new Promise((resolve) => {
+                const selector = document.getElementById('semana-select');
+                selector.innerHTML = '';
+                
+                // Obtener el año actual
+                const currentYear = new Date().getFullYear();
+                
+                // Generar opciones para las 52 semanas del año
+                for (let week = 1; week <= 52; week++) {
+                    const option = document.createElement('option');
+                    option.value = week;
+                    option.textContent = `Semana ${week} - ${currentYear}`;
+                    selector.appendChild(option);
+                }
+                
+                // Event listener para cuando se cambie la semana manualmente
+                selector.addEventListener('change', function() {
+                    updateWeekDates(this.value);
+                    loadAttendanceData();
+                });
+                
+                resolve();
+            });
+        }
+
+        // Seleccionar automáticamente la última semana con datos
+        function selectLatestWeekWithData() {
+            // Obtener las últimas 8 semanas (para encontrar la más reciente con datos)
             const currentYear = new Date().getFullYear();
-            
-            // Generar opciones para las 52 semanas del año
-            for (let week = 1; week <= 52; week++) {
-                const option = document.createElement('option');
-                option.value = week;
-                option.textContent = `Semana ${week} - ${currentYear}`;
-                selector.appendChild(option);
-            }
-            
-            // Seleccionar la semana actual por defecto
             const currentWeek = getWeekNumber(new Date());
-            selector.value = currentWeek;
-            updateWeekDates(currentWeek);
+            
+            // Verificar semanas desde la actual hacia atrás
+            checkWeeksForData(currentWeek, currentYear, 8);
+        }
+
+        // Verificar semanas para encontrar la más reciente con datos
+        function checkWeeksForData(startWeek, year, weeksToCheck) {
+            const selector = document.getElementById('semana-select');
+            let weeksChecked = 0;
+            
+            const checkWeek = (week) => {
+                if (weeksChecked >= weeksToCheck) {
+                    // Si no encontramos datos en las últimas semanas, usar la semana actual
+                    selector.value = currentWeek;
+                    updateWeekDates(currentWeek);
+                    loadAttendanceData();
+                    return;
+                }
+                
+                const firstDay = getFirstDayOfWeek(week, year);
+                const checkDate = formatDate(firstDay);
+                
+                // Verificar si existe esta fecha en Firebase
+                attendanceRef.child(checkDate).once('value').then(snapshot => {
+                    if (snapshot.exists()) {
+                        // Encontramos datos, seleccionar esta semana
+                        selector.value = week;
+                        updateWeekDates(week);
+                        loadAttendanceData();
+                    } else {
+                        // No hay datos, probar con la semana anterior
+                        weeksChecked++;
+                        const prevWeek = week > 1 ? week - 1 : 52;
+                        checkWeek(prevWeek);
+                    }
+                }).catch(error => {
+                    console.error('Error al verificar datos de la semana:', error);
+                    // En caso de error, seguir con la siguiente semana
+                    weeksChecked++;
+                    const prevWeek = week > 1 ? week - 1 : 52;
+                    checkWeek(prevWeek);
+                });
+            };
+            
+            // Comenzar con la semana actual
+            checkWeek(startWeek);
         }
 
         // Actualizar rango de fechas al cambiar la semana
-        document.getElementById('semana-select').addEventListener('change', function() {
-            updateWeekDates(this.value);
-        });
-
-        // Obtener el número de semana de una fecha (formato ISO)
-        function getWeekNumber(date) {
-            date = new Date(date);
-            date.setHours(0, 0, 0, 0);
-            
-            // Thursday in current week decides the year.
-            date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-            
-            // January 4 is always in week 1.
-            const week1 = new Date(date.getFullYear(), 0, 4);
-            
-            // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-            return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-        }
-
-        // Actualizar el rango de fechas según la semana seleccionada
         function updateWeekDates(weekNumber) {
             if (!weekNumber) return;
             
@@ -481,6 +514,21 @@
             
             document.getElementById('rango-fechas').textContent = 
                 `${startFormatted} al ${endFormatted} de ${year}`;
+        }
+
+        // Obtener el número de semana de una fecha (formato ISO)
+        function getWeekNumber(date) {
+            date = new Date(date);
+            date.setHours(0, 0, 0, 0);
+            
+            // Thursday in current week decides the year.
+            date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+            
+            // January 4 is always in week 1.
+            const week1 = new Date(date.getFullYear(), 0, 4);
+            
+            // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+            return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
         }
 
         // Obtener el primer día (lunes) de una semana específica
@@ -526,14 +574,10 @@
             });
         }
 
-        // Cargar datos del reporte
-        function loadReportData() {
-            const weekNumber = document.getElementById('semana-select').value;
-            
-            if (!weekNumber) {
-                showError('Por favor seleccione una semana');
-                return;
-            }
+        // Cargar datos de asistencia
+        function loadAttendanceData() {
+            weekData = {};
+            availableWeekDates = [];
             
             // Mostrar mensaje de carga
             document.getElementById('chile-table-body').innerHTML = 
@@ -544,25 +588,6 @@
             
             // Resetear resúmenes
             resetSummaries();
-            
-            loadAttendanceData();
-        }
-
-        // Resetear resúmenes
-        function resetSummaries() {
-            document.getElementById('chile-promedio').textContent = '0%';
-            document.getElementById('tomate-promedio').textContent = '0%';
-            
-            document.getElementById('chile-resumen').innerHTML = 
-                '<tr><td colspan="2" class="text-center">Cargando...</td></tr>';
-            document.getElementById('tomate-resumen').innerHTML = 
-                '<tr><td colspan="2" class="text-center">Cargando...</td></tr>';
-        }
-
-        // Cargar datos de asistencia
-        function loadAttendanceData() {
-            weekData = {};
-            availableWeekDates = [];
             
             // Primero verificar qué fechas existen en la base de datos
             const checkPromises = currentWeekDates.map(date => {
@@ -616,6 +641,17 @@
                 console.error('Error al verificar fechas existentes:', error);
                 showError('Error al verificar datos disponibles');
             });
+        }
+
+        // Resetear resúmenes
+        function resetSummaries() {
+            document.getElementById('chile-promedio').textContent = '0%';
+            document.getElementById('tomate-promedio').textContent = '0%';
+            
+            document.getElementById('chile-resumen').innerHTML = 
+                '<tr><td colspan="2" class="text-center">Cargando...</td></tr>';
+            document.getElementById('tomate-resumen').innerHTML = 
+                '<tr><td colspan="2" class="text-center">Cargando...</td></tr>';
         }
 
         // Procesar datos para el reporte
