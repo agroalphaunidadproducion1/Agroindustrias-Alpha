@@ -308,11 +308,12 @@
           <th>Ingrediente Activo</th>
           <th>Dosis/Litro</th>
           <th>Días a Cosecha</th>
-          <th>Registro Senasa</th>
-          <th>Registro EPA</th>
+          <!-- Nuevo orden de columnas -->
           <th>Periodo de Reingreso</th>
-          <th>Plagas</th>
           <th>Dosis Máxima</th>
+          <th>Plagas</th>
+          <th>Registro EPA</th>
+          <th>Registro Senasa</th>
           <th>Banda</th>
         </tr>
       </thead>
@@ -510,11 +511,12 @@
             <td>${p.ingredientes || '-'}</td>
             <td>${dosisLitro || '-'}</td>
             <td>${dias || '-'}</td>
-            <td>${p.senasa || '-'}</td>
-            <td>${enlaceEPA}</td>
+            <!-- Nuevo orden de columnas -->
             <td>${reingreso || '-'}</td>
-            <td>${plagas || '-'}</td>
             <td>${dosisMaxima || '-'}</td>
+            <td>${plagas || '-'}</td>
+            <td>${enlaceEPA}</td>
+            <td>${p.senasa || '-'}</td>
             <td><div class="banda-color" style="background-color: ${colorBanda}" title="${p.banda || 'Sin banda'}"></div></td>
           </tr>
         `;
@@ -544,11 +546,12 @@
                 <th>Ingrediente Activo</th>
                 <th>Dosis/Litro</th>
                 <th>Días a Cosecha</th>
-                <th>Registro Senasa</th>
-                <th>Registro EPA</th>
+                <!-- Nuevo orden de columnas -->
                 <th>Periodo de Reingreso</th>
-                <th>Plagas</th>
                 <th>Dosis Máxima</th>
+                <th>Plagas</th>
+                <th>Registro EPA</th>
+                <th>Registro Senasa</th>
                 <th>Banda</th>
               </tr>
             </thead>
@@ -567,11 +570,12 @@
                 <td>${p.ingredientes || ''}</td>
                 <td>${p.dosis_litro_mini || ''}</td>
                 <td>${p.dias_mini || ''}</td>
-                <td>${p.senasa || ''}</td>
-                <td>${p.epa || ''}</td>
+                <!-- Nuevo orden de columnas -->
                 <td>${p.reingreso_mini || ''}</td>
-                <td>${p.plagas_mini || ''}</td>
                 <td>${p.dosis_maxima_mini || ''}</td>
+                <td>${p.plagas_mini || ''}</td>
+                <td>${p.epa || ''}</td>
+                <td>${p.senasa || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
             `;
@@ -585,11 +589,12 @@
                 <td>${p.ingredientes || ''}</td>
                 <td>${p.dosis_litro_tomate || ''}</td>
                 <td>${p.dias_tomate || ''}</td>
-                <td>${p.senasa || ''}</td>
-                <td>${p.epa || ''}</td>
+                <!-- Nuevo orden de columnas -->
                 <td>${p.reingreso_tomate || ''}</td>
-                <td>${p.plagas_tomate || ''}</td>
                 <td>${p.dosis_maxima_tomate || ''}</td>
+                <td>${p.plagas_tomate || ''}</td>
+                <td>${p.epa || ''}</td>
+                <td>${p.senasa || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
             `;
@@ -611,11 +616,12 @@
                 <td>${p.ingredientes || ''}</td>
                 <td>${datos.dosisLitro || ''}</td>
                 <td>${datos.dias || ''}</td>
-                <td>${p.senasa || ''}</td>
-                <td>${p.epa || ''}</td>
+                <!-- Nuevo orden de columnas -->
                 <td>${datos.reingreso || ''}</td>
-                <td>${datos.plagas || ''}</td>
                 <td>${datos.dosisMaxima || ''}</td>
+                <td>${datos.plagas || ''}</td>
+                <td>${p.epa || ''}</td>
+                <td>${p.senasa || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
             `;
