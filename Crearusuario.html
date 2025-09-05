@@ -9,13 +9,14 @@
             --primary-color: #4CAF50;
             --secondary-color: #45a049;
             --admin-color: #2196F3;
-            --grower-junior-color: #FF9800; /* Cambiado a Grower Junior */
+            --grower-junior-color: #FF9800;
             --digitador-color: #9C27B0;
             --tecnico-color: #607D8B;
             --supervisor-color: #FF5722;
             --invitado-color: #9E9E9E;
             --gerente-general-color: #E91E63;
             --gerente-produccion-color: #3F51B5;
+            --jefe-vivero-color: #009688; /* Nuevo color para Jefe de Vivero */
             --error-color: #f44336;
             --light-gray: #f5f5f5;
             --white: #ffffff;
@@ -158,6 +159,7 @@
         .invitado-badge { background-color: var(--invitado-color); color: white; }
         .gerente-general-badge { background-color: var(--gerente-general-color); color: white; }
         .gerente-produccion-badge { background-color: var(--gerente-produccion-color); color: white; }
+        .jefe-vivero-badge { background-color: var(--jefe-vivero-color); color: white; } /* Nuevo estilo para Jefe de Vivero */
     </style>
 </head>
 <body>
@@ -187,6 +189,7 @@
                 <option value="Gerente General">Gerente General</option>
                 <option value="Gerente de Producción">Gerente de Producción</option>
                 <option value="Supervisor">Supervisor</option>
+                <option value="Jefe de Vivero">Jefe de Vivero</option> <!-- Nuevo rol agregado -->
                 <option value="Grower Junior">Grower Junior</option>
                 <option value="Digitador">Digitador</option>
                 <option value="Técnico Fitosanidad">Técnico Fitosanidad</option>
@@ -257,6 +260,7 @@
                 case 'Gerente General': return 'gerente-general-badge';
                 case 'Gerente de Producción': return 'gerente-produccion-badge';
                 case 'Supervisor': return 'supervisor-badge';
+                case 'Jefe de Vivero': return 'jefe-vivero-badge'; // Nuevo caso para Jefe de Vivero
                 case 'Grower Junior': return 'grower-junior-badge';
                 case 'Digitador': return 'digitador-badge';
                 case 'Técnico Fitosanidad': return 'fitosanidad-badge';
