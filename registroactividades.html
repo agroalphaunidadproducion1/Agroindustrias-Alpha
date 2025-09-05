@@ -288,10 +288,10 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Definir invernaderos por cultivo
+        // Definir invernaderos por cultivo (agregado vivero al tomate)
         const invernaderosPorCultivo = {
             chile: ['9', '10', '11', '12', '33', '35', '37', '39'],
-            tomate: ['13', '14', '15', '16']
+            tomate: ['13', '14', '15', '16', 'vivero']
         };
 
         // Definir actividades por cultivo (Cosecha primero en ambos)
@@ -300,7 +300,7 @@
             tomate: ['Cosecha', 'Enguie', 'Bajado', 'Deshoje', 'Desbrote']
         };
 
-        // Definir metas de camas por invernadero
+        // Definir metas de camas por invernadero (agregada meta para vivero: 64 camas)
         const metasCamas = {
             '9': 274,
             '10': 270,
@@ -313,7 +313,8 @@
             '33': 276,
             '35': 276,
             '37': 284,
-            '39': 284
+            '39': 284,
+            'vivero': 64  // Nueva meta para el vivero
         };
 
         // Preferencias de usuario
@@ -367,7 +368,7 @@
                 (preferenciasUsuario.cultivo === 'chile' ? 'Chile' : 'Tomate') : 'No seleccionado';
                 
             document.getElementById('prefInvernadero').textContent = preferenciasUsuario.invernadero ? 
-                `Invernadero ${preferenciasUsuario.invernadero}` : 'No seleccionado';
+                (preferenciasUsuario.invernadero === 'vivero' ? 'Vivero' : `Invernadero ${preferenciasUsuario.invernadero}`) : 'No seleccionado';
         }
 
         // Mostrar formulario de preferencias
@@ -401,7 +402,7 @@
                 invernaderosPorCultivo[cultivo].forEach(inv => {
                     const option = document.createElement('option');
                     option.value = inv;
-                    option.textContent = `Invernadero ${inv}`;
+                    option.textContent = inv === 'vivero' ? 'Vivero' : `Invernadero ${inv}`;
                     invernaderoSelect.appendChild(option);
                 });
             } else {
