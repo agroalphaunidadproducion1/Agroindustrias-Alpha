@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Accesos - Sistema Agroalpha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2E7D32;
+            --primary-light: #4CAF50;
+            --primary-dark: #1B5E20;
+            --admin-color: #1976D2;
+            --supervisor-color: #7B1FA2;
+            --grower-color: #D32F2F;
+            --digitador-color: #C2185B;
+            --tecnico-color: #0288D1;
+            --culturales-color: #5D4037;
+            --riego-color: #0097A7;
+            --invitado-color: #616161;
+            --gerente-color: #FF9800;
+            --camaron-color: #607D8B;
+            --jefe-vivero-color: #009688;
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --dark-gray: #343a40;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --card-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .brand-icon {
+            font-size: 20px;
+        }
+        
+        .brand-text h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            margin-top: 4px;
+        }
+        
+        .admin-badge { background-color: var(--admin-color); }
+        .supervisor-badge { background-color: var(--supervisor-color); }
+        .grower-badge { background-color: var(--grower-color); }
+        .digitador-badge { background-color: var(--digitador-color); }
+        .fitosanidad-badge { background-color: var(--tecnico-color); }
+        .culturales-badge { background-color: var(--culturales-color); }
+        .riego-badge { background-color: var(--riego-color); }
+        .invitado-badge { background-color: var(--invitado-color); }
+        .gerente-badge { background-color: var(--gerente-color); }
+        .camaron-badge { background-color: var(--camaron-color); }
+        .jefe-vivero-badge { background-color: var(--jefe-vivero-color); }
+        
+        .back-btn, .logout-btn, .add-module-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .back-btn:hover, .logout-btn:hover, .add-module-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .add-module-btn {
+            background-color: var(--primary-light);
+            font-weight: bold;
+        }
+        
+        .add-module-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-panels {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        .roles-panel {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            height: fit-content;
+        }
+        
+        .panel-title {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .roles-list {
+            list-style: none;
+        }
+        
+        .role-item {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .role-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .role-item.active {
+            background-color: #e8f5e9;
+            font-weight: 600;
+        }
+        
+        .modules-panel {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+        }
+        
+        .modules-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .module-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .module-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+        
+        .module-title {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        
+        .module-description {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .module-link {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        
+        .module-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--success-color);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .delete-module {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--danger-color);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .delete-module:hover {
+            opacity: 1;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--white);
+            margin-top: 30px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            background-color: var(--success-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+        
+        .icon-selector {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .icon-search {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        
+        .icon-option {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .icon-option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .icon-option.selected {
+            background-color: var(--primary-light);
+            color: white;
+        }
+        
+        .selected-icon-preview {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 900px) {
+            .admin-panels {
+                grid-template-columns: 1fr;
+            }
+            
+            .icons-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .icons-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <div class="brand-text">
+                <h1>Administración de Accesos - Agroalpha</h1>
+            </div>
+        </div>
+        
+        <div class="user-info">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+            <button class="add-module-btn" id="addModuleBtn">
+                <i class="fas fa-plus"></i> Agregar Módulo
+            </button>
+            <div class="user-details">
+                <span id="user-name">Usuario Administrador</span>
+                <span class="role-badge admin-badge">Administrador</span>
+            </div>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
+        </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="page-title">
+            <h1><i class="fas fa-unlock-alt"></i> Configuración de Permisos por Rol</h1>
+        </div>
+        
+        <div class="admin-panels">
+            <div class="roles-panel">
+                <h2 class="panel-title">
+                    <i class="fas fa-user-tag"></i> Roles del Sistema
+                </h2>
+                <ul class="roles-list" id="rolesList">
+                    <li class="role-item active" data-role="Administrador">
+                        <span>Administrador</span>
+                        <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                    </li>
+                    <li class="role-item" data-role="Gerente General">
+                        <span>Gerente General</span>
+                    </li>
+                    <li class="role-item" data-role="Gerente de Producción">
+                        <span>Gerente de Producción</span>
+                    </li>
+                    <li class="role-item" data-role="Supervisor">
+                        <span>Supervisor</span>
+                    </li>
+                    <li class="role-item" data-role="Jefe de Vivero">
+                        <span>Jefe de Vivero</span>
+                    </li>
+                    <li class="role-item" data-role="Grower Junior">
+                        <span>Grower Junior</span>
+                    </li>
+                    <li class="role-item" data-role="Digitador">
+                        <span>Digitador</span>
+                    </li>
+                    <li class="role-item" data-role="Técnico Fitosanidad">
+                        <span>Técnico Fitosanidad</span>
+                    </li>
+                    <li class="role-item" data-role="Técnico Prácticas Culturales">
+                        <span>Técnico Prácticas Culturales</span>
+                    </li>
+                    <li class="role-item" data-role="Técnico Riego">
+                        <span>Técnico Riego</span>
+                    </li>
+                    <li class="role-item" data-role="Invitado">
+                        <span>Invitado</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="modules-panel">
+                <div class="modules-header">
+                    <h2 class="panel-title">
+                        <i class="fas fa-th-large"></i> Módulos para: <span id="selectedRole">Administrador</span>
+                    </h2>
+                </div>
+                <p>Selecciona los módulos a los que tendrá acceso este rol.</p>
+                
+                <div class="modules-grid" id="modulesGrid">
+                    <!-- Módulos se cargarán dinámicamente -->
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-undo"></i> Restablecer
+                    </button>
+                    <button class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar módulo -->
+    <div class="modal" id="moduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Agregar Nuevo Módulo</h2>
+                <span class="close-modal" id="closeModal">&times;</span>
+            </div>
+            <form id="moduleForm">
+                <input type="hidden" id="moduleId">
+                <div class="form-group">
+                    <label for="moduleTitle">Nombre del Módulo</label>
+                    <input type="text" id="moduleTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="moduleDescription">Descripción</label>
+                    <input type="text" id="moduleDescription" required>
+                </div>
+                <div class="form-group">
+                    <label for="moduleIcon">Icono</label>
+                    <input type="text" id="moduleIcon" placeholder="fa-users-gear" required readonly>
+                    <small>Selecciona un icono de la lista</small>
+                    
+                    <div class="icon-selector">
+                        <input type="text" class="icon-search" id="iconSearch" placeholder="Buscar icono...">
+                        <div class="icons-grid" id="iconsGrid">
+                            <!-- Iconos se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="selected-icon-preview">
+                        <i id="iconPreview"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="moduleLink">URL del Módulo</label>
+                    <input type="text" id="moduleLink" placeholder="modulo.html" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Módulo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notificationText">Cambios guardados correctamente</span>
+    </div>
+
+    <div class="footer">
+        <p>Agroalpha © 2025 | Sistema de Administración de Accesos</p>
+    </div>
+
+    <script>
+        // Lista de iconos FontAwesome comunes
+        const commonIcons = [
+            'fa-users', 'fa-user-tie', 'fa-clipboard-check', 'fa-clipboard-list', 
+            'fa-database', 'fa-folder-tree', 'fa-bug', 'fa-list-check', 'fa-flask', 
+            'fa-spray-can', 'fa-eye', 'fa-user-check', 'fa-shrimp', 'fa-project-diagram', 
+            'fa-magnifying-glass', 'fa-droplet', 'fa-cloud-rain', 'fa-file-lines', 
+            'fa-chart-bar', 'fa-cog', 'fa-wrench', 'fa-tools', 'fa-chart-line', 
+            'fa-chart-pie', 'fa-table', 'fa-map', 'fa-map-marker', 'fa-calendar', 
+            'fa-clock', 'fa-bell', 'fa-envelope', 'fa-inbox', 'fa-box', 'fa-pallet', 
+            'fa-truck', 'fa-warehouse', 'fa-seedling', 'fa-leaf', 'fa-tree', 
+            'fa-tint', 'fa-cloud-sun', 'fa-temperature-high', 'fa-weight-hanging', 
+            'fa-ruler', 'fa-flask', 'fa-vial', 'fa-microscope', 'fa-prescription-bottle', 
+            'fa-pump-medical', 'fa-syringe', 'fa-pills', 'fa-first-aid', 'fa-heartbeat', 
+            'fa-laptop', 'fa-mobile', 'fa-tablet', 'fa-print', 'fa-server', 'fa-hdd', 
+            'fa-microchip', 'fa-memory', 'fa-desktop', 'fa-keyboard', 'fa-mouse', 
+            'fa-network-wired', 'fa-wifi', 'fa-bluetooth', 'fa-broadcast-tower', 
+            'fa-satellite', 'fa-satellite-dish', 'fa-shield-alt', 'fa-lock', 
+            'fa-unlock', 'fa-key', 'fa-fingerprint', 'fa-id-card', 'fa-passport', 
+            'fa-credit-card', 'fa-money-bill', 'fa-money-bill-wave', 'fa-money-check', 
+            'fa-calculator', 'fa-percentage', 'fa-receipt', 'fa-shopping-cart', 
+            'fa-store', 'fa-tag', 'fa-tags', 'fa-gift', 'fa-award', 'fa-trophy', 
+            'fa-medal', 'fa-crown', 'fa-star', 'fa-flag', 'fa-bookmark', 'fa-heart', 
+            'fa-thumbs-up', 'fa-thumbs-down', 'fa-comment', 'fa-comments', 'fa-quote-left'
+        ];
+
+        // Datos de ejemplo para los módulos del sistema
+        let systemModules = [
+            { id: 'users', icon: 'fa-users-gear', title: 'Gestión de Usuarios', description: 'Crear y administrar usuarios del sistema', link: 'gestionuser.html' },
+            { id: 'attendance', icon: 'fa-clipboard-check', title: 'Control de Asistencias', description: 'Registrar y consultar asistencias del personal', link: 'reporteasistencia.html' },
+            { id: 'staff', icon: 'fa-user-tie', title: 'Administrar Personal', description: 'Gestionar información del personal', link: 'adminpersonal.html' },
+            { id: 'records', icon: 'fa-clipboard-list', title: 'Registros', description: 'Registros generales del sistema', link: 'registrar.html' },
+            { id: 'harvest', icon: 'fa-database', title: 'Cosechas', description: 'Seguimiento de cosechas y producción', link: 'Vercosechas.html' },
+            { id: 'documents', icon: 'fa-folder-tree', title: 'Documentos', description: 'Gestión documental del sistema', link: 'documentos.html' },
+            { id: 'beneficios', icon: 'fa-bug', title: 'Organismos Benéficos', description: 'Control de organismos benéficos', link: 'verdanobeneficos.html' },
+            { id: 'activities', icon: 'fa-list-check', title: 'Actividades', description: 'Planificación y seguimiento de actividades', link: 'reporteactividades.html' },
+            { id: 'chemicals', icon: 'fa-flask', title: 'Agroquímicos', description: 'Inventario y control de agroquímicos', link: 'veragroquimicos.html' },
+            { id: 'database', icon: 'fa-database', title: 'Base de Datos', description: 'Administración de bases de datos', link: 'administrarbases.html' },
+            { id: 'applications', icon: 'fa-spray-can', title: 'Aplicaciones', description: 'Registro de aplicaciones realizadas', link: 'ingresoaplicaciones.html' },
+            { id: 'view-apps', icon: 'fa-eye', title: 'Visualizar Aplicaciones', description: 'Consultar aplicaciones registradas', link: 'visualizaraplicaciones.html' },
+            { id: 'register-att', icon: 'fa-user-check', title: 'Registrar Asistencia', description: 'Registro diario de asistencias', link: 'registrarasistencia.html' },
+            { id: 'register-act', icon: 'fa-clipboard-list', title: 'Registrar Actividades', description: 'Registro de actividades realizadas', link: 'registroactividades.html' },
+            { id: 'shrimp', icon: 'fa-shrimp', title: 'Módulo Camaron', description: 'Gestión de producción camaronera', link: 'camaron.html' },
+            { id: 'projections', icon: 'fa-project-diagram', title: 'Proyecciones', description: 'Proyecciones de producción y rendimiento', link: 'proyecciones.html' },
+            { id: 'queries', icon: 'fa-magnifying-glass', title: 'Consultas', description: 'Sistema de consultas generales', link: 'sistemaAsistencia.html' },
+            { id: 'pests', icon: 'fa-bug', title: 'Control de Plagas', description: 'Manejo integrado de plagas', link: 'plagas.html' },
+            { id: 'irrigation', icon: 'fa-droplet', title: 'Gestión de Riego', description: 'Control y programación de riego', link: 'riego.html' },
+            { id: 'humidity', icon: 'fa-cloud-rain', title: 'Control de Humedad', description: 'Monitoreo de humedad ambiental', link: 'humedad.html' },
+            { id: 'public-reports', icon: 'fa-file-lines', title: 'Reportes Públicos', description: 'Reportes de acceso general', link: 'reportes-publicos.html' }
+        ];
+
+        // Permisos por rol (datos de ejemplo)
+        let rolePermissions = {
+            'Administrador': systemModules.map(m => m.id), // Admin tiene acceso a todo
+            'Gerente General': ['attendance', 'activities', 'beneficios', 'records', 'chemicals', 'documents'],
+            'Gerente de Producción': ['attendance', 'activities', 'beneficios', 'records', 'chemicals', 'documents'],
+            'Supervisor': ['register-att', 'register-act', 'activities', 'attendance'],
+            'Jefe de Vivero': ['register-att', 'register-act', 'activities', 'attendance'],
+            'Grower Junior': ['attendance', 'activities', 'beneficios', 'records', 'chemicals', 'documents', 'shrimp', 'view-apps'],
+            'Digitador': ['harvest', 'projections', 'queries'],
+            'Técnico Fitosanidad': ['attendance', 'beneficios', 'records', 'chemicals', 'documents', 'pests', 'applications'],
+            'Técnico Prácticas Culturales': ['attendance', 'activities', 'records'],
+            'Técnico Riego': ['irrigation', 'humidity'],
+            'Invitado': ['queries', 'public-reports']
+        };
+
+        // Elementos del DOM
+        const rolesList = document.getElementById('rolesList');
+        const selectedRoleSpan = document.getElementById('selectedRole');
+        const modulesGrid = document.getElementById('modulesGrid');
+        const saveBtn = document.getElementById('saveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const backBtn = document.getElementById('backBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const addModuleBtn = document.getElementById('addModuleBtn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const moduleModal = document.getElementById('moduleModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelModal = document.getElementById('cancelModal');
+        const moduleForm = document.getElementById('moduleForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const moduleIdInput = document.getElementById('moduleId');
+        const moduleTitleInput = document.getElementById('moduleTitle');
+        const moduleDescriptionInput = document.getElementById('moduleDescription');
+        const moduleIconInput = document.getElementById('moduleIcon');
+        const moduleLinkInput = document.getElementById('moduleLink');
+        const iconsGrid = document.getElementById('iconsGrid');
+        const iconSearch = document.getElementById('iconSearch');
+        const iconPreview = document.getElementById('iconPreview');
+
+        // Rol actualmente seleccionado
+        let currentRole = 'Administrador';
+        let editingModuleId = null;
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            renderModules(currentRole);
+            renderIcons();
+            
+            // Configurar event listeners
+            rolesList.addEventListener('click', function(e) {
+                if (e.target.classList.contains('role-item')) {
+                    selectRole(e.target.dataset.role);
+                } else if (e.target.parentElement.classList.contains('role-item')) {
+                    selectRole(e.target.parentElement.dataset.role);
+                }
+            });
+            
+            saveBtn.addEventListener('click', savePermissions);
+            resetBtn.addEventListener('click', resetPermissions);
+            backBtn.addEventListener('click', goBack);
+            logoutBtn.addEventListener('click', logout);
+            addModuleBtn.addEventListener('click', openAddModuleModal);
+            closeModal.addEventListener('click', closeModuleModal);
+            cancelModal.addEventListener('click', closeModuleModal);
+            moduleForm.addEventListener('submit', saveModule);
+            iconSearch.addEventListener('input', filterIcons);
+            
+            // Cerrar modal al hacer clic fuera del contenido
+            moduleModal.addEventListener('click', function(e) {
+                if (e.target === moduleModal) {
+                    closeModuleModal();
+                }
+            });
+        });
+
+        // Renderizar iconos en el grid
+        function renderIcons() {
+            iconsGrid.innerHTML = '';
+            
+            commonIcons.forEach(icon => {
+                const iconOption = document.createElement('div');
+                iconOption.className = 'icon-option';
+                iconOption.innerHTML = `<i class="fas ${icon}"></i>`;
+                iconOption.dataset.icon = icon;
+                
+                iconOption.addEventListener('click', () => {
+                    selectIcon(icon);
+                });
+                
+                iconsGrid.appendChild(iconOption);
+            });
+        }
+
+        // Filtrar iconos según la búsqueda
+        function filterIcons() {
+            const searchTerm = iconSearch.value.toLowerCase();
+            const iconOptions = iconsGrid.querySelectorAll('.icon-option');
+            
+            iconOptions.forEach(option => {
+                const iconName = option.dataset.icon.toLowerCase();
+                if (iconName.includes(searchTerm)) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        }
+
+        // Seleccionar un icono
+        function selectIcon(icon) {
+            moduleIconInput.value = icon;
+            iconPreview.className = `fas ${icon}`;
+            
+            // Resaltar el icono seleccionado
+            const iconOptions = iconsGrid.querySelectorAll('.icon-option');
+            iconOptions.forEach(option => {
+                if (option.dataset.icon === icon) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+
+        // Cargar datos desde localStorage
+        function loadFromLocalStorage() {
+            const savedModules = localStorage.getItem('systemModules');
+            const savedPermissions = localStorage.getItem('rolePermissions');
+            
+            if (savedModules) {
+                systemModules = JSON.parse(savedModules);
+            }
+            
+            if (savedPermissions) {
+                rolePermissions = JSON.parse(savedPermissions);
+                
+                // Asegurar que el administrador siempre tenga acceso a todos los módulos
+                rolePermissions['Administrador'] = systemModules.map(m => m.id);
+            }
+        }
+
+        // Guardar datos en localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('systemModules', JSON.stringify(systemModules));
+            localStorage.setItem('rolePermissions', JSON.stringify(rolePermissions));
+        }
+
+        // Seleccionar un rol
+        function selectRole(role) {
+            currentRole = role;
+            
+            // Actualizar UI
+            document.querySelectorAll('.role-item').forEach(item => {
+                if (item.dataset.role === role) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            selectedRoleSpan.textContent = role;
+            renderModules(role);
+        }
+
+        // Renderizar módulos para el rol seleccionado
+        function renderModules(role) {
+            modulesGrid.innerHTML = '';
+            
+            const permissions = rolePermissions[role] || [];
+            
+            systemModules.forEach(module => {
+                const isEnabled = permissions.includes(module.id);
+                
+                const moduleCard = document.createElement('div');
+                moduleCard.className = 'module-card';
+                moduleCard.innerHTML = `
+                    <i class="fas fa-times delete-module" data-module="${module.id}"></i>
+                    <div class="module-header">
+                        <div class="module-icon"><i class="fas ${module.icon}"></i></div>
+                        <div class="module-title">${module.title}</div>
+                    </div>
+                    <div class="module-description">${module.description}</div>
+                    <div class="module-link">${module.link}</div>
+                    <div class="module-actions">
+                        <span>${isEnabled ? 'Habilitado' : 'Deshabilitado'}</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${isEnabled ? 'checked' : ''} data-module="${module.id}">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                `;
+                
+                // Agregar evento para editar módulo al hacer doble clic
+                moduleCard.addEventListener('dblclick', () => {
+                    editModule(module.id);
+                });
+                
+                // Agregar evento para eliminar módulo
+                const deleteBtn = moduleCard.querySelector('.delete-module');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteModule(module.id);
+                });
+                
+                modulesGrid.appendChild(moduleCard);
+            });
+        }
+
+        // Guardar permisos
+        function savePermissions() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const newPermissions = [];
+            
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    newPermissions.push(checkbox.dataset.module);
+                }
+            });
+            
+            rolePermissions[currentRole] = newPermissions;
+            
+            // Asegurar que el administrador siempre tenga acceso a todos los módulos
+            if (currentRole === 'Administrador') {
+                rolePermissions['Administrador'] = systemModules.map(m => m.id);
+            }
+            
+            saveToLocalStorage();
+            showNotification('Permisos actualizados correctamente para ' + currentRole);
+        }
+
+        // Restablecer permisos a los valores predeterminados
+        function resetPermissions() {
+            if (confirm(`¿Estás seguro de que deseas restablecer los permisos para ${currentRole} a los valores predeterminados?`)) {
+                // Eliminar permisos personalizados para este rol
+                delete rolePermissions[currentRole];
+                
+                // Asegurar que el administrador siempre tenga acceso a todos los módulos
+                if (currentRole === 'Administrador') {
+                    rolePermissions['Administrador'] = systemModules.map(m => m.id);
+                }
+                
+                saveToLocalStorage();
+                renderModules(currentRole);
+                showNotification('Permisos restablecidos para ' + currentRole);
+            }
+        }
+
+        // Abrir modal para agregar módulo
+        function openAddModuleModal() {
+            editingModuleId = null;
+            modalTitle.textContent = 'Agregar Nuevo Módulo';
+            moduleForm.reset();
+            moduleIdInput.value = '';
+            iconPreview.className = '';
+            iconSearch.value = '';
+            filterIcons();
+            
+            // Limpiar selección de iconos
+            const iconOptions = iconsGrid.querySelectorAll('.icon-option');
+            iconOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            moduleModal.style.display = 'flex';
+        }
+
+        // Editar módulo existente
+        function editModule(moduleId) {
+            const module = systemModules.find(m => m.id === moduleId);
+            if (!module) return;
+            
+            editingModuleId = moduleId;
+            modalTitle.textContent = 'Editar Módulo';
+            moduleIdInput.value = module.id;
+            moduleTitleInput.value = module.title;
+            moduleDescriptionInput.value = module.description;
+            moduleIconInput.value = module.icon;
+            moduleLinkInput.value = module.link;
+            
+            // Mostrar vista previa del icono
+            iconPreview.className = `fas ${module.icon}`;
+            
+            // Resaltar el icono seleccionado
+            const iconOptions = iconsGrid.querySelectorAll('.icon-option');
+            iconOptions.forEach(option => {
+                if (option.dataset.icon === module.icon) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+            
+            iconSearch.value = '';
+            filterIcons();
+            
+            moduleModal.style.display = 'flex';
+        }
+
+        // Cerrar modal
+        function closeModuleModal() {
+            moduleModal.style.display = 'none';
+            editingModuleId = null;
+        }
+
+        // Guardar módulo (nuevo o editado)
+        function saveModule(e) {
+            e.preventDefault();
+            
+            const title = moduleTitleInput.value.trim();
+            const description = moduleDescriptionInput.value.trim();
+            const icon = moduleIconInput.value.trim();
+            const link = moduleLinkInput.value.trim();
+            
+            if (!title || !description || !icon || !link) {
+                showNotification('Todos los campos son obligatorios', 'error');
+                return;
+            }
+            
+            // Generar ID si es un nuevo módulo
+            const id = editingModuleId || generateModuleId(title);
+            
+            const newModule = {
+                id,
+                title,
+                description,
+                icon: icon.startsWith('fa-') ? icon : `fa-${icon}`,
+                link: link.endsWith('.html') ? link : `${link}.html`
+            };
+            
+            if (editingModuleId) {
+                // Actualizar módulo existente
+                const index = systemModules.findIndex(m => m.id === editingModuleId);
+                if (index !== -1) {
+                    systemModules[index] = newModule;
+                }
+            } else {
+                // Agregar nuevo módulo
+                systemModules.push(newModule);
+                
+                // Agregar el nuevo módulo al administrador
+                rolePermissions['Administrador'].push(id);
+            }
+            
+            saveToLocalStorage();
+            renderModules(currentRole);
+            closeModuleModal();
+            showNotification(`Módulo ${editingModuleId ? 'actualizado' : 'agregado'} correctamente`);
+        }
+
+        // Eliminar módulo
+        function deleteModule(moduleId) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este módulo? Esto afectará los permisos de todos los roles.')) {
+                return;
+            }
+            
+            // Eliminar módulo de la lista
+            systemModules = systemModules.filter(m => m.id !== moduleId);
+            
+            // Eliminar módulo de los permisos de todos los roles
+            for (const role in rolePermissions) {
+                rolePermissions[role] = rolePermissions[role].filter(id => id !== moduleId);
+            }
+            
+            saveToLocalStorage();
+            renderModules(currentRole);
+            showNotification('Módulo eliminado correctamente');
+        }
+
+        // Generar ID para módulo basado en el título
+        function generateModuleId(title) {
+            return title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type = 'success') {
+            notificationText.textContent = message;
+            notification.className = 'notification';
+            
+            if (type === 'error') {
+                notification.classList.add('error');
+            } else if (type === 'warning') {
+                notification.classList.add('warning');
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Volver al dashboard
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Cerrar sesión
+        function logout() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
