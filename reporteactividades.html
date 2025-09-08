@@ -393,10 +393,11 @@
                             const vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
                             const camasVueltaActual = totalCamas % metaCamas;
                             
-                            // Mostrar el número de camas (si completó vuelta, mostrar total en lugar de 0)
+                            // Mostrar el número de camas (si completó vuelta, mostrar la meta en lugar del total)
                             let camasAMostrar = camasVueltaActual;
                             if (camasVueltaActual === 0 && totalCamas > 0) {
-                                camasAMostrar = totalCamas; // Mostrar el total en lugar de 0
+                                // Cuando se completa una vuelta, mostrar la meta (no el total acumulado)
+                                camasAMostrar = metaCamas;
                                 celda.classList.add('completed');
                             }
                             
