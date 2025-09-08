@@ -385,6 +385,13 @@
         }
       });
       
+      // Ordenar productos por nombre comercial (alfabéticamente)
+      productos.sort((a, b) => {
+        const nombreA = a.nombre || '';
+        const nombreB = b.nombre || '';
+        return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+      });
+      
       // Actualizar filtro de grupos químicos
       actualizarFiltroGrupos();
       mostrarProductos(productos);
@@ -471,6 +478,13 @@
 
     // Mostrar productos en tabla
     function mostrarProductos(lista) {
+      // Asegurar que la lista esté ordenada por nombre comercial
+      lista.sort((a, b) => {
+        const nombreA = a.nombre || '';
+        const nombreB = b.nombre || '';
+        return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+      });
+      
       tabla.innerHTML = lista.map(p => {
         // Determinar qué datos mostrar según el filtro de cultivo
         const cultivoFiltro = filtroCultivo.value;
@@ -558,7 +572,14 @@
             <tbody>
       `;
       
-      productos.forEach(p => {
+      // Ordenar productos para exportación
+      const productosOrdenados = [...productos].sort((a, b) => {
+        const nombreA = a.nombre || '';
+        const nombreB = b.nombre || '';
+        return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+      });
+      
+      productosOrdenados.forEach(p => {
         // Para exportar, incluimos ambos cultivos si no hay filtro
         if (!cultivoFiltro) {
           if (p.dias_mini) {
