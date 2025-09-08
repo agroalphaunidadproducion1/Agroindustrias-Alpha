@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evaluación de Organismos Benéficos</title>
+  <title>Editar Evaluaciones de Organismos Benéficos</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
@@ -14,6 +14,8 @@
       --light-border: #c8e6c9;
       --white: #ffffff;
       --shadow: rgba(0,128,0,0.2);
+      --danger: #f44336;
+      --warning: #ff9800;
     }
     
     * {
@@ -26,25 +28,124 @@
       padding: 20px;
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
     
-    form {
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1, h2 {
+      text-align: center;
+      color: var(--primary-color);
+    }
+    
+    .search-section {
       background-color: var(--white);
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px var(--shadow);
-      max-width: 800px;
-      margin: 0 auto 20px;
-      border-left: 8px solid var(--primary-color);
-      flex: 1;
+      margin-bottom: 20px;
     }
     
-    h2 {
-      text-align: center;
+    .search-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    
+    .search-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
       color: var(--primary-color);
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--light-border);
+      border-radius: 5px;
+      background-color: #f9fff9;
+    }
+    
+    button {
+      padding: 10px 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+    }
+    
+    .btn-danger:hover {
+      background-color: #d32f2f;
+    }
+    
+    .btn-warning {
+      background-color: var(--warning);
+    }
+    
+    .btn-warning:hover {
+      background-color: #f57c00;
+    }
+    
+    .results-section {
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--shadow);
       margin-bottom: 20px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--light-border);
+    }
+    
+    th {
+      background-color: var(--light-bg);
+      color: var(--primary-color);
+    }
+    
+    tr:hover {
+      background-color: #e8f5e9;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .edit-form {
+      background-color: var(--white);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px var(--shadow);
+      margin-bottom: 20px;
+      display: none;
     }
     
     .form-section {
@@ -74,55 +175,6 @@
       min-width: 200px;
     }
     
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-      color: var(--primary-color);
-      font-size: 14px;
-    }
-    
-    select, input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid var(--light-border);
-      border-radius: 5px;
-      background-color: #f9fff9;
-      font-size: 14px;
-    }
-    
-    button {
-      margin-top: 20px;
-      padding: 12px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-      font-weight: bold;
-      font-size: 16px;
-    }
-    
-    button:hover {
-      background-color: var(--primary-hover);
-    }
-    
-    .footer {
-      text-align: center;
-      padding: 15px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 5px;
-      margin-top: auto;
-    }
-    
-    .footer p {
-      margin: 5px 0;
-    }
-    
-    /* Estilos para checkboxes personalizados */
     .checkbox-group {
       margin-top: 10px;
     }
@@ -146,33 +198,53 @@
       background-color: #e8f5e9;
     }
     
-    /* Responsive */
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    
     @media (max-width: 768px) {
-      .form-row {
+      .form-row, .search-form {
         flex-direction: column;
-        gap: 0;
+        gap: 10px;
       }
       
-      .form-group {
+      .form-group, .search-group {
         min-width: 100%;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
-
-  <form id="formularioDañoOrganismos">
-    <h2>🌾 Evaluación de Organismos Benéficos</h2>
-
-    <!-- Información básica del producto -->
-    <div class="form-section">
-      <div class="section-title">Información del Producto</div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="categoria">Categoría del producto:</label>
-          <select id="categoria" required>
-            <option value="">Seleccione una categoría</option>
+  <div class="container">
+    <h1>🌾 Editar Evaluaciones de Organismos Benéficos</h1>
+    
+    <!-- Búsqueda de registros -->
+    <div class="search-section">
+      <h2>Buscar Registros</h2>
+      <div class="search-form">
+        <div class="search-group">
+          <label for="search-product">Nombre del producto:</label>
+          <input type="text" id="search-product" placeholder="Ej: Insecticida X">
+        </div>
+        
+        <div class="search-group">
+          <label for="search-ingredient">Ingrediente activo:</label>
+          <input type="text" id="search-ingredient" placeholder="Ej: Abamectina">
+        </div>
+        
+        <div class="search-group">
+          <label for="search-category">Categoría:</label>
+          <select id="search-category">
+            <option value="">Todas las categorías</option>
             <option value="Fungicida">Fungicida</option>
             <option value="Insecticida">Insecticida</option>
             <option value="Herbicida">Herbicida</option>
@@ -182,326 +254,376 @@
           </select>
         </div>
         
-        <div class="form-group">
-          <label for="producto">Nombre del producto:</label>
-          <input type="text" id="producto" required>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="ingrediente">Ingrediente activo:</label>
-          <input type="text" id="ingrediente" required>
+        <div class="search-group">
+          <button id="search-button">Buscar</button>
         </div>
       </div>
     </div>
-
-    <!-- A. Swirskii -->
-    <div class="form-section">
-      <div class="section-title">A. Swirskii</div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="swirskii_larva">Larva:</label>
-          <select id="swirskii_larva">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="swirskii_adulto">Adulto:</label>
-          <select id="swirskii_adulto">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="swirskii_huevo">Huevo:</label>
-          <select id="swirskii_huevo">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="swirskii_ninfa">Ninfa:</label>
-          <select id="swirskii_ninfa">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="swirskii_persistencia">Persistencia (días):</label>
-          <input type="text" id="swirskii_persistencia" placeholder="Ej: 3-5 días">
-        </div>
+    
+    <!-- Resultados de búsqueda -->
+    <div class="results-section">
+      <h2>Resultados</h2>
+      <div id="search-results">
+        <p>Realice una búsqueda para ver los registros.</p>
       </div>
     </div>
-
-    <!-- N. Cucumeris -->
-    <div class="form-section">
-      <div class="section-title">N. Cucumeris</div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cucumeris_larva">Larva:</label>
-          <select id="cucumeris_larva">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
+    
+    <!-- Formulario de edición (inicialmente oculto) -->
+    <div class="edit-form" id="edit-form">
+      <h2>Editar Evaluación</h2>
+      <form id="edit-form-daño">
+        <input type="hidden" id="edit-key">
         
-        <div class="form-group">
-          <label for="cucumeris_adulto">Adulto:</label>
-          <select id="cucumeris_adulto">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cucumeris_huevo">Huevo:</label>
-          <select id="cucumeris_huevo">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="cucumeris_ninfa">Ninfa:</label>
-          <select id="cucumeris_ninfa">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cucumeris_persistencia">Persistencia (días):</label>
-          <input type="text" id="cucumeris_persistencia" placeholder="Ej: 3-5 días">
-        </div>
-      </div>
-    </div>
-
-    <!-- Crizopa -->
-    <div class="form-section">
-      <div class="section-title">Crizopa</div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="crizopa_larva">Larva:</label>
-          <select id="crizopa_larva">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="crizopa_adulto">Adulto:</label>
-          <select id="crizopa_adulto">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="crizopa_huevo">Huevo:</label>
-          <select id="crizopa_huevo">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="crizopa_ninfa">Ninfa:</label>
-          <select id="crizopa_ninfa">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="crizopa_persistencia">Persistencia (días):</label>
-          <input type="text" id="crizopa_persistencia" placeholder="Ej: 3-5 días">
-        </div>
-      </div>
-    </div>
-
-    <!-- Aphidius Colemani -->
-    <div class="form-section">
-      <div class="section-title">Aphidius Colemani</div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="colemani_larva">Larva:</label>
-          <select id="colemani_larva">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="colemani_adulto">Adulto:</label>
-          <select id="colemani_adulto">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="colemani_huevo">Huevo:</label>
-          <select id="colemani_huevo">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="colemani_ninfa">Ninfa:</label>
-          <select id="colemani_ninfa">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="colemani_persistencia">Persistencia (días):</label>
-          <input type="text" id="colemani_persistencia" placeholder="Ej: 3-5 días">
-        </div>
-      </div>
-    </div>
-
-    <!-- Abejorros - Versión Simplificada -->
-    <div class="form-section">
-      <div class="section-title">Abejorros</div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="abejorros_colonia">Colonia:</label>
-          <select id="abejorros_colonia">
-            <option value="0">Sin efecto</option>
-            <option value="1">🟢 Nivel 1 – &lt; 25%</option>
-            <option value="2">🟡 Nivel 2 – 25%-50%</option>
-            <option value="3">🟠 Nivel 3 – 50%-75%</option>
-            <option value="4">🔴 Nivel 4 – &gt; 75%</option>
-            <option value="?">⚪ Desconocido</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="abejorros_persistencia">Persistencia (días):</label>
-          <input type="text" id="abejorros_persistencia" placeholder="Ej: 3-5 días">
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>Acción recomendada:</label>
-          <div class="checkbox-group">
-            <label class="checkbox-option">
-              <input type="radio" name="abejorros_accion" value="ninguna" checked> 
-              ✅ Ninguna acción
-            </label>
-            <label class="checkbox-option">
-              <input type="radio" name="abejorros_accion" value="cubrir"> 
-              🟧 Cubrir colmena
-            </label>
-            <label class="checkbox-option">
-              <input type="radio" name="abejorros_accion" value="retirar"> 
-              ❌ Retirar
-            </label>
-            <label class="checkbox-option">
-              <input type="radio" name="abejorros_accion" value="incompatible"> 
-              ⚠️ Incompatible
-            </label>
+        <!-- Información básica del producto -->
+        <div class="form-section">
+          <div class="section-title">Información del Producto</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-categoria">Categoría del producto:</label>
+              <select id="edit-categoria" required>
+                <option value="">Seleccione una categoría</option>
+                <option value="Fungicida">Fungicida</option>
+                <option value="Insecticida">Insecticida</option>
+                <option value="Herbicida">Herbicida</option>
+                <option value="Acaricida">Acaricida</option>
+                <option value="Bactericida">Bactericida</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-producto">Nombre del producto:</label>
+              <input type="text" id="edit-producto" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-ingrediente">Ingrediente activo:</label>
+              <input type="text" id="edit-ingrediente" required>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <button type="submit">Registrar Evaluación</button>
-  </form>
+        <!-- A. Swirskii -->
+        <div class="form-section">
+          <div class="section-title">A. Swirskii</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-swirskii_larva">Larva:</label>
+              <select id="edit-swirskii_larva">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-swirskii_adulto">Adulto:</label>
+              <select id="edit-swirskii_adulto">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-swirskii_huevo">Huevo:</label>
+              <select id="edit-swirskii_huevo">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-swirskii_ninfa">Ninfa:</label>
+              <select id="edit-swirskii_ninfa">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-swirskii_persistencia">Persistencia (días):</label>
+              <input type="text" id="edit-swirskii_persistencia" placeholder="Ej: 3-5 días">
+            </div>
+          </div>
+        </div>
+
+        <!-- N. Cucumeris -->
+        <div class="form-section">
+          <div class="section-title">N. Cucumeris</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-cucumeris_larva">Larva:</label>
+              <select id="edit-cucumeris_larva">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-cucumeris_adulto">Adulto:</label>
+              <select id="edit-cucumeris_adulto">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-cucumeris_huevo">Huevo:</label>
+              <select id="edit-cucumeris_huevo">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-cucumeris_ninfa">Ninfa:</label>
+              <select id="edit-cucumeris_ninfa">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-cucumeris_persistencia">Persistencia (días):</label>
+              <input type="text" id="edit-cucumeris_persistencia" placeholder="Ej: 3-5 días">
+            </div>
+          </div>
+        </div>
+
+        <!-- Crizopa -->
+        <div class="form-section">
+          <div class="section-title">Crizopa</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-crizopa_larva">Larva:</label>
+              <select id="edit-crizopa_larva">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-crizopa_adulto">Adulto:</label>
+              <select id="edit-crizopa_adulto">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-crizopa_huevo">Huevo:</label>
+              <select id="edit-crizopa_huevo">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-crizopa_ninfa">Ninfa:</label>
+              <select id="edit-crizopa_ninfa">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-crizopa_persistencia">Persistencia (días):</label>
+              <input type="text" id="edit-crizopa_persistencia" placeholder="Ej: 3-5 días">
+            </div>
+          </div>
+        </div>
+
+        <!-- Aphidius Colemani -->
+        <div class="form-section">
+          <div class="section-title">Aphidius Colemani</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-colemani_larva">Larva:</label>
+              <select id="edit-colemani_larva">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-colemani_adulto">Adulto:</label>
+              <select id="edit-colemani_adulto">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-colemani_huevo">Huevo:</label>
+              <select id="edit-colemani_huevo">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-colemani_ninfa">Ninfa:</label>
+              <select id="edit-colemani_ninfa">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-colemani_persistencia">Persistencia (días):</label>
+              <input type="text" id="edit-colemani_persistencia" placeholder="Ej: 3-5 días">
+            </div>
+          </div>
+        </div>
+
+        <!-- Abejorros - Versión Simplificada -->
+        <div class="form-section">
+          <div class="section-title">Abejorros</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-abejorros_colonia">Colonia:</label>
+              <select id="edit-abejorros_colonia">
+                <option value="0">Sin efecto</option>
+                <option value="1">🟢 Nivel 1 – &lt; 25%</option>
+                <option value="2">🟡 Nivel 2 – 25%-50%</option>
+                <option value="3">🟠 Nivel 3 – 50%-75%</option>
+                <option value="4">🔴 Nivel 4 – &gt; 75%</option>
+                <option value="?">⚪ Desconocido</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="edit-abejorros_persistencia">Persistencia (días):</label>
+              <input type="text" id="edit-abejorros_persistencia" placeholder="Ej: 3-5 días">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Acción recomendada:</label>
+              <div class="checkbox-group">
+                <label class="checkbox-option">
+                  <input type="radio" name="edit-abejorros_accion" value="ninguna" id="edit-abejorros_ninguna"> 
+                  ✅ Ninguna acción
+                </label>
+                <label class="checkbox-option">
+                  <input type="radio" name="edit-abejorros_accion" value="cubrir" id="edit-abejorros_cubrir"> 
+                  🟧 Cubrir colmena
+                </label>
+                <label class="checkbox-option">
+                  <input type="radio" name="edit-abejorros_accion" value="retirar" id="edit-abejorros_retirar"> 
+                  ❌ Retirar
+                </label>
+                <label class="checkbox-option">
+                  <input type="radio" name="edit-abejorros_accion" value="incompatible" id="edit-abejorros_incompatible"> 
+                  ⚠️ Incompatible
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <button type="submit" class="btn-warning">Actualizar Evaluación</button>
+            <button type="button" id="cancel-edit" class="btn-danger">Cancelar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <div class="footer">
+      <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+      <p>Versión 2.0 - Módulo de edición</p>
+    </div>
+  </div>
 
   <script>
     // 🔐 Configuración Firebase
@@ -510,71 +632,249 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    // 🚀 Registro al nodo 'dañobeneficos'
-    document.getElementById("formularioDañoOrganismos").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      // Obtener la acción seleccionada para abejorros
-      const abejorrosAccion = document.querySelector('input[name="abejorros_accion"]:checked').value;
-
-      const registro = {
-        // Información del producto
-        categoria: document.getElementById("categoria").value,
-        producto: document.getElementById("producto").value,
-        ingrediente: document.getElementById("ingrediente").value,
-        
-        // A. Swirskii
-        swirskii_larva: document.getElementById("swirskii_larva").value,
-        swirskii_adulto: document.getElementById("swirskii_adulto").value,
-        swirskii_huevo: document.getElementById("swirskii_huevo").value,
-        swirskii_ninfa: document.getElementById("swirskii_ninfa").value,
-        swirskii_persistencia: document.getElementById("swirskii_persistencia").value,
-        
-        // N. Cucumeris
-        cucumeris_larva: document.getElementById("cucumeris_larva").value,
-        cucumeris_adulto: document.getElementById("cucumeris_adulto").value,
-        cucumeris_huevo: document.getElementById("cucumeris_huevo").value,
-        cucumeris_ninfa: document.getElementById("cucumeris_ninfa").value,
-        cucumeris_persistencia: document.getElementById("cucumeris_persistencia").value,
-        
-        // Crizopa
-        crizopa_larva: document.getElementById("crizopa_larva").value,
-        crizopa_adulto: document.getElementById("crizopa_adulto").value,
-        crizopa_huevo: document.getElementById("crizopa_huevo").value,
-        crizopa_ninfa: document.getElementById("crizopa_ninfa").value,
-        crizopa_persistencia: document.getElementById("crizopa_persistencia").value,
-        
-        // Aphidius Colemani
-        colemani_larva: document.getElementById("colemani_larva").value,
-        colemani_adulto: document.getElementById("colemani_adulto").value,
-        colemani_huevo: document.getElementById("colemani_huevo").value,
-        colemani_ninfa: document.getElementById("colemani_ninfa").value,
-        colemani_persistencia: document.getElementById("colemani_persistencia").value,
-        
-        // Abejorros (versión simplificada)
-        abejorros_colonia: document.getElementById("abejorros_colonia").value,
-        abejorros_persistencia: document.getElementById("abejorros_persistencia").value,
-        abejorros_accion: abejorrosAccion,
-        
-        timestamp: new Date().toISOString()
-      };
-
-      db.ref("dañobeneficos").push(registro)
-        .then(() => {
-          alert("✅ Registro guardado en Firebase (dañobeneficos).");
-          this.reset();
+    
+    // Referencia a la base de datos
+    const dbRef = db.ref("dañobeneficos");
+    
+    // Elementos DOM
+    const searchButton = document.getElementById("search-button");
+    const searchResults = document.getElementById("search-results");
+    const editForm = document.getElementById("edit-form");
+    const editFormDaño = document.getElementById("edit-form-daño");
+    const cancelEdit = document.getElementById("cancel-edit");
+    
+    // Buscar registros
+    searchButton.addEventListener("click", searchRecords);
+    
+    function searchRecords() {
+      const productSearch = document.getElementById("search-product").value.toLowerCase();
+      const ingredientSearch = document.getElementById("search-ingredient").value.toLowerCase();
+      const categorySearch = document.getElementById("search-category").value;
+      
+      dbRef.once("value")
+        .then((snapshot) => {
+          let resultsHTML = "";
+          let hasResults = false;
+          
+          snapshot.forEach((childSnapshot) => {
+            const key = childSnapshot.key;
+            const data = childSnapshot.val();
+            
+            // Aplicar filtros
+            if (
+              (productSearch === "" || data.producto.toLowerCase().includes(productSearch)) &&
+              (ingredientSearch === "" || data.ingrediente.toLowerCase().includes(ingredientSearch)) &&
+              (categorySearch === "" || data.categoria === categorySearch)
+            ) {
+              hasResults = true;
+              resultsHTML += `
+                <tr>
+                  <td>${data.categoria}</td>
+                  <td>${data.producto}</td>
+                  <td>${data.ingrediente}</td>
+                  <td>${new Date(data.timestamp).toLocaleDateString()}</td>
+                  <td class="action-buttons">
+                    <button class="edit-record" data-key="${key}">Editar</button>
+                    <button class="delete-record" data-key="${key}">Eliminar</button>
+                  </td>
+                </tr>
+              `;
+            }
+          });
+          
+          if (hasResults) {
+            searchResults.innerHTML = `
+              <table>
+                <thead>
+                  <tr>
+                    <th>Categoría</th>
+                    <th>Producto</th>
+                    <th>Ingrediente</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${resultsHTML}
+                </tbody>
+              </table>
+            `;
+            
+            // Agregar event listeners a los botones de editar y eliminar
+            document.querySelectorAll(".edit-record").forEach(button => {
+              button.addEventListener("click", function() {
+                const key = this.getAttribute("data-key");
+                loadRecordForEditing(key);
+              });
+            });
+            
+            document.querySelectorAll(".delete-record").forEach(button => {
+              button.addEventListener("click", function() {
+                const key = this.getAttribute("data-key");
+                if (confirm("¿Está seguro de que desea eliminar este registro?")) {
+                  deleteRecord(key);
+                }
+              });
+            });
+            
+          } else {
+            searchResults.innerHTML = "<p>No se encontraron registros que coincidan con los criterios de búsqueda.</p>";
+          }
         })
         .catch((error) => {
-          console.error("❌ Error al guardar:", error);
-          alert("Ocurrió un error al guardar en Firebase.");
+          console.error("Error al buscar registros:", error);
+          searchResults.innerHTML = "<p>Ocurrió un error al buscar los registros.</p>";
+        });
+    }
+    
+    // Cargar registro para edición
+    function loadRecordForEditing(key) {
+      dbRef.child(key).once("value")
+        .then((snapshot) => {
+          const data = snapshot.val();
+          
+          // Guardar la marca de tiempo original
+          document.getElementById("edit-key")._originalTimestamp = data.timestamp;
+          
+          // Llenar el formulario con los datos existentes
+          document.getElementById("edit-key").value = key;
+          document.getElementById("edit-categoria").value = data.categoria || "";
+          document.getElementById("edit-producto").value = data.producto || "";
+          document.getElementById("edit-ingrediente").value = data.ingrediente || "";
+          
+          // A. Swirskii
+          document.getElementById("edit-swirskii_larva").value = data.swirskii_larva || "0";
+          document.getElementById("edit-swirskii_adulto").value = data.swirskii_adulto || "0";
+          document.getElementById("edit-swirskii_huevo").value = data.swirskii_huevo || "0";
+          document.getElementById("edit-swirskii_ninfa").value = data.swirskii_ninfa || "0";
+          document.getElementById("edit-swirskii_persistencia").value = data.swirskii_persistencia || "";
+          
+          // N. Cucumeris
+          document.getElementById("edit-cucumeris_larva").value = data.cucumeris_larva || "0";
+          document.getElementById("edit-cucumeris_adulto").value = data.cucumeris_adulto || "0";
+          document.getElementById("edit-cucumeris_huevo").value = data.cucumeris_huevo || "0";
+          document.getElementById("edit-cucumeris_ninfa").value = data.cucumeris_ninfa || "0";
+          document.getElementById("edit-cucumeris_persistencia").value = data.cucumeris_persistencia || "";
+          
+          // Crizopa
+          document.getElementById("edit-crizopa_larva").value = data.crizopa_larva || "0";
+          document.getElementById("edit-crizopa_adulto").value = data.crizopa_adulto || "0";
+          document.getElementById("edit-crizopa_huevo").value = data.crizopa_huevo || "0";
+          document.getElementById("edit-crizopa_ninfa").value = data.crizopa_ninfa || "0";
+          document.getElementById("edit-crizopa_persistencia").value = data.crizopa_persistencia || "";
+          
+          // Aphidius Colemani
+          document.getElementById("edit-colemani_larva").value = data.colemani_larva || "0";
+          document.getElementById("edit-colemani_adulto").value = data.colemani_adulto || "0";
+          document.getElementById("edit-colemani_huevo").value = data.colemani_huevo || "0";
+          document.getElementById("edit-colemani_ninfa").value = data.colemani_ninfa || "0";
+          document.getElementById("edit-colemani_persistencia").value = data.colemani_persistencia || "";
+          
+          // Abejorros
+          document.getElementById("edit-abejorros_colonia").value = data.abejorros_colonia || "0";
+          document.getElementById("edit-abejorros_persistencia").value = data.abejorros_persistencia || "";
+          
+          // Seleccionar la opción correcta para la acción de abejorros
+          const abejorrosAccion = data.abejorros_accion || "ninguna";
+          document.getElementById(`edit-abejorros_${abejorrosAccion}`).checked = true;
+          
+          // Mostrar el formulario de edición
+          editForm.style.display = "block";
+          
+          // Desplazarse al formulario de edición
+          editForm.scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch((error) => {
+          console.error("Error al cargar el registro:", error);
+          alert("Ocurrió un error al cargar el registro para edición.");
+        });
+    }
+    
+    // Actualizar registro
+    editFormDaño.addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      const key = document.getElementById("edit-key").value;
+      
+      // Obtener la acción seleccionada para abejorros
+      const abejorrosAccion = document.querySelector('input[name="edit-abejorros_accion"]:checked').value;
+      
+      const updatedData = {
+        // Información del producto
+        categoria: document.getElementById("edit-categoria").value,
+        producto: document.getElementById("edit-producto").value,
+        ingrediente: document.getElementById("edit-ingrediente").value,
+        
+        // A. Swirskii
+        swirskii_larva: document.getElementById("edit-swirskii_larva").value,
+        swirskii_adulto: document.getElementById("edit-swirskii_adulto").value,
+        swirskii_huevo: document.getElementById("edit-swirskii_huevo").value,
+        swirskii_ninfa: document.getElementById("edit-swirskii_ninfa").value,
+        swirskii_persistencia: document.getElementById("edit-swirskii_persistencia").value,
+        
+        // N. Cucumeris
+        cucumeris_larva: document.getElementById("edit-cucumeris_larva").value,
+        cucumeris_adulto: document.getElementById("edit-cucumeris_adulto").value,
+        cucumeris_huevo: document.getElementById("edit-cucumeris_huevo").value,
+        cucumeris_ninfa: document.getElementById("edit-cucumeris_ninfa").value,
+        cucumeris_persistencia: document.getElementById("edit-cucumeris_persistencia").value,
+        
+        // Crizopa
+        crizopa_larva: document.getElementById("edit-crizopa_larva").value,
+        crizopa_adulto: document.getElementById("edit-crizopa_adulto").value,
+        crizopa_huevo: document.getElementById("edit-crizopa_huevo").value,
+        crizopa_ninfa: document.getElementById("edit-crizopa_ninfa").value,
+        crizopa_persistencia: document.getElementById("edit-crizopa_persistencia").value,
+        
+        // Aphidius Colemani
+        colemani_larva: document.getElementById("edit-colemani_larva").value,
+        colemani_adulto: document.getElementById("edit-colemani_adulto").value,
+        colemani_huevo: document.getElementById("edit-colemani_huevo").value,
+        colemani_ninfa: document.getElementById("edit-colemani_ninfa").value,
+        colemani_persistencia: document.getElementById("edit-colemani_persistencia").value,
+        
+        // Abejorros (versión simplificada)
+        abejorros_colonia: document.getElementById("edit-abejorros_colonia").value,
+        abejorros_persistencia: document.getElementById("edit-abejorros_persistencia").value,
+        abejorros_accion: abejorrosAccion,
+        
+        // Mantener la marca de tiempo original
+        timestamp: document.getElementById("edit-key")._originalTimestamp
+      };
+      
+      // Actualizar en Firebase
+      dbRef.child(key).update(updatedData)
+        .then(() => {
+          alert("✅ Registro actualizado correctamente.");
+          editForm.style.display = "none";
+          searchRecords(); // Actualizar la lista de resultados
+        })
+        .catch((error) => {
+          console.error("Error al actualizar:", error);
+          alert("Ocurrió un error al actualizar el registro.");
         });
     });
+    
+    // Cancelar edición
+    cancelEdit.addEventListener("click", function() {
+      editForm.style.display = "none";
+    });
+    
+    // Eliminar registro
+    function deleteRecord(key) {
+      dbRef.child(key).remove()
+        .then(() => {
+          alert("✅ Registro eliminado correctamente.");
+          searchRecords(); // Actualizar la lista de resultados
+        })
+        .catch((error) => {
+          console.error("Error al eliminar:", error);
+          alert("Ocurrió un error al eliminar el registro.");
+        });
+    }
+    
+    // Al cargar la página, buscar todos los registros
+    window.addEventListener("load", searchRecords);
   </script>
-  
-  <div class="footer">
-    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-    <p>Versión 2.0 - Módulo completo</p>
-  </div>
 </body>
 </html>
