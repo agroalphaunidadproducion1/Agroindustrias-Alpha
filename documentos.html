@@ -13,6 +13,7 @@
             --medium-gray: #e1dfdd;
             --dark-gray: #323130;
             --white: #ffffff;
+            --danger-color: #d13438;
         }
         
         body {
@@ -39,10 +40,16 @@
             font-weight: 600;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
         
         h1 i {
             margin-right: 12px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
         }
         
         .search-container {
@@ -74,16 +81,23 @@
             font-size: 14px;
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid var(--medium-gray);
             border-radius: 2px;
             font-size: 14px;
             height: 32px;
+            box-sizing: border-box;
         }
         
-        input:focus, select:focus {
+        textarea {
+            height: auto;
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.3);
@@ -104,6 +118,23 @@
         
         button:hover {
             background-color: var(--secondary-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #a4262c;
+        }
+        
+        .btn-secondary {
+            background-color: var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #c8c6c4;
         }
         
         .search-icon {
@@ -127,6 +158,7 @@
             box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.1);
             overflow: hidden;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
         }
         
         .document-card:hover {
@@ -152,6 +184,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            padding-right: 30px;
         }
         
         .document-meta {
@@ -180,6 +213,7 @@
             font-size: 14px;
             border-radius: 2px;
             transition: background-color 0.167s ease;
+            margin-top: 8px;
         }
         
         .document-link:hover {
@@ -205,6 +239,135 @@
         .type-zip { color: #737373; }
         .type-other { color: #666666; }
         
+        /* Menu de 3 puntos */
+        .document-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: var(--dark-gray);
+            padding: 4px;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .document-menu:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-dropdown {
+            position: absolute;
+            top: 30px;
+            right: 10px;
+            background-color: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            min-width: 120px;
+            display: none;
+        }
+        
+        .menu-dropdown.show {
+            display: block;
+        }
+        
+        .menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .menu-item:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .menu-item.delete {
+            color: var(--danger-color);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            font-size: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--dark-gray);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .modal-body {
+            padding: 16px;
+        }
+        
+        .modal-footer {
+            padding: 16px;
+            border-top: 1px solid var(--medium-gray);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
         @media (max-width: 768px) {
             .search-container {
                 flex-direction: column;
@@ -222,12 +385,32 @@
             .documents-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .modal-content {
+                width: 90%;
+                margin: 20px;
+            }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: var(--dark-gray);
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1><i class="fab fa-microsoft"></i> Documentos en OneDrive</h1>
+        <h1>
+            <span><i class="fab fa-microsoft"></i> Documentos en OneDrive</span>
+            <div class="header-actions">
+                <button id="addDocumentBtn">
+                    <i class="fas fa-plus"></i> Nuevo Documento
+                </button>
+            </div>
+        </h1>
         
         <div class="search-container">
             <div class="search-input">
@@ -258,99 +441,176 @@
         </div>
     </div>
 
+    <!-- Modal para agregar/editar documentos -->
+    <div class="modal" id="documentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Agregar Nuevo Documento</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="documentForm">
+                    <input type="hidden" id="documentId">
+                    <div class="form-group">
+                        <label for="documentName">Nombre del documento *</label>
+                        <input type="text" id="documentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentType">Tipo de documento *</label>
+                        <select id="documentType" required>
+                            <option value="">Selecciona un tipo</option>
+                            <option value="word">Word</option>
+                            <option value="excel">Excel</option>
+                            <option value="powerpoint">PowerPoint</option>
+                            <option value="pdf">PDF</option>
+                            <option value="image">Imagen</option>
+                            <option value="video">Video</option>
+                            <option value="audio">Audio</option>
+                            <option value="zip">Archivo comprimido</option>
+                            <option value="other">Otros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentDate">Fecha *</label>
+                        <input type="date" id="documentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentSize">Tamaño (MB) *</label>
+                        <input type="number" id="documentSize" step="0.1" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentUrl">URL del documento *</label>
+                        <input type="url" id="documentUrl" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentDescription">Descripción (opcional)</label>
+                        <textarea id="documentDescription"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelModal">Cancelar</button>
+                <button id="saveDocument">Guardar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Base de datos de documentos (simulada)
-        const documents = [
+        let documents = [
             {
+                id: 1,
                 name: "Documento de Fisiologia de MINIS",
                 type: "excel",
-                date: "2025-8-8",
-                size: "2.4 MB",
+                date: "2025-08-08",
+                size: "2.4",
                 url: "https://1drv.ms/x/c/02d857ae3d05bf9f/ESml_WtQqCJCnG4ObA2PodwB36D-XrnADEc9kFVxVvUINQ?e=cNmPhp",
-                icon: "fa-file-excel"
+                icon: "fa-file-excel",
+                description: ""
             },
             {
+                id: 2,
                 name: "Documento de Fisiologia TOMATES",
                 type: "excel",
-                date: "2025-8-8",
-                size: "1.8 MB",
+                date: "2025-08-08",
+                size: "1.8",
                 url: "https://1drv.ms/x/c/02d857ae3d05bf9f/EVmsR9pSVLhPiUrowbcCgC4BAmKzqkuoEK7M_XmKHUwChw?e=zfti1l",
-                icon: "fa-file-excel"
+                icon: "fa-file-excel",
+                description: ""
             },
             {
+                id: 3,
                 name: "Analisis Foliares Riego",
                 type: "excel",
-                date: "2025-8-08",
-                size: "5.2 MB",
+                date: "2025-08-08",
+                size: "5.2",
                 url: "https://onedrive.live.com/:x:/g/personal/02D857AE3D05BF9F/ETEv1D3h19lFroZVjEMiRAIB1b5E4T8MyZhPrF-1P_fh9A?resid=02D857AE3D05BF9F!s3dd42f31d7e145d9ae86558c43224402&ithint=file%2Cxlsx&e=RRROJT&wdOrigin=OWA.LINK&wdPreviousSession=54b05671-672b-4774-80ee-98fc5",
-                icon: "fa-file-excel"
+                icon: "fa-file-excel",
+                description: ""
             },
             {
+                id: 4,
                 name: "Prod. Sem.-AgroAlpha-Para el ciclo (2025-2026)",
                 type: "excel",
                 date: "2025-08-08",
-                size: "3.7 MB",
+                size: "3.7",
                 url: "https://onedrive.live.com/:x:/g/personal/02D857AE3D05BF9F/EZ-_BT2uV9gggAJ3JgAAAAABkGBfAzWMZoATFZxyVpU6Tg?resid=02D857AE3D05BF9F!9847&ithint=file%2Cxlsx&e=ws3dfj&wdOrigin=OWA.LINK&wdPreviousSession=496c3457-32c4-4a5a-b2e0-8608eb734380&migratedtospo=true&redeem",
-                icon: "fa-file-excel"
+                icon: "fa-file-excel",
+                description: ""
             },
-             {
+            {
+                id: 5,
                 name: "Agroquimicos",
                 type: "excel",
                 date: "2025-08-08",
-                size: "3.7 MB",
+                size: "3.7",
                 url: "https://d.docs.live.net/006c9091acd085cb/Documentos/Agroindustrial%20Alpha/Agroquimicos/Agroquimicos.xlsx",
-                icon: "fa-file-excel"
+                icon: "fa-file-excel",
+                description: ""
             },
-           {
+            {
+                id: 6,
                 name: "Fichas Tecnicas Insecticidas",
                 type: "other",
                 date: "2025-08-08",
-                size: "3.7 MB",
-                url: "https://1drv.ms/f/c/7b132ef70b2c6509/EsN4np2YdFVJiAMnJdtV6V8B6YWvrmchYu7xnZf99_NuJw?e=LWRJu5",
-                icon: "fa-folder"
+                size: "3.7",
+                url: "https://1drv.ms/c/7b132ef70b2c6509/EsN4np2YdFVJiAMnJdtV6V8B6YWvrmchYu7xnZf99_NuJw?e=LWRJu5",
+                icon: "fa-folder",
+                description: ""
             },
             {
+                id: 7,
                 name: "Fichas Tecnicas Fungicidas",
                 type: "other",
                 date: "2025-08-08",
-                size: "3.7 MB",
-                url: "https://1drv.ms/f/c/7b132ef70b2c6509/Eo3BwQb1xTNBiXVfjlqECz8B5FmQLi5s5m_k_9vWCTDUFQ?e=HoY7vS",
-                icon: "fa-folder"
+                size: "3.7",
+                url: "https://1drv.ms/c/7b132ef70b2c6509/Eo3BwQb1xTNBiXVfjlqECz8B5FmQLi5s5m_k_9vWCTDUFQ?e=HoY7vS",
+                icon: "fa-folder",
+                description: ""
             },
-               {
+            {
+                id: 8,
                 name: "Fichas Tecnicas Aminoacidos",
                 type: "other",
                 date: "2025-08-08",
-                size: "3.7 MB",
-                url: "https://1drv.ms/f/c/7b132ef70b2c6509/ElmhGVfHuChPpqk8xXyZ2VEBjR-uP1XFS5EL_VqEZPS2Yw?e=RaSiog",
-                icon: "fa-folder"
+                size: "3.7",
+                url: "https://1drv.ms/c/7b132ef70b2c6509/ElmhGVfHuChPpqk8xXyZ2VEBjR-uP1XFS5EL_VqEZPS2Yw?e=RaSiog",
+                icon: "fa-folder",
+                description: ""
             },
-                 {
+            {
+                id: 9,
                 name: "Fichas Tecnicas Bactericidas",
                 type: "other",
                 date: "2025-08-08",
-                size: "3.7 MB",
-                url: "https://1drv.ms/f/c/7b132ef70b2c6509/EmcDsXxJaxpIi5ltkf0DdWEBvCBVDpRmM7dfIiOgliWOzQ?e=Dis4qJ",
-                icon: "fa-folder"
+                size: "3.7",
+                url: "https://1drv.ms/c/7b132ef70b2c6509/EmcDsXxJaxpIi5ltkf0DdWEBvCBVDpRmM7dfIiOgliWOzQ?e=Dis4qJ",
+                icon: "fa-folder",
+                description: ""
             },
-               {
+            {
+                id: 10,
                 name: "Fichas Tecnicas Estimuladores de crecimiento",
                 type: "other",
                 date: "2025-08-08",
-                size: "3.7 MB",
-                url: "https://1drv.ms/f/c/7b132ef70b2c6509/Ehv2YMfu-sVEsjcQ1hbYDEoBuAAFlagpr2J7ES0yLPJDVQ?e=Ts0gl0",
-                icon: "fa-folder"
+                size: "3.7",
+                url: "https://1drv.ms/c/7b132ef70b2c6509/Ehv2YMfu-sVEsjcQ1hbYDEoBuAAFlagpr2J7ES0yLPJDVQ?e=Ts0gl0",
+                icon: "fa-folder",
+                description: ""
             },
-                 {
+            {
+                id: 11,
                 name: "Fichas Tecnicas Herbicidas",
                 type: "other",
                 date: "2025-08-08",
-                size: "3.7 MB",
-                url: "https://1drv.ms/f/c/7b132ef70b2c6509/Eq6ZNMxVjR9DiRQ_Jl4LzNwB0uA9XQyK55Cvhcakb1aMyQ?e=TeEYYE",
-                icon: "fa-folder"
+                size: "3.7",
+                url: "https://1drv.ms/c/7b132ef70b2c6509/Eq6ZNMxVjR9DiRQ_Jl4LzNwB0uA9XQyK55Cvhcakb1aMyQ?e=TeEYYE",
+                icon: "fa-folder",
+                description: ""
             },
         ];
-        
+
+        // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
             // Mostrar todos los documentos al cargar
             displayDocuments(documents);
@@ -371,6 +631,9 @@
             document.getElementById('type').addEventListener('change', function() {
                 filterDocuments();
             });
+            
+            // Configurar funcionalidad del modal
+            setupModal();
         });
         
         function filterDocuments() {
@@ -407,6 +670,17 @@
                 const typeClass = `type-${doc.type}`;
                 
                 card.innerHTML = `
+                    <div class="document-menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                        <div class="menu-dropdown">
+                            <div class="menu-item edit" data-id="${doc.id}">
+                                <i class="fas fa-edit"></i> Editar
+                            </div>
+                            <div class="menu-item delete" data-id="${doc.id}">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </div>
+                        </div>
+                    </div>
                     <div class="document-icon">
                         <i class="fas ${doc.icon} ${typeClass}"></i>
                     </div>
@@ -414,7 +688,7 @@
                         <div class="document-name" title="${doc.name}">${doc.name}</div>
                         <div class="document-meta">
                             <span>${formatDate(doc.date)}</span>
-                            <span>${doc.size}</span>
+                            <span>${doc.size} MB</span>
                         </div>
                         <div class="document-type ${typeClass}">${getTypeName(doc.type)}</div>
                         <a href="${doc.url}" target="_blank" class="document-link">
@@ -425,6 +699,187 @@
                 
                 grid.appendChild(card);
             });
+            
+            // Agregar event listeners a los menús
+            attachMenuListeners();
+        }
+        
+        function attachMenuListeners() {
+            // Mostrar/ocultar menú al hacer clic en los tres puntos
+            document.querySelectorAll('.document-menu').forEach(menu => {
+                menu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Cerrar otros menús abiertos
+                    document.querySelectorAll('.menu-dropdown.show').forEach(dropdown => {
+                        if (dropdown !== this.querySelector('.menu-dropdown')) {
+                            dropdown.classList.remove('show');
+                        }
+                    });
+                    
+                    // Alternar menú actual
+                    const dropdown = this.querySelector('.menu-dropdown');
+                    dropdown.classList.toggle('show');
+                });
+            });
+            
+            // Cerrar menús al hacer clic en cualquier parte
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.menu-dropdown.show').forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                });
+            });
+            
+            // Editar documento
+            document.querySelectorAll('.menu-item.edit').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = parseInt(this.getAttribute('data-id'));
+                    editDocument(id);
+                });
+            });
+            
+            // Eliminar documento
+            document.querySelectorAll('.menu-item.delete').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = parseInt(this.getAttribute('data-id'));
+                    deleteDocument(id);
+                });
+            });
+        }
+        
+        function editDocument(id) {
+            const doc = documents.find(d => d.id === id);
+            if (doc) {
+                document.getElementById('modalTitle').textContent = 'Editar Documento';
+                document.getElementById('documentId').value = doc.id;
+                document.getElementById('documentName').value = doc.name;
+                document.getElementById('documentType').value = doc.type;
+                document.getElementById('documentDate').value = doc.date;
+                document.getElementById('documentSize').value = doc.size;
+                document.getElementById('documentUrl').value = doc.url;
+                document.getElementById('documentDescription').value = doc.description || '';
+                
+                document.getElementById('documentModal').classList.add('show');
+            }
+        }
+        
+        function deleteDocument(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este documento?')) {
+                documents = documents.filter(doc => doc.id !== id);
+                displayDocuments(documents);
+                filterDocuments(); // Aplicar filtros actuales
+            }
+        }
+        
+        function setupModal() {
+            const modal = document.getElementById('documentModal');
+            const addDocumentBtn = document.getElementById('addDocumentBtn');
+            const closeModalBtn = document.getElementById('closeModal');
+            const cancelModalBtn = document.getElementById('cancelModal');
+            const saveDocumentBtn = document.getElementById('saveDocument');
+            
+            // Abrir modal para nuevo documento
+            addDocumentBtn.addEventListener('click', function() {
+                document.getElementById('modalTitle').textContent = 'Agregar Nuevo Documento';
+                document.getElementById('documentForm').reset();
+                document.getElementById('documentId').value = '';
+                document.getElementById('documentDate').value = new Date().toISOString().split('T')[0];
+                modal.classList.add('show');
+            });
+            
+            // Cerrar modal
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelModalBtn.addEventListener('click', closeModal);
+            
+            // Cerrar modal al hacer clic fuera del contenido
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Guardar documento
+            saveDocumentBtn.addEventListener('click', function() {
+                if (validateForm()) {
+                    saveDocument();
+                }
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('documentModal').classList.remove('show');
+        }
+        
+        function validateForm() {
+            const name = document.getElementById('documentName').value;
+            const type = document.getElementById('documentType').value;
+            const date = document.getElementById('documentDate').value;
+            const size = document.getElementById('documentSize').value;
+            const url = document.getElementById('documentUrl').value;
+            
+            if (!name || !type || !date || !size || !url) {
+                alert('Por favor, completa todos los campos obligatorios.');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function saveDocument() {
+            const id = document.getElementById('documentId').value;
+            const name = document.getElementById('documentName').value;
+            const type = document.getElementById('documentType').value;
+            const date = document.getElementById('documentDate').value;
+            const size = document.getElementById('documentSize').value;
+            const url = document.getElementById('documentUrl').value;
+            const description = document.getElementById('documentDescription').value;
+            
+            // Determinar el icono según el tipo
+            let icon = 'fa-file';
+            if (type === 'word') icon = 'fa-file-word';
+            else if (type === 'excel') icon = 'fa-file-excel';
+            else if (type === 'powerpoint') icon = 'fa-file-powerpoint';
+            else if (type === 'pdf') icon = 'fa-file-pdf';
+            else if (type === 'image') icon = 'fa-file-image';
+            else if (type === 'video') icon = 'fa-file-video';
+            else if (type === 'audio') icon = 'fa-file-audio';
+            else if (type === 'zip') icon = 'fa-file-archive';
+            else if (type === 'other') icon = 'fa-folder';
+            
+            if (id) {
+                // Editar documento existente
+                const index = documents.findIndex(doc => doc.id === parseInt(id));
+                if (index !== -1) {
+                    documents[index] = {
+                        ...documents[index],
+                        name,
+                        type,
+                        date,
+                        size,
+                        url,
+                        description,
+                        icon
+                    };
+                }
+            } else {
+                // Agregar nuevo documento
+                const newId = documents.length > 0 ? Math.max(...documents.map(doc => doc.id)) + 1 : 1;
+                documents.push({
+                    id: newId,
+                    name,
+                    type,
+                    date,
+                    size,
+                    url,
+                    description,
+                    icon
+                });
+            }
+            
+            closeModal();
+            displayDocuments(documents);
+            filterDocuments(); // Aplicar filtros actuales
         }
         
         function formatDate(dateString) {
@@ -442,7 +897,7 @@
                 'video': 'Video',
                 'audio': 'Audio',
                 'zip': 'Archivo comprimido',
-                'other': 'Otro tipo'
+                'other': 'Carpeta'
             };
             return typeNames[type] || 'Documento';
         }
