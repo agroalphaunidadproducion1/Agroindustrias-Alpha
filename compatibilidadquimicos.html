@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Compatibilidad de Productos Químicos</title>
+  <title>Gestión Clasificación IRAC</title>
   <style>
     :root {
       --primary-color: #2e7d32;
@@ -14,6 +14,11 @@
       --shadow: rgba(0,0,0,0.1);
       --accent-color: #1565c0;
       --accent-hover: #0d47a1;
+      --nervioso: #e3f2fd;
+      --crecimiento: #fff8e1;
+      --respiración: #e8f5e9;
+      --digestivo: #fbe9e7;
+      --desconocido: #f5f5f5;
     }
     
     * {
@@ -25,10 +30,8 @@
       background: var(--light-bg);
       margin: 0;
       padding: 20px;
-      color: var(--primary-color);
+      color: #333;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
     
     h2 {
@@ -37,14 +40,150 @@
       margin-top: 0;
     }
     
-    form {
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      background: #e8f5e9;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      font-weight: bold;
+    }
+    
+    .tab.active {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .fisiologia-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .fisiologia-btn {
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px var(--shadow);
+    }
+    
+    .fisiologia-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+    
+    .nervioso {
+      background-color: var(--nervioso);
+      color: var(--accent-color);
+    }
+    
+    .crecimiento {
+      background-color: var(--crecimiento);
+      color: #f57c00;
+    }
+    
+    .respiración {
+      background-color: var(--respiración);
+      color: var(--primary-color);
+    }
+    
+    .digestivo {
+      background-color: var(--digestivo);
+      color: #d32f2f;
+    }
+    
+    .desconocido {
+      background-color: var(--desconocido);
+      color: #616161;
+    }
+    
+    .grupos-container {
       background: var(--white);
       padding: 20px;
       border-radius: 10px;
-      max-width: 800px;
-      margin: 0 auto 20px;
       box-shadow: 0 4px 8px var(--shadow);
-      flex: 1;
+      margin-bottom: 20px;
+    }
+    
+    .grupo-title {
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--light-border);
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+    
+    .grupos-lista {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+    }
+    
+    .grupo-item {
+      border: 1px solid var(--light-border);
+      border-radius: 8px;
+      padding: 15px;
+      background: #f9f9f9;
+    }
+    
+    .grupo-nombre {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--accent-color);
+    }
+    
+    .subgrupos-lista {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+    
+    .subgrupo-item {
+      margin-bottom: 10px;
+      padding: 8px;
+      background: var(--white);
+      border-radius: 5px;
+      border-left: 3px solid var(--primary-color);
+    }
+    
+    .subgrupo-nombre {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .sustancias-lista {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .form-container {
+      background: var(--white);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px var(--shadow);
     }
     
     .form-group {
@@ -55,14 +194,20 @@
       display: block;
       margin-bottom: 5px;
       font-weight: bold;
+      color: var(--primary-color);
     }
     
-    input, select, textarea {
+    select, input, textarea {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       border: 1px solid var(--light-border);
       border-radius: 5px;
       font-size: 16px;
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
     
     button {
@@ -73,14 +218,48 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 16px;
-      display: block;
-      margin: 20px auto 0;
-      width: 100%;
-      max-width: 300px;
     }
     
     button:hover {
       background: var(--primary-hover);
+    }
+    
+    .btn-agregar-subgrupo {
+      background: var(--accent-color);
+      margin-top: 10px;
+    }
+    
+    .btn-agregar-subgrupo:hover {
+      background: var(--accent-hover);
+    }
+    
+    .subgrupo-input {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    
+    .eliminar-subgrupo {
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    
+    .footer p {
+      margin: 5px 0;
     }
     
     .success {
@@ -96,154 +275,121 @@
       margin-top: 15px;
     }
     
-    .footer {
-      text-align: center;
-      padding: 15px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 5px;
-      margin-top: auto;
-    }
-    
-    .footer p {
-      margin: 5px 0;
-    }
-    
-    .info-section {
-      background-color: #e8f5e9;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border-left: 4px solid var(--primary-color);
-    }
-    
-    .info-title {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: var(--primary-color);
-    }
-    
-    .compatibilidad-section {
-      background-color: #e3f2fd;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border-left: 4px solid var(--accent-color);
-    }
-    
-    .compatibilidad-title {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: var(--accent-color);
-    }
-    
-    .form-row {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    
-    .form-row .form-group {
-      flex: 1;
-      min-width: 200px;
-    }
-    
-    .checkbox-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-      max-height: 300px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid var(--light-border);
-      border-radius: 5px;
-    }
-    
-    .checkbox-item {
-      display: flex;
-      align-items: center;
-      background: #f5f5f5;
-      padding: 8px 12px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-    }
-    
-    .checkbox-item input {
-      width: auto;
-      margin-right: 8px;
-    }
-    
-    /* Responsive */
     @media (max-width: 768px) {
-      .form-row {
-        flex-direction: column;
-        gap: 0;
+      .fisiologia-selector {
+        grid-template-columns: 1fr;
       }
       
-      .checkbox-group {
+      .grupos-lista {
         grid-template-columns: 1fr;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+        margin-bottom: 5px;
+        border-radius: 5px;
       }
     }
   </style>
 </head>
 <body>
-  <h2>Compatibilidad de Productos Químicos</h2>
-  <form id="compatibilidad-form">
-    <div class="form-group">
-      <label for="producto-select">Seleccionar Producto:</label>
-      <select id="producto-select" required>
-        <option value="" disabled selected>Seleccione un producto</option>
-      </select>
+  <div class="container">
+    <h2>Gestión de Clasificación IRAC España</h2>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="visualizar">Visualizar Clasificación</div>
+      <div class="tab" data-tab="agregar">Agregar Grupo</div>
     </div>
     
-    <div class="info-section">
-      <div class="info-title">INFORMACIÓN DEL PRODUCTO SELECCIONADO</div>
+    <div class="tab-content active" id="visualizar">
+      <div class="fisiologia-selector">
+        <button class="fisiologia-btn nervioso" data-fisiologia="nervioso">Nervioso y muscular</button>
+        <button class="fisiologia-btn crecimiento" data-fisiologia="crecimiento">Crecimiento y desarrollo</button>
+        <button class="fisiologia-btn respiración" data-fisiologia="respiración">Respiración</button>
+        <button class="fisiologia-btn digestivo" data-fisiologia="digestivo">Digestivo</button>
+        <button class="fisiologia-btn desconocido" data-fisiologia="desconocido">Desconocido o no específico</button>
+      </div>
       
-      <div class="form-row">
-        <div class="form-group">
-          <label for="nombre">Nombre comercial:</label>
-          <input type="text" id="nombre" readonly />
+      <div id="nervioso-container" class="grupos-container">
+        <h3 class="grupo-title">Sistema Nervioso y Muscular</h3>
+        <div class="grupos-lista">
+          <!-- Los grupos se cargarán aquí -->
         </div>
+      </div>
+      
+      <div id="crecimiento-container" class="grupos-container">
+        <h3 class="grupo-title">Crecimiento y Desarrollo</h3>
+        <div class="grupos-lista">
+          <!-- Los grupos se cargarán aquí -->
+        </div>
+      </div>
+      
+      <div id="respiración-container" class="grupos-container">
+        <h3 class="grupo-title">Respiración</h3>
+        <div class="grupos-lista">
+          <!-- Los grupos se cargarán aquí -->
+        </div>
+      </div>
+      
+      <div id="digestivo-container" class="grupos-container">
+        <h3 class="grupo-title">Digestivo</h3>
+        <div class="grupos-lista">
+          <!-- Los grupos se cargarán aquí -->
+        </div>
+      </div>
+      
+      <div id="desconocido-container" class="grupos-container">
+        <h3 class="grupo-title">Desconocido o no específico</h3>
+        <div class="grupos-lista">
+          <!-- Los grupos se cargarán aquí -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="agregar">
+      <div class="form-container">
+        <h3 class="grupo-title">Agregar Nuevo Grupo IRAC</h3>
         
-        <div class="form-group">
-          <label for="ingredientes">Ingrediente activo:</label>
-          <input type="text" id="ingredientes" readonly />
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="familia_quimica">Familia química:</label>
-          <input type="text" id="familia_quimica" readonly />
-        </div>
-        
-        <div class="form-group">
-          <label for="grupo_quimico">Grupo químico:</label>
-          <input type="text" id="grupo_quimico" readonly />
-        </div>
+        <form id="form-grupo">
+          <div class="form-group">
+            <label for="fisiologia">Fisiología:</label>
+            <select id="fisiologia" required>
+              <option value="">Seleccione una fisiología</option>
+              <option value="nervioso">Nervioso y muscular</option>
+              <option value="crecimiento">Crecimiento y desarrollo</option>
+              <option value="respiración">Respiración</option>
+              <option value="digestivo">Digestivo</option>
+              <option value="desconocido">Desconocido o no específico</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="grupo">Grupo principal:</label>
+            <input type="text" id="grupo" placeholder="Ej: 1. Inhibidores de la acetilcolinesterasa" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Subgrupos:</label>
+            <div id="subgrupos-container">
+              <!-- Los subgrupos se agregarán aquí -->
+            </div>
+            <button type="button" class="btn-agregar-subgrupo" id="agregar-subgrupo">+ Agregar Subgrupo</button>
+          </div>
+          
+          <button type="submit">Guardar Grupo</button>
+          <div class="success" id="mensaje-exito"></div>
+          <div class="error" id="mensaje-error"></div>
+        </form>
       </div>
     </div>
     
-    <div class="compatibilidad-section">
-      <div class="compatibilidad-title">GRUPOS QUÍMICOS COMPATIBLES</div>
-      
-      <div class="form-group">
-        <label>Seleccione los grupos químicos compatibles (de todos los productos):</label>
-        <div class="checkbox-group" id="grupos-compatibles">
-          <!-- Los checkboxes se generarán dinámicamente con JavaScript -->
-        </div>
-      </div>
+    <div class="footer">
+      <p>Sistema Agroalpha © 2025 | Clasificación IRAC</p>
+      <p>Basado en la clasificación de Febrero 2024</p>
     </div>
-    
-    <button type="submit">Guardar Compatibilidad</button>
-    <div class="success" id="mensaje-exito"></div>
-    <div class="error" id="mensaje-error"></div>
-  </form>
-
-  <div class="footer">
-    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
-    <p>Versión 2.0 - Módulo de compatibilidad</p>
   </div>
 
   <!-- Firebase -->
@@ -263,162 +409,255 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Referencias a las bases de datos
-    const productosRef = db.ref("productos");
-    const resistenciasRef = db.ref("resistencias-quimicos");
+    // Referencia a la base de datos
+    const iracRef = db.ref("clasificacion-irac");
 
     // Variables globales
-    let productos = [];
-    let gruposQuimicosUnicos = new Set();
-    let compatibilidadesExistentes = {};
+    let clasificacionIRAC = {
+      nervioso: [],
+      crecimiento: [],
+      respiración: [],
+      digestivo: [],
+      desconocido: []
+    };
 
-    // Cargar productos y grupos químicos al iniciar
+    // Cargar datos al iniciar
     document.addEventListener('DOMContentLoaded', function() {
-      cargarProductos();
-      cargarCompatibilidadesExistentes();
+      // Cargar datos desde Firebase
+      cargarDatosIRAC();
+      
+      // Event listeners para los botones de fisiología
+      document.querySelectorAll('.fisiologia-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const fisiologia = this.getAttribute('data-fisiologia');
+          mostrarFisiologia(fisiologia);
+        });
+      });
+      
+      // Event listener para tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          cambiarTab(tabId);
+        });
+      });
+      
+      // Event listener para agregar subgrupo
+      document.getElementById('agregar-subgrupo').addEventListener('click', agregarSubgrupoInput);
+      
+      // Event listener para el formulario
+      document.getElementById('form-grupo').addEventListener('submit', guardarGrupo);
     });
 
-    // Función para cargar productos desde Firebase
-    function cargarProductos() {
-      productosRef.on("value", (snapshot) => {
+    // Función para cargar datos desde Firebase
+    function cargarDatosIRAC() {
+      iracRef.on("value", (snapshot) => {
         const data = snapshot.val();
-        productos = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
-        
-        // Extraer todos los grupos químicos únicos
-        gruposQuimicosUnicos = new Set();
-        productos.forEach(producto => {
-          if (producto.grupo_quimico) {
-            gruposQuimicosUnicos.add(producto.grupo_quimico);
-          }
-        });
-        
-        // Actualizar select de productos
-        const select = document.getElementById("producto-select");
-        // Mantener la selección actual si existe
-        const selectedValue = select.value;
-        select.innerHTML = '<option value="" disabled selected>Seleccione un producto</option>';
-        
-        productos.forEach(producto => {
-          const option = document.createElement('option');
-          option.value = producto.id;
-          option.textContent = producto.nombre;
-          select.appendChild(option);
-        });
-        
-        // Restaurar selección si existe
-        if (selectedValue) {
-          select.value = selectedValue;
-          actualizarInformacionProducto(selectedValue);
+        if (data) {
+          // Inicializar todas las fisiologías
+          clasificacionIRAC = {
+            nervioso: data.nervioso || [],
+            crecimiento: data.crecimiento || [],
+            respiración: data.respiración || [],
+            digestivo: data.digestivo || [],
+            desconocido: data.desconocido || []
+          };
+          
+          // Mostrar sistema nervioso por defecto
+          mostrarFisiologia('nervioso');
+        } else {
+          // Datos por defecto si no hay nada en Firebase
+          inicializarDatosPorDefecto();
         }
-        
-        // Actualizar checkboxes de grupos compatibles
-        actualizarCheckboxesGrupos();
       });
     }
 
-    // Función para cargar compatibilidades existentes
-    function cargarCompatibilidadesExistentes() {
-      resistenciasRef.on("value", (snapshot) => {
-        const data = snapshot.val();
-        compatibilidadesExistentes = data || {};
+    // Función para inicializar datos por defecto
+    function inicializarDatosPorDefecto() {
+      clasificacionIRAC = {
+        nervioso: [
+          {
+            grupo: "1. Inhibidores de la acetilcolinesterasa",
+            subgrupos: [
+              {
+                nombre: "1A Carbamatos",
+                sustancias: "Formetanato, pirimicarb"
+              },
+              {
+                nombre: "1B Organofosforados",
+                sustancias: "Fostiazato, metil-pirimifos"
+              }
+            ]
+          },
+          {
+            grupo: "3. Moduladores del canal de sodio",
+            subgrupos: [
+              {
+                nombre: "3A Piretroides Piretrinas",
+                sustancias: "Cipermetrina, deltametrina, esfenvalerato, etofenprox, lambda-cihalotrina, tau-fluvalinato, teflutrina"
+              },
+              {
+                nombre: "",
+                sustancias: "Piretrinas"
+              }
+            ]
+          }
+        ],
+        crecimiento: [],
+        respiración: [],
+        digestivo: [],
+        desconocido: []
+      };
+      
+      // Guardar datos por defecto en Firebase
+      iracRef.set(clasificacionIRAC);
+      
+      // Mostrar sistema nervioso
+      mostrarFisiologia('nervioso');
+    }
+
+    // Función para mostrar los grupos de una fisiología
+    function mostrarFisiologia(fisiologia) {
+      // Ocultar todos los contenedores primero
+      document.querySelectorAll('.grupos-container').forEach(container => {
+        container.style.display = 'none';
       });
-    }
-
-    // Función para actualizar la información del producto seleccionado
-    function actualizarInformacionProducto(productoId) {
-      const producto = productos.find(p => p.id === productoId);
       
-      if (producto) {
-        document.getElementById("nombre").value = producto.nombre || "";
-        document.getElementById("ingredientes").value = producto.ingredientes || "";
-        document.getElementById("familia_quimica").value = producto.familia_quimica || "";
-        document.getElementById("grupo_quimico").value = producto.grupo_quimico || "";
-        
-        // Cargar compatibilidades existentes para este producto
-        cargarCompatibilidadesProducto(productoId);
-      }
-    }
-
-    // Función para cargar las compatibilidades de un producto específico
-    function cargarCompatibilidadesProducto(productoId) {
-      if (compatibilidadesExistentes[productoId]) {
-        const compatibilidades = compatibilidadesExistentes[productoId].grupos_compatibles || [];
-        
-        // Marcar los checkboxes correspondientes
-        const checkboxes = document.querySelectorAll('#grupos-compatibles input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = compatibilidades.includes(checkbox.value);
-        });
-      } else {
-        // Desmarcar todos los checkboxes si no hay compatibilidades guardadas
-        const checkboxes = document.querySelectorAll('#grupos-compatibles input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = false;
-        });
-      }
-    }
-
-    // Función para actualizar los checkboxes de grupos compatibles
-    function actualizarCheckboxesGrupos() {
-      const container = document.getElementById("grupos-compatibles");
-      container.innerHTML = "";
+      // Mostrar el contenedor seleccionado
+      const container = document.getElementById(`${fisiologia}-container`);
+      container.style.display = 'block';
       
-      // Ordenar los grupos químicos
-      const gruposOrdenados = Array.from(gruposQuimicosUnicos).sort();
+      // Cargar los datos
+      const grupos = clasificacionIRAC[fisiologia];
+      const gruposLista = container.querySelector('.grupos-lista');
       
-      gruposOrdenados.forEach(grupo => {
-        const label = document.createElement("label");
-        label.className = "checkbox-item";
-        
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.value = grupo;
-        
-        const span = document.createElement("span");
-        span.textContent = grupo;
-        
-        label.appendChild(checkbox);
-        label.appendChild(span);
-        container.appendChild(label);
-      });
-    }
-
-    // Event listener para cuando se selecciona un producto
-    document.getElementById("producto-select").addEventListener("change", function() {
-      actualizarInformacionProducto(this.value);
-    });
-
-    // Event listener para el envío del formulario
-    document.getElementById("compatibilidad-form").addEventListener("submit", function(e) {
-      e.preventDefault();
+      gruposLista.innerHTML = '';
       
-      const productoId = document.getElementById("producto-select").value;
-      if (!productoId) {
-        mostrarMensaje("Por favor, seleccione un producto", "error");
+      if (grupos.length === 0) {
+        gruposLista.innerHTML = '<p>No hay datos disponibles para esta fisiología.</p>';
         return;
       }
       
-      // Obtener los grupos compatibles seleccionados
-      const checkboxes = document.querySelectorAll('#grupos-compatibles input[type="checkbox"]:checked');
-      const gruposCompatibles = Array.from(checkboxes).map(checkbox => checkbox.value);
+      grupos.forEach(grupo => {
+        const grupoItem = document.createElement('div');
+        grupoItem.className = 'grupo-item';
+        
+        let html = `<div class="grupo-nombre">${grupo.grupo}</div>`;
+        
+        if (grupo.subgrupos && grupo.subgrupos.length > 0) {
+          html += '<div class="subgrupos-lista">';
+          
+          grupo.subgrupos.forEach(subgrupo => {
+            html += `
+              <div class="subgrupo-item">
+                ${subgrupo.nombre ? `<div class="subgrupo-nombre">${subgrupo.nombre}</div>` : ''}
+                <div class="sustancias-lista">${subgrupo.sustancias}</div>
+              </div>
+            `;
+          });
+          
+          html += '</div>';
+        }
+        
+        grupoItem.innerHTML = html;
+        gruposLista.appendChild(grupoItem);
+      });
+    }
+
+    // Función para cambiar de pestaña
+    function cambiarTab(tabId) {
+      // Desactivar todas las pestañas
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
       
-      // Guardar en Firebase
-      resistenciasRef.child(productoId).set({
-        producto_id: productoId,
-        nombre: document.getElementById("nombre").value,
-        ingredientes: document.getElementById("ingredientes").value,
-        familia_quimica: document.getElementById("familia_quimica").value,
-        grupo_quimico: document.getElementById("grupo_quimico").value,
-        grupos_compatibles: gruposCompatibles,
-        fecha_actualizacion: new Date().toISOString()
-      }, function(error) {
-        if (error) {
-          mostrarMensaje("Error al guardar la compatibilidad", "error");
-        } else {
-          mostrarMensaje("Compatibilidad guardada con éxito", "success");
+      // Ocultar todos los contenidos
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Activar la pestaña seleccionada
+      document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Función para agregar campo de subgrupo
+    function agregarSubgrupoInput() {
+      const container = document.getElementById('subgrupos-container');
+      const div = document.createElement('div');
+      div.className = 'subgrupo-input';
+      div.innerHTML = `
+        <input type="text" placeholder="Nombre del subgrupo" class="subgrupo-nombre">
+        <textarea placeholder="Sustancias activas (separadas por comas)" class="subgrupo-sustancias"></textarea>
+        <button type="button" class="eliminar-subgrupo">X</button>
+      `;
+      
+      container.appendChild(div);
+      
+      // Event listener para eliminar subgrupo
+      div.querySelector('.eliminar-subgrupo').addEventListener('click', function() {
+        container.removeChild(div);
+      });
+    }
+
+    // Función para guardar grupo en Firebase
+    function guardarGrupo(e) {
+      e.preventDefault();
+      
+      const fisiologia = document.getElementById('fisiologia').value;
+      const grupo = document.getElementById('grupo').value;
+      
+      if (!fisiologia || !grupo) {
+        mostrarMensaje("Por favor, complete todos los campos obligatorios", "error");
+        return;
+      }
+      
+      // Obtener subgrupos
+      const subgruposInputs = document.querySelectorAll('.subgrupo-input');
+      const subgrupos = [];
+      
+      subgruposInputs.forEach(input => {
+        const nombre = input.querySelector('.subgrupo-nombre').value;
+        const sustancias = input.querySelector('.subgrupo-sustancias').value;
+        
+        if (nombre || sustancias) {
+          subgrupos.push({
+            nombre: nombre,
+            sustancias: sustancias
+          });
         }
       });
-    });
+      
+      // Crear nuevo grupo
+      const nuevoGrupo = {
+        grupo: grupo,
+        subgrupos: subgrupos
+      };
+      
+      // Agregar a la clasificación
+      if (!clasificacionIRAC[fisiologia]) {
+        clasificacionIRAC[fisiologia] = [];
+      }
+      
+      clasificacionIRAC[fisiologia].push(nuevoGrupo);
+      
+      // Guardar en Firebase
+      iracRef.set(clasificacionIRAC, function(error) {
+        if (error) {
+          mostrarMensaje("Error al guardar el grupo", "error");
+        } else {
+          mostrarMensaje("Grupo guardado con éxito", "success");
+          document.getElementById('form-grupo').reset();
+          document.getElementById('subgrupos-container').innerHTML = '';
+          
+          // Mostrar la fisiología donde se agregó el grupo
+          setTimeout(() => {
+            cambiarTab('visualizar');
+            mostrarFisiologia(fisiologia);
+          }, 1500);
+        }
+      });
+    }
 
     // Función para mostrar mensajes
     function mostrarMensaje(mensaje, tipo) {
