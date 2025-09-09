@@ -468,7 +468,7 @@
     </div>
   </div>
 
-  <!-- Modal de Descargas -->
+  <!-- Modal of Descargas -->
   <div id="modalDescargas" class="modal">
     <div class="modal-content modal-small">
       <span class="close" onclick="cerrarModalDescargas()">&times;</span>
@@ -553,6 +553,14 @@
             registro.id = childSnapshot.key;
             registros.push(registro);
           });
+          
+          // Ordenar registros alfabéticamente por nombre de producto
+          registros.sort((a, b) => {
+            const nombreA = a.producto || '';
+            const nombreB = b.producto || '';
+            return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+          });
+          
           mostrarFiltrados();
         })
         .catch((error) => {
@@ -575,6 +583,14 @@
         registro.id = childSnapshot.key;
         registros.push(registro);
       });
+      
+      // Ordenar registros alfabéticamente por nombre de producto
+      registros.sort((a, b) => {
+        const nombreA = a.producto || '';
+        const nombreB = b.producto || '';
+        return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+      });
+      
       mostrarFiltrados();
     });
 
