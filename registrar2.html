@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <style>
+        :root {
+            --primary-color: #2E7D32;
+            --primary-light: #4CAF50;
+            --primary-dark: #1B5E20;
+            --admin-color: #1976D2;
+            --supervisor-color: #7B1FA2;
+            --grower-color: #D32F2F;
+            --digitador-color: #C2185B;
+            --tecnico-color: #0288D1;
+            --culturales-color: #5D4037;
+            --riego-color: #0097A7;
+            --invitado-color: #616161;
+            --personal-color: #9C27B0;
+            --beneficos-color: #7B1FA2;
+            --aplicaciones-color: #FF9800;
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --dark-gray: #343a40;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --card-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        
+        .brand-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .brand-text h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-right: 10px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            margin-top: 4px;
+        }
+        
+        .admin-badge { background-color: var(--admin-color); }
+        .supervisor-badge { background-color: var(--supervisor-color); }
+        .grower-badge { background-color: var(--grower-color); }
+        .digitador-badge { background-color: var(--digitador-color); }
+        .fitosanidad-badge { background-color: var(--tecnico-color); }
+        .culturales-badge { background-color: var(--culturales-color); }
+        .riego-badge { background-color: var(--riego-color); }
+        .invitado-badge { background-color: var(--invitado-color); }
+        
+        .logout-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .main-content {
+            padding: 16px;
+        }
+        
+        .page-title {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        /* Colores específicos para cada tipo de registro */
+        .card[data-module="chemicals"] .card-icon { color: #D32F2F; }
+        .card[data-module="applications"] .card-icon { color: var(--aplicaciones-color); }
+        .card[data-module="attendance"] .card-icon { color: #1976D2; }
+        .card[data-module="activities"] .card-icon { color: #ED6C02; }
+        .card[data-module="harvest"] .card-icon { color: #2E7D32; }
+        .card[data-module="projections"] .card-icon { color: #0288D1; }
+        .card[data-module="staff"] .card-icon { color: var(--personal-color); }
+        .card[data-module="beneficios"] .card-icon { color: var(--beneficos-color); }
+        
+        .card h3 {
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        /* Icono personalizado para benéficos (crisopa/ácaro) */
+        .beneficos-icon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .beneficos-icon::before {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 16px;
+            background-color: var(--beneficos-color);
+            border-radius: 50% 50% 40% 40%;
+        }
+        
+        .beneficos-icon::after {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+            top: 6px;
+            left: 6px;
+            box-shadow: 12px 0 0 white;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--white);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--primary-color);
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            color: #dc3545;
+            background-color: #f8d7da;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        /* Estilos responsivos adicionales */
+        @media (max-width: 340px) {
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .card {
+                padding: 10px;
+                min-height: 110px;
+            }
+            
+            .card-icon {
+                font-size: 1.5rem;
+            }
+            
+            .beneficos-icon {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .beneficos-icon::before {
+                width: 20px;
+                height: 14px;
+            }
+            
+            .beneficos-icon::after {
+                width: 5px;
+                height: 5px;
+                top: 5px;
+                left: 5px;
+                box-shadow: 10px 0 0 white;
+            }
+            
+            .card h3 {
+                font-size: 0.8rem;
+            }
+            
+            .brand-text h1 {
+                font-size: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Agroalpha</h1>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-details">
+                    <span id="user-name">Usuario</span>
+                    <span id="user-role" class="role-badge">Rol</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1 class="page-title">Registros</h1>
+        
+        <div class="cards-container" id="modulesContainer">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Cargando módulos...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        const registrosModulesRef = database.ref('modulos_registros');
+        const registrosAccessRef = database.ref('accesos_registros');
+        
+        // Mapeo de IDs de módulos a URLs
+        const moduleUrls = {
+            'chemicals': 'ingresoquimicos.html',
+            'applications': 'ingresoaplicaciones.html',
+            'attendance': 'registrarasistencia.html',
+            'activities': 'registroactividades.html',
+            'harvest': 'Registrocosecha.html',
+            'projections': 'proyecciones.html',
+            'staff': 'registropersonal.html',
+            'beneficios': 'ingresodanobeneficos.html'
+        };
+        
+        // Mapeo de IDs de módulos a nombres en español
+        const moduleNames = {
+            'chemicals': 'Químicos',
+            'applications': 'Aplicaciones Químicos',
+            'attendance': 'Asistencia',
+            'activities': 'Actividades',
+            'harvest': 'Cosecha',
+            'projections': 'Proyecciones',
+            'staff': 'Agregar Personal',
+            'beneficios': 'Benéficos'
+        };
+        
+        // Mapeo de IDs de módulos a iconos
+        const moduleIcons = {
+            'chemicals': 'fa-flask',
+            'applications': 'fa-spray-can',
+            'attendance': 'fa-user-check',
+            'activities': 'fa-clipboard-list',
+            'harvest': 'fa-apple-whole',
+            'projections': 'fa-chart-line',
+            'staff': 'fa-user-plus',
+            'beneficios': 'beneficos-icon' // Icono especial
+        };
+        
+        // Variables globales
+        let systemModules = [];
+        let roleAccess = {};
+        let userRole = '';
+        
+        // Verificar sesión al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Guardar el rol del usuario
+            userRole = userData.role;
+            
+            // Verificar si el usuario sigue activo en uactivos
+            activeUsersRef.child(userData.username).once('value')
+                .then(snapshot => {
+                    if (!snapshot.exists()) {
+                        logout();
+                        return;
+                    }
+                    
+                    // Mostrar información del usuario
+                    displayUserInfo(userData);
+                    
+                    // Cargar datos de Firebase
+                    loadFirebaseData();
+                    
+                    // Configurar eventos de los botones
+                    document.getElementById('logoutBtn').addEventListener('click', logout);
+                })
+                .catch(error => {
+                    console.error('Error verificando sesión activa:', error);
+                    showError('Error de conexión. Intente recargar la página.');
+                });
+        });
+        
+        // Cargar datos desde Firebase
+        function loadFirebaseData() {
+            // Cargar módulos y accesos en paralelo
+            Promise.all([
+                registrosModulesRef.once('value'),
+                registrosAccessRef.once('value')
+            ])
+            .then(([modulesSnapshot, accessSnapshot]) => {
+                // Procesar módulos
+                if (modulesSnapshot.exists()) {
+                    const modulesData = modulesSnapshot.val();
+                    
+                    // Verificar si modulesData es un array o un objeto
+                    if (Array.isArray(modulesData)) {
+                        systemModules = modulesData;
+                    } else if (typeof modulesData === 'object' && modulesData !== null) {
+                        // Convertir objeto a array
+                        systemModules = Object.values(modulesData);
+                    } else {
+                        systemModules = [];
+                    }
+                    
+                    console.log('Módulos cargados:', systemModules);
+                } else {
+                    console.error('No se encontraron módulos en Firebase');
+                    systemModules = [];
+                }
+                
+                // Procesar accesos
+                if (accessSnapshot.exists()) {
+                    roleAccess = accessSnapshot.val();
+                    console.log('Accesos cargados:', roleAccess);
+                } else {
+                    console.error('No se encontraron accesos en Firebase');
+                    roleAccess = {};
+                }
+                
+                // Generar las tarjetas con los permisos del usuario
+                generateModuleCards();
+            })
+            .catch(error => {
+                console.error('Error cargando datos de Firebase:', error);
+                showError('Error al cargar los módulos. Intente recargar la página.');
+            });
+        }
+        
+        // Mostrar información del usuario
+        function displayUserInfo(userData) {
+            document.getElementById('user-name').textContent = userData.name || userData.username;
+            
+            const roleBadge = document.getElementById('user-role');
+            roleBadge.textContent = userData.role;
+            roleBadge.className = 'role-badge ' + getBadgeClass(userData.role);
+        }
+        
+        // Obtener clase CSS para el badge según el rol
+        function getBadgeClass(role) {
+            const roleClasses = {
+                'Administrador': 'admin-badge',
+                'Supervisor': 'supervisor-badge',
+                'Grower': 'grower-badge',
+                'Digitador': 'digitador-badge',
+                'Técnico Fitosanidad': 'fitosanidad-badge',
+                'Técnico Prácticas Culturales': 'culturales-badge',
+                'Técnico Riego': 'riego-badge',
+                'Invitado': 'invitado-badge'
+            };
+            return roleClasses[role] || 'invitado-badge';
+        }
+        
+        // Generar tarjetas de módulos según los permisos del rol
+        function generateModuleCards() {
+            const container = document.getElementById('modulesContainer');
+            
+            // Verificar si tenemos los datos necesarios
+            if (systemModules.length === 0) {
+                container.innerHTML = '<div class="error-message">No hay módulos configurados en el sistema.</div>';
+                return;
+            }
+            
+            if (Object.keys(roleAccess).length === 0) {
+                container.innerHTML = '<div class="error-message">No hay permisos configurados en el sistema.</div>';
+                return;
+            }
+            
+            // Obtener los accesos para el rol del usuario
+            const userAccess = roleAccess[userRole];
+            
+            if (!userAccess) {
+                container.innerHTML = `<div class="error-message">No se encontraron permisos para el rol "${userRole}".</div>`;
+                return;
+            }
+            
+            // Filtrar módulos a los que el usuario tiene acceso
+            const accessibleModules = systemModules.filter(module => {
+                return module && module.id && userAccess[module.id] === true;
+            });
+            
+            if (accessibleModules.length === 0) {
+                container.innerHTML = '<div class="error-message">No tiene acceso a ningún módulo. Contacte al administrador.</div>';
+                return;
+            }
+            
+            // Generar tarjetas para los módulos accesibles
+            container.innerHTML = '';
+            accessibleModules.forEach(module => {
+                // Solo mostrar módulos que están en la lista de registros
+                if (moduleUrls[module.id]) {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-module', module.id);
+                    card.onclick = function() {
+                        navigateTo(moduleUrls[module.id]);
+                    };
+                    
+                    // Determinar el contenido del icono
+                    let iconContent = '';
+                    if (module.id === 'beneficios') {
+                        iconContent = '<div class="beneficos-icon"></div>';
+                    } else {
+                        const iconClass = moduleIcons[module.id] || 'fa-cube';
+                        iconContent = `<i class="fas ${iconClass}"></i>`;
+                    }
+                    
+                    // Usar el nombre del módulo desde el mapeo o desde Firebase
+                    const moduleName = moduleNames[module.id] || module.title || 'Módulo sin nombre';
+                    
+                    card.innerHTML = `
+                        <div class="card-icon">${iconContent}</div>
+                        <h3>${moduleName}</h3>
+                    `;
+                    
+                    container.appendChild(card);
+                }
+            });
+            
+            // Si no hay módulos accesibles después del filtrado
+            if (container.innerHTML === '') {
+                container.innerHTML = '<div class="error-message">No tiene acceso a ningún módulo de registros.</div>';
+            }
+        }
+        
+        // Función para navegar a una página
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+        
+        // Función para volver atrás
+        function goBack() {
+            window.history.back();
+        }
+        
+        // Mostrar mensaje de error
+        function showError(message) {
+            const container = document.getElementById('modulesContainer');
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+        
+        // Cerrar sesión
+        function logout() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (userData?.username) {
+                // Eliminar de usuarios activos
+                activeUsersRef.child(userData.username).remove()
+                    .then(() => {
+                        sessionStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => {
+                        console.error('Error al cerrar sesión:', error);
+                        sessionStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    });
+            } else {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+
+    <div class="footer">
+        <p>Agroalpha © 2025 | UP1</p>
+    </div>
+</body>
+</html>
