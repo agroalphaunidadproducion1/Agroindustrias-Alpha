@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agregar Producto</title>
+  <style>
+    :root {
+      --primary-color: #2e7d32;
+      --primary-hover: #1b5e20;
+      --light-bg: #f1fdf3;
+      --light-border: #c8e6c9;
+      --white: #ffffff;
+      --shadow: rgba(0,0,0,0.1);
+      --danger: #f44336;
+      --danger-hover: #d32f2f;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--light-bg);
+      margin: 0;
+      padding: 20px;
+      color: var(--primary-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    h2 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-top: 0;
+    }
+    
+    form {
+      background: var(--white);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 8px var(--shadow);
+      flex: 1;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--light-border);
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    
+    button {
+      background: var(--primary-color);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      display: block;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    button:hover {
+      background: var(--primary-hover);
+    }
+    
+    .btn-danger {
+      background: var(--danger);
+      max-width: 120px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    
+    .btn-danger:hover {
+      background: var(--danger-hover);
+    }
+    
+    .btn-secondary {
+      background: #78909c;
+      max-width: 200px;
+      margin-top: 10px;
+    }
+    
+    .btn-secondary:hover {
+      background: #546e7a;
+    }
+    
+    .success {
+      color: green;
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+      margin-top: auto;
+    }
+    
+    .footer p {
+      margin: 5px 0;
+    }
+    
+    .cultivo-section {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .cultivo-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .quimica-section {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .epa-section {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .epa-item {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      position: relative;
+      border: 1px solid var(--light-border);
+    }
+    
+    .remove-epa {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .remove-epa:hover {
+      background: var(--danger-hover);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Agregar Producto Químico</h2>
+  <form id="producto-form">
+    <div class="form-group">
+      <input type="text" id="nombre" placeholder="Nombre comercial" required />
+    </div>
+    
+    <div class="form-group">
+      <input type="text" id="ingredientes" placeholder="Ingredientes activos" required />
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <input type="text" id="senasa" placeholder="Registro Senasa" required />
+      </div>
+    </div>
+    
+    <!-- Sección para múltiples registros EPA -->
+    <div class="epa-section">
+      <div class="cultivo-title">REGISTROS EPA</div>
+      <div id="epa-container">
+        <!-- Los elementos EPA se agregarán aquí dinámicamente -->
+        <div class="epa-item">
+          <div class="form-row">
+            <div class="form-group">
+              <input type="text" class="epa-registro" placeholder="Registro EPA" />
+            </div>
+            <div class="form-group">
+              <input type="url" class="epa-enlace" placeholder="Enlace EPA (URL)" pattern="https?://.+" title="Ingrese una URL válida que comience con http:// o https://" />
+            </div>
+          </div>
+          <button type="button" class="remove-epa">×</button>
+        </div>
+      </div>
+      <button type="button" id="agregar-epa" class="btn-secondary">+ Agregar otro registro EPA</button>
+    </div>
+    
+    <div class="form-group">
+      <label for="categoria">Categoría:</label>
+      <select id="categoria" required>
+        <option value="" disabled selected>Seleccione una categoría</option>
+        <option value="Insecticida">Insecticida</option>
+        <option value="Fungicida">Fungicida</option>
+        <option value="Aminoácido">Aminoácido</option>
+        <option value="Estimulador">Estimulador</option>
+        <option value="Herbicida">Herbicida</option>
+        <option value="Bactericida">Bactericida</option>
+      </select>
+    </div>
+    
+    <!-- Nueva sección para Grupo Químico y Familia Química -->
+    <div class="quimica-section">
+      <div class="cultivo-title">INFORMACIÓN QUÍMICA</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" id="grupo_quimico" placeholder="Grupo químico" required />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="familia_quimica" placeholder="Familia química" required />
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección para MINI PEPINO -->
+    <div class="cultivo-section">
+      <div class="cultivo-title">MINI</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="number" id="dias_mini" placeholder="Días a cosecha (Mini)" required />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="reingreso_mini" placeholder="Periodo de reingreso (Mini)" required />
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="plagas_mini">Plagas a controlar (Mini):</label>
+        <div class="plagas-container">
+          <input type="text" id="plagas_mini" list="plagas-sugerencias" placeholder="Escriba o seleccione una plaga" required />
+          <datalist id="plagas-sugerencias"></datalist>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" id="dosis_maxima_mini" placeholder="Dosis máxima (Mini)" />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="dosis_litro_mini" placeholder="Dosis por litro de agua (Mini)" />
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección para TOMATE -->
+    <div class="cultivo-section">
+      <div class="cultivo-title">TOMATE</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="number" id="dias_tomate" placeholder="Días a cosecha (Tomate)" required />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="reingreso_tomate" placeholder="Periodo de reingreso (Tomate)" required />
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="plagas_tomate">Plagas a controlar (Tomate):</label>
+        <div class="plagas-container">
+          <input type="text" id="plagas_tomate" list="plagas-sugerencias" placeholder="Escriba o seleccione una plaga" required />
+          <datalist id="plagas-sugerencias"></datalist>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" id="dosis_maxima_tomate" placeholder="Dosis máxima (Tomate)" />
+        </div>
+        
+        <div class="form-group">
+          <input type="text" id="dosis_litro_tomate" placeholder="Dosis por litro de agua (Tomate)" />
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="banda">Banda:</label>
+      <select id="banda" required>
+        <option value="" disabled selected>Seleccione un color</option>
+        <option value="red">Rojo</option>
+        <option value="yellow">Amarillo</option>
+        <option value="blue">Azul</option>
+        <option value="green">Verde</option>
+      </select>
+    </div>
+    
+    <button type="submit">Guardar Producto</button>
+    <div class="success" id="mensaje"></div>
+  </form>
+
+  <div class="footer">
+    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo completo</p>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
+      authDomain: "agro-productos.firebaseapp.com",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.appspot.com",
+      messagingSenderId: "196774282512",
+      appId: "1:196774282512:web:92697209153eac8acb1195"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Cargar sugerencias de plagas desde Firebase
+    let plagasSugerencias = [];
+    const plagasRef = db.ref("plagas");
+    
+    plagasRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      plagasSugerencias = data ? Object.values(data) : [];
+      
+      // Actualizar datalist
+      const datalist = document.getElementById("plagas-sugerencias");
+      datalist.innerHTML = '';
+      
+      plagasSugerencias.forEach(plaga => {
+        const option = document.createElement('option');
+        option.value = plaga;
+        datalist.appendChild(option);
+      });
+    });
+
+    // Función para agregar campos EPA
+    document.getElementById('agregar-epa').addEventListener('click', function() {
+      const container = document.getElementById('epa-container');
+      const newEpaItem = document.createElement('div');
+      newEpaItem.className = 'epa-item';
+      newEpaItem.innerHTML = `
+        <div class="form-row">
+          <div class="form-group">
+            <input type="text" class="epa-registro" placeholder="Registro EPA" />
+          </div>
+          <div class="form-group">
+            <input type="url" class="epa-enlace" placeholder="Enlace EPA (URL)" pattern="https?://.+" title="Ingrese una URL válida que comience con http:// o https://" />
+          </div>
+        </div>
+        <button type="button" class="remove-epa">×</button>
+      `;
+      container.appendChild(newEpaItem);
+      
+      // Agregar evento al botón de eliminar
+      newEpaItem.querySelector('.remove-epa').addEventListener('click', function() {
+        if (document.querySelectorAll('.epa-item').length > 1) {
+          newEpaItem.remove();
+        } else {
+          alert('Debe haber al menos un registro EPA.');
+        }
+      });
+    });
+
+    // Agregar evento a los botones de eliminar existentes
+    document.querySelectorAll('.remove-epa').forEach(button => {
+      button.addEventListener('click', function() {
+        if (document.querySelectorAll('.epa-item').length > 1) {
+          this.closest('.epa-item').remove();
+        } else {
+          alert('Debe haber al menos un registro EPA.');
+        }
+      });
+    });
+
+    document.getElementById("producto-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      const plagaMiniInput = document.getElementById("plagas_mini").value.trim();
+      const plagaTomateInput = document.getElementById("plagas_tomate").value.trim();
+      
+      // Guardar las nuevas plagas si no existen en las sugerencias
+      if (plagaMiniInput && !plagasSugerencias.includes(plagaMiniInput)) {
+        db.ref("plagas").push(plagaMiniInput);
+      }
+      
+      if (plagaTomateInput && !plagasSugerencias.includes(plagaTomateInput)) {
+        db.ref("plagas").push(plagaTomateInput);
+      }
+      
+      // Recopilar todos los registros EPA
+      const epaItems = document.querySelectorAll('.epa-item');
+      const registrosEpa = [];
+      
+      epaItems.forEach(item => {
+        const registro = item.querySelector('.epa-registro').value.trim();
+        const enlace = item.querySelector('.epa-enlace').value.trim();
+        
+        if (registro || enlace) {
+          registrosEpa.push({
+            registro: registro,
+            enlace: enlace
+          });
+        }
+      });
+      
+      const producto = {
+        nombre: document.getElementById("nombre").value,
+        ingredientes: document.getElementById("ingredientes").value,
+        senasa: document.getElementById("senasa").value,
+        registros_epa: registrosEpa, // Ahora es un array de objetos
+        categoria: document.getElementById("categoria").value,
+        // Nuevos campos químicos
+        grupo_quimico: document.getElementById("grupo_quimico").value,
+        familia_quimica: document.getElementById("familia_quimica").value,
+        // Datos para MINI PEPINO
+        dias_mini: document.getElementById("dias_mini").value,
+        reingreso_mini: document.getElementById("reingreso_mini").value,
+        plagas_mini: plagaMiniInput,
+        dosis_maxima_mini: document.getElementById("dosis_maxima_mini").value,
+        dosis_litro_mini: document.getElementById("dosis_litro_mini").value,
+        // Datos para TOMATE
+        dias_tomate: document.getElementById("dias_tomate").value,
+        reingreso_tomate: document.getElementById("reingreso_tomate").value,
+        plagas_tomate: plagaTomateInput,
+        dosis_maxima_tomate: document.getElementById("dosis_maxima_tomate").value,
+        dosis_litro_tomate: document.getElementById("dosis_litro_tomate").value,
+        banda: document.getElementById("banda").value
+      };
+      
+      db.ref("productos").push(producto, function(error) {
+        const mensaje = document.getElementById("mensaje");
+        if (error) {
+          mensaje.textContent = "Error al guardar.";
+          mensaje.style.color = "red";
+        } else {
+          mensaje.textContent = "Producto guardado con éxito.";
+          mensaje.style.color = "green";
+          document.getElementById("producto-form").reset();
+          
+          // Restablecer los campos EPA (dejar solo uno)
+          const epaContainer = document.getElementById('epa-container');
+          epaContainer.innerHTML = `
+            <div class="epa-item">
+              <div class="form-row">
+                <div class="form-group">
+                  <input type="text" class="epa-registro" placeholder="Registro EPA" />
+                </div>
+                <div class="form-group">
+                  <input type="url" class="epa-enlace" placeholder="Enlace EPA (URL)" pattern="https?://.+" title="Ingrese una URL válida que comience con http:// o https://" />
+                </div>
+              </div>
+              <button type="button" class="remove-epa">×</button>
+            </div>
+          `;
+          
+          // Volver a agregar el evento al botón de eliminar
+          document.querySelector('.remove-epa').addEventListener('click', function() {
+            alert('Debe haber al menos un registro EPA.');
+          });
+          
+          // Ocultar mensaje después de 3 segundos
+          setTimeout(() => {
+            mensaje.textContent = "";
+          }, 3000);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
