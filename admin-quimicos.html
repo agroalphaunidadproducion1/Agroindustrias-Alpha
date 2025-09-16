@@ -103,6 +103,16 @@
       background-color: #f57c00;
     }
     
+    .btn-secondary {
+      background: #78909c;
+      max-width: 200px;
+      margin-top: 10px;
+    }
+    
+    .btn-secondary:hover {
+      background: #546e7a;
+    }
+    
     .results-section {
       background: var(--white);
       padding: 20px;
@@ -181,6 +191,44 @@
       border-radius: 8px;
       margin-bottom: 20px;
       border-left: 4px solid var(--primary-color);
+    }
+    
+    .epa-section {
+      background-color: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .epa-item {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      position: relative;
+      border: 1px solid var(--light-border);
+    }
+    
+    .remove-epa {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .remove-epa:hover {
+      background: #d32f2f;
     }
     
     .footer {
@@ -279,15 +327,15 @@
           <div class="form-group">
             <input type="text" id="edit-senasa" placeholder="Registro Senasa" required />
           </div>
-          
-          <div class="form-group">
-            <input type="text" id="edit-epa" placeholder="Registro EPA" />
-          </div>
         </div>
         
-        <!-- Nuevo campo: Enlace EPA -->
-        <div class="form-group">
-          <input type="url" id="edit-enlace_epa" placeholder="Enlace EPA (URL)" pattern="https?://.+" title="Ingrese una URL válida que comience con http:// o https://" />
+        <!-- Sección para múltiples registros EPA -->
+        <div class="epa-section">
+          <div class="cultivo-title">REGISTROS EPA</div>
+          <div id="edit-epa-container">
+            <!-- Los elementos EPA se agregarán aquí dinámicamente -->
+          </div>
+          <button type="button" id="edit-agregar-epa" class="btn-secondary">+ Agregar otro registro EPA</button>
         </div>
         
         <div class="form-group">
@@ -439,6 +487,8 @@
     const editForm = document.getElementById("edit-form");
     const editProductoForm = document.getElementById("edit-producto-form");
     const cancelEdit = document.getElementById("cancel-edit");
+    const epaContainer = document.getElementById("edit-epa-container");
+    const agregarEpaBtn = document.getElementById("edit-agregar-epa");
     
     // Cargar sugerencias de plagas desde Firebase
     let plagasSugerencias = [];
@@ -456,6 +506,38 @@
         option.value = plaga;
         datalist.appendChild(option);
       });
+    });
+    
+    // Función para agregar campos EPA
+    function agregarCampoEpa(registro = '', enlace = '') {
+      const newEpaItem = document.createElement('div');
+      newEpaItem.className = 'epa-item';
+      newEpaItem.innerHTML = `
+        <div class="form-row">
+          <div class="form-group">
+            <input type="text" class="epa-registro" placeholder="Registro EPA" value="${registro}" />
+          </div>
+          <div class="form-group">
+            <input type="url" class="epa-enlace" placeholder="Enlace EPA (URL)" pattern="https?://.+" title="Ingrese una URL válida que comience con http:// o https://" value="${enlace}" />
+          </div>
+        </div>
+        <button type="button" class="remove-epa">×</button>
+      `;
+      epaContainer.appendChild(newEpaItem);
+      
+      // Agregar evento al botón de eliminar
+      newEpaItem.querySelector('.remove-epa').addEventListener('click', function() {
+        if (document.querySelectorAll('.epa-item').length > 1) {
+          newEpaItem.remove();
+        } else {
+          alert('Debe haber al menos un registro EPA.');
+        }
+      });
+    }
+    
+    // Evento para agregar campos EPA
+    agregarEpaBtn.addEventListener('click', function() {
+      agregarCampoEpa();
     });
     
     // Buscar registros
@@ -477,17 +559,17 @@
             
             // Aplicar filtros
             if (
-              (nombreSearch === "" || data.nombre.toLowerCase().includes(nombreSearch)) &&
-              (ingredientesSearch === "" || data.ingredientes.toLowerCase().includes(ingredientesSearch)) &&
+              (nombreSearch === "" || (data.nombre && data.nombre.toLowerCase().includes(nombreSearch))) &&
+              (ingredientesSearch === "" || (data.ingredientes && data.ingredientes.toLowerCase().includes(ingredientesSearch))) &&
               (categoriaSearch === "" || data.categoria === categoriaSearch)
             ) {
               hasResults = true;
               resultsHTML += `
                 <tr>
-                  <td>${data.nombre}</td>
-                  <td>${data.ingredientes}</td>
-                  <td>${data.categoria}</td>
-                  <td>${data.senasa}</td>
+                  <td>${data.nombre || '-'}</td>
+                  <td>${data.ingredientes || '-'}</td>
+                  <td>${data.categoria || '-'}</td>
+                  <td>${data.senasa || '-'}</td>
                   <td class="action-buttons">
                     <button class="edit-product" data-key="${key}">Editar</button>
                     <button class="delete-product" data-key="${key}">Eliminar</button>
@@ -555,11 +637,22 @@
           document.getElementById("edit-nombre").value = data.nombre || "";
           document.getElementById("edit-ingredientes").value = data.ingredientes || "";
           document.getElementById("edit-senasa").value = data.senasa || "";
-          document.getElementById("edit-epa").value = data.epa || "";
-          document.getElementById("edit-enlace_epa").value = data.enlace_epa || "";
           document.getElementById("edit-categoria").value = data.categoria || "";
           document.getElementById("edit-grupo_quimico").value = data.grupo_quimico || "";
           document.getElementById("edit-familia_quimica").value = data.familia_quimica || "";
+          
+          // Limpiar contenedor de EPA
+          epaContainer.innerHTML = '';
+          
+          // Cargar registros EPA (nuevo formato)
+          if (data.registros_epa && Array.isArray(data.registros_epa)) {
+            data.registros_epa.forEach(registro => {
+              agregarCampoEpa(registro.registro || '', registro.enlace || '');
+            });
+          } else {
+            // Si no hay registros EPA en el nuevo formato, usar el formato antiguo
+            agregarCampoEpa(data.epa || '', data.enlace_epa || '');
+          }
           
           // Datos para MINI PEPINO
           document.getElementById("edit-dias_mini").value = data.dias_mini || "";
@@ -607,12 +700,27 @@
         db.ref("plagas").push(plagaTomateInput);
       }
       
+      // Recopilar todos los registros EPA
+      const epaItems = document.querySelectorAll('.epa-item');
+      const registrosEpa = [];
+      
+      epaItems.forEach(item => {
+        const registro = item.querySelector('.epa-registro').value.trim();
+        const enlace = item.querySelector('.epa-enlace').value.trim();
+        
+        if (registro || enlace) {
+          registrosEpa.push({
+            registro: registro,
+            enlace: enlace
+          });
+        }
+      });
+      
       const producto = {
         nombre: document.getElementById("edit-nombre").value,
         ingredientes: document.getElementById("edit-ingredientes").value,
         senasa: document.getElementById("edit-senasa").value,
-        epa: document.getElementById("edit-epa").value,
-        enlace_epa: document.getElementById("edit-enlace_epa").value,
+        registros_epa: registrosEpa, // Nuevo formato de múltiples registros
         categoria: document.getElementById("edit-categoria").value,
         grupo_quimico: document.getElementById("edit-grupo_quimico").value,
         familia_quimica: document.getElementById("edit-familia_quimica").value,
@@ -673,7 +781,11 @@
     }
     
     // Al cargar la página, buscar todos los productos
-    window.addEventListener("load", searchProducts);
+    window.addEventListener("load", function() {
+      // Agregar un campo EPA inicial
+      agregarCampoEpa();
+      searchProducts();
+    });
   </script>
 </body>
 </html>
