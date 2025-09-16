@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Actividades - Agro Alpha</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1b5e20;
+            --secondary-color: #2e7d32;
+            --accent-color: #4caf50;
+            --dark-green: #0d3b13;
+            --light-bg: #e8f5e9;
+            --header-color: #1b5e20;
+            --table-header: #2e7d32;
+            --completed-color: #4caf50;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            padding-top: 20px;
+            padding-bottom: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--header-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: none;
+        }
+        
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+            color: white;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, var(--header-color), var(--secondary-color));
+        }
+        
+        .tabla-resumen {
+            font-size: 0.9rem;
+        }
+        
+        .tabla-resumen th {
+            background-color: var(--table-header);
+            color: white;
+        }
+        
+        .tabla-resumen td {
+            text-align: center;
+        }
+        
+        .info-hover {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .info-hover .tooltip-info {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark-green);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .info-hover:hover .tooltip-info {
+            display: block;
+        }
+        
+        .cultivo-icon {
+            color: var(--header-color);
+        }
+        
+        .rendimiento-cell {
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+        
+        .section-title {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .completed {
+            background-color: rgba(76, 175, 80, 0.2) !important;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .completed::after {
+            content: "✓";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+            color: var(--completed-color);
+        }
+        
+        .week-selector {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header p.lead {
+                font-size: 0.9rem;
+            }
+            
+            .tabla-resumen {
+                font-size: 0.8rem;
+            }
+            
+            .info-hover .tooltip-info {
+                white-space: normal;
+                width: 150px;
+            }
+            
+            .completed::after {
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header text-center">
+            <h1><i class="fas fa-seedling me-2"></i>Reporte de Actividades</h1>
+            <p class="lead">Agroalpha - Unidad de producción 1</p>
+            <div class="week-selector mt-3">
+                <label for="weekSelector" class="me-2">Semana:</label>
+                <select id="weekSelector" class="form-select d-inline-block" style="width: auto;">
+                    <!-- Se llenará dinámicamente -->
+                </select>
+            </div>
+        </div>
+
+        <!-- Sección de Tomate -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-4 section-title"><i class="fas fa-apple-alt me-2 cultivo-icon"></i>Tomate actividades</h2>
+                
+                <!-- Tabla de invernaderos de tomate -->
+                <div class="card mb-4">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover tabla-resumen mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Inv</th>
+                                        <th>Enguie</th>
+                                        <th>Bajado</th>
+                                        <th>Deshoje</th>
+                                        <th>Desbrote</th>
+                                        <th>Cosecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaResumenTomate">
+                                    <!-- Se llenará dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rendimientos de Tomate -->
+            <div class="col-12 mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Rendimientos de Tomate</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover tabla-resumen">
+                                <thead>
+                                    <tr>
+                                        <th>Inv</th>
+                                        <th>Enguie</th>
+                                        <th>Bajado</th>
+                                        <th>Deshoje</th>
+                                        <th>Desbrote</th>
+                                        <th>Cosecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaRendimientosTomate">
+                                    <!-- Se llenará dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Chile/Mini -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-4 section-title"><i class="fas fa-pepper-hot me-2 cultivo-icon"></i>Chile actividades</h2>
+                
+                <!-- Tabla de invernaderos de chile -->
+                <div class="card mb-4">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover tabla-resumen mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Inv</th>
+                                        <th>Enguie</th>
+                                        <th>Poda</th>
+                                        <th>Amarrado</th>
+                                        <th>Raleo</th>
+                                        <th>Cosecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaResumenChile">
+                                    <!-- Se llenará dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rendimientos de Chile -->
+            <div class="col-12 mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Rendimientos de Chile</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover tabla-resumen">
+                                <thead>
+                                    <tr>
+                                        <th>Inv</th>
+                                        <th>Enguie</th>
+                                        <th>Poda</th>
+                                        <th>Amarrado</th>
+                                        <th>Raleo</th>
+                                        <th>Cosecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaRendimientosChile">
+                                    <!-- Se llenará dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Configuración de Firebase con tu URL
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Definir invernaderos por cultivo (agregado vivero al tomate)
+        const invernaderosPorCultivo = {
+            chile: ['9', '10', '11', '12', '33', '35', '37', '39'],
+            tomate: ['13', '14', '15', '16', 'vivero'] // Vivero agregado después del 16
+        };
+
+        // Definir actividades por cultivo (con cosecha al final)
+        const actividadesPorCultivo = {
+            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'],
+            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha']
+        };
+
+        // Definir metas de camas por invernadero (agregada meta para vivero: 64 camas)
+        const metasCamas = {
+            '9': 274,
+            '10': 270,
+            '11': 274,
+            '12': 274,
+            '13': 274,
+            '14': 274,
+            '15': 274,
+            '16': 274,
+            '33': 276,
+            '35': 276,
+            '37': 284,
+            '39': 284,
+            'vivero': 64  // Nueva meta para el vivero
+        };
+
+        // Variables globales
+        let actividadesData = [];
+        let selectedWeek = getWeekNumber(new Date()).week;
+        let selectedYear = new Date().getFullYear();
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar selector de semanas
+            setupWeekSelector();
+            
+            // Cargar datos de Firebase
+            cargarDatosActividades();
+        });
+
+        // Configurar el selector de semanas
+        function setupWeekSelector() {
+            const weekSelector = document.getElementById('weekSelector');
+            const currentWeek = getWeekNumber(new Date()).week;
+            const currentYear = new Date().getFullYear();
+            
+            // Limpiar opciones existentes
+            weekSelector.innerHTML = '';
+            
+            // Agregar semanas (desde la 1 hasta la semana actual)
+            for (let week = 1; week <= currentWeek; week++) {
+                const option = document.createElement('option');
+                option.value = week;
+                option.textContent = `Semana ${week} (${currentYear})`;
+                if (week === currentWeek) {
+                    option.selected = true;
+                }
+                weekSelector.appendChild(option);
+            }
+            
+            // Agregar evento para cambiar semana
+            weekSelector.addEventListener('change', function() {
+                selectedWeek = parseInt(this.value);
+                selectedYear = currentYear;
+                procesarDatos();
+            });
+        }
+
+        // Obtener el número de semana de una fecha
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return {week: weekNo, year: d.getUTCFullYear()};
+        }
+
+        // Obtener el lunes de la semana específica
+        function getMondayOfWeek(week, year) {
+            const janFirst = new Date(year, 0, 1);
+            const daysOffset = 1 - janFirst.getDay(); // 1 for Monday
+            const firstMonday = new Date(year, 0, janFirst.getDate() + daysOffset);
+            const result = new Date(firstMonday.setDate(firstMonday.getDate() + (week - 1) * 7));
+            return result;
+        }
+
+        // Cargar datos de actividades desde Firebase
+        function cargarDatosActividades() {
+            const actividadesRef = database.ref('unidad_produccion_1/actividades');
+            
+            actividadesRef.on('value', (snapshot) => {
+                actividadesData = [];
+                snapshot.forEach(childSnapshot => {
+                    actividadesData.push(childSnapshot.val());
+                });
+                
+                // Procesar y mostrar datos
+                procesarDatos();
+            });
+        }
+
+        // Procesar datos y actualizar la interfaz
+        function procesarDatos() {
+            // Mostrar tablas resumen
+            mostrarTablaResumen('tomate', 'tablaResumenTomate');
+            mostrarTablaResumen('chile', 'tablaResumenChile');
+            
+            // Mostrar últimos rendimientos
+            mostrarTablaRendimientos('tomate', 'tablaRendimientosTomate');
+            mostrarTablaRendimientos('chile', 'tablaRendimientosChile');
+        }
+
+        // Mostrar tabla resumen por tipo de cultivo
+        function mostrarTablaResumen(tipoCultivo, contenedorId) {
+            const contenedor = document.getElementById(contenedorId);
+            contenedor.innerHTML = '';
+            
+            const invernaderos = invernaderosPorCultivo[tipoCultivo];
+            const actividades = actividadesPorCultivo[tipoCultivo];
+            
+            invernaderos.forEach(invernadero => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero (abreviado)
+                const celdaInvernadero = document.createElement('td');
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('fw-bold');
+                fila.appendChild(celdaInvernadero);
+                
+                // Celdas para cada actividad
+                actividades.forEach(actividad => {
+                    const celda = document.createElement('td');
+                    
+                    // Filtrar datos para esta actividad e invernadero
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && item.actividad === actividad
+                    );
+                    
+                    if (datosActividad.length > 0) {
+                        const metaCamas = metasCamas[invernadero] || 0;
+                        
+                        if (actividad === 'Cosecha') {
+                            // Para cosecha, mostrar el total de camas de la semana seleccionada
+                            const cosechaSemana = calcularCamasPorSemana(datosActividad, selectedWeek, selectedYear);
+                            celda.textContent = cosechaSemana;
+                            
+                            // Verificar si se completó una vuelta (múltiplo de la meta)
+                            if (cosechaSemana >= metaCamas) {
+                                celda.classList.add('completed');
+                            }
+                        } else {
+                            // Calcular el progreso acumulado hasta la semana anterior
+                            const progresoAcumulado = calcularProgresoAcumulado(datosActividad, selectedWeek - 1, selectedYear, metaCamas);
+                            
+                            // Calcular el progreso de la semana actual
+                            const progresoSemanal = calcularCamasPorSemana(datosActividad, selectedWeek, selectedYear);
+                            
+                            // Calcular el progreso total (acumulado + semanal)
+                            const progresoTotal = progresoAcumulado.totalCamas + progresoSemanal;
+                            
+                            // Calcular la vuelta actual
+                            const vueltaActual = Math.floor(progresoTotal / metaCamas) + 1;
+                            const camasVueltaActual = progresoTotal % metaCamas;
+                            
+                            // Mostrar el número de camas de la semana actual
+                            let camasAMostrar = progresoSemanal;
+                            
+                            // Si se completó una vuelta esta semana, mostrar la meta en lugar del total
+                            if (progresoAcumulado.camasVueltaActual + progresoSemanal >= metaCamas) {
+                                camasAMostrar = metaCamas - progresoAcumulado.camasVueltaActual;
+                                celda.classList.add('completed');
+                            }
+                            
+                            // Si no hay actividad en la semana actual, mostrar 0
+                            if (progresoSemanal === 0) {
+                                camasAMostrar = 0;
+                            }
+                            
+                            celda.innerHTML = `
+                                <div class="info-hover">
+                                    ${camasAMostrar}
+                                    <div class="tooltip-info">
+                                        Vuelta ${vueltaActual}<br>
+                                        Progreso semanal: ${progresoSemanal} camas<br>
+                                        Progreso acumulado: ${progresoTotal} camas<br>
+                                        Meta: ${metaCamas} camas
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        celda.innerHTML = '<span class="text-muted">-</span>';
+                    }
+                    
+                    fila.appendChild(celda);
+                });
+                
+                contenedor.appendChild(fila);
+            });
+        }
+
+        // Calcular camas por semana específica
+        function calcularCamasPorSemana(datosActividad, week, year) {
+            if (week < 1) return 0;
+            
+            const startDate = getMondayOfWeek(week, year);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            
+            return datosActividad.reduce((sum, item) => {
+                if (!item.fecha) return sum;
+                
+                const itemDate = new Date(item.fecha);
+                if (itemDate >= startDate && itemDate <= endDate) {
+                    return sum + (item.camas || 0);
+                }
+                return sum;
+            }, 0);
+        }
+
+        // Calcular progreso acumulado hasta la semana anterior
+        function calcularProgresoAcumulado(datosActividad, hastaSemana, year, metaCamas) {
+            let totalCamas = 0;
+            
+            for (let week = 1; week <= hastaSemana; week++) {
+                totalCamas += calcularCamasPorSemana(datosActividad, week, year);
+            }
+            
+            const vueltasCompletadas = Math.floor(totalCamas / metaCamas);
+            const camasVueltaActual = totalCamas % metaCamas;
+            
+            return {
+                totalCamas: totalCamas,
+                vueltasCompletadas: vueltasCompletadas,
+                camasVueltaActual: camasVueltaActual
+            };
+        }
+
+        // Mostrar tabla de rendimientos por tipo de cultivo
+        function mostrarTablaRendimientos(tipoCultivo, contenedorId) {
+            const contenedor = document.getElementById(contenedorId);
+            contenedor.innerHTML = '';
+            
+            const invernaderos = invernaderosPorCultivo[tipoCultivo];
+            const actividades = actividadesPorCultivo[tipoCultivo];
+            
+            invernaderos.forEach(invernadero => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero (abreviado)
+                const celdaInvernadero = document.createElement('td');
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('fw-bold');
+                fila.appendChild(celdaInvernadero);
+                
+                // Celdas para cada actividad
+                actividades.forEach(actividad => {
+                    const celda = document.createElement('td');
+                    
+                    // Filtrar datos para esta actividad e invernadero con rendimiento
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && 
+                        item.actividad === actividad &&
+                        item.rendimiento > 0
+                    );
+                    
+                    if (datosActividad.length > 0) {
+                        // Obtener el último registro con rendimiento de la semana seleccionada
+                        const rendimientoSemana = obtenerRendimientoSemana(datosActividad, selectedWeek, selectedYear);
+                        if (rendimientoSemana > 0) {
+                            celda.innerHTML = `<span class="rendimiento-cell">${rendimientoSemana}</span>`;
+                        } else {
+                            celda.innerHTML = '<span class="text-muted">-</span>';
+                        }
+                    } else {
+                        celda.innerHTML = '<span class="text-muted">-</span>';
+                    }
+                    
+                    fila.appendChild(celda);
+                });
+                
+                contenedor.appendChild(fila);
+            });
+        }
+
+        // Obtener rendimiento de la semana específica
+        function obtenerRendimientoSemana(datosActividad, week, year) {
+            if (week < 1) return 0;
+            
+            const startDate = getMondayOfWeek(week, year);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            
+            let ultimoRendimiento = 0;
+            
+            datosActividad.forEach(item => {
+                if (!item.fecha) return;
+                
+                const itemDate = new Date(item.fecha);
+                if (itemDate >= startDate && itemDate <= endDate && item.rendimiento) {
+                    ultimoRendimiento = item.rendimiento;
+                }
+            });
+            
+            return ultimoRendimiento;
+        }
+    </script>
+</body>
+</html>
