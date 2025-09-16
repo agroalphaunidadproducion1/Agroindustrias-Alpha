@@ -90,11 +90,13 @@
         .percentage-cell {
             font-weight: bold;
             text-align: center;
+            cursor: pointer;
         }
         
         .count-cell {
             text-align: center;
             font-weight: normal;
+            cursor: pointer;
         }
         
         .high-percentage {
@@ -179,6 +181,18 @@
             width: 3rem;
             height: 3rem;
             margin-right: 10px;
+        }
+        
+        /* Tooltip para mostrar detalles */
+        .count-tooltip {
+            position: absolute;
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
         }
         
         /* Responsive */
@@ -526,6 +540,7 @@
         let currentWeekDates = [];
         let availableWeekDates = []; // Fechas que realmente existen en Firebase
         let viewMode = 'percentage'; // 'percentage' o 'count'
+        let currentWeekNumber = 0;
 
         // Mapeo de nombres abreviados a nombres completos
         const areaNameMapping = {
@@ -555,8 +570,14 @@
             // Cargar datos iniciales
             loadEmployees();
             loadWeeksSelector().then(() => {
-                // Una vez cargado el selector, seleccionar automáticamente la última semana
-                selectLatestWeekWithData();
+                // Obtener la semana actual
+                const today = new Date();
+                currentWeekNumber = getWeekNumber(today);
+                
+                // Seleccionar automáticamente la semana actual
+                document.getElementById('semana-select').value = currentWeekNumber;
+                updateWeekDates(currentWeekNumber);
+                loadAttendanceData();
             });
         });
 
@@ -599,61 +620,6 @@
                 
                 resolve();
             });
-        }
-
-        // Seleccionar automáticamente la última semana con datos
-        function selectLatestWeekWithData() {
-            // Obtener las últimas 8 semanas (para encontrar la más reciente con datos)
-            const currentYear = new Date().getFullYear();
-            const currentWeek = getWeekNumber(new Date());
-            
-            // Verificar semanas desde la actual hacia atrás
-            checkWeeksForData(currentWeek, currentYear, 8);
-        }
-
-        // Verificar semanas para encontrar la más reciente con datos
-        function checkWeeksForData(startWeek, year, weeksToCheck) {
-            const selector = document.getElementById('semana-select');
-            let weeksChecked = 0;
-            
-            const checkWeek = (week, currentYear) => {
-                if (weeksChecked >= weeksToCheck) {
-                    // Si no encontramos datos en las últimas semanas, usar la semana actual
-                    selector.value = startWeek;
-                    updateWeekDates(startWeek);
-                    loadAttendanceData();
-                    return;
-                }
-                
-                const firstDay = getFirstDayOfWeek(week, currentYear);
-                const checkDate = formatDate(firstDay);
-                
-                // Verificar si existe esta fecha en Firebase
-                attendanceRef.child(checkDate).once('value').then(snapshot => {
-                    if (snapshot.exists()) {
-                        // Encontramos datos, seleccionar esta semana
-                        selector.value = week;
-                        updateWeekDates(week);
-                        loadAttendanceData();
-                    } else {
-                        // No hay datos, probar con la semana anterior
-                        weeksChecked++;
-                        const prevWeek = week > 1 ? week - 1 : 52;
-                        const prevYear = week > 1 ? currentYear : currentYear - 1;
-                        checkWeek(prevWeek, prevYear);
-                    }
-                }).catch(error => {
-                    console.error('Error al verificar datos de la semana:', error);
-                    // En caso de error, seguir con la siguiente semana
-                    weeksChecked++;
-                    const prevWeek = week > 1 ? week - 1 : 52;
-                    const prevYear = week > 1 ? currentYear : currentYear - 1;
-                    checkWeek(prevWeek, prevYear);
-                });
-            };
-            
-            // Comenzar con la semana actual
-            checkWeek(startWeek, year);
         }
 
         // Actualizar rango de fechas al cambiar la semana
@@ -885,6 +851,9 @@
             generateChileTable(reportData);
             generateTomateTable(reportData);
             generateOtrasAreasTable(reportData);
+            
+            // Agregar event listeners para mostrar detalles al hacer clic
+            addCellClickListeners();
         }
 
         // Generar encabezados de tabla dinámicamente
@@ -1045,17 +1014,22 @@
             const otrasAreasPercentage = otrasAreasWeekMax > 0 ? Math.round((otrasAreasWeekTotal / otrasAreasWeekMax) * 100) : 0;
             
             // Actualizar resúmenes
-            document.getElementById('chile-promedio').textContent = viewMode === 'percentage' ? `${chilePercentage}%` : `${chileWeekTotal}/${chileWeekMax}`;
-            document.getElementById('tomate-promedio').textContent = viewMode === 'percentage' ? `${tomatePercentage}%` : `${tomateWeekTotal}/${tomateWeekMax}`;
-            document.getElementById('otras-areas-promedio').textContent = viewMode === 'percentage' ? `${otrasAreasPercentage}%` : `${otrasAreasWeekTotal}/${otrasAreasWeekMax}`;
-            
-            // Aplicar colores según porcentaje (solo en modo porcentaje)
             if (viewMode === 'percentage') {
+                document.getElementById('chile-promedio').textContent = `${chilePercentage}%`;
+                document.getElementById('tomate-promedio').textContent = `${tomatePercentage}%`;
+                document.getElementById('otras-areas-promedio').textContent = `${otrasAreasPercentage}%`;
+                
+                // Aplicar colores según porcentaje
                 applyPercentageColor('chile-promedio', chilePercentage);
                 applyPercentageColor('tomate-promedio', tomatePercentage);
                 applyPercentageColor('otras-areas-promedio', otrasAreasPercentage);
             } else {
-                // En modo números, quitar colores
+                // En modo números, mostrar solo el número de asistentes
+                document.getElementById('chile-promedio').textContent = `${chileWeekTotal}`;
+                document.getElementById('tomate-promedio').textContent = `${tomateWeekTotal}`;
+                document.getElementById('otras-areas-promedio').textContent = `${otrasAreasWeekTotal}`;
+                
+                // Quitar colores
                 document.getElementById('chile-promedio').className = '';
                 document.getElementById('tomate-promedio').className = '';
                 document.getElementById('otras-areas-promedio').className = '';
@@ -1096,7 +1070,7 @@
                     } else {
                         row.innerHTML = `
                             <td>${dayName}</td>
-                            <td>${count.present}/${count.total}</td>
+                            <td>${count.present}</td>
                         `;
                     }
                 }
@@ -1170,9 +1144,9 @@
                         const percentageClass = getPercentageClass(percentage);
                         
                         if (viewMode === 'percentage') {
-                            rowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
+                            rowContent += `<td class="percentage-cell ${percentageClass}" data-present="${presentCount}" data-total="${totalEmployees}">${percentage}%</td>`;
                         } else {
-                            rowContent += `<td class="count-cell">${presentCount}/${totalEmployees}</td>`;
+                            rowContent += `<td class="count-cell" data-present="${presentCount}" data-total="${totalEmployees}">${presentCount}</td>`;
                         }
                         
                         // Acumular para el total diario
@@ -1193,9 +1167,9 @@
                 const weekPercentageClass = getPercentageClass(weekPercentage);
                 
                 if (viewMode === 'percentage') {
-                    rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
+                    rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekPercentage}%</td>`;
                 } else {
-                    rowContent += `<td class="count-cell week-total">${weekTotalPresent}/${weekTotalMax}</td>`;
+                    rowContent += `<td class="count-cell week-total" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekTotalPresent}</td>`;
                 }
                 
                 row.innerHTML = rowContent;
@@ -1219,9 +1193,9 @@
                     const percentageClass = getPercentageClass(percentage);
                     
                     if (viewMode === 'percentage') {
-                        totalRowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
+                        totalRowContent += `<td class="percentage-cell ${percentageClass}" data-present="${totalPresent}" data-total="${totalMax}">${percentage}%</td>`;
                     } else {
-                        totalRowContent += `<td class="count-cell">${totalPresent}/${totalMax}</td>`;
+                        totalRowContent += `<td class="count-cell" data-present="${totalPresent}" data-total="${totalMax}">${totalPresent}</td>`;
                     }
                     
                     // Acumular para el total semanal
@@ -1237,9 +1211,9 @@
             const weekPercentageClass = getPercentageClass(weekPercentage);
             
             if (viewMode === 'percentage') {
-                totalRowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
+                totalRowContent += `<td class="percentage-cell week-total ${weekPercentageClass}" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekPercentage}%</td>`;
             } else {
-                totalRowContent += `<td class="count-cell week-total">${weekTotalPresent}/${weekTotalMax}</td>`;
+                totalRowContent += `<td class="count-cell week-total" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekTotalPresent}</td>`;
             }
             
             totalRow.innerHTML = totalRowContent;
@@ -1298,9 +1272,9 @@
                         const percentageClass = getPercentageClass(percentage);
                         
                         if (viewMode === 'percentage') {
-                            rowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
+                            rowContent += `<td class="percentage-cell ${percentageClass}" data-present="${presentCount}" data-total="${totalEmployees}">${percentage}%</td>`;
                         } else {
-                            rowContent += `<td class="count-cell">${presentCount}/${totalEmployees}</td>`;
+                            rowContent += `<td class="count-cell" data-present="${presentCount}" data-total="${totalEmployees}">${presentCount}</td>`;
                         }
                         
                         // Acumular para el total diario
@@ -1321,9 +1295,9 @@
                 const weekPercentageClass = getPercentageClass(weekPercentage);
                 
                 if (viewMode === 'percentage') {
-                    rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
+                    rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekPercentage}%</td>`;
                 } else {
-                    rowContent += `<td class="count-cell week-total">${weekTotalPresent}/${weekTotalMax}</td>`;
+                    rowContent += `<td class="count-cell week-total" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekTotalPresent}</td>`;
                 }
                 
                 row.innerHTML = rowContent;
@@ -1347,9 +1321,9 @@
                     const percentageClass = getPercentageClass(percentage);
                     
                     if (viewMode === 'percentage') {
-                        totalRowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
+                        totalRowContent += `<td class="percentage-cell ${percentageClass}" data-present="${totalPresent}" data-total="${totalMax}">${percentage}%</td>`;
                     } else {
-                        totalRowContent += `<td class="count-cell">${totalPresent}/${totalMax}</td>`;
+                        totalRowContent += `<td class="count-cell" data-present="${totalPresent}" data-total="${totalMax}">${totalPresent}</td>`;
                     }
                     
                     // Acumular para el total semanal
@@ -1365,9 +1339,9 @@
             const weekPercentageClass = getPercentageClass(weekPercentage);
             
             if (viewMode === 'percentage') {
-                totalRowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
+                totalRowContent += `<td class="percentage-cell week-total ${weekPercentageClass}" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekPercentage}%</td>`;
             } else {
-                totalRowContent += `<td class="count-cell week-total">${weekTotalPresent}/${weekTotalMax}</td>`;
+                totalRowContent += `<td class="count-cell week-total" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekTotalPresent}</td>`;
             }
             
             totalRow.innerHTML = totalRowContent;
@@ -1426,9 +1400,9 @@
                         const percentageClass = getPercentageClass(percentage);
                         
                         if (viewMode === 'percentage') {
-                            rowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
+                            rowContent += `<td class="percentage-cell ${percentageClass}" data-present="${presentCount}" data-total="${totalEmployees}">${percentage}%</td>`;
                         } else {
-                            rowContent += `<td class="count-cell">${presentCount}/${totalEmployees}</td>`;
+                            rowContent += `<td class="count-cell" data-present="${presentCount}" data-total="${totalEmployees}">${presentCount}</td>`;
                         }
                         
                         // Acumular para el total diario
@@ -1449,9 +1423,9 @@
                 const weekPercentageClass = getPercentageClass(weekPercentage);
                 
                 if (viewMode === 'percentage') {
-                    rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
+                    rowContent += `<td class="percentage-cell week-total ${weekPercentageClass}" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekPercentage}%</td>`;
                 } else {
-                    rowContent += `<td class="count-cell week-total">${weekTotalPresent}/${weekTotalMax}</td>`;
+                    rowContent += `<td class="count-cell week-total" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekTotalPresent}</td>`;
                 }
                 
                 row.innerHTML = rowContent;
@@ -1475,9 +1449,9 @@
                     const percentageClass = getPercentageClass(percentage);
                     
                     if (viewMode === 'percentage') {
-                        totalRowContent += `<td class="percentage-cell ${percentageClass}">${percentage}%</td>`;
+                        totalRowContent += `<td class="percentage-cell ${percentageClass}" data-present="${totalPresent}" data-total="${totalMax}">${percentage}%</td>`;
                     } else {
-                        totalRowContent += `<td class="count-cell">${totalPresent}/${totalMax}</td>`;
+                        totalRowContent += `<td class="count-cell" data-present="${totalPresent}" data-total="${totalMax}">${totalPresent}</td>`;
                     }
                     
                     // Acumular para el total semanal
@@ -1493,9 +1467,9 @@
             const weekPercentageClass = getPercentageClass(weekPercentage);
             
             if (viewMode === 'percentage') {
-                totalRowContent += `<td class="percentage-cell week-total ${weekPercentageClass}">${weekPercentage}%</td>`;
+                totalRowContent += `<td class="percentage-cell week-total ${weekPercentageClass}" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekPercentage}%</td>`;
             } else {
-                totalRowContent += `<td class="count-cell week-total">${weekTotalPresent}/${weekTotalMax}</td>`;
+                totalRowContent += `<td class="count-cell week-total" data-present="${weekTotalPresent}" data-total="${weekTotalMax}">${weekTotalPresent}</td>`;
             }
             
             totalRow.innerHTML = totalRowContent;
@@ -1507,6 +1481,42 @@
             if (percentage >= 80) return 'high-percentage';
             if (percentage >= 70) return 'medium-percentage';
             return 'low-percentage';
+        }
+
+        // Agregar event listeners para mostrar detalles al hacer clic
+        function addCellClickListeners() {
+            // Agregar event listeners a todas las celdas con datos
+            const cells = document.querySelectorAll('.percentage-cell, .count-cell');
+            cells.forEach(cell => {
+                if (!cell.classList.contains('no-attendance')) {
+                    cell.addEventListener('click', function() {
+                        const present = this.getAttribute('data-present');
+                        const total = this.getAttribute('data-total');
+                        
+                        if (present && total) {
+                            // Crear tooltip si no existe
+                            let tooltip = document.querySelector('.count-tooltip');
+                            if (!tooltip) {
+                                tooltip = document.createElement('div');
+                                tooltip.className = 'count-tooltip';
+                                document.body.appendChild(tooltip);
+                            }
+                            
+                            // Posicionar y mostrar tooltip
+                            const rect = this.getBoundingClientRect();
+                            tooltip.textContent = `${present}/${total}`;
+                            tooltip.style.left = `${rect.left + window.scrollX}px`;
+                            tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
+                            tooltip.style.display = 'block';
+                            
+                            // Ocultar tooltip después de 2 segundos
+                            setTimeout(() => {
+                                tooltip.style.display = 'none';
+                            }, 2000);
+                        }
+                    });
+                }
+            });
         }
 
         // Mostrar mensaje de error
