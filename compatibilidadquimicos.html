@@ -118,6 +118,10 @@
       background-color: #f1f8e9;
     }
     
+    .product-item.selected {
+      background-color: #ffebee;
+    }
+    
     .product-item:last-child {
       border-bottom: none;
     }
@@ -194,6 +198,10 @@
       .recommendation-grid {
         grid-template-columns: 1fr;
       }
+      
+      .search-section {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -246,7 +254,7 @@
         </div>
         
         <div class="recommendations-section">
-          <h3>Recomendaciones de Grupos Químicos</h3>
+          <h3>Recomendaciones (Misma Categoría - Grupo Químico Diferente)</h3>
           <div class="recommendation-grid" id="recommendations-container">
             <!-- Las recomendaciones se mostrarán aquí -->
           </div>
@@ -351,12 +359,11 @@
         const isSelected = selectedProduct && selectedProduct.id === product.id;
         
         const productItem = document.createElement('div');
-        productItem.className = 'product-item';
-        if (isSelected) productItem.style.backgroundColor = '#ffebee';
+        productItem.className = isSelected ? 'product-item selected' : 'product-item';
         productItem.dataset.id = product.id;
         
         productItem.innerHTML = `
-          <strong>${product.nombre}</strong>
+          <strong>${product.nombre}</strong> <span style="font-size: 12px; color: #666;">(${product.categoria})</span>
         `;
         
         productItem.addEventListener('click', () => selectProduct(product.id));
@@ -414,16 +421,20 @@
         return;
       }
       
-      // Obtener grupo y familia química del producto seleccionado
+      // Obtener grupo, familia y categoría del producto seleccionado
       const selectedGroup = selectedProduct.grupo_quimico;
       const selectedFamily = selectedProduct.familia_quimica;
+      const selectedCategory = selectedProduct.categoria;
       
-      // Filtrar productos que no estén en el mismo grupo/familia química
+      // Filtrar productos de la MISMA categoría pero con grupo/familia química DIFERENTE
       const recommendedProducts = allProducts.filter(product => {
         // Excluir producto seleccionado
         if (product.id === selectedProduct.id) return false;
         
-        // Incluir solo productos de grupos químicos diferentes
+        // Incluir solo productos de la MISMA categoría
+        if (product.categoria !== selectedCategory) return false;
+        
+        // Incluir solo productos de grupos químicos DIFERENTES
         return product.grupo_quimico !== selectedGroup && 
                product.familia_quimica !== selectedFamily;
       });
@@ -431,8 +442,8 @@
       if (recommendedProducts.length === 0) {
         container.innerHTML = `
           <div class="recommendation-item">
-            <div class="recommendation-header">No se encontraron productos con grupos químicos diferentes</div>
-            <p>Intente seleccionar un producto de diferente categoría o modifique los filtros.</p>
+            <div class="recommendation-header">No se encontraron productos de la misma categoría con grupos químicos diferentes</div>
+            <p>Intente modificar los filtros de búsqueda.</p>
           </div>
         `;
         return;
@@ -455,7 +466,6 @@
             </div>
             <div class="product-info">
               <div><strong>Ingredientes:</strong> ${product.ingredientes}</div>
-              <div><strong>Categoría:</strong> ${product.categoria}</div>
               <div><strong>Grupo:</strong> ${product.grupo_quimico}</div>
               <div><strong>Familia:</strong> ${product.familia_quimica}</div>
               ${product.plagas_mini ? `<div><strong>Plagas (Mini):</strong> ${product.plagas_mini}</div>` : ''}
