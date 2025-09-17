@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestión Clasificación IRAC</title>
+  <title>Recomendación de Grupos Químicos</title>
   <style>
     :root {
       --primary-color: #2e7d32;
@@ -12,13 +12,10 @@
       --light-border: #c8e6c9;
       --white: #ffffff;
       --shadow: rgba(0,0,0,0.1);
-      --accent-color: #1565c0;
-      --accent-hover: #0d47a1;
-      --nervioso: #e3f2fd;
-      --crecimiento: #fff8e1;
-      --respiración: #e8f5e9;
-      --digestivo: #fbe9e7;
-      --desconocido: #f5f5f5;
+      --red: #f44336;
+      --yellow: #ffeb3b;
+      --blue: #2196f3;
+      --green: #4caf50;
     }
     
     * {
@@ -30,8 +27,10 @@
       background: var(--light-bg);
       margin: 0;
       padding: 20px;
-      color: #333;
+      color: var(--primary-color);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     
     h2 {
@@ -43,171 +42,42 @@
     .container {
       max-width: 1200px;
       margin: 0 auto;
-    }
-    
-    .tabs {
       display: flex;
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--primary-color);
+      flex-direction: column;
+      gap: 20px;
     }
     
-    .tab {
-      padding: 12px 20px;
-      cursor: pointer;
-      background: #e8f5e9;
-      margin-right: 5px;
-      border-radius: 5px 5px 0 0;
-      font-weight: bold;
-    }
-    
-    .tab.active {
-      background: var(--primary-color);
-      color: white;
-    }
-    
-    .tab-content {
-      display: none;
-    }
-    
-    .tab-content.active {
-      display: block;
-    }
-    
-    .fisiologia-selector {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-    
-    .fisiologia-btn {
-      padding: 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      text-align: center;
-      transition: all 0.3s;
-      box-shadow: 0 2px 5px var(--shadow);
-    }
-    
-    .fisiologia-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 8px var(--shadow);
-    }
-    
-    .nervioso {
-      background-color: var(--nervioso);
-      color: var(--accent-color);
-    }
-    
-    .crecimiento {
-      background-color: var(--crecimiento);
-      color: #f57c00;
-    }
-    
-    .respiración {
-      background-color: var(--respiración);
-      color: var(--primary-color);
-    }
-    
-    .digestivo {
-      background-color: var(--digestivo);
-      color: #d32f2f;
-    }
-    
-    .desconocido {
-      background-color: var(--desconocido);
-      color: #616161;
-    }
-    
-    .grupos-container {
-      background: var(--white);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px var(--shadow);
-      margin-bottom: 20px;
-    }
-    
-    .grupo-title {
-      color: var(--primary-color);
-      border-bottom: 2px solid var(--light-border);
-      padding-bottom: 10px;
-      margin-top: 0;
-    }
-    
-    .grupos-lista {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 15px;
-    }
-    
-    .grupo-item {
-      border: 1px solid var(--light-border);
-      border-radius: 8px;
-      padding: 15px;
-      background: #f9f9f9;
-    }
-    
-    .grupo-nombre {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: var(--accent-color);
-    }
-    
-    .subgrupos-lista {
-      margin-top: 10px;
-      padding-left: 20px;
-    }
-    
-    .subgrupo-item {
-      margin-bottom: 10px;
-      padding: 8px;
-      background: var(--white);
-      border-radius: 5px;
-      border-left: 3px solid var(--primary-color);
-    }
-    
-    .subgrupo-nombre {
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-    
-    .sustancias-lista {
-      margin-top: 5px;
-      font-size: 14px;
-      color: #666;
-    }
-    
-    .form-container {
+    .card {
       background: var(--white);
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px var(--shadow);
     }
     
-    .form-group {
+    .filters {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
       margin-bottom: 20px;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
     }
     
     label {
       display: block;
       margin-bottom: 5px;
       font-weight: bold;
-      color: var(--primary-color);
     }
     
-    select, input, textarea {
+    select, input {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid var(--light-border);
       border-radius: 5px;
       font-size: 16px;
-    }
-    
-    textarea {
-      min-height: 100px;
-      resize: vertical;
     }
     
     button {
@@ -224,29 +94,84 @@
       background: var(--primary-hover);
     }
     
-    .btn-agregar-subgrupo {
-      background: var(--accent-color);
-      margin-top: 10px;
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
     }
     
-    .btn-agregar-subgrupo:hover {
-      background: var(--accent-hover);
-    }
-    
-    .subgrupo-input {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: center;
-    }
-    
-    .eliminar-subgrupo {
-      background: #f44336;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      padding: 5px 10px;
+    .product-card {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 4px var(--shadow);
+      border-left: 4px solid var(--primary-color);
       cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-3px);
+    }
+    
+    .product-card.selected {
+      border-left: 4px solid var(--red);
+      background-color: #ffebee;
+    }
+    
+    .product-name {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .product-details {
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .banda-indicator {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    
+    .banda-red { background-color: var(--red); }
+    .banda-yellow { background-color: var(--yellow); }
+    .banda-blue { background-color: var(--blue); }
+    .banda-green { background-color: var(--green); }
+    
+    .results {
+      margin-top: 20px;
+    }
+    
+    .recommendation {
+      background: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .recommendation-header {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .recommendation-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .recommendation-item {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px var(--shadow);
     }
     
     .footer {
@@ -255,141 +180,83 @@
       background-color: var(--primary-color);
       color: white;
       border-radius: 5px;
-      margin-top: 20px;
+      margin-top: auto;
     }
     
     .footer p {
       margin: 5px 0;
     }
     
-    .success {
-      color: green;
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    
-    .error {
-      color: red;
-      text-align: center;
-      margin-top: 15px;
-    }
-    
     @media (max-width: 768px) {
-      .fisiologia-selector {
-        grid-template-columns: 1fr;
-      }
-      
-      .grupos-lista {
-        grid-template-columns: 1fr;
-      }
-      
-      .tabs {
+      .filters {
         flex-direction: column;
       }
       
-      .tab {
-        margin-bottom: 5px;
-        border-radius: 5px;
+      .product-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Gestión de Clasificación IRAC España</h2>
+    <h2>Recomendación de Grupos Químicos</h2>
     
-    <div class="tabs">
-      <div class="tab active" data-tab="visualizar">Visualizar Clasificación</div>
-      <div class="tab" data-tab="agregar">Agregar Grupo</div>
-    </div>
-    
-    <div class="tab-content active" id="visualizar">
-      <div class="fisiologia-selector">
-        <button class="fisiologia-btn nervioso" data-fisiologia="nervioso">Nervioso y muscular</button>
-        <button class="fisiologia-btn crecimiento" data-fisiologia="crecimiento">Crecimiento y desarrollo</button>
-        <button class="fisiologia-btn respiración" data-fisiologia="respiración">Respiración</button>
-        <button class="fisiologia-btn digestivo" data-fisiologia="digestivo">Digestivo</button>
-        <button class="fisiologia-btn desconocido" data-fisiologia="desconocido">Desconocido o no específico</button>
-      </div>
-      
-      <div id="nervioso-container" class="grupos-container">
-        <h3 class="grupo-title">Sistema Nervioso y Muscular</h3>
-        <div class="grupos-lista">
-          <!-- Los grupos se cargarán aquí -->
+    <div class="card">
+      <h3>Seleccionar Productos</h3>
+      <div class="filters">
+        <div class="filter-group">
+          <label for="filter-cultivo">Cultivo:</label>
+          <select id="filter-cultivo">
+            <option value="todos">Todos los cultivos</option>
+            <option value="mini">Mini Pepino</option>
+            <option value="tomate">Tomate</option>
+          </select>
         </div>
-      </div>
-      
-      <div id="crecimiento-container" class="grupos-container">
-        <h3 class="grupo-title">Crecimiento y Desarrollo</h3>
-        <div class="grupos-lista">
-          <!-- Los grupos se cargarán aquí -->
-        </div>
-      </div>
-      
-      <div id="respiración-container" class="grupos-container">
-        <h3 class="grupo-title">Respiración</h3>
-        <div class="grupos-lista">
-          <!-- Los grupos se cargarán aquí -->
-        </div>
-      </div>
-      
-      <div id="digestivo-container" class="grupos-container">
-        <h3 class="grupo-title">Digestivo</h3>
-        <div class="grupos-lista">
-          <!-- Los grupos se cargarán aquí -->
-        </div>
-      </div>
-      
-      <div id="desconocido-container" class="grupos-container">
-        <h3 class="grupo-title">Desconocido o no específico</h3>
-        <div class="grupos-lista">
-          <!-- Los grupos se cargarán aquí -->
-        </div>
-      </div>
-    </div>
-    
-    <div class="tab-content" id="agregar">
-      <div class="form-container">
-        <h3 class="grupo-title">Agregar Nuevo Grupo IRAC</h3>
         
-        <form id="form-grupo">
-          <div class="form-group">
-            <label for="fisiologia">Fisiología:</label>
-            <select id="fisiologia" required>
-              <option value="">Seleccione una fisiología</option>
-              <option value="nervioso">Nervioso y muscular</option>
-              <option value="crecimiento">Crecimiento y desarrollo</option>
-              <option value="respiración">Respiración</option>
-              <option value="digestivo">Digestivo</option>
-              <option value="desconocido">Desconocido o no específico</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="grupo">Grupo principal:</label>
-            <input type="text" id="grupo" placeholder="Ej: 1. Inhibidores de la acetilcolinesterasa" required>
-          </div>
-          
-          <div class="form-group">
-            <label>Subgrupos:</label>
-            <div id="subgrupos-container">
-              <!-- Los subgrupos se agregarán aquí -->
-            </div>
-            <button type="button" class="btn-agregar-subgrupo" id="agregar-subgrupo">+ Agregar Subgrupo</button>
-          </div>
-          
-          <button type="submit">Guardar Grupo</button>
-          <div class="success" id="mensaje-exito"></div>
-          <div class="error" id="mensaje-error"></div>
-        </form>
+        <div class="filter-group">
+          <label for="filter-categoria">Categoría:</label>
+          <select id="filter-categoria">
+            <option value="todos">Todas las categorías</option>
+            <option value="Insecticida">Insecticida</option>
+            <option value="Fungicida">Fungicida</option>
+            <option value="Aminoácido">Aminoácido</option>
+            <option value="Estimulador">Estimulador</option>
+            <option value="Herbicida">Herbicida</option>
+            <option value="Bactericida">Bactericida</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="filter-plaga">Plaga:</label>
+          <input type="text" id="filter-plaga" list="plagas-list" placeholder="Filtrar por plaga">
+          <datalist id="plagas-list"></datalist>
+        </div>
+      </div>
+      
+      <div class="product-grid" id="productos-container">
+        <!-- Los productos se cargarán aquí dinámicamente -->
       </div>
     </div>
     
-    <div class="footer">
-      <p>Sistema Agroalpha © 2025 | Clasificación IRAC</p>
-      <p>Basado en la clasificación de Febrero 2024</p>
+    <div class="card">
+      <h3>Productos Seleccionados</h3>
+      <div id="selected-products">
+        <p>No hay productos seleccionados. Seleccione al menos un producto para obtener recomendaciones.</p>
+      </div>
+      
+      <div class="results" id="recommendations-container" style="display: none;">
+        <h3>Recomendaciones de Grupos Químicos</h3>
+        <div id="recommendations-content">
+          <!-- Las recomendaciones se mostrarán aquí -->
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="footer">
+    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo de recomendación</p>
   </div>
 
   <!-- Firebase -->
@@ -409,275 +276,282 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Referencia a la base de datos
-    const iracRef = db.ref("clasificacion-irac");
-
     // Variables globales
-    let clasificacionIRAC = {
-      nervioso: [],
-      crecimiento: [],
-      respiración: [],
-      digestivo: [],
-      desconocido: []
-    };
+    let allProducts = [];
+    let selectedProducts = [];
+    let allPlagas = [];
 
-    // Cargar datos al iniciar
+    // Cargar productos y plagas desde Firebase
+    function loadData() {
+      // Cargar productos
+      db.ref("productos").on("value", (snapshot) => {
+        const data = snapshot.val();
+        allProducts = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+        renderProducts();
+      });
+      
+      // Cargar plagas para el datalist
+      db.ref("plagas").on("value", (snapshot) => {
+        const data = snapshot.val();
+        allPlagas = data ? Object.values(data) : [];
+        
+        // Actualizar datalist
+        const datalist = document.getElementById("plagas-list");
+        datalist.innerHTML = '';
+        
+        allPlagas.forEach(plaga => {
+          const option = document.createElement('option');
+          option.value = plaga;
+          datalist.appendChild(option);
+        });
+      });
+    }
+
+    // Renderizar productos según los filtros
+    function renderProducts() {
+      const container = document.getElementById("productos-container");
+      const cultivoFilter = document.getElementById("filter-cultivo").value;
+      const categoriaFilter = document.getElementById("filter-categoria").value;
+      const plagaFilter = document.getElementById("filter-plaga").value.toLowerCase();
+      
+      container.innerHTML = '';
+      
+      const filteredProducts = allProducts.filter(product => {
+        // Filtrar por cultivo
+        if (cultivoFilter !== 'todos') {
+          if (cultivoFilter === 'mini' && !product.plagas_mini) return false;
+          if (cultivoFilter === 'tomate' && !product.plagas_tomate) return false;
+        }
+        
+        // Filtrar por categoría
+        if (categoriaFilter !== 'todos' && product.categoria !== categoriaFilter) {
+          return false;
+        }
+        
+        // Filtrar por plaga
+        if (plagaFilter) {
+          const plagasMini = product.plagas_mini ? product.plagas_mini.toLowerCase() : '';
+          const plagasTomate = product.plagas_tomate ? product.plagas_tomate.toLowerCase() : '';
+          
+          if (!plagasMini.includes(plagaFilter) && !plagasTomate.includes(plagaFilter)) {
+            return false;
+          }
+        }
+        
+        return true;
+      });
+      
+      if (filteredProducts.length === 0) {
+        container.innerHTML = '<p>No se encontraron productos con los filtros seleccionados.</p>';
+        return;
+      }
+      
+      filteredProducts.forEach(product => {
+        const isSelected = selectedProducts.some(p => p.id === product.id);
+        
+        const productCard = document.createElement('div');
+        productCard.className = `product-card ${isSelected ? 'selected' : ''}`;
+        productCard.dataset.id = product.id;
+        
+        // Determinar color de banda
+        let bandaColor = 'green';
+        if (product.banda === 'red') bandaColor = 'red';
+        else if (product.banda === 'yellow') bandaColor = 'yellow';
+        else if (product.banda === 'blue') bandaColor = 'blue';
+        
+        productCard.innerHTML = `
+          <div class="product-name">
+            <span class="banda-indicator banda-${bandaColor}"></span>
+            ${product.nombre}
+          </div>
+          <div class="product-details">
+            <div><strong>Categoría:</strong> ${product.categoria}</div>
+            <div><strong>Grupo:</strong> ${product.grupo_quimico}</div>
+            <div><strong>Familia:</strong> ${product.familia_quimica}</div>
+            ${product.plagas_mini ? `<div><strong>Plagas (Mini):</strong> ${product.plagas_mini}</div>` : ''}
+            ${product.plagas_tomate ? `<div><strong>Plagas (Tomate):</strong> ${product.plagas_tomate}</div>` : ''}
+          </div>
+        `;
+        
+        productCard.addEventListener('click', () => toggleProductSelection(product));
+        container.appendChild(productCard);
+      });
+    }
+
+    // Alternar selección de producto
+    function toggleProductSelection(product) {
+      const index = selectedProducts.findIndex(p => p.id === product.id);
+      
+      if (index === -1) {
+        selectedProducts.push(product);
+      } else {
+        selectedProducts.splice(index, 1);
+      }
+      
+      updateSelectedProducts();
+      renderProducts(); // Para actualizar el estado visual de selección
+      
+      // Si hay productos seleccionados, generar recomendaciones
+      if (selectedProducts.length > 0) {
+        generateRecommendations();
+        document.getElementById('recommendations-container').style.display = 'block';
+      } else {
+        document.getElementById('recommendations-container').style.display = 'none';
+      }
+    }
+
+    // Actualizar la lista de productos seleccionados
+    function updateSelectedProducts() {
+      const container = document.getElementById('selected-products');
+      
+      if (selectedProducts.length === 0) {
+        container.innerHTML = '<p>No hay productos seleccionados. Seleccione al menos un producto para obtener recomendaciones.</p>';
+        return;
+      }
+      
+      let html = '<div class="selected-list">';
+      
+      selectedProducts.forEach(product => {
+        // Determinar color de banda
+        let bandaColor = 'green';
+        if (product.banda === 'red') bandaColor = 'red';
+        else if (product.banda === 'yellow') bandaColor = 'yellow';
+        else if (product.banda === 'blue') bandaColor = 'blue';
+        
+        html += `
+          <div class="product-card">
+            <div class="product-name">
+              <span class="banda-indicator banda-${bandaColor}"></span>
+              ${product.nombre}
+              <button onclick="removeProduct('${product.id}')" style="float: right; padding: 5px 10px; font-size: 12px;">Quitar</button>
+            </div>
+            <div class="product-details">
+              <div><strong>Grupo Químico:</strong> ${product.grupo_quimico}</div>
+              <div><strong>Familia Química:</strong> ${product.familia_quimica}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // Eliminar producto de la selección
+    function removeProduct(productId) {
+      selectedProducts = selectedProducts.filter(p => p.id !== productId);
+      updateSelectedProducts();
+      renderProducts();
+      
+      if (selectedProducts.length > 0) {
+        generateRecommendations();
+      } else {
+        document.getElementById('recommendations-container').style.display = 'none';
+      }
+    }
+
+    // Generar recomendaciones basadas en los productos seleccionados
+    function generateRecommendations() {
+      const container = document.getElementById('recommendations-content');
+      
+      // Obtener grupos químicos de los productos seleccionados
+      const selectedGroups = selectedProducts.map(p => p.grupo_quimico);
+      const selectedFamilies = selectedProducts.map(p => p.familia_quimica);
+      
+      // Filtrar productos que no estén en los grupos/familias seleccionados
+      const recommendedProducts = allProducts.filter(product => {
+        // Excluir productos ya seleccionados
+        if (selectedProducts.some(p => p.id === product.id)) return false;
+        
+        // Incluir solo productos de grupos químicos diferentes
+        return !selectedGroups.includes(product.grupo_quimico) && 
+               !selectedFamilies.includes(product.familia_quimica);
+      });
+      
+      if (recommendedProducts.length === 0) {
+        container.innerHTML = `
+          <div class="recommendation">
+            <div class="recommendation-header">No se encontraron productos con grupos químicos diferentes</div>
+            <p>Intente seleccionar productos de diferentes categorías o modifique los filtros.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Agrupar por categoría
+      const productsByCategory = {};
+      recommendedProducts.forEach(product => {
+        if (!productsByCategory[product.categoria]) {
+          productsByCategory[product.categoria] = [];
+        }
+        productsByCategory[product.categoria].push(product);
+      });
+      
+      let html = '';
+      
+      for (const category in productsByCategory) {
+        html += `
+          <div class="recommendation">
+            <div class="recommendation-header">Alternativas en ${category}</div>
+            <div class="recommendation-details">
+        `;
+        
+        productsByCategory[category].forEach(product => {
+          // Determinar color de banda
+          let bandaColor = 'green';
+          if (product.banda === 'red') bandaColor = 'red';
+          else if (product.banda === 'yellow') bandaColor = 'yellow';
+          else if (product.banda === 'blue') bandaColor = 'blue';
+          
+          html += `
+            <div class="recommendation-item">
+              <div class="product-name">
+                <span class="banda-indicator banda-${bandaColor}"></span>
+                ${product.nombre}
+              </div>
+              <div class="product-details">
+                <div><strong>Grupo:</strong> ${product.grupo_quimico}</div>
+                <div><strong>Familia:</strong> ${product.familia_quimica}</div>
+                <div><strong>Registro Senasa:</strong> ${product.senasa}</div>
+                <button onclick="addToSelection('${product.id}')" style="width: 100%; margin-top: 10px; padding: 5px;">Agregar</button>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+      }
+      
+      container.innerHTML = html;
+    }
+
+    // Agregar producto a la selección desde las recomendaciones
+    function addToSelection(productId) {
+      const product = allProducts.find(p => p.id === productId);
+      if (product && !selectedProducts.some(p => p.id === productId)) {
+        selectedProducts.push(product);
+        updateSelectedProducts();
+        renderProducts();
+        generateRecommendations();
+      }
+    }
+
+    // Inicializar la aplicación
     document.addEventListener('DOMContentLoaded', function() {
-      // Cargar datos desde Firebase
-      cargarDatosIRAC();
+      loadData();
       
-      // Event listeners para los botones de fisiología
-      document.querySelectorAll('.fisiologia-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const fisiologia = this.getAttribute('data-fisiologia');
-          mostrarFisiologia(fisiologia);
-        });
-      });
-      
-      // Event listener para tabs
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-          const tabId = this.getAttribute('data-tab');
-          cambiarTab(tabId);
-        });
-      });
-      
-      // Event listener para agregar subgrupo
-      document.getElementById('agregar-subgrupo').addEventListener('click', agregarSubgrupoInput);
-      
-      // Event listener para el formulario
-      document.getElementById('form-grupo').addEventListener('submit', guardarGrupo);
+      // Configurar event listeners para los filtros
+      document.getElementById('filter-cultivo').addEventListener('change', renderProducts);
+      document.getElementById('filter-categoria').addEventListener('change', renderProducts);
+      document.getElementById('filter-plaga').addEventListener('input', renderProducts);
     });
 
-    // Función para cargar datos desde Firebase
-    function cargarDatosIRAC() {
-      iracRef.on("value", (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          // Inicializar todas las fisiologías
-          clasificacionIRAC = {
-            nervioso: data.nervioso || [],
-            crecimiento: data.crecimiento || [],
-            respiración: data.respiración || [],
-            digestivo: data.digestivo || [],
-            desconocido: data.desconocido || []
-          };
-          
-          // Mostrar sistema nervioso por defecto
-          mostrarFisiologia('nervioso');
-        } else {
-          // Datos por defecto si no hay nada en Firebase
-          inicializarDatosPorDefecto();
-        }
-      });
-    }
-
-    // Función para inicializar datos por defecto
-    function inicializarDatosPorDefecto() {
-      clasificacionIRAC = {
-        nervioso: [
-          {
-            grupo: "1. Inhibidores de la acetilcolinesterasa",
-            subgrupos: [
-              {
-                nombre: "1A Carbamatos",
-                sustancias: "Formetanato, pirimicarb"
-              },
-              {
-                nombre: "1B Organofosforados",
-                sustancias: "Fostiazato, metil-pirimifos"
-              }
-            ]
-          },
-          {
-            grupo: "3. Moduladores del canal de sodio",
-            subgrupos: [
-              {
-                nombre: "3A Piretroides Piretrinas",
-                sustancias: "Cipermetrina, deltametrina, esfenvalerato, etofenprox, lambda-cihalotrina, tau-fluvalinato, teflutrina"
-              },
-              {
-                nombre: "",
-                sustancias: "Piretrinas"
-              }
-            ]
-          }
-        ],
-        crecimiento: [],
-        respiración: [],
-        digestivo: [],
-        desconocido: []
-      };
-      
-      // Guardar datos por defecto en Firebase
-      iracRef.set(clasificacionIRAC);
-      
-      // Mostrar sistema nervioso
-      mostrarFisiologia('nervioso');
-    }
-
-    // Función para mostrar los grupos de una fisiología
-    function mostrarFisiologia(fisiologia) {
-      // Ocultar todos los contenedores primero
-      document.querySelectorAll('.grupos-container').forEach(container => {
-        container.style.display = 'none';
-      });
-      
-      // Mostrar el contenedor seleccionado
-      const container = document.getElementById(`${fisiologia}-container`);
-      container.style.display = 'block';
-      
-      // Cargar los datos
-      const grupos = clasificacionIRAC[fisiologia];
-      const gruposLista = container.querySelector('.grupos-lista');
-      
-      gruposLista.innerHTML = '';
-      
-      if (grupos.length === 0) {
-        gruposLista.innerHTML = '<p>No hay datos disponibles para esta fisiología.</p>';
-        return;
-      }
-      
-      grupos.forEach(grupo => {
-        const grupoItem = document.createElement('div');
-        grupoItem.className = 'grupo-item';
-        
-        let html = `<div class="grupo-nombre">${grupo.grupo}</div>`;
-        
-        if (grupo.subgrupos && grupo.subgrupos.length > 0) {
-          html += '<div class="subgrupos-lista">';
-          
-          grupo.subgrupos.forEach(subgrupo => {
-            html += `
-              <div class="subgrupo-item">
-                ${subgrupo.nombre ? `<div class="subgrupo-nombre">${subgrupo.nombre}</div>` : ''}
-                <div class="sustancias-lista">${subgrupo.sustancias}</div>
-              </div>
-            `;
-          });
-          
-          html += '</div>';
-        }
-        
-        grupoItem.innerHTML = html;
-        gruposLista.appendChild(grupoItem);
-      });
-    }
-
-    // Función para cambiar de pestaña
-    function cambiarTab(tabId) {
-      // Desactivar todas las pestañas
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Ocultar todos los contenidos
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      
-      // Activar la pestaña seleccionada
-      document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-    }
-
-    // Función para agregar campo de subgrupo
-    function agregarSubgrupoInput() {
-      const container = document.getElementById('subgrupos-container');
-      const div = document.createElement('div');
-      div.className = 'subgrupo-input';
-      div.innerHTML = `
-        <input type="text" placeholder="Nombre del subgrupo" class="subgrupo-nombre">
-        <textarea placeholder="Sustancias activas (separadas por comas)" class="subgrupo-sustancias"></textarea>
-        <button type="button" class="eliminar-subgrupo">X</button>
-      `;
-      
-      container.appendChild(div);
-      
-      // Event listener para eliminar subgrupo
-      div.querySelector('.eliminar-subgrupo').addEventListener('click', function() {
-        container.removeChild(div);
-      });
-    }
-
-    // Función para guardar grupo en Firebase
-    function guardarGrupo(e) {
-      e.preventDefault();
-      
-      const fisiologia = document.getElementById('fisiologia').value;
-      const grupo = document.getElementById('grupo').value;
-      
-      if (!fisiologia || !grupo) {
-        mostrarMensaje("Por favor, complete todos los campos obligatorios", "error");
-        return;
-      }
-      
-      // Obtener subgrupos
-      const subgruposInputs = document.querySelectorAll('.subgrupo-input');
-      const subgrupos = [];
-      
-      subgruposInputs.forEach(input => {
-        const nombre = input.querySelector('.subgrupo-nombre').value;
-        const sustancias = input.querySelector('.subgrupo-sustancias').value;
-        
-        if (nombre || sustancias) {
-          subgrupos.push({
-            nombre: nombre,
-            sustancias: sustancias
-          });
-        }
-      });
-      
-      // Crear nuevo grupo
-      const nuevoGrupo = {
-        grupo: grupo,
-        subgrupos: subgrupos
-      };
-      
-      // Agregar a la clasificación
-      if (!clasificacionIRAC[fisiologia]) {
-        clasificacionIRAC[fisiologia] = [];
-      }
-      
-      clasificacionIRAC[fisiologia].push(nuevoGrupo);
-      
-      // Guardar en Firebase
-      iracRef.set(clasificacionIRAC, function(error) {
-        if (error) {
-          mostrarMensaje("Error al guardar el grupo", "error");
-        } else {
-          mostrarMensaje("Grupo guardado con éxito", "success");
-          document.getElementById('form-grupo').reset();
-          document.getElementById('subgrupos-container').innerHTML = '';
-          
-          // Mostrar la fisiología donde se agregó el grupo
-          setTimeout(() => {
-            cambiarTab('visualizar');
-            mostrarFisiologia(fisiologia);
-          }, 1500);
-        }
-      });
-    }
-
-    // Función para mostrar mensajes
-    function mostrarMensaje(mensaje, tipo) {
-      const exito = document.getElementById("mensaje-exito");
-      const error = document.getElementById("mensaje-error");
-      
-      if (tipo === "success") {
-        exito.textContent = mensaje;
-        error.textContent = "";
-      } else {
-        error.textContent = mensaje;
-        exito.textContent = "";
-      }
-      
-      // Ocultar mensajes después de 3 segundos
-      setTimeout(() => {
-        exito.textContent = "";
-        error.textContent = "";
-      }, 3000);
-    }
+    // Hacer funciones disponibles globalmente para los event handlers HTML
+    window.removeProduct = removeProduct;
+    window.addToSelection = addToSelection;
   </script>
 </body>
 </html>
