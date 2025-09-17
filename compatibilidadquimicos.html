@@ -16,6 +16,7 @@
       --yellow: #ffeb3b;
       --blue: #2196f3;
       --green: #4caf50;
+      --nervous-system: #e3f2fd; /* Celeste para sistema nervioso */
     }
     
     * {
@@ -100,6 +101,11 @@
       margin-bottom: 20px;
     }
     
+    .nervous-system {
+      background-color: var(--nervous-system);
+      border-left: 4px solid #2196f3;
+    }
+    
     .product-list {
       max-height: 300px;
       overflow-y: auto;
@@ -120,6 +126,10 @@
     
     .product-item.selected {
       background-color: #ffebee;
+    }
+    
+    .product-item.nervous-system {
+      background-color: var(--nervous-system);
     }
     
     .product-item:last-child {
@@ -153,6 +163,11 @@
       border-left: 4px solid var(--primary-color);
     }
     
+    .recommendation-item.nervous-system {
+      background-color: var(--nervous-system);
+      border-left: 4px solid #2196f3;
+    }
+    
     .product-info {
       margin-bottom: 10px;
     }
@@ -160,6 +175,21 @@
     .product-info div {
       margin-bottom: 5px;
       font-size: 14px;
+    }
+    
+    .mode-of-action {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      background-color: #e8f5e9;
+      color: var(--primary-color);
+      margin-left: 8px;
+    }
+    
+    .nervous-system-mode {
+      background-color: #bbdefb;
+      color: #0d47a1;
     }
     
     .select-btn {
@@ -254,7 +284,7 @@
         </div>
         
         <div class="recommendations-section">
-          <h3>Recomendaciones (Misma Categoría - Grupo Químico Diferente)</h3>
+          <h3>Recomendaciones (Misma Categoría - Modo de Acción Diferente)</h3>
           <div class="recommendation-grid" id="recommendations-container">
             <!-- Las recomendaciones se mostrarán aquí -->
           </div>
@@ -285,10 +315,23 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Grupos químicos que actúan en el sistema nervioso
+    const NERVOUS_SYSTEM_GROUPS = ['1', '3', '4', '5', '6', '22', '28', '29'];
+    
     // Variables globales
     let allProducts = [];
     let selectedProduct = null;
     let allPlagas = [];
+
+    // Determinar si un producto actúa en el sistema nervioso
+    function isNervousSystemProduct(product) {
+      // Extraer números del grupo químico (asumiendo que el número está al inicio)
+      const groupMatch = product.grupo_quimico ? product.grupo_quimico.match(/^(\d+)/) : null;
+      if (groupMatch && groupMatch[1]) {
+        return NERVOUS_SYSTEM_GROUPS.includes(groupMatch[1]);
+      }
+      return false;
+    }
 
     // Cargar productos y plagas desde Firebase
     function loadData() {
@@ -357,13 +400,21 @@
       
       filteredProducts.forEach(product => {
         const isSelected = selectedProduct && selectedProduct.id === product.id;
+        const isNervousSystem = isNervousSystemProduct(product);
         
         const productItem = document.createElement('div');
         productItem.className = isSelected ? 'product-item selected' : 'product-item';
+        if (isNervousSystem) productItem.classList.add('nervous-system');
         productItem.dataset.id = product.id;
         
+        let modeBadge = '';
+        if (isNervousSystem) {
+          modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
+        }
+        
         productItem.innerHTML = `
-          <strong>${product.nombre}</strong> <span style="font-size: 12px; color: #666;">(${product.categoria})</span>
+          <strong>${product.nombre}</strong> ${modeBadge}<br>
+          <span style="font-size: 12px; color: #666;">${product.categoria} - ${product.grupo_quimico}</span>
         `;
         
         productItem.addEventListener('click', () => selectProduct(product.id));
@@ -396,9 +447,21 @@
       else if (selectedProduct.banda === 'yellow') bandaColor = 'yellow';
       else if (selectedProduct.banda === 'blue') bandaColor = 'blue';
       
+      const isNervousSystem = isNervousSystemProduct(selectedProduct);
+      if (isNervousSystem) {
+        container.classList.add('nervous-system');
+      } else {
+        container.classList.remove('nervous-system');
+      }
+      
+      let modeBadge = '';
+      if (isNervousSystem) {
+        modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
+      }
+      
       container.innerHTML = `
         <div style="margin-bottom: 15px;">
-          <h3 style="margin-top: 0;">${selectedProduct.nombre}</h3>
+          <h3 style="margin-top: 0;">${selectedProduct.nombre} ${modeBadge}</h3>
           <div><strong>Ingredientes Activos:</strong> ${selectedProduct.ingredientes}</div>
           <div><strong>Categoría:</strong> ${selectedProduct.categoria}</div>
           <div><strong>Grupo Químico:</strong> ${selectedProduct.grupo_quimico}</div>
@@ -425,14 +488,21 @@
       const selectedGroup = selectedProduct.grupo_quimico;
       const selectedFamily = selectedProduct.familia_quimica;
       const selectedCategory = selectedProduct.categoria;
+      const isSelectedNervousSystem = isNervousSystemProduct(selectedProduct);
       
-      // Filtrar productos de la MISMA categoría pero con grupo/familia química DIFERENTE
+      // Filtrar productos de la MISMA categoría pero con modo de acción DIFERENTE
       const recommendedProducts = allProducts.filter(product => {
         // Excluir producto seleccionado
         if (product.id === selectedProduct.id) return false;
         
         // Incluir solo productos de la MISMA categoría
         if (product.categoria !== selectedCategory) return false;
+        
+        // Si el producto seleccionado actúa en el sistema nervioso,
+        // excluir todos los que también actúen en el sistema nervioso
+        if (isSelectedNervousSystem && isNervousSystemProduct(product)) {
+          return false;
+        }
         
         // Incluir solo productos de grupos químicos DIFERENTES
         return product.grupo_quimico !== selectedGroup && 
@@ -442,7 +512,7 @@
       if (recommendedProducts.length === 0) {
         container.innerHTML = `
           <div class="recommendation-item">
-            <div class="recommendation-header">No se encontraron productos de la misma categoría con grupos químicos diferentes</div>
+            <div class="recommendation-header">No se encontraron productos de la misma categoría con modo de acción diferente</div>
             <p>Intente modificar los filtros de búsqueda.</p>
           </div>
         `;
@@ -458,11 +528,19 @@
         else if (product.banda === 'yellow') bandaColor = 'yellow';
         else if (product.banda === 'blue') bandaColor = 'blue';
         
+        const isNervousSystem = isNervousSystemProduct(product);
+        const itemClass = isNervousSystem ? 'recommendation-item nervous-system' : 'recommendation-item';
+        
+        let modeBadge = '';
+        if (isNervousSystem) {
+          modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
+        }
+        
         html += `
-          <div class="recommendation-item">
+          <div class="${itemClass}">
             <div class="product-name">
               <span class="banda-indicator banda-${bandaColor}"></span>
-              <strong>${product.nombre}</strong>
+              <strong>${product.nombre}</strong> ${modeBadge}
             </div>
             <div class="product-info">
               <div><strong>Ingredientes:</strong> ${product.ingredientes}</div>
