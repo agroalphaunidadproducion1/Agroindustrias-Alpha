@@ -525,26 +525,38 @@
         <p><strong>Grupos que actúan en el sistema nervioso:</strong></p>
         <ul class="mode-list">
           <li>Grupo 1: Inhibidores de acetilcolinesterasa (AChE)</li>
+          <li>Grupo 2: Antagonistas del receptor de GABA</li>
           <li>Grupo 3: Moduladores de canales de sodio</li>
           <li>Grupo 4: Moduladores de receptores nicotínicos de acetilcolina (nAChR)</li>
           <li>Grupo 5: Moduladores de receptores de glutamato</li>
           <li>Grupo 6: Activadores de canales de cloro</li>
+          <li>Grupo 9: Moduladores de receptores de octopamina</li>
+          <li>Grupo 14: Inhibidores de la biosíntesis de lípidos</li>
+          <li>Grupo 19: Moduladores de canales de calcio</li>
           <li>Grupo 22: Inhibidores de canales de voltaje de calcio</li>
           <li>Grupo 28: Moduladores de canales de iones Ryanodina</li>
           <li>Grupo 29: Compuestos con efecto desconocido o no clasificado</li>
+          <li>Grupo 30: Inhibidores de la síntesis de acetilcolina</li>
+          <li>Grupo 32: Inhibidores de la captación de GABA</li>
+          <li>Grupo 33: Inhibidores de la captación de octopamina</li>
+          <li>Grupo 35: Moduladores de canales de cloro activados por glutamato</li>
+          <li>Grupo 36: Inhibidores de la síntesis de glutamato</li>
+          <li>Grupo 37: Moduladores de canales de potasio</li>
         </ul>
         <p>Los productos marcados con <span class="mode-of-action nervous-system-mode">Sistema Nervioso</span> y fondo celeste pertenecen a estos grupos.</p>
       </div>
       
       <div class="action-section growth-development-section">
         <h3>Acción sobre el crecimiento y desarrollo</h3>
-        <p>El desarrollo de los insectos está controlado por el equilibrio de dos hormonas principales: la hormona juvenil y la ecdisona. Los reguladores del crecimiento de los insectos actúan imitando una de estas hormonas o perturbando directamente la formación/deposición de la cutícula o la biosíntesis de lípidos.</p>
+        <p>El desarrollo de los insectos está controlado por el equilibrio de two hormonas principales: la hormona juvenil y la ecdisona. Los reguladores del crecimiento de los insectos actúan imitando una de estas hormonas o perturbando directamente la formación/deposición de la cutícula o la biosíntesis de lípidos.</p>
         <p>Los insecticidas que actúan sobre los distintos objetivos de este sistema, son generalmente de acción lenta a moderadamente lenta.</p>
         <p><strong>Grupos que actúan en el crecimiento y desarrollo:</strong></p>
         <ul class="mode-list">
           <li>Grupo 7: Análogos de la hormona juvenil (JH)</li>
           <li>Grupo 10: Inhibidores de la biosíntesis de quitina</li>
+          <li>Grupo 15: Inhibidores de la biosíntesis de quitina (tipo 1)</li>
           <li>Grupo 16: Inhibidores de la síntesis de lípidos</li>
+          <li>Grupo 17: Inhibidores de la biosíntesis de quitina (tipo 2)</li>
           <li>Grupo 18: Ecdisona agonistas/disruptores de la muda</li>
           <li>Grupo 23: Inhibidores de la síntesis de ATP mitocondrial</li>
         </ul>
@@ -557,10 +569,13 @@
         <p>Varios insecticidas son conocidos por interferir en la respiración mitocondrial mediante la inhibición del transporte de electrones y/o la fosforilación oxidativa. Los insecticidas que actúan sobre los distintos puntos de este sistema son generalmente de acción rápida a moderadamente rápida.</p>
         <p><strong>Grupos que actúan en la respiración:</strong></p>
         <ul class="mode-list">
+          <li>Grupo 12: Inhibidores del transporte de electrones mitocondrial</li>
+          <li>Grupo 13: Desacopladores de la fosforilación oxidativa</li>
           <li>Grupo 20: Inhibidores del transporte de electrones mitocondrial (Complexo I)</li>
           <li>Grupo 21: Inhibidores del transporte de electrones mitocondrial (Complexo III)</li>
           <li>Grupo 24: Inhibidores del transporte de electrones mitocondrial (Complexo IV)</li>
           <li>Grupo 25: Desacopladores de la fosforilación oxidativa</li>
+          <li>Grupo 34: Inhibidores de la síntesis de ATP</li>
         </ul>
         <p>Los productos marcados con <span class="mode-of-action respiration-mode">Respiración</span> y fondo rojo claro pertenecen a estos grupos.</p>
       </div>
@@ -586,6 +601,9 @@
           <li>Grupo UNE: Compuestos de modo de acción desconocido (efectos en enzimas)</li>
           <li>Grupo UNF: Compuestos de modo de acción desconocido (efectos en funciones)</li>
           <li>Grupo UNM: Compuestos de modo de acción desconocido (efectos múltiples)</li>
+          <li>Grupo ONU: Compuestos con modo de acción no determinado</li>
+          <li>Grupo UNP: Compuestos de modo de acción desconocido (efectos fisiológicos)</li>
+          <li>Grupo UNU: Compuestos de modo de acción desconocido (efectos diversos)</li>
         </ul>
         <p>Los productos marcados con <span class="mode-of-action unknown-action-mode">Modo Desconocido</span> y fondo gris claro pertenecen a estos grupos.</p>
       </div>
@@ -614,12 +632,12 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Grupos químicos por modo de acción
-    const NERVOUS_SYSTEM_GROUPS = ['1', '3', '4', '5', '6', '22', '28', '29'];
-    const GROWTH_DEVELOPMENT_GROUPS = ['7', '10', '16', '18', '23'];
-    const RESPIRATION_GROUPS = ['20', '21', '24', '25'];
+    // Grupos químicos por modo de acción (ACTUALIZADOS)
+    const NERVOUS_SYSTEM_GROUPS = ['1', '2', '3', '4', '5', '6', '9', '14', '19', '22', '28', '29', '30', '32', '33', '35', '36', '37'];
+    const GROWTH_DEVELOPMENT_GROUPS = ['7', '10', '15', '16', '17', '18', '23'];
+    const RESPIRATION_GROUPS = ['12', '13', '20', '21', '24', '25', '34'];
     const DIGESTIVE_SYSTEM_GROUPS = ['11', '31'];
-    const UNKNOWN_ACTION_GROUPS = ['8', 'UN', 'UNE', 'UNF', 'UNM'];
+    const UNKNOWN_ACTION_GROUPS = ['8', 'UN', 'UNE', 'UNF', 'UNM', 'ONU', 'UNP', 'UNU'];
     
     // Variables globales
     let allProducts = [];
