@@ -18,6 +18,8 @@
       --green: #4caf50;
       --nervous-system: #e3f2fd; /* Celeste para sistema nervioso */
       --growth-development: #f3e5f5; /* Lila para crecimiento y desarrollo */
+      --respiration: #ffebee; /* Rojo claro para respiración */
+      --digestive-system: #fff3e0; /* Naranja claro para sistema digestivo */
     }
     
     * {
@@ -134,6 +136,16 @@
       border-left: 4px solid #9c27b0;
     }
     
+    .respiration {
+      background-color: var(--respiration);
+      border-left: 4px solid #f44336;
+    }
+    
+    .digestive-system {
+      background-color: var(--digestive-system);
+      border-left: 4px solid #ff9800;
+    }
+    
     .product-list {
       max-height: 300px;
       overflow-y: auto;
@@ -162,6 +174,14 @@
     
     .product-item.growth-development {
       background-color: var(--growth-development);
+    }
+    
+    .product-item.respiration {
+      background-color: var(--respiration);
+    }
+    
+    .product-item.digestive-system {
+      background-color: var(--digestive-system);
     }
     
     .product-item:last-child {
@@ -205,6 +225,16 @@
       border-left: 4px solid #9c27b0;
     }
     
+    .recommendation-item.respiration {
+      background-color: var(--respiration);
+      border-left: 4px solid #f44336;
+    }
+    
+    .recommendation-item.digestive-system {
+      background-color: var(--digestive-system);
+      border-left: 4px solid #ff9800;
+    }
+    
     .product-info {
       margin-bottom: 10px;
     }
@@ -232,6 +262,16 @@
     .growth-development-mode {
       background-color: #e1bee7;
       color: #4a148c;
+    }
+    
+    .respiration-mode {
+      background-color: #ffcdd2;
+      color: #b71c1c;
+    }
+    
+    .digestive-system-mode {
+      background-color: #ffe0b2;
+      color: #e65100;
     }
     
     .select-btn {
@@ -281,7 +321,7 @@
       padding: 20px;
       border-radius: 10px;
       width: 90%;
-      max-width: 700px;
+      max-width: 800px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       animation: slideIn 0.3s;
       position: relative;
@@ -324,6 +364,16 @@
     .growth-development-section {
       background-color: var(--growth-development);
       border-left: 4px solid #9c27b0;
+    }
+    
+    .respiration-section {
+      background-color: var(--respiration);
+      border-left: 4px solid #f44336;
+    }
+    
+    .digestive-system-section {
+      background-color: var(--digestive-system);
+      border-left: 4px solid #ff9800;
     }
     
     .modal-note {
@@ -476,6 +526,31 @@
         <p>Los productos marcados con <span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span> y fondo lila pertenecen a estos grupos.</p>
       </div>
       
+      <div class="action-section respiration-section">
+        <h3>Acción sobre la respiración</h3>
+        <p>La respiración mitocondrial produce ATP, la molécula que da energía a todos los procesos celulares vitales. En las mitocondrias, una cadena de transporte de electrones almacena la energía generada por la oxidación en forma de un gradiente de protones, lo que genera la síntesis de ATP.</p>
+        <p>Varios insecticidas son conocidos por interferir en la respiración mitocondrial mediante la inhibición del transporte de electrones y/o la fosforilación oxidativa. Los insecticidas que actúan sobre los distintos puntos de este sistema son generalmente de acción rápida a moderadamente rápida.</p>
+        <p><strong>Grupos que actúan en la respiración:</strong></p>
+        <ul class="mode-list">
+          <li>Grupo 20: Inhibidores del transporte de electrones mitocondrial (Complexo I)</li>
+          <li>Grupo 21: Inhibidores del transporte de electrones mitocondrial (Complexo III)</li>
+          <li>Grupo 24: Inhibidores del transporte de electrones mitocondrial (Complexo IV)</li>
+          <li>Grupo 25: Desacopladores de la fosforilación oxidativa</li>
+        </ul>
+        <p>Los productos marcados con <span class="mode-of-action respiration-mode">Respiración</span> y fondo rojo claro pertenecen a estos grupos.</p>
+      </div>
+      
+      <div class="action-section digestive-system-section">
+        <h3>Acción sobre el sistema digestivo</h3>
+        <p>Toxinas microbianas específicas de lepidópteros (aplicadas mediante pulverización o expresadas en variedades de cultivos transgénicos) y baculovirus.</p>
+        <p><strong>Grupos que actúan en el sistema digestivo:</strong></p>
+        <ul class="mode-list">
+          <li>Grupo 11: Toxinas microbianas disruptoras de la membrana</li>
+          <li>Grupo 31: Toxinas de Bacillus thuringiensis (Bt) y otros bioinsecticidas</li>
+        </ul>
+        <p>Los productos marcados con <span class="mode-of-action digestive-system-mode">Sistema Digestivo</span> y fondo naranja claro pertenecen a estos grupos.</p>
+      </div>
+      
       <div class="modal-note">
         <p><strong>Nota importante:</strong> El esquema de color empleado asocia modos de acción con categorías generales basadas en las funciones fisiológicas afectadas, como una ayuda para la comprensión de la sintomatología, la rapidez de acción y otras propiedades de los insecticidas, y no para cualquier propósito de manejo de la resistencia.</p>
         <p><strong>Las rotaciones para el manejo de la resistencia deben basarse únicamente en los grupos numerados de modo de acción.</strong></p>
@@ -500,11 +575,11 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Grupos químicos que actúan en el sistema nervioso
+    // Grupos químicos por modo de acción
     const NERVOUS_SYSTEM_GROUPS = ['1', '3', '4', '5', '6', '22', '28', '29'];
-    
-    // Grupos químicos que actúan en crecimiento y desarrollo
     const GROWTH_DEVELOPMENT_GROUPS = ['7', '10', '16', '18', '23'];
+    const RESPIRATION_GROUPS = ['20', '21', '24', '25'];
+    const DIGESTIVE_SYSTEM_GROUPS = ['11', '31'];
     
     // Variables globales
     let allProducts = [];
@@ -530,30 +605,18 @@
       }
     });
 
-    // Determinar si un producto actúa en el sistema nervioso
-    function isNervousSystemProduct(product) {
-      // Extraer números del grupo químico (asumiendo que el número está al inicio)
-      const groupMatch = product.grupo_quimico ? product.grupo_quimico.match(/^(\d+)/) : null;
-      if (groupMatch && groupMatch[1]) {
-        return NERVOUS_SYSTEM_GROUPS.includes(groupMatch[1]);
-      }
-      return false;
-    }
-
-    // Determinar si un producto actúa en crecimiento y desarrollo
-    function isGrowthDevelopmentProduct(product) {
-      // Extraer números del grupo químico (asumiendo que el número está al inicio)
-      const groupMatch = product.grupo_quimico ? product.grupo_quimico.match(/^(\d+)/) : null;
-      if (groupMatch && groupMatch[1]) {
-        return GROWTH_DEVELOPMENT_GROUPS.includes(groupMatch[1]);
-      }
-      return false;
-    }
-
-    // Obtener el modo de acción de un producto
+    // Determinar el modo de acción de un producto
     function getProductMode(product) {
-      if (isNervousSystemProduct(product)) return 'nervous-system';
-      if (isGrowthDevelopmentProduct(product)) return 'growth-development';
+      // Extraer números del grupo químico (asumiendo que el número está al inicio)
+      const groupMatch = product.grupo_quimico ? product.grupo_quimico.match(/^(\d+)/) : null;
+      if (groupMatch && groupMatch[1]) {
+        const groupNumber = groupMatch[1];
+        
+        if (NERVOUS_SYSTEM_GROUPS.includes(groupNumber)) return 'nervous-system';
+        if (GROWTH_DEVELOPMENT_GROUPS.includes(groupNumber)) return 'growth-development';
+        if (RESPIRATION_GROUPS.includes(groupNumber)) return 'respiration';
+        if (DIGESTIVE_SYSTEM_GROUPS.includes(groupNumber)) return 'digestive-system';
+      }
       return 'other';
     }
 
@@ -636,6 +699,10 @@
           modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
         } else if (productMode === 'growth-development') {
           modeBadge = '<span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span>';
+        } else if (productMode === 'respiration') {
+          modeBadge = '<span class="mode-of-action respiration-mode">Respiración</span>';
+        } else if (productMode === 'digestive-system') {
+          modeBadge = '<span class="mode-of-action digestive-system-mode">Sistema Digestivo</span>';
         }
         
         productItem.innerHTML = `
@@ -682,6 +749,10 @@
         modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
       } else if (productMode === 'growth-development') {
         modeBadge = '<span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span>';
+      } else if (productMode === 'respiration') {
+        modeBadge = '<span class="mode-of-action respiration-mode">Respiración</span>';
+      } else if (productMode === 'digestive-system') {
+        modeBadge = '<span class="mode-of-action digestive-system-mode">Sistema Digestivo</span>';
       }
       
       container.innerHTML = `
@@ -761,6 +832,10 @@
           modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
         } else if (productMode === 'growth-development') {
           modeBadge = '<span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span>';
+        } else if (productMode === 'respiration') {
+          modeBadge = '<span class="mode-of-action respiration-mode">Respiración</span>';
+        } else if (productMode === 'digestive-system') {
+          modeBadge = '<span class="mode-of-action digestive-system-mode">Sistema Digestivo</span>';
         }
         
         html += `
