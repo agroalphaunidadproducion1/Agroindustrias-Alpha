@@ -20,6 +20,7 @@
       --growth-development: #f3e5f5; /* Lila para crecimiento y desarrollo */
       --respiration: #ffebee; /* Rojo claro para respiración */
       --digestive-system: #fff3e0; /* Naranja claro para sistema digestivo */
+      --unknown-action: #f5f5f5; /* Gris claro para modo desconocido */
     }
     
     * {
@@ -146,6 +147,11 @@
       border-left: 4px solid #ff9800;
     }
     
+    .unknown-action {
+      background-color: var(--unknown-action);
+      border-left: 4px solid #9e9e9e;
+    }
+    
     .product-list {
       max-height: 300px;
       overflow-y: auto;
@@ -182,6 +188,10 @@
     
     .product-item.digestive-system {
       background-color: var(--digestive-system);
+    }
+    
+    .product-item.unknown-action {
+      background-color: var(--unknown-action);
     }
     
     .product-item:last-child {
@@ -235,6 +245,11 @@
       border-left: 4px solid #ff9800;
     }
     
+    .recommendation-item.unknown-action {
+      background-color: var(--unknown-action);
+      border-left: 4px solid #9e9e9e;
+    }
+    
     .product-info {
       margin-bottom: 10px;
     }
@@ -272,6 +287,11 @@
     .digestive-system-mode {
       background-color: #ffe0b2;
       color: #e65100;
+    }
+    
+    .unknown-action-mode {
+      background-color: #e0e0e0;
+      color: #424242;
     }
     
     .select-btn {
@@ -374,6 +394,11 @@
     .digestive-system-section {
       background-color: var(--digestive-system);
       border-left: 4px solid #ff9800;
+    }
+    
+    .unknown-action-section {
+      background-color: var(--unknown-action);
+      border-left: 4px solid #9e9e9e;
     }
     
     .modal-note {
@@ -551,6 +576,20 @@
         <p>Los productos marcados con <span class="mode-of-action digestive-system-mode">Sistema Digestivo</span> y fondo naranja claro pertenecen a estos grupos.</p>
       </div>
       
+      <div class="action-section unknown-action-section">
+        <h3>Modo de acción desconocido o incierto</h3>
+        <p>Varios insecticidas que afectan a funciones o puntos de acción de un modo menos conocido, o actúan inespecíficamente sobre varios puntos.</p>
+        <p><strong>Grupos con modo de acción desconocido o incierto:</strong></p>
+        <ul class="mode-list">
+          <li>Grupo 8: Compuestos varios (modo de acción no clasificado)</li>
+          <li>Grupo UN: Compuestos de modo de acción desconocido</li>
+          <li>Grupo UNE: Compuestos de modo de acción desconocido (efectos en enzimas)</li>
+          <li>Grupo UNF: Compuestos de modo de acción desconocido (efectos en funciones)</li>
+          <li>Grupo UNM: Compuestos de modo de acción desconocido (efectos múltiples)</li>
+        </ul>
+        <p>Los productos marcados con <span class="mode-of-action unknown-action-mode">Modo Desconocido</span> y fondo gris claro pertenecen a estos grupos.</p>
+      </div>
+      
       <div class="modal-note">
         <p><strong>Nota importante:</strong> El esquema de color empleado asocia modos de acción con categorías generales basadas en las funciones fisiológicas afectadas, como una ayuda para la comprensión de la sintomatología, la rapidez de acción y otras propiedades de los insecticidas, y no para cualquier propósito de manejo de la resistencia.</p>
         <p><strong>Las rotaciones para el manejo de la resistencia deben basarse únicamente en los grupos numerados de modo de acción.</strong></p>
@@ -580,6 +619,7 @@
     const GROWTH_DEVELOPMENT_GROUPS = ['7', '10', '16', '18', '23'];
     const RESPIRATION_GROUPS = ['20', '21', '24', '25'];
     const DIGESTIVE_SYSTEM_GROUPS = ['11', '31'];
+    const UNKNOWN_ACTION_GROUPS = ['8', 'UN', 'UNE', 'UNF', 'UNM'];
     
     // Variables globales
     let allProducts = [];
@@ -607,8 +647,16 @@
 
     // Determinar el modo de acción de un producto
     function getProductMode(product) {
-      // Extraer números del grupo químico (asumiendo que el número está al inicio)
-      const groupMatch = product.grupo_quimico ? product.grupo_quimico.match(/^(\d+)/) : null;
+      if (!product.grupo_quimico) return 'other';
+      
+      // Convertir a string y limpiar
+      const grupo = String(product.grupo_quimico).trim().toUpperCase();
+      
+      // Verificar grupos específicos primero
+      if (UNKNOWN_ACTION_GROUPS.includes(grupo)) return 'unknown-action';
+      
+      // Extraer números del grupo químico
+      const groupMatch = grupo.match(/^(\d+)/);
       if (groupMatch && groupMatch[1]) {
         const groupNumber = groupMatch[1];
         
@@ -617,6 +665,7 @@
         if (RESPIRATION_GROUPS.includes(groupNumber)) return 'respiration';
         if (DIGESTIVE_SYSTEM_GROUPS.includes(groupNumber)) return 'digestive-system';
       }
+      
       return 'other';
     }
 
@@ -703,6 +752,8 @@
           modeBadge = '<span class="mode-of-action respiration-mode">Respiración</span>';
         } else if (productMode === 'digestive-system') {
           modeBadge = '<span class="mode-of-action digestive-system-mode">Sistema Digestivo</span>';
+        } else if (productMode === 'unknown-action') {
+          modeBadge = '<span class="mode-of-action unknown-action-mode">Modo Desconocido</span>';
         }
         
         productItem.innerHTML = `
@@ -753,6 +804,8 @@
         modeBadge = '<span class="mode-of-action respiration-mode">Respiración</span>';
       } else if (productMode === 'digestive-system') {
         modeBadge = '<span class="mode-of-action digestive-system-mode">Sistema Digestivo</span>';
+      } else if (productMode === 'unknown-action') {
+        modeBadge = '<span class="mode-of-action unknown-action-mode">Modo Desconocido</span>';
       }
       
       container.innerHTML = `
@@ -836,6 +889,8 @@
           modeBadge = '<span class="mode-of-action respiration-mode">Respiración</span>';
         } else if (productMode === 'digestive-system') {
           modeBadge = '<span class="mode-of-action digestive-system-mode">Sistema Digestivo</span>';
+        } else if (productMode === 'unknown-action') {
+          modeBadge = '<span class="mode-of-action unknown-action-mode">Modo Desconocido</span>';
         }
         
         html += `
