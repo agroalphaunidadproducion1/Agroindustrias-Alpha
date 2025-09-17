@@ -18,6 +18,7 @@
             --header-color: #1b5e20;
             --table-header: #2e7d32;
             --completed-color: #4caf50;
+            --recent-activity: #00c853;
         }
         
         body {
@@ -127,6 +128,23 @@
             margin-bottom: 15px;
         }
         
+        .recent-activity {
+            color: var(--recent-activity);
+            margin-left: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .invernadero-cell {
+            position: relative;
+            font-weight: bold;
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -147,6 +165,10 @@
             
             .completed::after {
                 font-size: 8px;
+            }
+            
+            .recent-activity {
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -332,6 +354,7 @@
         let actividadesData = [];
         let selectedWeek = getWeekNumber(new Date()).week;
         let selectedYear = new Date().getFullYear();
+        let invernaderosRecientes = new Set();
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -398,8 +421,27 @@
                     actividadesData.push(childSnapshot.val());
                 });
                 
+                // Identificar invernaderos con actividad reciente
+                identificarActividadReciente();
+                
                 // Procesar y mostrar datos
                 procesarDatos();
+            });
+        }
+
+        // Identificar invernaderos con actividad en las últimas 24 horas
+        function identificarActividadReciente() {
+            invernaderosRecientes.clear();
+            const ahora = new Date();
+            const hace24Horas = new Date(ahora.getTime() - (24 * 60 * 60 * 1000));
+            
+            actividadesData.forEach(item => {
+                if (!item.fecha) return;
+                
+                const fechaItem = new Date(item.fecha);
+                if (fechaItem >= hace24Horas && fechaItem <= ahora) {
+                    invernaderosRecientes.add(item.invernadero);
+                }
             });
         }
 
@@ -427,8 +469,18 @@
                 
                 // Celda de invernadero (abreviado)
                 const celdaInvernadero = document.createElement('td');
-                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
-                celdaInvernadero.classList.add('fw-bold');
+                celdaInvernadero.classList.add('invernadero-cell');
+                
+                // Verificar si este invernadero tiene actividad reciente
+                const tieneActividadReciente = invernaderosRecientes.has(invernadero);
+                
+                let contenido = invernadero === 'vivero' ? 'Viv' : invernadero;
+                
+                if (tieneActividadReciente) {
+                    contenido += ' <i class="fas fa-arrow-up recent-activity" title="Actividad en las últimas 24 horas"></i>';
+                }
+                
+                celdaInvernadero.innerHTML = contenido;
                 fila.appendChild(celdaInvernadero);
                 
                 // Celdas para cada actividad
@@ -553,7 +605,18 @@
                 
                 // Celda de invernadero (abreviado)
                 const celdaInvernadero = document.createElement('td');
-                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('invernadero-cell');
+                
+                // Verificar si este invernadero tiene actividad reciente
+                const tieneActividadReciente = invernaderosRecientes.has(invernadero);
+                
+                let contenido = invernadero === 'vivero' ? 'Viv' : invernadero;
+                
+                if (tieneActividadReciente) {
+                    contenido += ' <i class="fas fa-arrow-up recent-activity" title="Actividad en las últimas 24 horas"></i>';
+                }
+                
+                celdaInvernadero.innerHTML = contenido;
                 celdaInvernadero.classList.add('fw-bold');
                 fila.appendChild(celdaInvernadero);
                 
