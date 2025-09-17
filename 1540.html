@@ -355,6 +355,7 @@
         let selectedWeek = getWeekNumber(new Date()).week;
         let selectedYear = new Date().getFullYear();
         let invernaderosRecientes = new Set();
+        let estadoSemanas = {}; // Almacenará el estado de cada semana
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -424,6 +425,9 @@
                 // Identificar invernaderos con actividad reciente
                 identificarActividadReciente();
                 
+                // Calcular el estado de todas las semanas
+                calcularEstadoSemanas();
+                
                 // Procesar y mostrar datos
                 procesarDatos();
             });
@@ -443,6 +447,126 @@
                     invernaderosRecientes.add(item.invernadero);
                 }
             });
+        }
+
+        // Calcular el estado de todas las semanas
+        function calcularEstadoSemanas() {
+            estadoSemanas = {};
+            const currentWeek = getWeekNumber(new Date()).week;
+            const currentYear = new Date().getFullYear();
+            
+            // Procesar cada semana desde la 1 hasta la actual
+            for (let week = 1; week <= currentWeek; week++) {
+                estadoSemanas[week] = {};
+                
+                // Procesar todos los invernaderos de ambos cultivos
+                const allInvernaderos = [...invernaderosPorCultivo.tomate, ...invernaderosPorCultivo.chile];
+                
+                allInvernaderos.forEach(invernadero => {
+                    estadoSemanas[week][invernadero] = {};
+                    
+                    // Determinar el tipo de cultivo según el invernadero
+                    const tipoCultivo = invernaderosPorCultivo.tomate.includes(invernadero) ? 'tomate' : 'chile';
+                    const actividades = actividadesPorCultivo[tipoCultivo];
+                    
+                    // Para cada actividad, calcular el estado al final de la semana
+                    actividades.forEach(actividad => {
+                        const datosActividad = actividadesData.filter(item => 
+                            item.invernadero === invernadero && 
+                            item.actividad === actividad
+                        );
+                        
+                        if (datosActividad.length > 0) {
+                            const metaCamas = metasCamas[invernadero] || 0;
+                            
+                            if (actividad === 'Cosecha') {
+                                // Para cosecha, calcular el total de camas de la semana
+                                const cosechaSemana = calcularCamasPorSemana(datosActividad, week, currentYear);
+                                estadoSemanas[week][invernadero][actividad] = {
+                                    camas: cosechaSemana,
+                                    completado: cosechaSemana >= metaCamas
+                                };
+                            } else {
+                                // Para otras actividades, calcular la última vuelta
+                                const progresoAcumulado = calcularProgresoAcumulado(datosActividad, week, currentYear, metaCamas);
+                                const ultimaVuelta = progresoAcumulado.vueltasCompletadas;
+                                const camasUltimaVuelta = progresoAcumulado.camasVueltaActual;
+                                
+                                estadoSemanas[week][invernadero][actividad] = {
+                                    vuelta: ultimaVuelta,
+                                    camas: camasUltimaVuelta,
+                                    completado: camasUltimaVuelta >= metaCamas
+                                };
+                            }
+                            
+                            // Guardar también el rendimiento si existe
+                            const rendimiento = obtenerRendimientoSemana(datosActividad, week, currentYear);
+                            if (rendimiento > 0) {
+                                estadoSemanas[week][invernadero][actividad].rendimiento = rendimiento;
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        // Calcular camas por semana específica
+        function calcularCamasPorSemana(datosActividad, week, year) {
+            if (week < 1) return 0;
+            
+            const startDate = getMondayOfWeek(week, year);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            
+            return datosActividad.reduce((sum, item) => {
+                if (!item.fecha) return sum;
+                
+                const itemDate = new Date(item.fecha);
+                if (itemDate >= startDate && itemDate <= endDate) {
+                    return sum + (item.camas || 0);
+                }
+                return sum;
+            }, 0);
+        }
+
+        // Calcular progreso acumulado hasta la semana específica
+        function calcularProgresoAcumulado(datosActividad, hastaSemana, year, metaCamas) {
+            let totalCamas = 0;
+            
+            for (let week = 1; week <= hastaSemana; week++) {
+                totalCamas += calcularCamasPorSemana(datosActividad, week, year);
+            }
+            
+            const vueltasCompletadas = Math.floor(totalCamas / metaCamas);
+            const camasVueltaActual = totalCamas % metaCamas;
+            
+            return {
+                totalCamas: totalCamas,
+                vueltasCompletadas: vueltasCompletadas,
+                camasVueltaActual: camasVueltaActual
+            };
+        }
+
+        // Obtener rendimiento de la semana específica
+        function obtenerRendimientoSemana(datosActividad, week, year) {
+            if (week < 1) return 0;
+            
+            const startDate = getMondayOfWeek(week, year);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            
+            let ultimoRendimiento = 0;
+            
+            datosActividad.forEach(item => {
+                if (!item.fecha) return;
+                
+                const itemDate = new Date(item.fecha);
+                if (itemDate >= startDate && itemDate <= endDate && item.rendimiento) {
+                    ultimoRendimiento = item.rendimiento;
+                }
+            });
+            
+            return ultimoRendimiento;
         }
 
         // Procesar datos y actualizar la interfaz
@@ -487,62 +611,41 @@
                 actividades.forEach(actividad => {
                     const celda = document.createElement('td');
                     
-                    // Filtrar datos para esta actividad e invernadero
-                    const datosActividad = actividadesData.filter(item => 
-                        item.invernadero === invernadero && item.actividad === actividad
-                    );
+                    // Obtener el estado de la semana seleccionada para este invernadero y actividad
+                    const estadoSemana = estadoSemanas[selectedWeek] && 
+                                        estadoSemanas[selectedWeek][invernadero] && 
+                                        estadoSemanas[selectedWeek][invernadero][actividad];
                     
-                    if (datosActividad.length > 0) {
+                    if (estadoSemana) {
                         const metaCamas = metasCamas[invernadero] || 0;
                         
                         if (actividad === 'Cosecha') {
-                            // Para cosecha, mostrar el total de camas de la semana seleccionada
-                            const cosechaSemana = calcularCamasPorSemana(datosActividad, selectedWeek, selectedYear);
-                            celda.textContent = cosechaSemana;
+                            // Para cosecha, mostrar el total de camas
+                            celda.textContent = estadoSemana.camas;
                             
-                            // Verificar si se completó una vuelta (múltiplo de la meta)
-                            if (cosechaSemana >= metaCamas) {
+                            // Verificar si se completó la meta
+                            if (estadoSemana.completado) {
                                 celda.classList.add('completed');
                             }
                         } else {
-                            // Calcular el progreso acumulado hasta la semana anterior
-                            const progresoAcumulado = calcularProgresoAcumulado(datosActividad, selectedWeek - 1, selectedYear, metaCamas);
-                            
-                            // Calcular el progreso de la semana actual
-                            const progresoSemanal = calcularCamasPorSemana(datosActividad, selectedWeek, selectedYear);
-                            
-                            // Calcular el progreso total (acumulado + semanal)
-                            const progresoTotal = progresoAcumulado.totalCamas + progresoSemanal;
-                            
-                            // Calcular la vuelta actual
-                            const vueltaActual = Math.floor(progresoTotal / metaCamas) + 1;
-                            const camasVueltaActual = progresoTotal % metaCamas;
-                            
-                            // Mostrar el número de camas de la semana actual
-                            let camasAMostrar = progresoSemanal;
-                            
-                            // Si se completó una vuelta esta semana, mostrar la meta en lugar del total
-                            if (progresoAcumulado.camasVueltaActual + progresoSemanal >= metaCamas) {
-                                camasAMostrar = metaCamas - progresoAcumulado.camasVueltaActual;
-                                celda.classList.add('completed');
-                            }
-                            
-                            // Si no hay actividad en la semana actual, mostrar 0
-                            if (progresoSemanal === 0) {
-                                camasAMostrar = 0;
-                            }
+                            // Para otras actividades, mostrar la última vuelta y camas
+                            const infoText = estadoSemana.vuelta > 0 ? 
+                                `Vuelta ${estadoSemana.vuelta}: ${estadoSemana.camas}/${metaCamas}` : 
+                                `${estadoSemana.camas}/${metaCamas}`;
                             
                             celda.innerHTML = `
                                 <div class="info-hover">
-                                    ${camasAMostrar}
+                                    ${estadoSemana.camas}
                                     <div class="tooltip-info">
-                                        Vuelta ${vueltaActual}<br>
-                                        Progreso semanal: ${progresoSemanal} camas<br>
-                                        Progreso acumulado: ${progresoTotal} camas<br>
-                                        Meta: ${metaCamas} camas
+                                        ${infoText}
                                     </div>
                                 </div>
                             `;
+                            
+                            // Verificar si se completó la vuelta
+                            if (estadoSemana.completado) {
+                                celda.classList.add('completed');
+                            }
                         }
                     } else {
                         celda.innerHTML = '<span class="text-muted">-</span>';
@@ -553,43 +656,6 @@
                 
                 contenedor.appendChild(fila);
             });
-        }
-
-        // Calcular camas por semana específica
-        function calcularCamasPorSemana(datosActividad, week, year) {
-            if (week < 1) return 0;
-            
-            const startDate = getMondayOfWeek(week, year);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-            
-            return datosActividad.reduce((sum, item) => {
-                if (!item.fecha) return sum;
-                
-                const itemDate = new Date(item.fecha);
-                if (itemDate >= startDate && itemDate <= endDate) {
-                    return sum + (item.camas || 0);
-                }
-                return sum;
-            }, 0);
-        }
-
-        // Calcular progreso acumulado hasta la semana anterior
-        function calcularProgresoAcumulado(datosActividad, hastaSemana, year, metaCamas) {
-            let totalCamas = 0;
-            
-            for (let week = 1; week <= hastaSemana; week++) {
-                totalCamas += calcularCamasPorSemana(datosActividad, week, year);
-            }
-            
-            const vueltasCompletadas = Math.floor(totalCamas / metaCamas);
-            const camasVueltaActual = totalCamas % metaCamas;
-            
-            return {
-                totalCamas: totalCamas,
-                vueltasCompletadas: vueltasCompletadas,
-                camasVueltaActual: camasVueltaActual
-            };
         }
 
         // Mostrar tabla de rendimientos por tipo de cultivo
@@ -624,21 +690,13 @@
                 actividades.forEach(actividad => {
                     const celda = document.createElement('td');
                     
-                    // Filtrar datos para esta actividad e invernadero con rendimiento
-                    const datosActividad = actividadesData.filter(item => 
-                        item.invernadero === invernadero && 
-                        item.actividad === actividad &&
-                        item.rendimiento > 0
-                    );
+                    // Obtener el estado de la semana seleccionada para este invernadero y actividad
+                    const estadoSemana = estadoSemanas[selectedWeek] && 
+                                        estadoSemanas[selectedWeek][invernadero] && 
+                                        estadoSemanas[selectedWeek][invernadero][actividad];
                     
-                    if (datosActividad.length > 0) {
-                        // Obtener el último registro con rendimiento de la semana seleccionada
-                        const rendimientoSemana = obtenerRendimientoSemana(datosActividad, selectedWeek, selectedYear);
-                        if (rendimientoSemana > 0) {
-                            celda.innerHTML = `<span class="rendimiento-cell">${rendimientoSemana}</span>`;
-                        } else {
-                            celda.innerHTML = '<span class="text-muted">-</span>';
-                        }
+                    if (estadoSemana && estadoSemana.rendimiento) {
+                        celda.innerHTML = `<span class="rendimiento-cell">${estadoSemana.rendimiento}</span>`;
                     } else {
                         celda.innerHTML = '<span class="text-muted">-</span>';
                     }
@@ -648,28 +706,6 @@
                 
                 contenedor.appendChild(fila);
             });
-        }
-
-        // Obtener rendimiento de la semana específica
-        function obtenerRendimientoSemana(datosActividad, week, year) {
-            if (week < 1) return 0;
-            
-            const startDate = getMondayOfWeek(week, year);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-            
-            let ultimoRendimiento = 0;
-            
-            datosActividad.forEach(item => {
-                if (!item.fecha) return;
-                
-                const itemDate = new Date(item.fecha);
-                if (itemDate >= startDate && itemDate <= endDate && item.rendimiento) {
-                    ultimoRendimiento = item.rendimiento;
-                }
-            });
-            
-            return ultimoRendimiento;
         }
     </script>
 </body>
