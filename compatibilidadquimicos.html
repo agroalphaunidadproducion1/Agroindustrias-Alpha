@@ -17,6 +17,7 @@
       --blue: #2196f3;
       --green: #4caf50;
       --nervous-system: #e3f2fd; /* Celeste para sistema nervioso */
+      --growth-development: #f3e5f5; /* Lila para crecimiento y desarrollo */
     }
     
     * {
@@ -51,6 +52,28 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 4px 8px var(--shadow);
+      position: relative;
+    }
+    
+    .info-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .info-button:hover {
+      background: var(--primary-hover);
     }
     
     .search-section {
@@ -106,6 +129,11 @@
       border-left: 4px solid #2196f3;
     }
     
+    .growth-development {
+      background-color: var(--growth-development);
+      border-left: 4px solid #9c27b0;
+    }
+    
     .product-list {
       max-height: 300px;
       overflow-y: auto;
@@ -130,6 +158,10 @@
     
     .product-item.nervous-system {
       background-color: var(--nervous-system);
+    }
+    
+    .product-item.growth-development {
+      background-color: var(--growth-development);
     }
     
     .product-item:last-child {
@@ -168,6 +200,11 @@
       border-left: 4px solid #2196f3;
     }
     
+    .recommendation-item.growth-development {
+      background-color: var(--growth-development);
+      border-left: 4px solid #9c27b0;
+    }
+    
     .product-info {
       margin-bottom: 10px;
     }
@@ -190,6 +227,11 @@
     .nervous-system-mode {
       background-color: #bbdefb;
       color: #0d47a1;
+    }
+    
+    .growth-development-mode {
+      background-color: #e1bee7;
+      color: #4a148c;
     }
     
     .select-btn {
@@ -220,6 +262,97 @@
       margin: 5px 0;
     }
     
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      animation: fadeIn 0.3s;
+    }
+    
+    .modal-content {
+      background-color: var(--white);
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: slideIn 0.3s;
+      position: relative;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .close-button {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
+    
+    .close-button:hover {
+      color: #000;
+    }
+    
+    .modal-title {
+      color: var(--primary-color);
+      margin-top: 0;
+      padding-right: 30px;
+    }
+    
+    .action-section {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    
+    .nervous-system-section {
+      background-color: var(--nervous-system);
+      border-left: 4px solid #2196f3;
+    }
+    
+    .growth-development-section {
+      background-color: var(--growth-development);
+      border-left: 4px solid #9c27b0;
+    }
+    
+    .modal-note {
+      font-style: italic;
+      margin: 15px 0;
+      padding: 10px;
+      background-color: #fff9c4;
+      border-radius: 5px;
+    }
+    
+    .mode-list {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .mode-list li {
+      margin-bottom: 5px;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
     @media (max-width: 768px) {
       .main-content {
         flex-direction: column;
@@ -232,6 +365,11 @@
       .search-section {
         flex-direction: column;
       }
+      
+      .modal-content {
+        width: 95%;
+        margin: 10% auto;
+      }
     }
   </style>
 </head>
@@ -240,6 +378,8 @@
     <h2>Recomendación de Grupos Químicos</h2>
     
     <div class="card">
+      <div class="info-button" id="info-button">i</div>
+      
       <div class="search-section">
         <div class="search-group">
           <label for="filter-cultivo">Cultivo:</label>
@@ -298,6 +438,51 @@
     <p>Versión 2.0 - Módulo de recomendación</p>
   </div>
 
+  <!-- Modal de Información -->
+  <div id="info-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2 class="modal-title">Modos de Acción de Insecticidas</h2>
+      
+      <div class="action-section nervous-system-section">
+        <h3>Acción sobre el sistema nervioso o muscular</h3>
+        <p>La mayoría de los insecticidas actúan sobre el sistema nervioso o muscular. Generalmente suelen ser de acción rápida.</p>
+        <p><strong>Grupos que actúan en el sistema nervioso:</strong></p>
+        <ul class="mode-list">
+          <li>Grupo 1: Inhibidores de acetilcolinesterasa (AChE)</li>
+          <li>Grupo 3: Moduladores de canales de sodio</li>
+          <li>Grupo 4: Moduladores de receptores nicotínicos de acetilcolina (nAChR)</li>
+          <li>Grupo 5: Moduladores de receptores de glutamato</li>
+          <li>Grupo 6: Activadores de canales de cloro</li>
+          <li>Grupo 22: Inhibidores de canales de voltaje de calcio</li>
+          <li>Grupo 28: Moduladores de canales de iones Ryanodina</li>
+          <li>Grupo 29: Compuestos con efecto desconocido o no clasificado</li>
+        </ul>
+        <p>Los productos marcados con <span class="mode-of-action nervous-system-mode">Sistema Nervioso</span> y fondo celeste pertenecen a estos grupos.</p>
+      </div>
+      
+      <div class="action-section growth-development-section">
+        <h3>Acción sobre el crecimiento y desarrollo</h3>
+        <p>El desarrollo de los insectos está controlado por el equilibrio de dos hormonas principales: la hormona juvenil y la ecdisona. Los reguladores del crecimiento de los insectos actúan imitando una de estas hormonas o perturbando directamente la formación/deposición de la cutícula o la biosíntesis de lípidos.</p>
+        <p>Los insecticidas que actúan sobre los distintos objetivos de este sistema, son generalmente de acción lenta a moderadamente lenta.</p>
+        <p><strong>Grupos que actúan en el crecimiento y desarrollo:</strong></p>
+        <ul class="mode-list">
+          <li>Grupo 7: Análogos de la hormona juvenil (JH)</li>
+          <li>Grupo 10: Inhibidores de la biosíntesis de quitina</li>
+          <li>Grupo 16: Inhibidores de la síntesis de lípidos</li>
+          <li>Grupo 18: Ecdisona agonistas/disruptores de la muda</li>
+          <li>Grupo 23: Inhibidores de la síntesis de ATP mitocondrial</li>
+        </ul>
+        <p>Los productos marcados con <span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span> y fondo lila pertenecen a estos grupos.</p>
+      </div>
+      
+      <div class="modal-note">
+        <p><strong>Nota importante:</strong> El esquema de color empleado asocia modos de acción con categorías generales basadas en las funciones fisiológicas afectadas, como una ayuda para la comprensión de la sintomatología, la rapidez de acción y otras propiedades de los insecticidas, y no para cualquier propósito de manejo de la resistencia.</p>
+        <p><strong>Las rotaciones para el manejo de la resistencia deben basarse únicamente en los grupos numerados de modo de acción.</strong></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -318,10 +503,32 @@
     // Grupos químicos que actúan en el sistema nervioso
     const NERVOUS_SYSTEM_GROUPS = ['1', '3', '4', '5', '6', '22', '28', '29'];
     
+    // Grupos químicos que actúan en crecimiento y desarrollo
+    const GROWTH_DEVELOPMENT_GROUPS = ['7', '10', '16', '18', '23'];
+    
     // Variables globales
     let allProducts = [];
     let selectedProduct = null;
     let allPlagas = [];
+
+    // Funcionalidad del modal
+    const modal = document.getElementById("info-modal");
+    const infoButton = document.getElementById("info-button");
+    const closeButton = document.querySelector(".close-button");
+
+    infoButton.addEventListener("click", () => {
+      modal.style.display = "block";
+    });
+
+    closeButton.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    window.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    });
 
     // Determinar si un producto actúa en el sistema nervioso
     function isNervousSystemProduct(product) {
@@ -331,6 +538,23 @@
         return NERVOUS_SYSTEM_GROUPS.includes(groupMatch[1]);
       }
       return false;
+    }
+
+    // Determinar si un producto actúa en crecimiento y desarrollo
+    function isGrowthDevelopmentProduct(product) {
+      // Extraer números del grupo químico (asumiendo que el número está al inicio)
+      const groupMatch = product.grupo_quimico ? product.grupo_quimico.match(/^(\d+)/) : null;
+      if (groupMatch && groupMatch[1]) {
+        return GROWTH_DEVELOPMENT_GROUPS.includes(groupMatch[1]);
+      }
+      return false;
+    }
+
+    // Obtener el modo de acción de un producto
+    function getProductMode(product) {
+      if (isNervousSystemProduct(product)) return 'nervous-system';
+      if (isGrowthDevelopmentProduct(product)) return 'growth-development';
+      return 'other';
     }
 
     // Cargar productos y plagas desde Firebase
@@ -400,16 +624,18 @@
       
       filteredProducts.forEach(product => {
         const isSelected = selectedProduct && selectedProduct.id === product.id;
-        const isNervousSystem = isNervousSystemProduct(product);
+        const productMode = getProductMode(product);
         
         const productItem = document.createElement('div');
         productItem.className = isSelected ? 'product-item selected' : 'product-item';
-        if (isNervousSystem) productItem.classList.add('nervous-system');
+        if (productMode !== 'other') productItem.classList.add(productMode);
         productItem.dataset.id = product.id;
         
         let modeBadge = '';
-        if (isNervousSystem) {
+        if (productMode === 'nervous-system') {
           modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
+        } else if (productMode === 'growth-development') {
+          modeBadge = '<span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span>';
         }
         
         productItem.innerHTML = `
@@ -447,16 +673,15 @@
       else if (selectedProduct.banda === 'yellow') bandaColor = 'yellow';
       else if (selectedProduct.banda === 'blue') bandaColor = 'blue';
       
-      const isNervousSystem = isNervousSystemProduct(selectedProduct);
-      if (isNervousSystem) {
-        container.classList.add('nervous-system');
-      } else {
-        container.classList.remove('nervous-system');
-      }
+      const productMode = getProductMode(selectedProduct);
+      container.className = 'selected-product';
+      if (productMode !== 'other') container.classList.add(productMode);
       
       let modeBadge = '';
-      if (isNervousSystem) {
+      if (productMode === 'nervous-system') {
         modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
+      } else if (productMode === 'growth-development') {
+        modeBadge = '<span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span>';
       }
       
       container.innerHTML = `
@@ -488,7 +713,7 @@
       const selectedGroup = selectedProduct.grupo_quimico;
       const selectedFamily = selectedProduct.familia_quimica;
       const selectedCategory = selectedProduct.categoria;
-      const isSelectedNervousSystem = isNervousSystemProduct(selectedProduct);
+      const selectedMode = getProductMode(selectedProduct);
       
       // Filtrar productos de la MISMA categoría pero con modo de acción DIFERENTE
       const recommendedProducts = allProducts.filter(product => {
@@ -498,9 +723,9 @@
         // Incluir solo productos de la MISMA categoría
         if (product.categoria !== selectedCategory) return false;
         
-        // Si el producto seleccionado actúa en el sistema nervioso,
-        // excluir todos los que también actúen en el sistema nervioso
-        if (isSelectedNervousSystem && isNervousSystemProduct(product)) {
+        // Si el producto seleccionado tiene un modo de acción específico,
+        // excluir todos los que tengan el mismo modo de acción
+        if (selectedMode !== 'other' && getProductMode(product) === selectedMode) {
           return false;
         }
         
@@ -528,12 +753,14 @@
         else if (product.banda === 'yellow') bandaColor = 'yellow';
         else if (product.banda === 'blue') bandaColor = 'blue';
         
-        const isNervousSystem = isNervousSystemProduct(product);
-        const itemClass = isNervousSystem ? 'recommendation-item nervous-system' : 'recommendation-item';
+        const productMode = getProductMode(product);
+        const itemClass = productMode !== 'other' ? `recommendation-item ${productMode}` : 'recommendation-item';
         
         let modeBadge = '';
-        if (isNervousSystem) {
+        if (productMode === 'nervous-system') {
           modeBadge = '<span class="mode-of-action nervous-system-mode">Sistema Nervioso</span>';
+        } else if (productMode === 'growth-development') {
+          modeBadge = '<span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span>';
         }
         
         html += `
