@@ -145,6 +145,16 @@
             font-weight: bold;
         }
         
+        .activity-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--recent-activity);
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: pulse 2s infinite;
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -169,6 +179,11 @@
             
             .recent-activity {
                 font-size: 0.8rem;
+            }
+            
+            .activity-indicator {
+                width: 6px;
+                height: 6px;
             }
         }
     </style>
@@ -356,6 +371,7 @@
         let selectedYear = new Date().getFullYear();
         let invernaderosRecientes = new Set();
         let estadoSemanas = {}; // Almacenará el estado de cada semana
+        let actividadRecientePorInvernadero = {}; // Almacenará la actividad reciente por invernadero
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -436,15 +452,22 @@
         // Identificar invernaderos con actividad en las últimas 24 horas
         function identificarActividadReciente() {
             invernaderosRecientes.clear();
+            actividadRecientePorInvernadero = {};
             const ahora = new Date();
             const hace24Horas = new Date(ahora.getTime() - (24 * 60 * 60 * 1000));
             
             actividadesData.forEach(item => {
-                if (!item.fecha) return;
+                if (!item.fecha || !item.invernadero) return;
                 
                 const fechaItem = new Date(item.fecha);
                 if (fechaItem >= hace24Horas && fechaItem <= ahora) {
                     invernaderosRecientes.add(item.invernadero);
+                    
+                    // Guardar la actividad reciente para este invernadero
+                    if (!actividadRecientePorInvernadero[item.invernadero]) {
+                        actividadRecientePorInvernadero[item.invernadero] = [];
+                    }
+                    actividadRecientePorInvernadero[item.invernadero].push(item);
                 }
             });
         }
@@ -492,15 +515,13 @@
                                     estadoSemanas[week][invernadero][actividad].rendimiento = ultimaCosecha.rendimiento;
                                 }
                             } else {
-                                // Para otras actividades, calcular la última vuelta
-                                const progresoAcumulado = calcularProgresoAcumulado(datosActividad, week, currentYear, metaCamas);
-                                const ultimaVuelta = progresoAcumulado.vueltasCompletadas;
-                                const camasUltimaVuelta = progresoAcumulado.camasVueltaActual;
+                                // Para otras actividades, obtener la última vuelta de la semana
+                                const ultimaVuelta = obtenerUltimaVueltaSemana(datosActividad, week, currentYear, metaCamas);
                                 
                                 estadoSemanas[week][invernadero][actividad] = {
-                                    vuelta: ultimaVuelta,
-                                    camas: camasUltimaVuelta,
-                                    completado: camasUltimaVuelta >= metaCamas
+                                    vuelta: ultimaVuelta.vuelta,
+                                    camas: ultimaVuelta.camas,
+                                    completado: ultimaVuelta.camas >= metaCamas
                                 };
                             }
                         }
@@ -535,41 +556,65 @@
             return ultimaCosecha;
         }
 
-        // Calcular progreso acumulado hasta la semana específica
-        function calcularProgresoAcumulado(datosActividad, hastaSemana, year, metaCamas) {
-            let totalCamas = 0;
-            
-            for (let week = 1; week <= hastaSemana; week++) {
-                totalCamas += calcularCamasPorSemana(datosActividad, week, year);
-            }
-            
-            const vueltasCompletadas = Math.floor(totalCamas / metaCamas);
-            const camasVueltaActual = totalCamas % metaCamas;
-            
-            return {
-                totalCamas: totalCamas,
-                vueltasCompletadas: vueltasCompletadas,
-                camasVueltaActual: camasVueltaActual
-            };
-        }
-
-        // Calcular camas por semana específica (para actividades que no son cosecha)
-        function calcularCamasPorSemana(datosActividad, week, year) {
-            if (week < 1) return 0;
+        // Obtener la última vuelta de la semana específica
+        function obtenerUltimaVueltaSemana(datosActividad, week, year, metaCamas) {
+            if (week < 1) return { vuelta: 0, camas: 0 };
             
             const startDate = getMondayOfWeek(week, year);
             const endDate = new Date(startDate);
             endDate.setDate(startDate.getDate() + 6);
             
-            return datosActividad.reduce((sum, item) => {
-                if (!item.fecha) return sum;
-                
+            // Filtrar actividades de esta semana
+            const actividadesSemana = datosActividad.filter(item => {
+                if (!item.fecha) return false;
                 const itemDate = new Date(item.fecha);
-                if (itemDate >= startDate && itemDate <= endDate) {
-                    return sum + (item.camas || 0);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            if (actividadesSemana.length === 0) {
+                // Si no hay actividades esta semana, usar el estado de la semana anterior
+                if (week > 1) {
+                    const estadoSemanaAnterior = estadoSemanas[week-1] && 
+                                               estadoSemanas[week-1][datosActividad[0].invernadero] &&
+                                               estadoSemanas[week-1][datosActividad[0].invernadero][datosActividad[0].actividad];
+                    
+                    if (estadoSemanaAnterior) {
+                        return { 
+                            vuelta: estadoSemanaAnterior.vuelta, 
+                            camas: estadoSemanaAnterior.camas 
+                        };
+                    }
                 }
-                return sum;
-            }, 0);
+                return { vuelta: 0, camas: 0 };
+            }
+            
+            // Obtener el estado de la semana anterior
+            let vueltaAnterior = 0;
+            let camasAcumuladasAnterior = 0;
+            
+            if (week > 1) {
+                const estadoSemanaAnterior = estadoSemanas[week-1] && 
+                                           estadoSemanas[week-1][datosActividad[0].invernadero] &&
+                                           estadoSemanas[week-1][datosActividad[0].invernadero][datosActividad[0].actividad];
+                
+                if (estadoSemanaAnterior) {
+                    vueltaAnterior = estadoSemanaAnterior.vuelta;
+                    camasAcumuladasAnterior = estadoSemanaAnterior.camas;
+                }
+            }
+            
+            // Calcular el total de camas de esta semana
+            const totalCamasSemana = actividadesSemana.reduce((sum, item) => sum + (item.camas || 0), 0);
+            
+            // Calcular la vuelta actual y las camas
+            const camasAcumuladas = camasAcumuladasAnterior + totalCamasSemana;
+            const vueltaActual = vueltaAnterior + Math.floor(camasAcumuladas / metaCamas);
+            const camasActual = camasAcumuladas % metaCamas;
+            
+            return {
+                vuelta: vueltaActual,
+                camas: camasActual
+            };
         }
 
         // Procesar datos y actualizar la interfaz
@@ -604,7 +649,7 @@
                 let contenido = invernadero === 'vivero' ? 'Viv' : invernadero;
                 
                 if (tieneActividadReciente) {
-                    contenido += ' <i class="fas fa-arrow-up recent-activity" title="Actividad en las últimas 24 horas"></i>';
+                    contenido += ' <span class="activity-indicator" title="Actividad en las últimas 24 horas"></span>';
                 }
                 
                 celdaInvernadero.innerHTML = contenido;
@@ -682,7 +727,7 @@
                 let contenido = invernadero === 'vivero' ? 'Viv' : invernadero;
                 
                 if (tieneActividadReciente) {
-                    contenido += ' <i class="fas fa-arrow-up recent-activity" title="Actividad en las últimas 24 horas"></i>';
+                    contenido += ' <span class="activity-indicator" title="Actividad en las últimas 24 horas"></span>';
                 }
                 
                 celdaInvernadero.innerHTML = contenido;
