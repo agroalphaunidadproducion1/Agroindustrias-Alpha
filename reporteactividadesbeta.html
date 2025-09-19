@@ -349,7 +349,7 @@
         </div>
         
         <div class="sidebar-option">
-            <i class="fas fa-sync-alt"></i> Reiniciar metas
+            <i class="fas fa-sync-alt"></i> Ocultar metas completadas
             <label class="switch">
                 <input type="checkbox" id="resetToggle">
                 <span class="slider"></span>
@@ -911,7 +911,7 @@
                             celda.textContent = estadoSemana.camas;
                             
                             // Verificar si se completó la meta
-                            if (estadoSemana.completado) {
+                            if (estadoSemana.completado && !resetMode) {
                                 celda.classList.add('completed');
                             }
                         } else {
@@ -937,7 +937,7 @@
                             `;
                             
                             // Verificar si se completó la vuelta
-                            if (estadoSemana.completado) {
+                            if (estadoSemana.completado && !resetMode) {
                                 celda.classList.add('completed');
                             }
                         }
