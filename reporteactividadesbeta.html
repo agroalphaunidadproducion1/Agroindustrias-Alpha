@@ -26,6 +26,7 @@
             padding-top: 20px;
             padding-bottom: 40px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: margin-left 0.3s;
         }
         
         .header {
@@ -155,6 +156,141 @@
             animation: pulse 2s infinite;
         }
         
+        /* Estilos para el menú hamburguesa */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .hamburger-menu i {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            z-index: 999;
+            padding: 20px;
+            overflow-y: auto;
+            transition: left 0.3s;
+        }
+        
+        .sidebar.open {
+            left: 0;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .sidebar-title {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .close-sidebar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .sidebar-option {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .sidebar-option i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        /* Estilos para el interruptor de reinicio */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            float: right;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .main-content {
+            transition: margin-left 0.3s;
+        }
+        
+        .main-content.shifted {
+            margin-left: 300px;
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -185,11 +321,51 @@
                 width: 6px;
                 height: 6px;
             }
+            
+            .sidebar {
+                width: 250px;
+                left: -250px;
+            }
+            
+            .main-content.shifted {
+                margin-left: 250px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Menú hamburguesa -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="sidebar-title">Ajustes</h5>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-option">
+            <i class="fas fa-sync-alt"></i> Reiniciar metas
+            <label class="switch">
+                <input type="checkbox" id="resetToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div class="sidebar-option">
+            <i class="fas fa-info-circle"></i> Acerca de
+        </div>
+        
+        <div class="sidebar-option">
+            <i class="fas fa-cog"></i> Configuración
+        </div>
+    </div>
+
+    <div class="container main-content" id="mainContent">
         <div class="header text-center">
             <h1><i class="fas fa-seedling me-2"></i>Reporte de Actividades</h1>
             <p class="lead">Agroalpha - Unidad de producción 1</p>
@@ -372,15 +548,50 @@
         let invernaderosRecientes = new Set();
         let estadoSemanas = {}; // Almacenará el estado de cada semana
         let actividadRecientePorInvernadero = {}; // Almacenará la actividad reciente por invernadero
+        let resetMode = false; // Controla si estamos en modo de reinicio
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar selector de semanas
             setupWeekSelector();
             
+            // Configurar menú hamburguesa
+            setupHamburgerMenu();
+            
+            // Configurar toggle de reinicio
+            setupResetToggle();
+            
             // Cargar datos de Firebase
             cargarDatosActividades();
         });
+
+        // Configurar el menú hamburguesa
+        function setupHamburgerMenu() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const sidebar = document.getElementById('sidebar');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            hamburgerMenu.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                mainContent.classList.toggle('shifted');
+            });
+            
+            closeSidebar.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                mainContent.classList.remove('shifted');
+            });
+        }
+
+        // Configurar el toggle de reinicio
+        function setupResetToggle() {
+            const resetToggle = document.getElementById('resetToggle');
+            
+            resetToggle.addEventListener('change', function() {
+                resetMode = this.checked;
+                procesarDatos();
+            });
+        }
 
         // Configurar el selector de semanas
         function setupWeekSelector() {
@@ -438,7 +649,7 @@
                     actividadesData.push(childSnapshot.val());
                 });
                 
-                // Identificar invernaderos con actividad reciente
+                // Identificar invernaderos con actividad reciente (últimas 24 horas)
                 identificarActividadReciente();
                 
                 // Calcular el estado de todas las semanas
@@ -705,13 +916,20 @@
                             }
                         } else {
                             // Para otras actividades, mostrar la última vuelta y camas
+                            let valorMostrar = estadoSemana.camas;
+                            
+                            // Si estamos en modo reinicio y la actividad está completada, mostrar 0
+                            if (resetMode && estadoSemana.completado && actividad !== 'Cosecha') {
+                                valorMostrar = 0;
+                            }
+                            
                             const infoText = estadoSemana.vuelta > 0 ? 
                                 `Vuelta ${estadoSemana.vuelta}: ${estadoSemana.camas}/${metaCamas}` : 
                                 `${estadoSemana.camas}/${metaCamas}`;
                             
                             celda.innerHTML = `
                                 <div class="info-hover">
-                                    ${estadoSemana.camas}
+                                    ${valorMostrar}
                                     <div class="tooltip-info">
                                         ${infoText}
                                     </div>
