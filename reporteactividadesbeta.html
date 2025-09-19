@@ -521,7 +521,7 @@
                                 estadoSemanas[week][invernadero][actividad] = {
                                     vuelta: ultimaVuelta.vuelta,
                                     camas: ultimaVuelta.camas,
-                                    completado: ultimaVuelta.camas >= metaCamas
+                                    completado: ultimaVuelta.completado || false
                                 };
                             }
                         }
@@ -556,9 +556,9 @@
             return ultimaCosecha;
         }
 
-        // Obtener la última vuelta de la semana específica
+        // Obtener la última vuelta de la semana específica - MODIFICADA
         function obtenerUltimaVueltaSemana(datosActividad, week, year, metaCamas) {
-            if (week < 1) return { vuelta: 0, camas: 0 };
+            if (week < 1) return { vuelta: 0, camas: 0, completado: false };
             
             const startDate = getMondayOfWeek(week, year);
             const endDate = new Date(startDate);
@@ -579,18 +579,29 @@
                                                estadoSemanas[week-1][datosActividad[0].invernadero][datosActividad[0].actividad];
                     
                     if (estadoSemanaAnterior) {
+                        // MODIFICACIÓN: Si se completó la meta la semana anterior, mantener el valor completo
+                        if (estadoSemanaAnterior.completado) {
+                            return { 
+                                vuelta: estadoSemanaAnterior.vuelta, 
+                                camas: metaCamas, // Mostrar el valor completo en lugar de 0
+                                completado: true
+                            };
+                        }
+                        
                         return { 
                             vuelta: estadoSemanaAnterior.vuelta, 
-                            camas: estadoSemanaAnterior.camas 
+                            camas: estadoSemanaAnterior.camas,
+                            completado: false
                         };
                     }
                 }
-                return { vuelta: 0, camas: 0 };
+                return { vuelta: 0, camas: 0, completado: false };
             }
             
             // Obtener el estado de la semana anterior
             let vueltaAnterior = 0;
             let camasAcumuladasAnterior = 0;
+            let completadoAnterior = false;
             
             if (week > 1) {
                 const estadoSemanaAnterior = estadoSemanas[week-1] && 
@@ -600,7 +611,13 @@
                 if (estadoSemanaAnterior) {
                     vueltaAnterior = estadoSemanaAnterior.vuelta;
                     camasAcumuladasAnterior = estadoSemanaAnterior.camas;
+                    completadoAnterior = estadoSemanaAnterior.completado || false;
                 }
+            }
+            
+            // Si la semana anterior estaba completada, reiniciar el contador para la nueva vuelta
+            if (completadoAnterior) {
+                camasAcumuladasAnterior = 0;
             }
             
             // Calcular el total de camas de esta semana
@@ -611,9 +628,20 @@
             const vueltaActual = vueltaAnterior + Math.floor(camasAcumuladas / metaCamas);
             const camasActual = camasAcumuladas % metaCamas;
             
+            // MODIFICACIÓN: Si se completa la meta esta semana, mostrar el valor completo
+            // en lugar de 0, hasta que comience una nueva semana
+            if (camasActual === 0 && camasAcumuladas > 0) {
+                return {
+                    vuelta: vueltaActual,
+                    camas: metaCamas, // Mostrar el valor completo
+                    completado: true
+                };
+            }
+            
             return {
                 vuelta: vueltaActual,
-                camas: camasActual
+                camas: camasActual,
+                completado: camasActual >= metaCamas
             };
         }
 
