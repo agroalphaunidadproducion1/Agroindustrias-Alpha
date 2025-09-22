@@ -96,6 +96,27 @@
       border-radius: 2px;
     }
     
+    /* Nuevo estilo para el botón de normativa EPA */
+    .epa-button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      height: 40px;
+    }
+    
+    .epa-button:hover {
+      background: var(--primary-hover);
+    }
+    
     .modal {
       display: none;
       position: fixed;
@@ -245,6 +266,11 @@
       .filters-container {
         width: 100%;
       }
+      
+      .epa-button {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -277,6 +303,12 @@
         </select>
       </div>
     </div>
+    
+    <!-- Botón de normativa EPA agregado aquí -->
+    <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-E/part-180/subpart-B/section-180.41" target="_blank" class="epa-button">
+      📋 Ver normativa EPA
+    </a>
+    
     <button class="menu-button" id="menu-button">
       <div class="menu-line"></div>
       <div class="menu-line"></div>
@@ -459,21 +491,51 @@
       return '#9E9E9E'; // Gris por defecto
     }
 
-    // Función para crear enlace EPA
-    function crearEnlaceEPA(epa, enlaceEpa) {
-      if (!epa) return '<span class="no-link">-</span>';
-      
-      if (enlaceEpa) {
-        // Verificar si el enlace ya tiene protocolo, si no, agregar https://
-        let url = enlaceEpa;
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          url = 'https://' + url;
+    // Función para crear enlaces EPA (compatible con formato antiguo y nuevo)
+    function crearEnlacesEPA(producto) {
+      // Formato nuevo: array de registros EPA
+      if (producto.registros_epa && Array.isArray(producto.registros_epa) && producto.registros_epa.length > 0) {
+        let enlacesHTML = '';
+        
+        producto.registros_epa.forEach((registro, index) => {
+          if (registro.registro) {
+            if (registro.enlace) {
+              // Verificar si el enlace ya tiene protocolo, si no, agregar https://
+              let url = registro.enlace;
+              if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+              }
+              
+              enlacesHTML += `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${registro.registro}</a>`;
+            } else {
+              enlacesHTML += `<span title="Sin enlace EPA">${registro.registro}</span>`;
+            }
+            
+            // Agregar separador si hay más registros
+            if (index < producto.registros_epa.length - 1) {
+              enlacesHTML += ', ';
+            }
+          }
+        });
+        
+        return enlacesHTML || '<span class="no-link">-</span>';
+      }
+      // Formato antiguo: campos individuales
+      else if (producto.epa) {
+        if (producto.enlace_epa) {
+          // Verificar si el enlace ya tiene protocolo, si no, agregar https://
+          let url = producto.enlace_epa;
+          if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+          }
+          
+          return `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${producto.epa}</a>`;
         }
         
-        return `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${epa}</a>`;
+        return `<span title="Sin enlace EPA">${producto.epa}</span>`;
       }
       
-      return `<span title="Sin enlace EPA">${epa}</span>`;
+      return '<span class="no-link">-</span>';
     }
 
     // Mostrar productos en tabla
@@ -514,8 +576,8 @@
         // Obtener color para la banda
         const colorBanda = obtenerColorBanda(p.banda);
         
-        // Crear enlace EPA
-        const enlaceEPA = crearEnlaceEPA(p.epa, p.enlace_epa);
+        // Crear enlaces EPA (compatible con formato antiguo y nuevo)
+        const enlacesEPA = crearEnlacesEPA(p);
         
         return `
           <tr>
@@ -529,7 +591,7 @@
             <td>${reingreso || '-'}</td>
             <td>${dosisMaxima || '-'}</td>
             <td>${plagas || '-'}</td>
-            <td>${enlaceEPA}</td>
+            <td>${enlacesEPA}</td>
             <td>${p.senasa || '-'}</td>
             <td><div class="banda-color" style="background-color: ${colorBanda}" title="${p.banda || 'Sin banda'}"></div></td>
           </tr>
@@ -583,6 +645,14 @@
         // Para exportar, incluimos ambos cultivos si no hay filtro
         if (!cultivoFiltro) {
           if (p.dias_mini) {
+            // Formatear registros EPA para exportación (compatible con ambos formatos)
+            let epaText = '';
+            if (p.registros_epa && Array.isArray(p.registros_epa)) {
+              epaText = p.registros_epa.map(r => r.registro).filter(r => r).join(', ');
+            } else if (p.epa) {
+              epaText = p.epa;
+            }
+            
             tablaHTML += `
               <tr>
                 <td>${p.nombre || ''}</td>
@@ -595,13 +665,21 @@
                 <td>${p.reingreso_mini || ''}</td>
                 <td>${p.dosis_maxima_mini || ''}</td>
                 <td>${p.plagas_mini || ''}</td>
-                <td>${p.epa || ''}</td>
+                <td>${epaText || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
             `;
           }
           if (p.dias_tomate) {
+            // Formatear registros EPA para exportación (compatible con ambos formatos)
+            let epaText = '';
+            if (p.registros_epa && Array.isArray(p.registros_epa)) {
+              epaText = p.registros_epa.map(r => r.registro).filter(r => r).join(', ');
+            } else if (p.epa) {
+              epaText = p.epa;
+            }
+            
             tablaHTML += `
               <tr>
                 <td>${p.nombre || ''}</td>
@@ -614,7 +692,7 @@
                 <td>${p.reingreso_tomate || ''}</td>
                 <td>${p.dosis_maxima_tomate || ''}</td>
                 <td>${p.plagas_tomate || ''}</td>
-                <td>${p.epa || ''}</td>
+                <td>${epaText || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
@@ -629,6 +707,14 @@
              dosisMaxima: p.dosis_maxima_tomate, dosisLitro: p.dosis_litro_tomate, cultivo: "TOMATE"};
           
           if (datos.dias || datos.reingreso || datos.plagas) {
+            // Formatear registros EPA para exportación (compatible con ambos formatos)
+            let epaText = '';
+            if (p.registros_epa && Array.isArray(p.registros_epa)) {
+              epaText = p.registros_epa.map(r => r.registro).filter(r => r).join(', ');
+            } else if (p.epa) {
+              epaText = p.epa;
+            }
+            
             tablaHTML += `
               <tr>
                 <td>${p.nombre || ''}</td>
@@ -641,7 +727,7 @@
                 <td>${datos.reingreso || ''}</td>
                 <td>${datos.dosisMaxima || ''}</td>
                 <td>${datos.plagas || ''}</td>
-                <td>${p.epa || ''}</td>
+                <td>${epaText || ''}</td>
                 <td>${p.senasa || ''}</td>
                 <td>${p.banda || ''}</td>
               </tr>
