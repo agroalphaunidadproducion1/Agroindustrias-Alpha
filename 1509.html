@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario de Entrega de Documentos</title>
+    <title>Documentos - Sistema de Gestión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -18,14 +18,18 @@
         body {
             background-color: #f5f7f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 70px;
         }
         
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 20px 0;
-            margin-bottom: 25px;
+            padding: 15px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
         }
         
         .document-list {
@@ -33,15 +37,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             padding: 20px;
-            height: 100%;
-        }
-        
-        .calendar-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            padding: 20px;
-            height: 100%;
+            margin-bottom: 20px;
         }
         
         .document-item {
@@ -58,50 +54,19 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-top: 20px;
-        }
-        
-        .calendar-header {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--secondary-color);
-        }
-        
-        .calendar-day {
-            height: 80px;
-            padding: 8px;
-            border-radius: 6px;
-            background-color: #f8f9fa;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .calendar-day:hover {
-            background-color: #e9ecef;
-            transform: scale(1.02);
-        }
-        
-        .delivery-badge {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background-color: var(--primary-color);
+        .btn-deliver {
+            background-color: var(--accent-color);
             color: white;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
             font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-deliver:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
         }
         
         .btn-add {
@@ -122,175 +87,91 @@
             z-index: 100;
         }
         
-        .btn-deliver {
-            background-color: var(--accent-color);
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .offcanvas {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
             color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 12px;
+        }
+        
+        .offcanvas-body .nav-link {
+            color: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
             transition: all 0.3s ease;
         }
         
-        .btn-deliver:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
+        .offcanvas-body .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
-        .modal-content {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-        
-        .modal-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-        
-        .day-with-delivery {
-            background-color: #e8f4fc;
-            border: 1px solid var(--primary-color);
-        }
-        
-        .day-number {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .document-name {
-            font-size: 12px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .selected-day {
-            background-color: #d4edda;
-            border: 2px solid #28a745;
-        }
-        
-        @media (max-width: 992px) {
-            .calendar-container, .document-list {
-                margin-bottom: 20px;
-            }
+        .offcanvas-body .nav-link.active {
+            background-color: var(--accent-color);
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header text-center">
-        <h1><i class="fas fa-calendar-alt me-2"></i>Calendario de Entrega de Documentos</h1>
-        <p class="lead">Sistema de gestión y seguimiento de documentos por departamento</p>
-    </div>
+    <!-- Header con menú hamburguesa -->
+    <nav class="navbar navbar-expand-lg header">
+        <div class="container-fluid">
+            <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand text-white mx-auto" href="#">
+                <i class="fas fa-file-alt me-2"></i>Gestión de Documentos
+            </a>
+            
+            <!-- Menú offcanvas -->
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú de Navegación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="documentos.html">
+                                <i class="fas fa-file-alt me-2"></i>Documentos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="calendario.html">
+                                <i class="fas fa-calendar-alt me-2"></i>Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-chart-bar me-2"></i>Reportes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-cog me-2"></i>Configuración
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container-fluid">
+    <div class="container mt-4">
         <div class="row">
-            <!-- Lista de documentos -->
-            <div class="col-lg-4 col-md-12 mb-4">
+            <div class="col-12">
                 <div class="document-list">
-                    <h3 class="mb-4"><i class="fas fa-file-alt me-2"></i>Documentos</h3>
+                    <h3 class="mb-4"><i class="fas fa-file-alt me-2"></i>Lista de Documentos</h3>
                     
                     <div class="input-group mb-4">
                         <input type="text" class="form-control" placeholder="Buscar documento..." id="searchDocument">
                         <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                     </div>
                     
-                    <div class="document-items">
-                        <div class="document-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5>Registros de Aplicaciones</h5>
-                                <span class="badge bg-success">Entregado</span>
-                            </div>
-                            <p class="mb-1">Última entrega: <span id="lastDelivery1">15/09/2023</span></p>
-                            <p class="mb-1">Departamento: Inocuidad</p>
-                            <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal">
-                                <i class="fas fa-truck me-1"></i>Registrar Entrega
-                            </button>
-                        </div>
-                        
-                        <div class="document-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5>Registros EPP</h5>
-                                <span class="badge bg-warning text-dark">Pendiente</span>
-                            </div>
-                            <p class="mb-1">Última entrega: <span id="lastDelivery2">10/09/2023</span></p>
-                            <p class="mb-1">Departamento: Inocuidad</p>
-                            <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal">
-                                <i class="fas fa-truck me-1"></i>Registrar Entrega
-                            </button>
-                        </div>
-                        
-                        <div class="document-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5>Control de Plagas</h5>
-                                <span class="badge bg-success">Entregado</span>
-                            </div>
-                            <p class="mb-1">Última entrega: <span id="lastDelivery3">18/09/2023</span></p>
-                            <p class="mb-1">Departamento: Inocuidad</p>
-                            <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal">
-                                <i class="fas fa-truck me-1"></i>Registrar Entrega
-                            </button>
-                        </div>
-                        
-                        <div class="document-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5>Limpieza y Desinfección</h5>
-                                <span class="badge bg-danger">Atrasado</span>
-                            </div>
-                            <p class="mb-1">Última entrega: <span id="lastDelivery4">05/09/2023</span></p>
-                            <p class="mb-1">Departamento: Inocuidad</p>
-                            <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal">
-                                <i class="fas fa-truck me-1"></i>Registrar Entrega
-                            </button>
-                        </div>
-                        
-                        <div class="document-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5>Verificación de Proveedores</h5>
-                                <span class="badge bg-success">Entregado</span>
-                            </div>
-                            <p class="mb-1">Última entrega: <span id="lastDelivery5">20/09/2023</span></p>
-                            <p class="mb-1">Departamento: Inocuidad</p>
-                            <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal">
-                                <i class="fas fa-truck me-1"></i>Registrar Entrega
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Calendario -->
-            <div class="col-lg-8 col-md-12">
-                <div class="calendar-container">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3><i class="fas fa-calendar me-2"></i>Calendario de Entregas</h3>
-                        <div>
-                            <button class="btn btn-outline-primary me-2" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                            <span class="fw-bold" id="currentMonth">Septiembre 2023</span>
-                            <button class="btn btn-outline-primary ms-2" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="calendar-header">
-                        <div>Lun</div>
-                        <div>Mar</div>
-                        <div>Mié</div>
-                        <div>Jue</div>
-                        <div>Vie</div>
-                        <div>Sáb</div>
-                        <div>Dom</div>
-                    </div>
-                    
-                    <div class="calendar" id="calendarGrid">
-                        <!-- El calendario se generará dinámicamente con JavaScript -->
-                    </div>
-                    
-                    <div class="mt-4">
-                        <h5>Entregas de Hoy</h5>
-                        <div class="list-group" id="todayDeliveries">
-                            <!-- Las entregas de hoy se generarán dinámicamente -->
-                        </div>
+                    <div class="document-items" id="documentItems">
+                        <!-- Los documentos se cargarán dinámicamente desde localStorage -->
                     </div>
                 </div>
             </div>
@@ -302,71 +183,13 @@
         <i class="fas fa-plus"></i>
     </button>
     
-    <!-- Modal para registrar entrega -->
-    <div class="modal fade" id="deliveryModal" tabindex="-1" aria-labelledby="deliveryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deliveryModalLabel"><i class="fas fa-truck me-2"></i>Registrar Entrega de Documento</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="deliveryForm">
-                        <div class="mb-3">
-                            <label for="documentSelect" class="form-label">Documento</label>
-                            <select class="form-select" id="documentSelect">
-                                <option selected>Seleccionar documento...</option>
-                                <option>Registros de Aplicaciones</option>
-                                <option>Registros EPP</option>
-                                <option>Control de Plagas</option>
-                                <option>Limpieza y Desinfección</option>
-                                <option>Verificación de Proveedores</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="deliveryDate" class="form-label">Fecha de Entrega</label>
-                            <input type="date" class="form-control" id="deliveryDate">
-                        </div>
-                        <div class="mb-3">
-                            <label for="departmentSelect" class="form-label">Departamento</label>
-                            <select class="form-select" id="departmentSelect">
-                                <option selected>Seleccionar departamento...</option>
-                                <option>Inocuidad</option>
-                                <option>Producción</option>
-                                <option>Almacén</option>
-                                <option>Calidad</option>
-                                <option>Logística</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="deliveryPerson" class="form-label">Persona que Entrega</label>
-                            <input type="text" class="form-control" id="deliveryPerson" placeholder="Nombre completo">
-                        </div>
-                        <div class="mb-3">
-                            <label for="receiverPerson" class="form-label">Persona que Recibe</label>
-                            <input type="text" class="form-control" id="receiverPerson" placeholder="Nombre completo">
-                        </div>
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Observaciones</label>
-                            <textarea class="form-control" id="notes" rows="3"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="registerDelivery">Registrar Entrega</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Modal para agregar documento -->
     <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addDocumentModalLabel"><i class="fas fa-plus-circle me-2"></i>Agregar Nuevo Documento</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addDocumentForm">
@@ -377,23 +200,23 @@
                         <div class="mb-3">
                             <label for="documentDepartment" class="form-label">Departamento</label>
                             <select class="form-select" id="documentDepartment">
-                                <option selected>Seleccionar departamento...</option>
-                                <option>Inocuidad</option>
-                                <option>Producción</option>
-                                <option>Almacén</option>
-                                <option>Calidad</option>
-                                <option>Logística</option>
+                                <option value="" selected>Seleccionar departamento...</option>
+                                <option value="Inocuidad">Inocuidad</option>
+                                <option value="Producción">Producción</option>
+                                <option value="Almacén">Almacén</option>
+                                <option value="Calidad">Calidad</option>
+                                <option value="Logística">Logística</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="frequency" class="form-label">Frecuencia de Entrega</label>
                             <select class="form-select" id="frequency">
-                                <option selected>Seleccionar frecuencia...</option>
-                                <option>Diario</option>
-                                <option>Semanal</option>
-                                <option>Quincenal</option>
-                                <option>Mensual</option>
-                                <option>Trimestral</option>
+                                <option value="" selected>Seleccionar frecuencia...</option>
+                                <option value="Diario">Diario</option>
+                                <option value="Semanal">Semanal</option>
+                                <option value="Quincenal">Quincenal</option>
+                                <option value="Mensual">Mensual</option>
+                                <option value="Trimestral">Trimestral</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -412,158 +235,73 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Datos de ejemplo para las entregas
-        const deliveries = [
-            { document: "Registros de Aplicaciones", date: "2023-09-15", department: "Inocuidad", deliveryPerson: "Juan Pérez", receiverPerson: "Ana García" },
-            { document: "Registros EPP", date: "2023-09-10", department: "Inocuidad", deliveryPerson: "María López", receiverPerson: "Carlos Ruiz" },
-            { document: "Control de Plagas", date: "2023-09-18", department: "Inocuidad", deliveryPerson: "Pedro Martínez", receiverPerson: "Laura Fernández" },
-            { document: "Limpieza y Desinfección", date: "2023-09-05", department: "Inocuidad", deliveryPerson: "Sofía Ramírez", receiverPerson: "Miguel Torres" },
-            { document: "Verificación de Proveedores", date: "2023-09-20", department: "Inocuidad", deliveryPerson: "Elena Vargas", receiverPerson: "Roberto Silva" }
-        ];
-
-        // Variables para el calendario
-        let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
-        let currentYear = currentDate.getFullYear();
-
-        // Función para formatear fechas
-        function formatDate(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+        // Función para cargar documentos desde localStorage
+        function loadDocuments() {
+            const documents = JSON.parse(localStorage.getItem('documents')) || [];
+            const documentItems = document.getElementById('documentItems');
+            documentItems.innerHTML = '';
+            
+            if (documents.length === 0) {
+                // Datos de ejemplo si no hay documentos guardados
+                const defaultDocuments = [
+                    { id: 1, name: "Registros de Aplicaciones", department: "Inocuidad", frequency: "Semanal", lastDelivery: "15/09/2023", status: "success" },
+                    { id: 2, name: "Registros EPP", department: "Inocuidad", frequency: "Mensual", lastDelivery: "10/09/2023", status: "warning" },
+                    { id: 3, name: "Control de Plagas", department: "Inocuidad", frequency: "Quincenal", lastDelivery: "18/09/2023", status: "success" },
+                    { id: 4, name: "Limpieza y Desinfección", department: "Inocuidad", frequency: "Diario", lastDelivery: "05/09/2023", status: "danger" },
+                    { id: 5, name: "Verificación de Proveedores", department: "Inocuidad", frequency: "Trimestral", lastDelivery: "20/09/2023", status: "success" }
+                ];
+                
+                localStorage.setItem('documents', JSON.stringify(defaultDocuments));
+                displayDocuments(defaultDocuments);
+            } else {
+                displayDocuments(documents);
+            }
         }
-
-        // Función para generar el calendario
-        function generateCalendar(month, year) {
-            const calendarGrid = document.getElementById('calendarGrid');
-            calendarGrid.innerHTML = '';
+        
+        // Función para mostrar documentos en la lista
+        function displayDocuments(documents) {
+            const documentItems = document.getElementById('documentItems');
+            documentItems.innerHTML = '';
             
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            
-            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
-            
-            // Primer día del mes
-            const firstDay = new Date(year, month, 1);
-            // Último día del mes
-            const lastDay = new Date(year, month + 1, 0);
-            // Día de la semana del primer día (0 = Domingo, 1 = Lunes, etc.)
-            const firstDayIndex = firstDay.getDay();
-            // Ajustar para que la semana empiece en lunes
-            const adjustedFirstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
-            
-            // Días del mes anterior
-            const prevMonthLastDay = new Date(year, month, 0).getDate();
-            
-            // Generar días del mes anterior
-            for (let i = adjustedFirstDayIndex - 1; i >= 0; i--) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day';
-                day.innerHTML = `<div class="day-number">${prevMonthLastDay - i}</div>`;
-                calendarGrid.appendChild(day);
-            }
-            
-            // Generar días del mes actual
-            for (let i = 1; i <= lastDay.getDate(); i++) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day';
-                day.innerHTML = `<div class="day-number">${i}</div>`;
+            documents.forEach(doc => {
+                const statusClass = {
+                    'success': 'bg-success',
+                    'warning': 'bg-warning text-dark',
+                    'danger': 'bg-danger'
+                }[doc.status] || 'bg-secondary';
                 
-                // Verificar si hay entregas para este día
-                const currentDay = new Date(year, month, i);
-                const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                
-                const dayDeliveries = deliveries.filter(d => d.date === formattedDate);
-                
-                if (dayDeliveries.length > 0) {
-                    day.classList.add('day-with-delivery');
-                    day.innerHTML += `<div class="document-name">${dayDeliveries[0].document}</div>`;
-                    day.innerHTML += `<span class="delivery-badge"><i class="fas fa-file"></i></span>`;
-                    
-                    // Agregar tooltip con todas las entregas del día
-                    day.title = `Entregas: ${dayDeliveries.map(d => d.document).join(', ')}`;
-                }
-                
-                // Marcar el día actual
-                const today = new Date();
-                if (currentDay.toDateString() === today.toDateString()) {
-                    day.style.backgroundColor = '#d4edda';
-                    day.style.border = '2px solid #28a745';
-                }
-                
-                calendarGrid.appendChild(day);
-            }
-            
-            // Completar con días del siguiente mes para completar la cuadrícula
-            const totalCells = 42; // 6 filas de 7 días
-            const daysInCalendar = adjustedFirstDayIndex + lastDay.getDate();
-            const nextMonthDays = totalCells - daysInCalendar;
-            
-            for (let i = 1; i <= nextMonthDays; i++) {
-                const day = document.createElement('div');
-                day.className = 'calendar-day';
-                day.innerHTML = `<div class="day-number">${i}</div>`;
-                calendarGrid.appendChild(day);
-            }
-            
-            // Agregar eventos de clic a los días
-            const calendarDays = document.querySelectorAll('.calendar-day');
-            calendarDays.forEach(day => {
-                day.addEventListener('click', function() {
-                    // Limpiar selección anterior
-                    calendarDays.forEach(d => d.classList.remove('selected-day'));
-                    // Marcar día seleccionado
-                    this.classList.add('selected-day');
-                    
-                    const dayNumber = this.querySelector('.day-number')?.textContent;
-                    if (dayNumber) {
-                        console.log(`Día seleccionado: ${dayNumber}`);
-                    }
-                });
+                const documentItem = document.createElement('div');
+                documentItem.className = 'document-item';
+                documentItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>${doc.name}</h5>
+                        <span class="badge ${statusClass}">${getStatusText(doc.status)}</span>
+                    </div>
+                    <p class="mb-1">Última entrega: <span class="last-delivery">${doc.lastDelivery}</span></p>
+                    <p class="mb-1">Departamento: ${doc.department}</p>
+                    <p class="mb-1">Frecuencia: ${doc.frequency}</p>
+                    <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal" data-doc-id="${doc.id}">
+                        <i class="fas fa-truck me-1"></i>Registrar Entrega
+                    </button>
+                `;
+                documentItems.appendChild(documentItem);
             });
         }
-
-        // Función para actualizar las entregas de hoy
-        function updateTodayDeliveries() {
-            const todayDeliveriesContainer = document.getElementById('todayDeliveries');
-            todayDeliveriesContainer.innerHTML = '';
-            
-            const today = new Date();
-            const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            
-            const todayDeliveries = deliveries.filter(d => d.date === formattedToday);
-            
-            if (todayDeliveries.length === 0) {
-                todayDeliveriesContainer.innerHTML = '<p class="text-muted">No hay entregas programadas para hoy.</p>';
-            } else {
-                todayDeliveries.forEach(delivery => {
-                    const deliveryItem = document.createElement('div');
-                    deliveryItem.className = 'list-group-item';
-                    deliveryItem.innerHTML = `
-                        <div class="d-flex justify-content-between">
-                            <h6 class="mb-1">${delivery.document} - ${delivery.department}</h6>
-                            <small>${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2, '0')}</small>
-                        </div>
-                        <p class="mb-1">Entregado por: ${delivery.deliveryPerson}</p>
-                    `;
-                    todayDeliveriesContainer.appendChild(deliveryItem);
-                });
-            }
+        
+        // Función para obtener texto del estado
+        function getStatusText(status) {
+            const statusMap = {
+                'success': 'Entregado',
+                'warning': 'Pendiente',
+                'danger': 'Atrasado'
+            };
+            return statusMap[status] || 'Desconocido';
         }
-
+        
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
-            // Generar calendario con el mes actual
-            generateCalendar(currentMonth, currentYear);
-            
-            // Actualizar entregas de hoy
-            updateTodayDeliveries();
-            
-            // Configurar fecha actual en el formulario
-            const today = new Date();
-            const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            document.getElementById('deliveryDate').value = formattedToday;
+            // Cargar documentos
+            loadDocuments();
             
             // Funcionalidad de búsqueda
             const searchInput = document.getElementById('searchDocument');
@@ -581,88 +319,43 @@
                 });
             });
             
-            // Navegación del calendario
-            document.getElementById('prevMonth').addEventListener('click', function() {
-                currentMonth--;
-                if (currentMonth < 0) {
-                    currentMonth = 11;
-                    currentYear--;
-                }
-                generateCalendar(currentMonth, currentYear);
-            });
-            
-            document.getElementById('nextMonth').addEventListener('click', function() {
-                currentMonth++;
-                if (currentMonth > 11) {
-                    currentMonth = 0;
-                    currentYear++;
-                }
-                generateCalendar(currentMonth, currentYear);
-            });
-            
-            // Simular envío de formularios
-            const deliveryButtons = document.querySelectorAll('.btn-deliver');
-            deliveryButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const documentItem = this.closest('.document-item');
-                    const documentName = documentItem.querySelector('h5').textContent;
-                    document.getElementById('documentSelect').value = documentName;
-                    document.getElementById('departmentSelect').value = "Inocuidad";
-                });
-            });
-            
-            // Registrar entrega
-            document.getElementById('registerDelivery').addEventListener('click', function() {
-                const documentSelect = document.getElementById('documentSelect');
-                const deliveryDate = document.getElementById('deliveryDate');
-                const departmentSelect = document.getElementById('departmentSelect');
-                const deliveryPerson = document.getElementById('deliveryPerson');
-                const receiverPerson = document.getElementById('receiverPerson');
-                
-                if (documentSelect.value && deliveryDate.value && departmentSelect.value && 
-                    deliveryPerson.value && receiverPerson.value) {
-                    
-                    // Aquí normalmente enviarías los datos al servidor
-                    alert('Entrega registrada exitosamente');
-                    
-                    // Cerrar modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('deliveryModal'));
-                    modal.hide();
-                    
-                    // Actualizar la última fecha de entrega en la lista
-                    const lastDeliverySpans = document.querySelectorAll(`[id^="lastDelivery"]`);
-                    for (let span of lastDeliverySpans) {
-                        if (span.closest('.document-item').querySelector('h5').textContent === documentSelect.value) {
-                            const date = new Date(deliveryDate.value);
-                            span.textContent = formatDate(date);
-                            break;
-                        }
-                    }
-                    
-                    // Limpiar formulario
-                    document.getElementById('deliveryForm').reset();
-                    document.getElementById('deliveryDate').value = formattedToday;
-                } else {
-                    alert('Por favor, complete todos los campos obligatorios');
-                }
-            });
-            
             // Agregar documento
             document.getElementById('addDocument').addEventListener('click', function() {
                 const documentName = document.getElementById('documentName');
                 const documentDepartment = document.getElementById('documentDepartment');
                 const frequency = document.getElementById('frequency');
+                const description = document.getElementById('description');
                 
                 if (documentName.value && documentDepartment.value && frequency.value) {
-                    // Aquí normalmente enviarías los datos al servidor
-                    alert('Documento agregado exitosamente');
+                    // Obtener documentos existentes
+                    const documents = JSON.parse(localStorage.getItem('documents')) || [];
                     
-                    // Cerrar modal
+                    // Crear nuevo documento
+                    const newDocument = {
+                        id: documents.length > 0 ? Math.max(...documents.map(d => d.id)) + 1 : 1,
+                        name: documentName.value,
+                        department: documentDepartment.value,
+                        frequency: frequency.value,
+                        description: description.value,
+                        lastDelivery: 'Nunca',
+                        status: 'warning'
+                    };
+                    
+                    // Agregar a la lista
+                    documents.push(newDocument);
+                    
+                    // Guardar en localStorage
+                    localStorage.setItem('documents', JSON.stringify(documents));
+                    
+                    // Recargar lista
+                    loadDocuments();
+                    
+                    // Cerrar modal y limpiar formulario
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addDocumentModal'));
                     modal.hide();
-                    
-                    // Limpiar formulario
                     document.getElementById('addDocumentForm').reset();
+                    
+                    alert('Documento agregado exitosamente');
                 } else {
                     alert('Por favor, complete todos los campos obligatorios');
                 }
