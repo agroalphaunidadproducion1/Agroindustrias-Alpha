@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Modos de Acción - IRAC</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #c8e6c9;
+            --secondary: #1565c0;
+            --secondary-light: #e3f2fd;
+            --accent: #ff9800;
+            --text: #333;
+            --text-light: #666;
+            --bg: #f9f9f9;
+            --card-bg: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --radius: 8px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .search-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        #ingredient-search {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .suggestions {
+            position: relative;
+        }
+        
+        #suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .suggestion-item:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .active-ingredient {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .ingredient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .ingredient-name {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .moa-badge {
+            background-color: var(--secondary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .ingredient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .detail-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .recommendations {
+            margin-top: 2rem;
+        }
+        
+        .recommendations h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .recommendation-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .rec-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .rec-moa {
+            color: var(--secondary);
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+        }
+        
+        .rec-details {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            margin-top: 2rem;
+        }
+        
+        .info-note {
+            background-color: var(--secondary-light);
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+        
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .ingredient-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .recommendation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Buscador de Modos de Acción</h1>
+        <p class="subtitle">Busque ingredientes activos y encuentre alternativas con diferentes modos de acción para un manejo integrado de plagas</p>
+    </header>
+    
+    <div class="container">
+        <section class="search-section">
+            <h2>Buscar Ingrediente Activo</h2>
+            <div class="search-box">
+                <div class="suggestions" style="flex: 1;">
+                    <input type="text" id="ingredient-search" placeholder="Ej: Imidacloprid, Clorpirifos, Lambda-cihalotrina...">
+                    <div id="suggestions-list"></div>
+                </div>
+                <button id="search-btn">Buscar</button>
+            </div>
+            <div class="info-note">
+                <p>Esta herramienta utiliza datos de la clasificación IRAC (Insecticide Resistance Action Committee) para recomendar ingredientes activos con modos de acción diferentes al ingrediente seleccionado.</p>
+            </div>
+        </section>
+        
+        <section class="results-section" id="results-section">
+            <div class="active-ingredient" id="active-ingredient">
+                <!-- Información del ingrediente activo seleccionado -->
+            </div>
+            
+            <div class="recommendations">
+                <h3>Ingredientes con Modos de Acción Diferentes</h3>
+                <div class="recommendation-grid" id="recommendation-grid">
+                    <!-- Recomendaciones se cargarán aquí -->
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <p>Basado en la clasificación de modos de acción de IRAC (Insecticide Resistance Action Committee)</p>
+        <p>© 2023 - Herramienta para el Manejo Integrado de Plagas</p>
+    </footer>
+
+    <script>
+        // Base de datos de ingredientes activos y sus modos de acción (basado en IRAC)
+        const ingredientsDatabase = [
+            {
+                name: "Imidacloprid",
+                moaCode: "4A",
+                moaGroup: "Neonicotinoides",
+                moaDescription: "Agonistas de receptores de acetilcolina",
+                chemicalGroup: "Neonicotinoides",
+                resistanceRisk: "Alto",
+                commonUses: "Control de insectos chupadores como pulgones, moscas blancas, trips"
+            },
+            {
+                name: "Clorpirifos",
+                moaCode: "1B",
+                moaGroup: "Organofosforados",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Organofosforados",
+                resistanceRisk: "Alto",
+                commonUses: "Control de insectos masticadores y chupadores en múltiples cultivos"
+            },
+            {
+                name: "Lambda-cihalotrina",
+                moaCode: "3A",
+                moaGroup: "Piretroides",
+                moaDescription: "Moduladores de canales de sodio",
+                chemicalGroup: "Piretroides",
+                resistanceRisk: "Moderado a Alto",
+                commonUses: "Amplio espectro contra insectos masticadores y chupadores"
+            },
+            {
+                name: "Abamectina",
+                moaCode: "6",
+                moaGroup: "Avermectinas",
+                moaDescription: "Activadores de canales de cloro",
+                chemicalGroup: "Avermectinas",
+                resistanceRisk: "Moderado",
+                commonUses: "Control de ácaros y minadores de hojas"
+            },
+            {
+                name: "Spinetoram",
+                moaCode: "5",
+                moaGroup: "Spinosinas",
+                moaDescription: "Activadores de receptores de nicotina",
+                chemicalGroup: "Spinosinas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de lepidópteros, trips y minadores"
+            },
+            {
+                name: "Indoxacarb",
+                moaCode: "22A",
+                moaGroup: "Oxadiazinas",
+                moaDescription: "Bloqueadores de canales de sodio",
+                chemicalGroup: "Oxadiazinas",
+                resistanceRisk: "Bajo",
+                commonUses: "Control de lepidópteros en frutales y hortalizas"
+            },
+            {
+                name: "Metomilo",
+                moaCode: "1A",
+                moaGroup: "Carbamatos",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Carbamatos",
+                resistanceRisk: "Alto",
+                commonUses: "Amplio espectro contra insectos en múltiples cultivos"
+            },
+            {
+                name: "Clorantraniliprol",
+                moaCode: "28",
+                moaGroup: "Diamidas",
+                moaDescription: "Activadores de receptores de rianodina",
+                chemicalGroup: "Diamidas antranílicas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de lepidópteros en cultivos extensivos y hortalizas"
+            },
+            {
+                name: "Spinosad",
+                moaCode: "5",
+                moaGroup: "Spinosinas",
+                moaDescription: "Activadores de receptores de nicotina",
+                chemicalGroup: "Spinosinas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de trips, minadores y lepidópteros"
+            },
+            {
+                name: "Tebufenocide",
+                moaCode: "18A",
+                moaGroup: "Diacilhidracinas",
+                moaDescription: "Agonistas de la ecdisona",
+                chemicalGroup: "Diacilhidracinas",
+                resistanceRisk: "Bajo",
+                commonUses: "Control de lepidópteros en frutales y hortalizas"
+            },
+            {
+                name: "Flubendiamida",
+                moaCode: "28",
+                moaGroup: "Diamidas",
+                moaDescription: "Activadores de receptores de rianodina",
+                chemicalGroup: "Diamidas ftálicas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de lepidópteros en cultivos extensivos y hortalizas"
+            },
+            {
+                name: "Pimetrozina",
+                moaCode: "9B",
+                moaGroup: "Pirazoles",
+                moaDescription: "Moduladores de la alimentación de homópteros",
+                chemicalGroup: "Pirazoles",
+                resistanceRisk: "Bajo",
+                commonUses: "Control específico de pulgones y moscas blancas"
+            },
+            {
+                name: "Ciantraniliprol",
+                moaCode: "28",
+                moaGroup: "Diamidas",
+                moaDescription: "Activadores de receptores de rianodina",
+                chemicalGroup: "Diamidas antranílicas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de insectos chupadores y masticadores"
+            },
+            {
+                name: "Tiametoxam",
+                moaCode: "4A",
+                moaGroup: "Neonicotinoides",
+                moaDescription: "Agonistas de receptores de acetilcolina",
+                chemicalGroup: "Neonicotinoides",
+                resistanceRisk: "Alto",
+                commonUses: "Control de insectos chupadores en múltiples cultivos"
+            },
+            {
+                name: "Bifentrina",
+                moaCode: "3A",
+                moaGroup: "Piretroides",
+                moaDescription: "Moduladores de canales de sodio",
+                chemicalGroup: "Piretroides",
+                resistanceRisk: "Moderado a Alto",
+                commonUses: "Control de insectos en cultivos y aplicaciones estructurales"
+            },
+            {
+                name: "Emanectina benzoato",
+                moaCode: "6",
+                moaGroup: "Avermectinas",
+                moaDescription: "Activadores de canales de cloro",
+                chemicalGroup: "Avermectinas",
+                resistanceRisk: "Moderado",
+                commonUses: "Control de lepidópteros y ácaros"
+            },
+            {
+                name: "Lufenuron",
+                moaCode: "15",
+                moaGroup: "Inhibidores de síntesis de quitina",
+                moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+                chemicalGroup: "Benzoylureas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de insectos en estado larval"
+            },
+            {
+                name: "Novaluron",
+                moaCode: "15",
+                moaGroup: "Inhibidores de síntesis de quitina",
+                moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+                chemicalGroup: "Benzoylureas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de lepidópteros y coleópteros"
+            },
+            {
+                name: "Azadiractina",
+                moaCode: "UN",
+                moaGroup: "Antialimentarios",
+                moaDescription: "Moduladores de canales de cloro diversos",
+                chemicalGroup: "Limonoides",
+                resistanceRisk: "Bajo",
+                commonUses: "Control de insectos en agricultura orgánica"
+            },
+            {
+                name: "Piretrinas",
+                moaCode: "3A",
+                moaGroup: "Piretroides",
+                moaDescription: "Moduladores de canales de sodio",
+                chemicalGroup: "Piretrinas naturales",
+                resistanceRisk: "Moderado",
+                commonUses: "Control de insectos en agricultura orgánica y hogar"
+            }
+        ];
+
+        // Elementos del DOM
+        const searchInput = document.getElementById('ingredient-search');
+        const searchBtn = document.getElementById('search-btn');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const resultsSection = document.getElementById('results-section');
+        const activeIngredientDiv = document.getElementById('active-ingredient');
+        const recommendationGrid = document.getElementById('recommendation-grid');
+
+        // Mostrar sugerencias al escribir
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            suggestionsList.innerHTML = '';
+            
+            if (query.length < 2) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+            
+            const matches = ingredientsDatabase.filter(ingredient => 
+                ingredient.name.toLowerCase().includes(query)
+            );
+            
+            if (matches.length > 0) {
+                matches.forEach(ingredient => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = ingredient.name;
+                    div.addEventListener('click', function() {
+                        searchInput.value = ingredient.name;
+                        suggestionsList.style.display = 'none';
+                        searchIngredient(ingredient.name);
+                    });
+                    suggestionsList.appendChild(div);
+                });
+                suggestionsList.style.display = 'block';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        });
+
+        // Ocultar sugerencias al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+                suggestionsList.style.display = 'none';
+            }
+        });
+
+        // Buscar al hacer clic en el botón
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchIngredient(query);
+            }
+        });
+
+        // Buscar ingrediente y mostrar resultados
+        function searchIngredient(query) {
+            const ingredient = ingredientsDatabase.find(ing => 
+                ing.name.toLowerCase() === query.toLowerCase()
+            );
+            
+            if (!ingredient) {
+                alert('Ingrediente no encontrado. Intente con otro nombre.');
+                return;
+            }
+            
+            // Mostrar información del ingrediente activo
+            displayActiveIngredient(ingredient);
+            
+            // Obtener recomendaciones
+            const recommendations = getRecommendations(ingredient);
+            
+            // Mostrar recomendaciones
+            displayRecommendations(recommendations);
+            
+            // Mostrar sección de resultados
+            resultsSection.style.display = 'block';
+            
+            // Desplazarse a los resultados
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Mostrar información del ingrediente activo
+        function displayActiveIngredient(ingredient) {
+            activeIngredientDiv.innerHTML = `
+                <div class="ingredient-header">
+                    <h2 class="ingredient-name">${ingredient.name}</h2>
+                    <span class="moa-badge">Modo de Acción: ${ingredient.moaCode} - ${ingredient.moaGroup}</span>
+                </div>
+                <div class="ingredient-details">
+                    <div>
+                        <div class="detail-item">
+                            <span class="detail-label">Grupo Químico:</span> ${ingredient.chemicalGroup}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Riesgo de Resistencia:</span> ${ingredient.resistanceRisk}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="detail-item">
+                            <span class="detail-label">Descripción del MoA:</span> ${ingredient.moaDescription}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Usos Comunes:</span> ${ingredient.commonUses}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Obtener recomendaciones de ingredientes con diferentes modos de acción
+        function getRecommendations(activeIngredient) {
+            // Filtrar ingredientes con diferente modo de acción
+            return ingredientsDatabase.filter(ingredient => 
+                ingredient.moaCode !== activeIngredient.moaCode && 
+                ingredient.name !== activeIngredient.name
+            );
+        }
+
+        // Mostrar recomendaciones
+        function displayRecommendations(recommendations) {
+            if (recommendations.length === 0) {
+                recommendationGrid.innerHTML = `
+                    <div class="no-results">
+                        <p>No se encontraron ingredientes con modos de acción diferentes.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            recommendationGrid.innerHTML = '';
+            
+            recommendations.forEach(ingredient => {
+                const card = document.createElement('div');
+                card.className = 'recommendation-card';
+                card.innerHTML = `
+                    <div class="rec-name">${ingredient.name}</div>
+                    <div class="rec-moa">Modo de Acción: ${ingredient.moaCode} - ${ingredient.moaGroup}</div>
+                    <div class="rec-details">
+                        <p><strong>Grupo Químico:</strong> ${ingredient.chemicalGroup}</p>
+                        <p><strong>Riesgo de Resistencia:</strong> ${ingredient.resistanceRisk}</p>
+                        <p><strong>Descripción:</strong> ${ingredient.moaDescription}</p>
+                        <p><strong>Usos Comunes:</strong> ${ingredient.commonUses}</p>
+                    </div>
+                `;
+                recommendationGrid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
