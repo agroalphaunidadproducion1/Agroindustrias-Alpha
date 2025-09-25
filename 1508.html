@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario - Sistema de Gestión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            background-color: #f5f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 70px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .calendar-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .calendar-day {
+            height: 80px;
+            padding: 8px;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: #e9ecef;
+            transform: scale(1.02);
+        }
+        
+        .delivery-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .day-with-delivery {
+            background-color: #e8f4fc;
+            border: 1px solid var(--primary-color);
+        }
+        
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .document-name {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .selected-day {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .offcanvas {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+        }
+        
+        .offcanvas-body .nav-link {
+            color: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .offcanvas-body .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .offcanvas-body .nav-link.active {
+            background-color: var(--accent-color);
+        }
+        
+        @media (max-width: 768px) {
+            .calendar-day {
+                height: 60px;
+                font-size: 0.8rem;
+            }
+            
+            .document-name {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con menú hamburguesa -->
+    <nav class="navbar navbar-expand-lg header">
+        <div class="container-fluid">
+            <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand text-white mx-auto" href="#">
+                <i class="fas fa-calendar-alt me-2"></i>Calendario de Entregas
+            </a>
+            
+            <!-- Menú offcanvas -->
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú de Navegación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="documentos.html">
+                                <i class="fas fa-file-alt me-2"></i>Documentos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="calendario.html">
+                                <i class="fas fa-calendar-alt me-2"></i>Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-chart-bar me-2"></i>Reportes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-cog me-2"></i>Configuración
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="calendar-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3><i class="fas fa-calendar me-2"></i>Calendario de Entregas</h3>
+                        <div>
+                            <button class="btn btn-outline-primary me-2" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                            <span class="fw-bold" id="currentMonth">Septiembre 2023</span>
+                            <button class="btn btn-outline-primary ms-2" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-header">
+                        <div>Lun</div>
+                        <div>Mar</div>
+                        <div>Mié</div>
+                        <div>Jue</div>
+                        <div>Vie</div>
+                        <div>Sáb</div>
+                        <div>Dom</div>
+                    </div>
+                    
+                    <div class="calendar" id="calendarGrid">
+                        <!-- El calendario se generará dinámicamente con JavaScript -->
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Entregas de Hoy</h5>
+                        <div class="list-group" id="todayDeliveries">
+                            <!-- Las entregas de hoy se generarán dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables para el calendario
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        // Función para formatear fechas
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Función para generar el calendario
+        function generateCalendar(month, year) {
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+            
+            // Primer día del mes
+            const firstDay = new Date(year, month, 1);
+            // Último día del mes
+            const lastDay = new Date(year, month + 1, 0);
+            // Día de la semana del primer día (0 = Domingo, 1 = Lunes, etc.)
+            const firstDayIndex = firstDay.getDay();
+            // Ajustar para que la semana empiece en lunes
+            const adjustedFirstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+            
+            // Días del mes anterior
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            
+            // Generar días del mes anterior
+            for (let i = adjustedFirstDayIndex - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.innerHTML = `<div class="day-number text-muted">${prevMonthLastDay - i}</div>`;
+                calendarGrid.appendChild(day);
+            }
+            
+            // Generar días del mes actual
+            for (let i = 1; i <= lastDay.getDate(); i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.innerHTML = `<div class="day-number">${i}</div>`;
+                
+                // Verificar si hay entregas para este día
+                const currentDay = new Date(year, month, i);
+                const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                
+                // Obtener entregas desde localStorage
+                const deliveries = JSON.parse(localStorage.getItem('deliveries')) || [];
+                const dayDeliveries = deliveries.filter(d => d.date === formattedDate);
+                
+                if (dayDeliveries.length > 0) {
+                    day.classList.add('day-with-delivery');
+                    day.innerHTML += `<div class="document-name">${dayDeliveries[0].document}</div>`;
+                    day.innerHTML += `<span class="delivery-badge"><i class="fas fa-file"></i></span>`;
+                    
+                    // Agregar tooltip con todas las entregas del día
+                    day.title = `Entregas: ${dayDeliveries.map(d => d.document).join(', ')}`;
+                }
+                
+                // Marcar el día actual
+                const today = new Date();
+                if (currentDay.toDateString() === today.toDateString()) {
+                    day.style.backgroundColor = '#d4edda';
+                    day.style.border = '2px solid #28a745';
+                }
+                
+                calendarGrid.appendChild(day);
+            }
+            
+            // Completar con días del siguiente mes para completar la cuadrícula
+            const totalCells = 42; // 6 filas de 7 días
+            const daysInCalendar = adjustedFirstDayIndex + lastDay.getDate();
+            const nextMonthDays = totalCells - daysInCalendar;
+            
+            for (let i = 1; i <= nextMonthDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.innerHTML = `<div class="day-number text-muted">${i}</div>`;
+                calendarGrid.appendChild(day);
+            }
+            
+            // Agregar eventos de clic a los días
+            const calendarDays = document.querySelectorAll('.calendar-day');
+            calendarDays.forEach(day => {
+                day.addEventListener('click', function() {
+                    // Limpiar selección anterior
+                    calendarDays.forEach(d => d.classList.remove('selected-day'));
+                    // Marcar día seleccionado
+                    this.classList.add('selected-day');
+                    
+                    const dayNumber = this.querySelector('.day-number')?.textContent;
+                    if (dayNumber) {
+                        console.log(`Día seleccionado: ${dayNumber}`);
+                    }
+                });
+            });
+        }
+
+        // Función para actualizar las entregas de hoy
+        function updateTodayDeliveries() {
+            const todayDeliveriesContainer = document.getElementById('todayDeliveries');
+            todayDeliveriesContainer.innerHTML = '';
+            
+            const today = new Date();
+            const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            
+            // Obtener entregas desde localStorage
+            const deliveries = JSON.parse(localStorage.getItem('deliveries')) || [];
+            const todayDeliveries = deliveries.filter(d => d.date === formattedToday);
+            
+            if (todayDeliveries.length === 0) {
+                todayDeliveriesContainer.innerHTML = '<p class="text-muted">No hay entregas programadas para hoy.</p>';
+            } else {
+                todayDeliveries.forEach(delivery => {
+                    const deliveryItem = document.createElement('div');
+                    deliveryItem.className = 'list-group-item';
+                    deliveryItem.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">${delivery.document} - ${delivery.department}</h6>
+                            <small>${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2, '0')}</small>
+                        </div>
+                        <p class="mb-1">Entregado por: ${delivery.deliveryPerson}</p>
+                    `;
+                    todayDeliveriesContainer.appendChild(deliveryItem);
+                });
+            }
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generar calendario con el mes actual
+            generateCalendar(currentMonth, currentYear);
+            
+            // Actualizar entregas de hoy
+            updateTodayDeliveries();
+            
+            // Navegación del calendario
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            // Inicializar datos de ejemplo si no existen
+            const deliveries = JSON.parse(localStorage.getItem('deliveries'));
+            if (!deliveries || deliveries.length === 0) {
+                const defaultDeliveries = [
+                    { document: "Registros de Aplicaciones", date: "2023-09-15", department: "Inocuidad", deliveryPerson: "Juan Pérez", receiverPerson: "Ana García" },
+                    { document: "Registros EPP", date: "2023-09-10", department: "Inocuidad", deliveryPerson: "María López", receiverPerson: "Carlos Ruiz" },
+                    { document: "Control de Plagas", date: "2023-09-18", department: "Inocuidad", deliveryPerson: "Pedro Martínez", receiverPerson: "Laura Fernández" },
+                    { document: "Limpieza y Desinfección", date: "2023-09-05", department: "Inocuidad", deliveryPerson: "Sofía Ramírez", receiverPerson: "Miguel Torres" },
+                    { document: "Verificación de Proveedores", date: "2023-09-20", department: "Inocuidad", deliveryPerson: "Elena Vargas", receiverPerson: "Roberto Silva" }
+                ];
+                
+                localStorage.setItem('deliveries', JSON.stringify(defaultDeliveries));
+                updateTodayDeliveries();
+            }
+        });
+    </script>
+</body>
+</html>
