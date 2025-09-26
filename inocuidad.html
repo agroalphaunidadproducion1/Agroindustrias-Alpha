@@ -6,6 +6,8 @@
     <title>Documentos - Sistema de Gestión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --primary-color: #3498db;
@@ -112,6 +114,16 @@
         .offcanvas-body .nav-link.active {
             background-color: var(--accent-color);
         }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
     </style>
 </head>
 <body>
@@ -139,13 +151,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="calendario.html">
+                            <a class="nav-link" href="calerepor.html">
                                 <i class="fas fa-calendar-alt me-2"></i>Calendario
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-chart-bar me-2"></i>Reportes
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                                <i class="fas fa-plus-circle me-2"></i>Agregar Documento
                             </a>
                         </li>
                         <li class="nav-item">
@@ -171,7 +183,12 @@
                     </div>
                     
                     <div class="document-items" id="documentItems">
-                        <!-- Los documentos se cargarán dinámicamente desde localStorage -->
+                        <div class="loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2">Cargando documentos...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,11 +212,11 @@
                     <form id="addDocumentForm">
                         <div class="mb-3">
                             <label for="documentName" class="form-label">Nombre del Documento</label>
-                            <input type="text" class="form-control" id="documentName" placeholder="Ej: Registros de Aplicaciones">
+                            <input type="text" class="form-control" id="documentName" placeholder="Ej: Registros de Aplicaciones" required>
                         </div>
                         <div class="mb-3">
                             <label for="documentDepartment" class="form-label">Departamento</label>
-                            <select class="form-select" id="documentDepartment">
+                            <select class="form-select" id="documentDepartment" required>
                                 <option value="" selected>Seleccionar departamento...</option>
                                 <option value="Inocuidad">Inocuidad</option>
                                 <option value="Producción">Producción</option>
@@ -210,7 +227,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="frequency" class="form-label">Frecuencia de Entrega</label>
-                            <select class="form-select" id="frequency">
+                            <select class="form-select" id="frequency" required>
                                 <option value="" selected>Seleccionar frecuencia...</option>
                                 <option value="Diario">Diario</option>
                                 <option value="Semanal">Semanal</option>
@@ -233,29 +250,60 @@
         </div>
     </div>
 
+    <!-- Modal para registrar entrega -->
+    <div class="modal fade" id="deliveryModal" tabindex="-1" aria-labelledby="deliveryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deliveryModalLabel"><i class="fas fa-truck me-2"></i>Registrar Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deliveryForm">
+                        <input type="hidden" id="deliveryDocId">
+                        <div class="mb-3">
+                            <label for="deliveryDate" class="form-label">Fecha de Entrega</label>
+                            <input type="date" class="form-control" id="deliveryDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="deliveryNotes" class="form-label">Notas (opcional)</label>
+                            <textarea class="form-control" id="deliveryNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveDelivery">Registrar Entrega</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Función para cargar documentos desde localStorage
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Función para cargar documentos desde Firebase
         function loadDocuments() {
-            const documents = JSON.parse(localStorage.getItem('documents')) || [];
             const documentItems = document.getElementById('documentItems');
-            documentItems.innerHTML = '';
+            documentItems.innerHTML = '<div class="loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><p class="mt-2">Cargando documentos...</p></div>';
             
-            if (documents.length === 0) {
-                // Datos de ejemplo si no hay documentos guardados
-                const defaultDocuments = [
-                    { id: 1, name: "Registros de Aplicaciones", department: "Inocuidad", frequency: "Semanal", lastDelivery: "15/09/2023", status: "success" },
-                    { id: 2, name: "Registros EPP", department: "Inocuidad", frequency: "Mensual", lastDelivery: "10/09/2023", status: "warning" },
-                    { id: 3, name: "Control de Plagas", department: "Inocuidad", frequency: "Quincenal", lastDelivery: "18/09/2023", status: "success" },
-                    { id: 4, name: "Limpieza y Desinfección", department: "Inocuidad", frequency: "Diario", lastDelivery: "05/09/2023", status: "danger" },
-                    { id: 5, name: "Verificación de Proveedores", department: "Inocuidad", frequency: "Trimestral", lastDelivery: "20/09/2023", status: "success" }
-                ];
-                
-                localStorage.setItem('documents', JSON.stringify(defaultDocuments));
-                displayDocuments(defaultDocuments);
-            } else {
-                displayDocuments(documents);
-            }
+            database.ref('documents').once('value')
+                .then((snapshot) => {
+                    const documents = snapshot.val();
+                    displayDocuments(documents);
+                })
+                .catch((error) => {
+                    console.error("Error al cargar documentos:", error);
+                    documentItems.innerHTML = '<div class="alert alert-danger">Error al cargar los documentos. Intente nuevamente.</div>';
+                });
         }
         
         // Función para mostrar documentos en la lista
@@ -263,39 +311,162 @@
             const documentItems = document.getElementById('documentItems');
             documentItems.innerHTML = '';
             
-            documents.forEach(doc => {
+            if (!documents || Object.keys(documents).length === 0) {
+                documentItems.innerHTML = '<div class="alert alert-info">No hay documentos registrados. Agregue el primero usando el botón "+".</div>';
+                return;
+            }
+            
+            // Convertir objeto a array
+            const documentsArray = Object.keys(documents).map(key => {
+                return { id: key, ...documents[key] };
+            });
+            
+            documentsArray.forEach(doc => {
+                // Determinar estado del documento
+                const status = calculateStatus(doc);
                 const statusClass = {
                     'success': 'bg-success',
                     'warning': 'bg-warning text-dark',
                     'danger': 'bg-danger'
-                }[doc.status] || 'bg-secondary';
+                }[status] || 'bg-secondary';
                 
                 const documentItem = document.createElement('div');
                 documentItem.className = 'document-item';
                 documentItem.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <h5>${doc.name}</h5>
-                        <span class="badge ${statusClass}">${getStatusText(doc.status)}</span>
+                        <span class="badge ${statusClass}">${getStatusText(status)}</span>
                     </div>
-                    <p class="mb-1">Última entrega: <span class="last-delivery">${doc.lastDelivery}</span></p>
+                    <p class="mb-1">Última entrega: <span class="last-delivery">${doc.lastDelivery || 'Nunca'}</span></p>
                     <p class="mb-1">Departamento: ${doc.department}</p>
                     <p class="mb-1">Frecuencia: ${doc.frequency}</p>
-                    <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal" data-doc-id="${doc.id}">
-                        <i class="fas fa-truck me-1"></i>Registrar Entrega
-                    </button>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <button class="btn-deliver" data-bs-toggle="modal" data-bs-target="#deliveryModal" data-doc-id="${doc.id}">
+                            <i class="fas fa-truck me-1"></i>Registrar Entrega
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-document" data-doc-id="${doc.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 `;
                 documentItems.appendChild(documentItem);
             });
+            
+            // Agregar event listeners para los botones de eliminar
+            document.querySelectorAll('.delete-document').forEach(button => {
+                button.addEventListener('click', function() {
+                    const docId = this.getAttribute('data-doc-id');
+                    deleteDocument(docId);
+                });
+            });
+            
+            // Agregar event listeners para los botones de registrar entrega
+            document.querySelectorAll('.btn-deliver').forEach(button => {
+                button.addEventListener('click', function() {
+                    const docId = this.getAttribute('data-doc-id');
+                    document.getElementById('deliveryDocId').value = docId;
+                    document.getElementById('deliveryDate').valueAsDate = new Date();
+                });
+            });
+        }
+        
+        // Función para calcular el estado del documento
+        function calculateStatus(doc) {
+            if (!doc.lastDelivery) return 'warning';
+            
+            const lastDelivery = new Date(doc.lastDelivery);
+            const today = new Date();
+            const diffTime = Math.abs(today - lastDelivery);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Definir límites según la frecuencia
+            const frequencyLimits = {
+                'Diario': 1,
+                'Semanal': 7,
+                'Quincenal': 15,
+                'Mensual': 30,
+                'Trimestral': 90
+            };
+            
+            const limit = frequencyLimits[doc.frequency] || 30;
+            
+            if (diffDays <= limit) {
+                return 'success';
+            } else if (diffDays <= limit * 1.5) {
+                return 'warning';
+            } else {
+                return 'danger';
+            }
         }
         
         // Función para obtener texto del estado
         function getStatusText(status) {
             const statusMap = {
-                'success': 'Entregado',
-                'warning': 'Pendiente',
+                'success': 'Al día',
+                'warning': 'Próximo a vencer',
                 'danger': 'Atrasado'
             };
             return statusMap[status] || 'Desconocido';
+        }
+        
+        // Función para agregar un documento
+        function addDocument(documentData) {
+            const newDocRef = database.ref('documents').push();
+            newDocRef.set(documentData)
+                .then(() => {
+                    alert('Documento agregado exitosamente');
+                    loadDocuments();
+                })
+                .catch((error) => {
+                    console.error("Error al agregar documento:", error);
+                    alert('Error al agregar el documento. Intente nuevamente.');
+                });
+        }
+        
+        // Función para eliminar un documento
+        function deleteDocument(docId) {
+            if (confirm('¿Está seguro de que desea eliminar este documento?')) {
+                database.ref('documents/' + docId).remove()
+                    .then(() => {
+                        alert('Documento eliminado exitosamente');
+                        loadDocuments();
+                    })
+                    .catch((error) => {
+                        console.error("Error al eliminar documento:", error);
+                        alert('Error al eliminar el documento. Intente nuevamente.');
+                    });
+            }
+        }
+        
+        // Función para registrar una entrega
+        function registerDelivery(docId, deliveryDate, notes) {
+            // Actualizar el documento con la nueva fecha de entrega
+            database.ref('documents/' + docId).update({
+                lastDelivery: deliveryDate
+            })
+            .then(() => {
+                // Registrar la entrega en la tabla de entregas
+                const deliveryData = {
+                    documentId: docId,
+                    deliveryDate: deliveryDate,
+                    notes: notes,
+                    timestamp: new Date().toISOString()
+                };
+                
+                database.ref('deliveries').push(deliveryData)
+                    .then(() => {
+                        alert('Entrega registrada exitosamente');
+                        loadDocuments();
+                    })
+                    .catch((error) => {
+                        console.error("Error al registrar entrega:", error);
+                        alert('Error al registrar la entrega. Intente nuevamente.');
+                    });
+            })
+            .catch((error) => {
+                console.error("Error al actualizar documento:", error);
+                alert('Error al registrar la entrega. Intente nuevamente.');
+            });
         }
         
         // Inicializar la aplicación
@@ -327,37 +498,41 @@
                 const description = document.getElementById('description');
                 
                 if (documentName.value && documentDepartment.value && frequency.value) {
-                    // Obtener documentos existentes
-                    const documents = JSON.parse(localStorage.getItem('documents')) || [];
-                    
                     // Crear nuevo documento
                     const newDocument = {
-                        id: documents.length > 0 ? Math.max(...documents.map(d => d.id)) + 1 : 1,
                         name: documentName.value,
                         department: documentDepartment.value,
                         frequency: frequency.value,
-                        description: description.value,
-                        lastDelivery: 'Nunca',
-                        status: 'warning'
+                        description: description.value
                     };
                     
-                    // Agregar a la lista
-                    documents.push(newDocument);
-                    
-                    // Guardar en localStorage
-                    localStorage.setItem('documents', JSON.stringify(documents));
-                    
-                    // Recargar lista
-                    loadDocuments();
+                    // Agregar a Firebase
+                    addDocument(newDocument);
                     
                     // Cerrar modal y limpiar formulario
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addDocumentModal'));
                     modal.hide();
                     document.getElementById('addDocumentForm').reset();
-                    
-                    alert('Documento agregado exitosamente');
                 } else {
                     alert('Por favor, complete todos los campos obligatorios');
+                }
+            });
+            
+            // Registrar entrega
+            document.getElementById('saveDelivery').addEventListener('click', function() {
+                const docId = document.getElementById('deliveryDocId').value;
+                const deliveryDate = document.getElementById('deliveryDate').value;
+                const notes = document.getElementById('deliveryNotes').value;
+                
+                if (docId && deliveryDate) {
+                    registerDelivery(docId, deliveryDate, notes);
+                    
+                    // Cerrar modal y limpiar formulario
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deliveryModal'));
+                    modal.hide();
+                    document.getElementById('deliveryForm').reset();
+                } else {
+                    alert('Por favor, complete la fecha de entrega');
                 }
             });
         });
