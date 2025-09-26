@@ -174,6 +174,7 @@
         .delivery-item {
             border-left: 4px solid var(--primary-color);
             margin-bottom: 10px;
+            position: relative;
         }
         
         .filter-section {
@@ -181,6 +182,36 @@
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 20px;
+        }
+        
+        .btn-options {
+            background: transparent;
+            border: none;
+            color: var(--dark-color);
+            font-size: 14px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-options:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .dropdown-menu {
+            min-width: auto;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .dropdown-toggle::after {
+            display: none;
+        }
+        
+        .delivery-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
         
         @media (max-width: 768px) {
@@ -200,6 +231,15 @@
             .calendar-header div {
                 font-size: 0.9rem;
             }
+            
+            .delivery-actions {
+                position: static;
+                margin-top: 10px;
+            }
+            
+            .delivery-item .d-flex {
+                flex-direction: column;
+            }
         }
         
         @media (max-width: 576px) {
@@ -214,6 +254,24 @@
             
             .day-number {
                 font-size: 11px;
+            }
+            
+            .filter-section .row {
+                flex-direction: column;
+            }
+            
+            .filter-section .col-md-6 {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .d-flex.justify-content-between > div {
+                margin-top: 10px;
             }
         }
         
@@ -248,7 +306,7 @@
                 <div class="offcanvas-body">
                     <ul class="navbar-nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="inocuidad.html.html">
+                            <a class="nav-link" href="inocuidad.html">
                                 <i class="fas fa-file-alt me-2"></i>Documentos
                             </a>
                         </li>
@@ -354,6 +412,35 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar entrega -->
+    <div class="modal fade" id="editDeliveryModal" tabindex="-1" aria-labelledby="editDeliveryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDeliveryModalLabel"><i class="fas fa-edit me-2"></i>Editar Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDeliveryForm">
+                        <input type="hidden" id="editDeliveryId">
+                        <div class="mb-3">
+                            <label for="editDeliveryDate" class="form-label">Fecha de Entrega</label>
+                            <input type="date" class="form-control" id="editDeliveryDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDeliveryNotes" class="form-label">Notas</label>
+                            <textarea class="form-control" id="editDeliveryNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveEditDelivery">Guardar Cambios</button>
                 </div>
             </div>
         </div>
@@ -569,6 +656,7 @@
                                         <p class="mb-1"><strong>Departamento:</strong> ${documentInfo.department}</p>
                                         <p class="mb-1"><strong>Frecuencia:</strong> ${documentInfo.frequency}</p>
                                         ${delivery.notes ? `<p class="mb-1"><strong>Notas:</strong> ${delivery.notes}</p>` : ''}
+                                        <p class="mb-1"><small class="text-muted">ID: ${delivery.id}</small></p>
                                     </div>
                                     <span class="badge bg-primary">${documentInfo.frequency}</span>
                                 </div>
@@ -614,12 +702,81 @@
                                     <p class="mb-1"><strong>Hora de entrega:</strong> ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
                                     ${delivery.notes ? `<p class="mb-1"><strong>Notas:</strong> ${delivery.notes}</p>` : ''}
                                 </div>
-                                <span class="badge bg-primary">${documentInfo.frequency}</span>
+                                <div class="delivery-actions">
+                                    <div class="dropdown">
+                                        <button class="btn-options dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item edit-delivery" href="#" data-delivery-id="${delivery.id}"><i class="fas fa-edit me-2"></i>Editar</a></li>
+                                            <li><a class="dropdown-item delete-delivery" href="#" data-delivery-id="${delivery.id}"><i class="fas fa-trash me-2"></i>Eliminar</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         `;
                         todayDeliveriesContainer.appendChild(deliveryItem);
                     }
                 }
+                
+                // Agregar event listeners para los botones de eliminar
+                document.querySelectorAll('.delete-delivery').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const deliveryId = this.getAttribute('data-delivery-id');
+                        deleteDelivery(deliveryId);
+                    });
+                });
+                
+                // Agregar event listeners para los botones de editar
+                document.querySelectorAll('.edit-delivery').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const deliveryId = this.getAttribute('data-delivery-id');
+                        loadDeliveryForEdit(deliveryId);
+                    });
+                });
+            }
+        }
+
+        // Función para cargar entrega para edición
+        function loadDeliveryForEdit(deliveryId) {
+            const delivery = deliveriesData[deliveryId];
+            if (delivery) {
+                document.getElementById('editDeliveryId').value = deliveryId;
+                document.getElementById('editDeliveryDate').value = delivery.deliveryDate;
+                document.getElementById('editDeliveryNotes').value = delivery.notes || '';
+                
+                const editModal = new bootstrap.Modal(document.getElementById('editDeliveryModal'));
+                editModal.show();
+            }
+        }
+
+        // Función para editar una entrega
+        function editDelivery(deliveryId, deliveryData) {
+            database.ref('deliveries/' + deliveryId).update(deliveryData)
+                .then(() => {
+                    alert('Entrega actualizada exitosamente');
+                    loadData(); // Recargar datos
+                })
+                .catch((error) => {
+                    console.error("Error al editar entrega:", error);
+                    alert('Error al editar la entrega. Intente nuevamente.');
+                });
+        }
+
+        // Función para eliminar una entrega
+        function deleteDelivery(deliveryId) {
+            if (confirm('¿Está seguro de que desea eliminar esta entrega?')) {
+                database.ref('deliveries/' + deliveryId).remove()
+                    .then(() => {
+                        alert('Entrega eliminada exitosamente');
+                        loadData(); // Recargar datos
+                    })
+                    .catch((error) => {
+                        console.error("Error al eliminar entrega:", error);
+                        alert('Error al eliminar la entrega. Intente nuevamente.');
+                    });
             }
         }
 
@@ -659,6 +816,28 @@
                 selectedDepartment = this.value;
                 generateCalendar(currentMonth, currentYear);
                 updateTodayDeliveries();
+            });
+            
+            // Guardar edición de entrega
+            document.getElementById('saveEditDelivery').addEventListener('click', function() {
+                const deliveryId = document.getElementById('editDeliveryId').value;
+                const deliveryDate = document.getElementById('editDeliveryDate').value;
+                const notes = document.getElementById('editDeliveryNotes').value;
+                
+                if (deliveryId && deliveryDate) {
+                    const deliveryData = {
+                        deliveryDate: deliveryDate,
+                        notes: notes
+                    };
+                    
+                    editDelivery(deliveryId, deliveryData);
+                    
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editDeliveryModal'));
+                    modal.hide();
+                } else {
+                    alert('Por favor, complete la fecha de entrega');
+                }
             });
         });
     </script>
