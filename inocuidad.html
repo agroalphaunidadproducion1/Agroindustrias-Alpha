@@ -10,22 +10,25 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --accent-color: #e74c3c;
+            --primary-color: #1a5d1a;
+            --secondary-color: #2d5016;
+            --accent-color: #4a7c59;
             --light-color: #f8f9fa;
-            --dark-color: #343a40;
+            --dark-color: #1a331c;
+            --text-light: #e8f5e9;
+            --text-dark: #1a331c;
         }
         
         body {
             background-color: #f5f7f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding-top: 70px;
+            color: var(--text-dark);
         }
         
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            color: var(--text-light);
             padding: 15px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             position: fixed;
@@ -43,32 +46,32 @@
         }
         
         .document-item {
-            padding: 12px 15px;
+            padding: 15px;
             border-left: 4px solid var(--primary-color);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             background-color: var(--light-color);
-            border-radius: 4px;
+            border-radius: 6px;
             transition: all 0.3s ease;
             position: relative;
         }
         
         .document-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         }
         
         .btn-deliver {
             background-color: var(--accent-color);
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 14px;
             transition: all 0.3s ease;
         }
         
         .btn-deliver:hover {
-            background-color: #c0392b;
+            background-color: #3a6347;
             transform: translateY(-2px);
         }
         
@@ -79,12 +82,12 @@
         
         .offcanvas {
             background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            color: white;
+            color: var(--text-light);
         }
         
         .offcanvas-body .nav-link {
-            color: white;
-            padding: 10px 15px;
+            color: var(--text-light);
+            padding: 12px 15px;
             margin: 5px 0;
             border-radius: 5px;
             transition: all 0.3s ease;
@@ -110,6 +113,8 @@
         
         .dropdown-menu {
             min-width: auto;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .dropdown-toggle::after {
@@ -130,23 +135,119 @@
             background-color: rgba(0,0,0,0.1);
         }
         
-        .btn-add {
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.6em;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+            }
+            
+            .document-list {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .document-item {
+                padding: 12px;
+            }
+            
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+            
+            .btn-deliver {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .document-item .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .document-item .d-flex .me-2 {
+                margin-right: 0 !important;
+                margin-bottom: 10px;
+            }
+            
+            .dropdown {
+                align-self: flex-end;
+                margin-top: -40px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .document-list {
+                padding: 10px;
+            }
+            
+            .document-item h5 {
+                font-size: 1.1rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .input-group .btn {
+                margin-top: 10px;
+                border-radius: 4px;
+                width: 100%;
+            }
+        }
+        
+        /* Estilos para el modal */
+        .modal-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            z-index: 100;
-            display: none; /* Oculto porque ahora está en el menú */
+            color: var(--text-light);
+        }
+        
+        .modal-footer .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .modal-footer .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        /* Mejoras visuales adicionales */
+        .document-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .document-info p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .document-info {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -203,7 +304,7 @@
                     
                     <div class="input-group mb-4">
                         <input type="text" class="form-control" placeholder="Buscar documento..." id="searchDocument">
-                        <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                        <button class="btn btn-primary"><i class="fas fa-search"></i> Buscar</button>
                     </div>
                     
                     <div class="document-items" id="documentItems">
@@ -410,7 +511,7 @@
                 documentItem.className = 'document-item';
                 documentItem.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5>${doc.name}</h5>
+                        <h5 class="mb-0">${doc.name}</h5>
                         <div class="d-flex align-items-center">
                             <span class="badge ${statusClass} me-2">${getStatusText(status)}</span>
                             <div class="dropdown">
@@ -424,10 +525,12 @@
                             </div>
                         </div>
                     </div>
-                    <p class="mb-1">Última entrega: <span class="last-delivery">${doc.lastDelivery || 'Nunca'}</span></p>
-                    <p class="mb-1">Departamento: ${doc.department}</p>
-                    <p class="mb-1">Frecuencia: ${doc.frequency}</p>
-                    ${doc.description ? `<p class="mb-1">Descripción: ${doc.description}</p>` : ''}
+                    <div class="document-info">
+                        <p class="mb-1"><strong>Última entrega:</strong> <span class="last-delivery">${doc.lastDelivery || 'Nunca'}</span></p>
+                        <p class="mb-1"><strong>Departamento:</strong> ${doc.department}</p>
+                        <p class="mb-1"><strong>Frecuencia:</strong> ${doc.frequency}</p>
+                        ${doc.description ? `<p class="mb-1"><strong>Descripción:</strong> ${doc.description}</p>` : ''}
+                    </div>
                     <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal" data-doc-id="${doc.id}">
                         <i class="fas fa-truck me-1"></i>Registrar Entrega
                     </button>
