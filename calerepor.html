@@ -6,24 +6,29 @@
     <title>Calendario - Sistema de Gestión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --accent-color: #e74c3c;
+            --primary-color: #1a5d1a;
+            --secondary-color: #2d5016;
+            --accent-color: #4a7c59;
             --light-color: #f8f9fa;
-            --dark-color: #343a40;
+            --dark-color: #1a331c;
+            --text-light: #e8f5e9;
+            --text-dark: #1a331c;
         }
         
         body {
             background-color: #f5f7f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding-top: 70px;
+            color: var(--text-dark);
         }
         
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            color: var(--text-light);
             padding: 15px 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             position: fixed;
@@ -57,13 +62,14 @@
         }
         
         .calendar-day {
-            height: 80px;
+            height: 100px;
             padding: 8px;
             border-radius: 6px;
             background-color: #f8f9fa;
             position: relative;
             cursor: pointer;
             transition: all 0.2s ease;
+            border: 1px solid #e9ecef;
         }
         
         .calendar-day:hover {
@@ -94,13 +100,23 @@
         .day-number {
             font-weight: bold;
             margin-bottom: 5px;
+            font-size: 14px;
         }
         
         .document-name {
-            font-size: 12px;
+            font-size: 11px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .document-icon {
+            margin-right: 4px;
+            color: var(--primary-color);
+            font-size: 10px;
         }
         
         .selected-day {
@@ -134,15 +150,81 @@
             background-color: var(--accent-color);
         }
         
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .delivery-item {
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 768px) {
             .calendar-day {
-                height: 60px;
+                height: 80px;
                 font-size: 0.8rem;
             }
             
             .document-name {
-                font-size: 10px;
+                font-size: 9px;
             }
+            
+            .day-number {
+                font-size: 12px;
+            }
+            
+            .calendar-header div {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .calendar-day {
+                height: 70px;
+                padding: 4px;
+            }
+            
+            .document-name {
+                display: none;
+            }
+            
+            .day-number {
+                font-size: 11px;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
         }
     </style>
 </head>
@@ -204,6 +286,31 @@
                         </div>
                     </div>
                     
+                    <!-- Filtro por departamento -->
+                    <div class="filter-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="departmentFilter" class="form-label">Filtrar por departamento:</label>
+                                <select class="form-select" id="departmentFilter">
+                                    <option value="all">Todos los departamentos</option>
+                                    <option value="Inocuidad">Inocuidad</option>
+                                    <option value="Producción">Producción</option>
+                                    <option value="Unidad de Producción 1">Unidad de Producción 1</option>
+                                    <option value="Unidad de Producción 2">Unidad de Producción 2</option>
+                                    <option value="Unidad de Producción 3">Unidad de Producción 3</option>
+                                    <option value="Almacén">Almacén</option>
+                                    <option value="Calidad">Calidad</option>
+                                    <option value="Logística">Logística</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button class="btn btn-primary" id="applyFilter">
+                                    <i class="fas fa-filter me-1"></i> Aplicar Filtro
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="calendar-header">
                         <div>Lun</div>
                         <div>Mar</div>
@@ -215,11 +322,16 @@
                     </div>
                     
                     <div class="calendar" id="calendarGrid">
-                        <!-- El calendario se generará dinámicamente con JavaScript -->
+                        <div class="loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2">Cargando calendario...</p>
+                        </div>
                     </div>
                     
                     <div class="mt-4">
-                        <h5>Entregas de Hoy</h5>
+                        <h5><i class="fas fa-truck me-2"></i>Entregas de Hoy</h5>
                         <div class="list-group" id="todayDeliveries">
                             <!-- Las entregas de hoy se generarán dinámicamente -->
                         </div>
@@ -229,19 +341,67 @@
         </div>
     </div>
 
+    <!-- Modal para ver detalles de entrega -->
+    <div class="modal fade" id="deliveryDetailsModal" tabindex="-1" aria-labelledby="deliveryDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deliveryDetailsModalLabel"><i class="fas fa-file-alt me-2"></i>Detalles de Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="deliveryDetailsContent">
+                    <!-- Los detalles se cargarán dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
         // Variables para el calendario
         let currentDate = new Date();
         let currentMonth = currentDate.getMonth();
         let currentYear = currentDate.getFullYear();
+        let selectedDepartment = 'all';
+        let deliveriesData = [];
+        let documentsData = [];
 
-        // Función para formatear fechas
-        function formatDate(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+        // Función para cargar datos desde Firebase
+        function loadData() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '<div class="loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><p class="mt-2">Cargando datos...</p></div>';
+            
+            // Cargar entregas
+            database.ref('deliveries').once('value')
+                .then((deliveriesSnapshot) => {
+                    deliveriesData = deliveriesSnapshot.val() || {};
+                    
+                    // Cargar documentos
+                    return database.ref('documents').once('value');
+                })
+                .then((documentsSnapshot) => {
+                    documentsData = documentsSnapshot.val() || {};
+                    
+                    // Generar calendario con los datos cargados
+                    generateCalendar(currentMonth, currentYear);
+                    updateTodayDeliveries();
+                })
+                .catch((error) => {
+                    console.error("Error al cargar datos:", error);
+                    calendarGrid.innerHTML = '<div class="alert alert-danger">Error al cargar los datos. Intente nuevamente.</div>';
+                });
         }
 
         // Función para generar el calendario
@@ -269,8 +429,8 @@
             // Generar días del mes anterior
             for (let i = adjustedFirstDayIndex - 1; i >= 0; i--) {
                 const day = document.createElement('div');
-                day.className = 'calendar-day';
-                day.innerHTML = `<div class="day-number text-muted">${prevMonthLastDay - i}</div>`;
+                day.className = 'calendar-day text-muted';
+                day.innerHTML = `<div class="day-number">${prevMonthLastDay - i}</div>`;
                 calendarGrid.appendChild(day);
             }
             
@@ -284,17 +444,43 @@
                 const currentDay = new Date(year, month, i);
                 const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 
-                // Obtener entregas desde localStorage
-                const deliveries = JSON.parse(localStorage.getItem('deliveries')) || [];
-                const dayDeliveries = deliveries.filter(d => d.date === formattedDate);
+                // Obtener entregas para este día
+                const dayDeliveries = getDeliveriesForDate(formattedDate);
                 
                 if (dayDeliveries.length > 0) {
                     day.classList.add('day-with-delivery');
-                    day.innerHTML += `<div class="document-name">${dayDeliveries[0].document}</div>`;
-                    day.innerHTML += `<span class="delivery-badge"><i class="fas fa-file"></i></span>`;
                     
-                    // Agregar tooltip con todas las entregas del día
-                    day.title = `Entregas: ${dayDeliveries.map(d => d.document).join(', ')}`;
+                    // Mostrar hasta 3 documentos en el día
+                    let documentsHTML = '';
+                    const maxDocuments = 3;
+                    let documentCount = 0;
+                    
+                    for (const delivery of dayDeliveries) {
+                        if (documentCount >= maxDocuments) break;
+                        
+                        const documentInfo = getDocumentInfo(delivery.documentId);
+                        if (documentInfo) {
+                            documentsHTML += `
+                                <div class="document-name">
+                                    <i class="fas fa-file document-icon"></i>${documentInfo.name}
+                                </div>
+                            `;
+                            documentCount++;
+                        }
+                    }
+                    
+                    // Si hay más de 3 documentos, mostrar indicador
+                    if (dayDeliveries.length > maxDocuments) {
+                        documentsHTML += `<div class="document-name text-muted">+${dayDeliveries.length - maxDocuments} más</div>`;
+                    }
+                    
+                    day.innerHTML += documentsHTML;
+                    day.innerHTML += `<span class="delivery-badge">${dayDeliveries.length}</span>`;
+                    
+                    // Agregar evento para mostrar detalles
+                    day.addEventListener('click', function() {
+                        showDeliveryDetails(formattedDate, dayDeliveries);
+                    });
                 }
                 
                 // Marcar el día actual
@@ -314,26 +500,90 @@
             
             for (let i = 1; i <= nextMonthDays; i++) {
                 const day = document.createElement('div');
-                day.className = 'calendar-day';
-                day.innerHTML = `<div class="day-number text-muted">${i}</div>`;
+                day.className = 'calendar-day text-muted';
+                day.innerHTML = `<div class="day-number">${i}</div>`;
                 calendarGrid.appendChild(day);
             }
+        }
+
+        // Función para obtener entregas para una fecha específica
+        function getDeliveriesForDate(date) {
+            const deliveries = [];
             
-            // Agregar eventos de clic a los días
-            const calendarDays = document.querySelectorAll('.calendar-day');
-            calendarDays.forEach(day => {
-                day.addEventListener('click', function() {
-                    // Limpiar selección anterior
-                    calendarDays.forEach(d => d.classList.remove('selected-day'));
-                    // Marcar día seleccionado
-                    this.classList.add('selected-day');
-                    
-                    const dayNumber = this.querySelector('.day-number')?.textContent;
-                    if (dayNumber) {
-                        console.log(`Día seleccionado: ${dayNumber}`);
-                    }
-                });
+            // Convertir objeto de entregas a array
+            const deliveriesArray = Object.keys(deliveriesData).map(key => {
+                return { id: key, ...deliveriesData[key] };
             });
+            
+            for (const delivery of deliveriesArray) {
+                if (delivery.deliveryDate === date) {
+                    // Verificar filtro de departamento
+                    const documentInfo = getDocumentInfo(delivery.documentId);
+                    if (documentInfo && 
+                        (selectedDepartment === 'all' || documentInfo.department === selectedDepartment)) {
+                        deliveries.push(delivery);
+                    }
+                }
+            }
+            
+            return deliveries;
+        }
+
+        // Función para obtener información de un documento por ID
+        function getDocumentInfo(documentId) {
+            if (documentsData[documentId]) {
+                return { id: documentId, ...documentsData[documentId] };
+            }
+            return null;
+        }
+
+        // Función para mostrar detalles de entrega en un modal
+        function showDeliveryDetails(date, deliveries) {
+            const modalContent = document.getElementById('deliveryDetailsContent');
+            modalContent.innerHTML = '';
+            
+            const dateObj = new Date(date);
+            const formattedDate = dateObj.toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            let detailsHTML = `<h6>Entregas para ${formattedDate}</h6>`;
+            
+            if (deliveries.length === 0) {
+                detailsHTML += '<p class="text-muted">No hay entregas para esta fecha.</p>';
+            } else {
+                detailsHTML += '<div class="list-group mt-3">';
+                
+                for (const delivery of deliveries) {
+                    const documentInfo = getDocumentInfo(delivery.documentId);
+                    
+                    if (documentInfo) {
+                        detailsHTML += `
+                            <div class="list-group-item delivery-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">${documentInfo.name}</h6>
+                                        <p class="mb-1"><strong>Departamento:</strong> ${documentInfo.department}</p>
+                                        <p class="mb-1"><strong>Frecuencia:</strong> ${documentInfo.frequency}</p>
+                                        ${delivery.notes ? `<p class="mb-1"><strong>Notas:</strong> ${delivery.notes}</p>` : ''}
+                                    </div>
+                                    <span class="badge bg-primary">${documentInfo.frequency}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                detailsHTML += '</div>';
+            }
+            
+            modalContent.innerHTML = detailsHTML;
+            
+            const modal = new bootstrap.Modal(document.getElementById('deliveryDetailsModal'));
+            modal.show();
         }
 
         // Función para actualizar las entregas de hoy
@@ -344,35 +594,39 @@
             const today = new Date();
             const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             
-            // Obtener entregas desde localStorage
-            const deliveries = JSON.parse(localStorage.getItem('deliveries')) || [];
-            const todayDeliveries = deliveries.filter(d => d.date === formattedToday);
+            // Obtener entregas para hoy
+            const todayDeliveries = getDeliveriesForDate(formattedToday);
             
             if (todayDeliveries.length === 0) {
                 todayDeliveriesContainer.innerHTML = '<p class="text-muted">No hay entregas programadas para hoy.</p>';
             } else {
-                todayDeliveries.forEach(delivery => {
-                    const deliveryItem = document.createElement('div');
-                    deliveryItem.className = 'list-group-item';
-                    deliveryItem.innerHTML = `
-                        <div class="d-flex justify-content-between">
-                            <h6 class="mb-1">${delivery.document} - ${delivery.department}</h6>
-                            <small>${new Date().getHours()}:${String(new Date().getMinutes()).padStart(2, '0')}</small>
-                        </div>
-                        <p class="mb-1">Entregado por: ${delivery.deliveryPerson}</p>
-                    `;
-                    todayDeliveriesContainer.appendChild(deliveryItem);
-                });
+                for (const delivery of todayDeliveries) {
+                    const documentInfo = getDocumentInfo(delivery.documentId);
+                    
+                    if (documentInfo) {
+                        const deliveryItem = document.createElement('div');
+                        deliveryItem.className = 'list-group-item delivery-item';
+                        deliveryItem.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">${documentInfo.name}</h6>
+                                    <p class="mb-1"><strong>Departamento:</strong> ${documentInfo.department}</p>
+                                    <p class="mb-1"><strong>Hora de entrega:</strong> ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
+                                    ${delivery.notes ? `<p class="mb-1"><strong>Notas:</strong> ${delivery.notes}</p>` : ''}
+                                </div>
+                                <span class="badge bg-primary">${documentInfo.frequency}</span>
+                            </div>
+                        `;
+                        todayDeliveriesContainer.appendChild(deliveryItem);
+                    }
+                }
             }
         }
 
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
-            // Generar calendario con el mes actual
-            generateCalendar(currentMonth, currentYear);
-            
-            // Actualizar entregas de hoy
-            updateTodayDeliveries();
+            // Cargar datos desde Firebase
+            loadData();
             
             // Navegación del calendario
             document.getElementById('prevMonth').addEventListener('click', function() {
@@ -393,20 +647,19 @@
                 generateCalendar(currentMonth, currentYear);
             });
             
-            // Inicializar datos de ejemplo si no existen
-            const deliveries = JSON.parse(localStorage.getItem('deliveries'));
-            if (!deliveries || deliveries.length === 0) {
-                const defaultDeliveries = [
-                    { document: "Registros de Aplicaciones", date: "2023-09-15", department: "Inocuidad", deliveryPerson: "Juan Pérez", receiverPerson: "Ana García" },
-                    { document: "Registros EPP", date: "2023-09-10", department: "Inocuidad", deliveryPerson: "María López", receiverPerson: "Carlos Ruiz" },
-                    { document: "Control de Plagas", date: "2023-09-18", department: "Inocuidad", deliveryPerson: "Pedro Martínez", receiverPerson: "Laura Fernández" },
-                    { document: "Limpieza y Desinfección", date: "2023-09-05", department: "Inocuidad", deliveryPerson: "Sofía Ramírez", receiverPerson: "Miguel Torres" },
-                    { document: "Verificación de Proveedores", date: "2023-09-20", department: "Inocuidad", deliveryPerson: "Elena Vargas", receiverPerson: "Roberto Silva" }
-                ];
-                
-                localStorage.setItem('deliveries', JSON.stringify(defaultDeliveries));
+            // Aplicar filtro
+            document.getElementById('applyFilter').addEventListener('click', function() {
+                selectedDepartment = document.getElementById('departmentFilter').value;
+                generateCalendar(currentMonth, currentYear);
                 updateTodayDeliveries();
-            }
+            });
+            
+            // Aplicar filtro al cambiar selección
+            document.getElementById('departmentFilter').addEventListener('change', function() {
+                selectedDepartment = this.value;
+                generateCalendar(currentMonth, currentYear);
+                updateTodayDeliveries();
+            });
         });
     </script>
 </body>
