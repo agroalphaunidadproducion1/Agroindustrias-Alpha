@@ -49,6 +49,7 @@
             background-color: var(--light-color);
             border-radius: 4px;
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .document-item:hover {
@@ -69,24 +70,6 @@
         .btn-deliver:hover {
             background-color: #c0392b;
             transform: translateY(-2px);
-        }
-        
-        .btn-add {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            z-index: 100;
         }
         
         .navbar-brand {
@@ -123,6 +106,47 @@
         .spinner-border {
             width: 3rem;
             height: 3rem;
+        }
+        
+        .dropdown-menu {
+            min-width: auto;
+        }
+        
+        .dropdown-toggle::after {
+            display: none;
+        }
+        
+        .btn-options {
+            background: transparent;
+            border: none;
+            color: var(--dark-color);
+            font-size: 16px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-options:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 100;
+            display: none; /* Oculto porque ahora está en el menú */
         }
     </style>
 </head>
@@ -195,11 +219,6 @@
         </div>
     </div>
     
-    <!-- Botón flotante para agregar documento -->
-    <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
-        <i class="fas fa-plus"></i>
-    </button>
-    
     <!-- Modal para agregar documento -->
     <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -220,6 +239,9 @@
                                 <option value="" selected>Seleccionar departamento...</option>
                                 <option value="Inocuidad">Inocuidad</option>
                                 <option value="Producción">Producción</option>
+                                <option value="Unidad de Producción 1">Unidad de Producción 1</option>
+                                <option value="Unidad de Producción 2">Unidad de Producción 2</option>
+                                <option value="Unidad de Producción 3">Unidad de Producción 3</option>
                                 <option value="Almacén">Almacén</option>
                                 <option value="Calidad">Calidad</option>
                                 <option value="Logística">Logística</option>
@@ -245,6 +267,60 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="addDocument">Agregar Documento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar documento -->
+    <div class="modal fade" id="editDocumentModal" tabindex="-1" aria-labelledby="editDocumentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDocumentModalLabel"><i class="fas fa-edit me-2"></i>Editar Documento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDocumentForm">
+                        <input type="hidden" id="editDocumentId">
+                        <div class="mb-3">
+                            <label for="editDocumentName" class="form-label">Nombre del Documento</label>
+                            <input type="text" class="form-control" id="editDocumentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDocumentDepartment" class="form-label">Departamento</label>
+                            <select class="form-select" id="editDocumentDepartment" required>
+                                <option value="" selected>Seleccionar departamento...</option>
+                                <option value="Inocuidad">Inocuidad</option>
+                                <option value="Producción">Producción</option>
+                                <option value="Unidad de Producción 1">Unidad de Producción 1</option>
+                                <option value="Unidad de Producción 2">Unidad de Producción 2</option>
+                                <option value="Unidad de Producción 3">Unidad de Producción 3</option>
+                                <option value="Almacén">Almacén</option>
+                                <option value="Calidad">Calidad</option>
+                                <option value="Logística">Logística</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editFrequency" class="form-label">Frecuencia de Entrega</label>
+                            <select class="form-select" id="editFrequency" required>
+                                <option value="" selected>Seleccionar frecuencia...</option>
+                                <option value="Diario">Diario</option>
+                                <option value="Semanal">Semanal</option>
+                                <option value="Quincenal">Quincenal</option>
+                                <option value="Mensual">Mensual</option>
+                                <option value="Trimestral">Trimestral</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDescription" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="editDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveEditDocument">Guardar Cambios</button>
                 </div>
             </div>
         </div>
@@ -312,7 +388,7 @@
             documentItems.innerHTML = '';
             
             if (!documents || Object.keys(documents).length === 0) {
-                documentItems.innerHTML = '<div class="alert alert-info">No hay documentos registrados. Agregue el primero usando el botón "+".</div>';
+                documentItems.innerHTML = '<div class="alert alert-info">No hay documentos registrados. Agregue el primero usando el menú lateral.</div>';
                 return;
             }
             
@@ -335,28 +411,45 @@
                 documentItem.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <h5>${doc.name}</h5>
-                        <span class="badge ${statusClass}">${getStatusText(status)}</span>
+                        <div class="d-flex align-items-center">
+                            <span class="badge ${statusClass} me-2">${getStatusText(status)}</span>
+                            <div class="dropdown">
+                                <button class="btn-options dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item edit-document" href="#" data-doc-id="${doc.id}"><i class="fas fa-edit me-2"></i>Editar</a></li>
+                                    <li><a class="dropdown-item delete-document" href="#" data-doc-id="${doc.id}"><i class="fas fa-trash me-2"></i>Eliminar</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <p class="mb-1">Última entrega: <span class="last-delivery">${doc.lastDelivery || 'Nunca'}</span></p>
                     <p class="mb-1">Departamento: ${doc.department}</p>
                     <p class="mb-1">Frecuencia: ${doc.frequency}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <button class="btn-deliver" data-bs-toggle="modal" data-bs-target="#deliveryModal" data-doc-id="${doc.id}">
-                            <i class="fas fa-truck me-1"></i>Registrar Entrega
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger delete-document" data-doc-id="${doc.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
+                    ${doc.description ? `<p class="mb-1">Descripción: ${doc.description}</p>` : ''}
+                    <button class="btn-deliver mt-2" data-bs-toggle="modal" data-bs-target="#deliveryModal" data-doc-id="${doc.id}">
+                        <i class="fas fa-truck me-1"></i>Registrar Entrega
+                    </button>
                 `;
                 documentItems.appendChild(documentItem);
             });
             
             // Agregar event listeners para los botones de eliminar
             document.querySelectorAll('.delete-document').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const docId = this.getAttribute('data-doc-id');
                     deleteDocument(docId);
+                });
+            });
+            
+            // Agregar event listeners para los botones de editar
+            document.querySelectorAll('.edit-document').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const docId = this.getAttribute('data-doc-id');
+                    loadDocumentForEdit(docId);
                 });
             });
             
@@ -368,6 +461,28 @@
                     document.getElementById('deliveryDate').valueAsDate = new Date();
                 });
             });
+        }
+        
+        // Función para cargar documento para edición
+        function loadDocumentForEdit(docId) {
+            database.ref('documents/' + docId).once('value')
+                .then((snapshot) => {
+                    const doc = snapshot.val();
+                    if (doc) {
+                        document.getElementById('editDocumentId').value = docId;
+                        document.getElementById('editDocumentName').value = doc.name;
+                        document.getElementById('editDocumentDepartment').value = doc.department;
+                        document.getElementById('editFrequency').value = doc.frequency;
+                        document.getElementById('editDescription').value = doc.description || '';
+                        
+                        const editModal = new bootstrap.Modal(document.getElementById('editDocumentModal'));
+                        editModal.show();
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error al cargar documento para edición:", error);
+                    alert('Error al cargar el documento. Intente nuevamente.');
+                });
         }
         
         // Función para calcular el estado del documento
@@ -420,6 +535,19 @@
                 .catch((error) => {
                     console.error("Error al agregar documento:", error);
                     alert('Error al agregar el documento. Intente nuevamente.');
+                });
+        }
+        
+        // Función para editar un documento
+        function editDocument(docId, documentData) {
+            database.ref('documents/' + docId).update(documentData)
+                .then(() => {
+                    alert('Documento actualizado exitosamente');
+                    loadDocuments();
+                })
+                .catch((error) => {
+                    console.error("Error al editar documento:", error);
+                    alert('Error al editar el documento. Intente nuevamente.');
                 });
         }
         
@@ -513,6 +641,34 @@
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addDocumentModal'));
                     modal.hide();
                     document.getElementById('addDocumentForm').reset();
+                } else {
+                    alert('Por favor, complete todos los campos obligatorios');
+                }
+            });
+            
+            // Guardar edición de documento
+            document.getElementById('saveEditDocument').addEventListener('click', function() {
+                const docId = document.getElementById('editDocumentId').value;
+                const documentName = document.getElementById('editDocumentName');
+                const documentDepartment = document.getElementById('editDocumentDepartment');
+                const frequency = document.getElementById('editFrequency');
+                const description = document.getElementById('editDescription');
+                
+                if (docId && documentName.value && documentDepartment.value && frequency.value) {
+                    // Crear objeto con datos actualizados
+                    const updatedDocument = {
+                        name: documentName.value,
+                        department: documentDepartment.value,
+                        frequency: frequency.value,
+                        description: description.value
+                    };
+                    
+                    // Actualizar en Firebase
+                    editDocument(docId, updatedDocument);
+                    
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editDocumentModal'));
+                    modal.hide();
                 } else {
                     alert('Por favor, complete todos los campos obligatorios');
                 }
