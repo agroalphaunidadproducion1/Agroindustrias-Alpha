@@ -46,13 +46,6 @@
             margin-bottom: 0.5rem;
         }
         
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -225,20 +218,29 @@
             color: var(--text-light);
         }
         
-        footer {
-            text-align: center;
-            padding: 2rem 1rem;
-            background-color: var(--primary);
-            color: white;
-            margin-top: 2rem;
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
         }
         
-        .info-note {
-            background-color: var(--secondary-light);
-            border-left: 4px solid var(--secondary);
-            padding: 1rem;
-            margin: 1.5rem 0;
-            border-radius: 0 var(--radius) var(--radius) 0;
+        .filter-section {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+        }
+        
+        #resistance-filter {
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            border: 1px solid #ddd;
         }
         
         @media (max-width: 768px) {
@@ -255,13 +257,17 @@
             .recommendation-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <h1>Buscador de Modos de Acción</h1>
-        <p class="subtitle">Busque ingredientes activos y encuentre alternativas con diferentes modos de acción para un manejo integrado de plagas</p>
     </header>
     
     <div class="container">
@@ -274,9 +280,6 @@
                 </div>
                 <button id="search-btn">Buscar</button>
             </div>
-            <div class="info-note">
-                <p>Esta herramienta utiliza datos de la clasificación IRAC (Insecticide Resistance Action Committee) para recomendar ingredientes activos con modos de acción diferentes al ingrediente seleccionado.</p>
-            </div>
         </section>
         
         <section class="results-section" id="results-section">
@@ -285,21 +288,28 @@
             </div>
             
             <div class="recommendations">
+                <div class="filter-section">
+                    <span class="filter-label">Filtrar por riesgo de resistencia:</span>
+                    <select id="resistance-filter">
+                        <option value="all">Todos</option>
+                        <option value="Bajo">Bajo</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Alto">Alto</option>
+                    </select>
+                </div>
                 <h3>Ingredientes con Modos de Acción Diferentes</h3>
+                <div class="stats" id="stats">
+                    <!-- Estadísticas se cargarán aquí -->
+                </div>
                 <div class="recommendation-grid" id="recommendation-grid">
                     <!-- Recomendaciones se cargarán aquí -->
                 </div>
             </div>
         </section>
     </div>
-    
-    <footer>
-        <p>Basado en la clasificación de modos de acción de IRAC (Insecticide Resistance Action Committee)</p>
-        <p>© 2023 - Herramienta para el Manejo Integrado de Plagas</p>
-    </footer>
 
     <script>
-        // Base de datos de ingredientes activos y sus modos de acción (basado en IRAC)
+        // Base de datos ampliada de ingredientes activos y sus modos de acción (basado en IRAC)
         const ingredientsDatabase = [
             {
                 name: "Imidacloprid",
@@ -480,6 +490,187 @@
                 chemicalGroup: "Piretrinas naturales",
                 resistanceRisk: "Moderado",
                 commonUses: "Control de insectos en agricultura orgánica y hogar"
+            },
+            // Ingredientes adicionales
+            {
+                name: "Acetamiprid",
+                moaCode: "4A",
+                moaGroup: "Neonicotinoides",
+                moaDescription: "Agonistas de receptores de acetilcolina",
+                chemicalGroup: "Neonicotinoides",
+                resistanceRisk: "Alto",
+                commonUses: "Control de insectos chupadores en frutales y hortalizas"
+            },
+            {
+                name: "Deltametrina",
+                moaCode: "3A",
+                moaGroup: "Piretroides",
+                moaDescription: "Moduladores de canales de sodio",
+                chemicalGroup: "Piretroides",
+                resistanceRisk: "Moderado a Alto",
+                commonUses: "Control de insectos en cultivos y salud pública"
+            },
+            {
+                name: "Fipronil",
+                moaCode: "2B",
+                moaGroup: "Fenilpirazoles",
+                moaDescription: "Antagonistas del receptor GABA",
+                chemicalGroup: "Fenilpirazoles",
+                resistanceRisk: "Moderado",
+                commonUses: "Control de insectos en cultivos, mascotas y salud pública"
+            },
+            {
+                name: "Buprofezin",
+                moaCode: "16",
+                moaGroup: "Inhibidores de crecimiento",
+                moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 1",
+                chemicalGroup: "Tiadiazinas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de insectos chupadores como moscas blancas y cochinillas"
+            },
+            {
+                name: "Diflubenzuron",
+                moaCode: "15",
+                moaGroup: "Inhibidores de síntesis de quitina",
+                moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+                chemicalGroup: "Benzoylureas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de insectos en estado larval en frutales y forestales"
+            },
+            {
+                name: "Hexitiazox",
+                moaCode: "10A",
+                moaGroup: "Inhibidores del crecimiento de ácaros",
+                moaDescription: "Inhibidores de la biosíntesis de lípidos",
+                chemicalGroup: "Tiazolidinas",
+                resistanceRisk: "Bajo",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Etoxazol",
+                moaCode: "10B",
+                moaGroup: "Inhibidores del crecimiento de ácaros",
+                moaDescription: "Inhibidores de la mitosis",
+                chemicalGroup: "Oxazolidinas",
+                resistanceRisk: "Bajo",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Spiromesifen",
+                moaCode: "23",
+                moaGroup: "Inhibidores de la síntesis de lípidos",
+                moaDescription: "Inhibidores de la acetil CoA carboxilasa",
+                chemicalGroup: "Tetrónicas y tetramicas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de ácaros y moscas blancas"
+            },
+            {
+                name: "Spirotetramat",
+                moaCode: "23",
+                moaGroup: "Inhibidores de la síntesis de lípidos",
+                moaDescription: "Inhibidores de la acetil CoA carboxilasa",
+                chemicalGroup: "Tetrónicas y tetramicas",
+                resistanceRisk: "Bajo a Moderado",
+                commonUses: "Control de insectos chupadores como pulgones y moscas blancas"
+            },
+            {
+                name: "Clofentezina",
+                moaCode: "10A",
+                moaGroup: "Inhibidores del crecimiento de ácaros",
+                moaDescription: "Inhibidores de la biosíntesis de lípidos",
+                chemicalGroup: "Tetrazinas",
+                resistanceRisk: "Bajo",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Acefato",
+                moaCode: "1B",
+                moaGroup: "Organofosforados",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Organofosforados",
+                resistanceRisk: "Alto",
+                commonUses: "Control de insectos masticadores y chupadores en múltiples cultivos"
+            },
+            {
+                name: "Metiocarb",
+                moaCode: "1A",
+                moaGroup: "Carbamatos",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Carbamatos",
+                resistanceRisk: "Alto",
+                commonUses: "Control de insectos y moluscos en múltiples cultivos"
+            },
+            {
+                name: "Fenpiroximato",
+                moaCode: "21A",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial I",
+                chemicalGroup: "Pirazoles",
+                resistanceRisk: "Moderado",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Tebufenpirad",
+                moaCode: "21A",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial I",
+                chemicalGroup: "Pirazoles",
+                resistanceRisk: "Moderado",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Piridabén",
+                moaCode: "21A",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial I",
+                chemicalGroup: "Pirazoles",
+                resistanceRisk: "Moderado",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Fenazoquin",
+                moaCode: "20B",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial III",
+                chemicalGroup: "Quinazolinonas",
+                resistanceRisk: "Moderado",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Acequinocil",
+                moaCode: "20B",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial III",
+                chemicalGroup: "Naftoquinonas",
+                resistanceRisk: "Moderado",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Bifenazato",
+                moaCode: "20D",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial III",
+                chemicalGroup: "Carbazatos",
+                resistanceRisk: "Bajo",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
+            },
+            {
+                name: "Diafentiurón",
+                moaCode: "12B",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial II",
+                chemicalGroup: "Tioureas",
+                resistanceRisk: "Moderado",
+                commonUses: "Control de ácaros y moscas blancas"
+            },
+            {
+                name: "Ciflumetofen",
+                moaCode: "25",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial II",
+                chemicalGroup: "Benzildioxaloles",
+                resistanceRisk: "Bajo",
+                commonUses: "Control específico de ácaros en frutales y hortalizas"
             }
         ];
 
@@ -490,6 +681,12 @@
         const resultsSection = document.getElementById('results-section');
         const activeIngredientDiv = document.getElementById('active-ingredient');
         const recommendationGrid = document.getElementById('recommendation-grid');
+        const resistanceFilter = document.getElementById('resistance-filter');
+        const statsDiv = document.getElementById('stats');
+
+        // Variables globales
+        let currentRecommendations = [];
+        let currentIngredient = null;
 
         // Mostrar sugerencias al escribir
         searchInput.addEventListener('input', function() {
@@ -538,6 +735,23 @@
             }
         });
 
+        // Permitir búsqueda con Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    searchIngredient(query);
+                }
+            }
+        });
+
+        // Filtrar recomendaciones por riesgo de resistencia
+        resistanceFilter.addEventListener('change', function() {
+            if (currentIngredient) {
+                filterRecommendations();
+            }
+        });
+
         // Buscar ingrediente y mostrar resultados
         function searchIngredient(query) {
             const ingredient = ingredientsDatabase.find(ing => 
@@ -549,14 +763,16 @@
                 return;
             }
             
+            currentIngredient = ingredient;
+            
             // Mostrar información del ingrediente activo
             displayActiveIngredient(ingredient);
             
             // Obtener recomendaciones
-            const recommendations = getRecommendations(ingredient);
+            currentRecommendations = getRecommendations(ingredient);
             
             // Mostrar recomendaciones
-            displayRecommendations(recommendations);
+            filterRecommendations();
             
             // Mostrar sección de resultados
             resultsSection.style.display = 'block';
@@ -602,12 +818,29 @@
             );
         }
 
+        // Filtrar y mostrar recomendaciones
+        function filterRecommendations() {
+            const filterValue = resistanceFilter.value;
+            let filteredRecommendations = [...currentRecommendations];
+            
+            if (filterValue !== 'all') {
+                filteredRecommendations = currentRecommendations.filter(ingredient => 
+                    ingredient.resistanceRisk.includes(filterValue)
+                );
+            }
+            
+            displayRecommendations(filteredRecommendations);
+        }
+
         // Mostrar recomendaciones
         function displayRecommendations(recommendations) {
+            // Actualizar estadísticas
+            updateStats(recommendations);
+            
             if (recommendations.length === 0) {
                 recommendationGrid.innerHTML = `
                     <div class="no-results">
-                        <p>No se encontraron ingredientes con modos de acción diferentes.</p>
+                        <p>No se encontraron ingredientes con modos de acción diferentes que coincidan con el filtro seleccionado.</p>
                     </div>
                 `;
                 return;
@@ -630,6 +863,21 @@
                 `;
                 recommendationGrid.appendChild(card);
             });
+        }
+
+        // Actualizar estadísticas
+        function updateStats(recommendations) {
+            const total = recommendations.length;
+            const lowRisk = recommendations.filter(i => i.resistanceRisk.includes("Bajo")).length;
+            const moderateRisk = recommendations.filter(i => i.resistanceRisk.includes("Moderado")).length;
+            const highRisk = recommendations.filter(i => i.resistanceRisk.includes("Alto")).length;
+            
+            statsDiv.innerHTML = `
+                <div>Total de alternativas: ${total}</div>
+                <div>Riesgo bajo: ${lowRisk}</div>
+                <div>Riesgo moderado: ${moderateRisk}</div>
+                <div>Riesgo alto: ${highRisk}</div>
+            `;
         }
     </script>
 </body>
