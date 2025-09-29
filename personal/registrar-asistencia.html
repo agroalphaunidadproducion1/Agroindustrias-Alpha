@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Asistencia - Agro Productos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #1b5e20;
+            --accent-color: #7cb342;
+            --light-bg: #f1f8e9;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            padding-top: 20px;
+            padding-bottom: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: none;
+        }
+        
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-action {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+        
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .attendance-table th, .attendance-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .attendance-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .attendance-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .present {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .absent {
+            color: #dc3545;
+        }
+        
+        .section-title {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .current-date {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .current-area {
+            background-color: #d1ecf1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .temporary-employee {
+            background-color: #fff3cd !important;
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .history-table {
+            font-size: 0.9rem;
+        }
+        
+        .history-table th {
+            background-color: var(--secondary-color);
+        }
+        
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .caporal-badge {
+            background-color: #ffc107;
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 0;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+            
+            .attendance-table th, .attendance-table td {
+                padding: 8px 5px;
+            }
+            
+            .btn-action {
+                padding: 4px 6px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header p.lead {
+                font-size: 1rem;
+            }
+            
+            .btn-action {
+                padding: 3px 5px;
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header text-center">
+            <h1><i class="fas fa-clipboard-check me-2"></i>Sistema de Asistencia</h1>
+            <p class="lead">Agro Productos - Control de Asistencia del Personal</p>
+            <div class="current-date" id="current-date"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Registro de Asistencia Diaria</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Selección de área actual -->
+                        <div class="current-area mb-4">
+                            <h5 class="section-title"><i class="fas fa-map-marker-alt me-2"></i>Área de Trabajo</h5>
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <label class="form-label"><strong>Seleccione el invernadero/área:</strong></label>
+                                    <select class="form-select" id="current-area-select">
+                                        <option value="">Seleccione un área...</option>
+                                        <!-- Opciones se cargarán dinámicamente -->
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="current-area-display">
+                                        <strong>Área seleccionada:</strong> <span id="current-area-name" class="fw-bold text-primary">Ninguna</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="search-container">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" id="search-employee" class="form-control" placeholder="Buscar personal por nombre o código...">
+                                    </div>
+                                    <div class="suggestions-container" id="search-suggestions"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-success me-2" id="mark-all-present">
+                                    <i class="fas fa-check-circle me-2"></i>Marcar Todos Presentes
+                                </button>
+                                <button class="btn btn-primary" id="save-attendance">
+                                    <i class="fas fa-save me-2"></i>Guardar Asistencia
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="attendance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Código</th>
+                                        <th>Puesto</th>
+                                        <th class="text-center">Asistencia</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-list">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Seleccione un área de trabajo para mostrar el personal</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Resumen de Asistencia</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Total Empleados</h6>
+                                        <h3 id="total-employees">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Presentes</h6>
+                                        <h3 id="present-count">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Ausentes</h6>
+                                        <h3 id="absent-count">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Instrucciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Seleccione el área donde está tomando asistencia</li>
+                            <li>Se mostrará automáticamente el personal de esa área</li>
+                            <li>Busque empleados por nombre o código si es necesario</li>
+                            <li>Seleccione "Presente" o "Ausente" para cada empleado</li>
+                            <li>Use el botón "+" para agregar personal de otras áreas</li>
+                            <li>Haga clic en "Guardar Asistencia" para guardar los registros</li>
+                            <li>Cada invernadero/área guarda su asistencia por separado</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón para ir al historial (oculto por ahora) -->
+        <div class="row mt-4 d-none">
+            <div class="col-md-12 text-center">
+                <a href="historial.html" class="btn btn-outline-primary">
+                    <i class="fas fa-history me-2"></i>Ver Historial de Asistencias
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de asistencia -->
+    <div class="modal fade" id="attendanceDetailModal" tabindex="-1" aria-labelledby="attendanceDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attendanceDetailModalLabel">Detalles de Asistencia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 id="detail-title"></h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Código</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-detail-list">
+                                <!-- Contenido dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mover empleado -->
+    <div class="modal fade" id="moveEmployeeModal" tabindex="-1" aria-labelledby="moveEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moveEmployeeModalLabel">Mover Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro que desea mover al empleado <strong id="employeeName"></strong>?</p>
+                    
+                    <div class="alert alert-info" id="move-restrictions-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="restrictions-text"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="currentAreaDisplay" class="form-label">Área actual:</label>
+                        <input type="text" class="form-control" id="currentAreaDisplay" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newAreaSelect" class="form-label">Seleccionar nuevo invernadero/área:</label>
+                        <select class="form-select" id="newAreaSelect">
+                            <option value="">Seleccione un área...</option>
+                            <!-- Opciones se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmMove">Mover Empleado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar empleado -->
+    <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteEmployeeModalLabel">Eliminar Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro que desea eliminar al empleado <strong id="deleteEmployeeName"></strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Esta acción no se puede deshacer. El empleado será eliminado completamente del sistema.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar Empleado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+      
+    <script src="/footer.js"></script>
+
+    <script>
+        // Configuración de Firebase con tu URL
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Referencias a las tablas
+        const personalRef = database.ref('personal');
+        const attendanceRef = database.ref('asistencia');
+
+        // Mostrar fecha actual
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('es-ES', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        document.getElementById('current-date').textContent = formattedDate;
+
+        // Formatear fecha como YYYY-MM-DD para usar como ID
+        const dateId = today.toISOString().split('T')[0];
+
+        // Variables globales
+        let allEmployees = [];
+        let filteredEmployees = [];
+        let temporalEmployees = [];
+        let savedAttendance = {};
+        let currentArea = '';
+        let allAreas = [];
+        let currentEmployeeForAction = null;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEmployees();
+            setupEventListeners();
+        });
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Selección de área actual
+            document.getElementById('current-area-select').addEventListener('change', function() {
+                currentArea = this.value;
+                const areaName = this.options[this.selectedIndex].text;
+                document.getElementById('current-area-name').textContent = areaName;
+                loadAttendanceForArea(currentArea);
+            });
+
+            // Búsqueda con sugerencias
+            const searchInput = document.getElementById('search-employee');
+            searchInput.addEventListener('input', function() {
+                showSuggestions(this.value);
+            });
+            
+            searchInput.addEventListener('focus', function() {
+                if (this.value) {
+                    showSuggestions(this.value);
+                }
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) {
+                    hideSuggestions();
+                }
+            });
+
+            // Botones de acción
+            document.getElementById('mark-all-present').addEventListener('click', markAllPresent);
+            document.getElementById('save-attendance').addEventListener('click', saveAttendance);
+            
+            // Event listeners para modales
+            document.getElementById('confirmMove').addEventListener('click', moveEmployee);
+            document.getElementById('confirmDelete').addEventListener('click', deleteEmployee);
+        }
+
+        // Cargar empleados desde Firebase
+        function loadEmployees() {
+            personalRef.once('value').then((snapshot) => {
+                allEmployees = [];
+                allAreas = new Set();
+                
+                snapshot.forEach((childSnapshot) => {
+                    const employee = childSnapshot.val();
+                    employee.id = childSnapshot.key;
+                    employee.temporal = false;
+                    allEmployees.push(employee);
+                    
+                    // Recopilar todas las áreas únicas
+                    if (employee.invernaderos && Array.isArray(employee.invernaderos)) {
+                        employee.invernaderos.forEach(area => allAreas.add(area));
+                    }
+                });
+                
+                // Cargar selector de áreas
+                loadAreaSelector();
+            }).catch((error) => {
+                console.error('Error al cargar empleados:', error);
+                document.getElementById('attendance-list').innerHTML = 
+                    '<tr><td colspan="5" class="text-center text-danger">Error al cargar los empleados</td></tr>';
+            });
+        }
+
+        // Cargar selector de áreas
+        function loadAreaSelector() {
+            const areaSelect = document.getElementById('current-area-select');
+            areaSelect.innerHTML = '<option value="">Seleccione un área...</option>';
+            
+            // Ordenar áreas
+            const sortedAreas = Array.from(allAreas).sort((a, b) => {
+                // Poner áreas especiales primero
+                const isSpecialA = isNaN(a);
+                const isSpecialB = isNaN(b);
+                
+                if (isSpecialA && !isSpecialB) return -1;
+                if (!isSpecialA && isSpecialB) return 1;
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+            
+            sortedAreas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                
+                // Mostrar nombre apropiado
+                if (area === 'Fitosanidad' || area === 'Riego' || area === 'Acopio' || area === 'Áreas Verdes') {
+                    option.textContent = area;
+                } else {
+                    option.textContent = 'Invernadero ' + area;
+                }
+                
+                areaSelect.appendChild(option);
+            });
+            
+            // También cargar selector de áreas para mover empleados
+            loadMoveAreaSelector();
+        }
+        
+        // Cargar selector de áreas para mover empleados
+        function loadMoveAreaSelector() {
+            const moveAreaSelect = document.getElementById('newAreaSelect');
+            moveAreaSelect.innerHTML = '<option value="">Seleccione un área...</option>';
+            
+            // Ordenar áreas
+            const sortedAreas = Array.from(allAreas).sort((a, b) => {
+                // Poner áreas especiales primero
+                const isSpecialA = isNaN(a);
+                const isSpecialB = isNaN(b);
+                
+                if (isSpecialA && !isSpecialB) return -1;
+                if (!isSpecialA && isSpecialB) return 1;
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+            
+            sortedAreas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                
+                // Mostrar nombre apropiado
+                if (area === 'Fitosanidad' || area === 'Riego' || area === 'Acopio' || area === 'Áreas Verdes') {
+                    option.textContent = area;
+                } else {
+                    option.textContent = 'Invernadero ' + area;
+                }
+                
+                moveAreaSelect.appendChild(option);
+            });
+        }
+
+        // Cargar asistencia para un área específica
+        function loadAttendanceForArea(area) {
+            if (!area) return;
+            
+            attendanceRef.child(dateId).child(area).once('value').then((snapshot) => {
+                savedAttendance = snapshot.val() || {};
+                filterEmployeesByArea(area);
+            });
+        }
+
+        // Filtrar empleados por área seleccionada
+        function filterEmployeesByArea(area) {
+            // Mostrar empleados del área seleccionada
+            const areaEmployees = allEmployees.filter(employee => 
+                employee.invernaderos && employee.invernaderos.includes(area)
+            );
+            
+            // Combinar con empleados temporales
+            filteredEmployees = [...areaEmployees, ...temporalEmployees];
+            
+            // Actualizar la lista de asistencia
+            renderAttendanceList();
+            updateCounters();
+        }
+
+        // Mostrar sugerencias de búsqueda
+        function showSuggestions(query) {
+            const suggestionsContainer = document.getElementById('search-suggestions');
+            suggestionsContainer.innerHTML = '';
+            
+            if (!query) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+            
+            const suggestions = allEmployees.filter(employee => {
+                const nombreMatch = employee.nombre && employee.nombre.toLowerCase().includes(query.toLowerCase());
+                const codigoMatch = employee.codigo && employee.codigo.toLowerCase().includes(query.toLowerCase());
+                return nombreMatch || codigoMatch;
+            }).slice(0, 5); // Limitar a 5 sugerencias
+            
+            if (suggestions.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+            
+            suggestions.forEach(employee => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'suggestion-item';
+                
+                // Obtener área principal del empleado
+                const mainArea = getMainArea(employee);
+                
+                suggestionItem.textContent = `${employee.nombre} (${employee.codigo}) - ${mainArea}`;
+                suggestionItem.addEventListener('click', () => {
+                    document.getElementById('search-employee').value = '';
+                    hideSuggestions();
+                    
+                    // Si el empleado no está en el área actual, agregarlo como temporal
+                    if (currentArea && employee.invernaderos && !employee.invernaderos.includes(currentArea)) {
+                        addTemporalEmployee(employee);
+                    }
+                });
+                suggestionsContainer.appendChild(suggestionItem);
+            });
+            
+            suggestionsContainer.style.display = 'block';
+        }
+        
+        // Obtener el área principal de un empleado
+        function getMainArea(employee) {
+            if (!employee.invernaderos || employee.invernaderos.length === 0) return 'Sin área';
+            
+            // Priorizar áreas especiales
+            const specialAreas = ['Fitosanidad', 'Riego', 'Acopio', 'Áreas Verdes'];
+            const specialArea = employee.invernaderos.find(area => specialAreas.includes(area));
+            
+            if (specialArea) return specialArea;
+            
+            // Devolver el primer invernadero
+            return 'Invernadero ' + employee.invernaderos[0];
+        }
+        
+        // Ocultar sugerencias
+        function hideSuggestions() {
+            document.getElementById('search-suggestions').style.display = 'none';
+        }
+
+        // Agregar empleado temporal
+        function addTemporalEmployee(employee) {
+            // Verificar si ya existe como temporal
+            const alreadyExists = temporalEmployees.some(e => e.id === employee.id);
+            if (alreadyExists) return;
+            
+            // Crear copia del empleado como temporal
+            const temporalEmployee = {
+                ...employee,
+                temporal: true,
+                originalArea: getMainArea(employee)
+            };
+            
+            temporalEmployees.push(temporalEmployee);
+            filterEmployeesByArea(currentArea);
+        }
+
+        // Renderizar lista de asistencia
+        function renderAttendanceList() {
+            const attendanceList = document.getElementById('attendance-list');
+            
+            if (!currentArea) {
+                attendanceList.innerHTML = '<tr><td colspan="5" class="text-center">Seleccione un área de trabajo para comenzar</td></tr>';
+                return;
+            }
+            
+            if (filteredEmployees.length === 0) {
+                attendanceList.innerHTML = '<tr><td colspan="5" class="text-center">No hay empleados en esta área</td></tr>';
+                return;
+            }
+            
+            attendanceList.innerHTML = '';
+            
+            filteredEmployees.forEach(employee => {
+                const isPresent = savedAttendance[employee.id] === true;
+                const isCaporal = employee.puesto && employee.puesto.toLowerCase().includes('caporal');
+                const row = document.createElement('tr');
+                
+                if (employee.temporal) {
+                    row.classList.add('temporary-employee');
+                }
+                
+                row.innerHTML = `
+                    <td>
+                        ${employee.nombre || '-'}
+                        ${isCaporal ? '<span class="caporal-badge">Caporal</span>' : ''}
+                    </td>
+                    <td>${employee.codigo || '-'}</td>
+                    <td>${employee.puesto || '-'}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm ${isPresent ? 'btn-success' : 'btn-outline-success'} attendance-btn present-btn" data-employee-id="${employee.id}" data-status="true">
+                                <i class="fas fa-check"></i> Presente
+                            </button>
+                            <button type="button" class="btn btn-sm ${!isPresent ? 'btn-danger' : 'btn-outline-danger'} attendance-btn absent-btn" data-employee-id="${employee.id}" data-status="false">
+                                <i class="fas fa-times"></i> Ausente
+                            </button>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-primary btn-action move-employee-btn" data-employee-id="${employee.id}">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-action delete-employee-btn" data-employee-id="${employee.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        ${employee.temporal ? 
+                            `<button class="btn btn-sm btn-warning btn-action remove-temporal-btn" data-employee-id="${employee.id}">
+                                <i class="fas fa-times"></i>
+                            </button>` : 
+                            (employee.invernaderos && employee.invernaderos.includes(currentArea) ? '' :
+                            `<button class="btn btn-sm btn-info btn-action add-temporal-btn" data-employee-id="${employee.id}">
+                                <i class="fas fa-plus"></i>
+                            </button>`)
+                        }
+                    </td>
+                `;
+                
+                attendanceList.appendChild(row);
+            });
+            
+            // Añadir event listeners a los botones de asistencia
+            document.querySelectorAll('.attendance-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const employeeId = this.dataset.employeeId;
+                    const status = this.dataset.status === 'true';
+                    
+                    // Guardar estado de asistencia
+                    savedAttendance[employeeId] = status;
+                    
+                    // Actualizar interfaz
+                    updateAttendanceUI(employeeId, status);
+                    
+                    // Actualizar contadores
+                    updateCounters();
+                });
+            });
+            
+            // Añadir event listeners a los botones de mover empleado
+            document.querySelectorAll('.move-employee-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const employeeId = this.dataset.employeeId;
+                    const employee = allEmployees.find(e => e.id === employeeId);
+                    
+                    if (employee) {
+                        showMoveModal(employee);
+                    }
+                });
+            });
+            
+            // Añadir event listeners a los botones de eliminar empleado
+            document.querySelectorAll('.delete-employee-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const employeeId = this.dataset.employeeId;
+                    const employee = allEmployees.find(e => e.id === employeeId);
+                    
+                    if (employee) {
+                        showDeleteModal(employee);
+                    }
+                });
+            });
+            
+            // Añadir event listeners a los botones de personal temporal
+            document.querySelectorAll('.add-temporal-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const employeeId = this.dataset.employeeId;
+                    const employee = allEmployees.find(e => e.id === employeeId);
+                    
+                    if (employee) {
+                        addTemporalEmployee(employee);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.remove-temporal-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const employeeId = this.dataset.employeeId;
+                    
+                    // Eliminar empleado temporal
+                    temporalEmployees = temporalEmployees.filter(e => e.id !== employeeId);
+                    
+                    // Eliminar de la asistencia guardada si existe
+                    if (savedAttendance[employeeId]) {
+                        delete savedAttendance[employeeId];
+                    }
+                    
+                    filterEmployeesByArea(currentArea);
+                });
+            });
+            
+            // Actualizar contadores
+            updateCounters();
+        }
+
+        // Actualizar la interfaz de asistencia
+        function updateAttendanceUI(employeeId, status) {
+            // Encontrar los botones para este empleado
+            const presentBtn = document.querySelector(`.present-btn[data-employee-id="${employeeId}"]`);
+            const absentBtn = document.querySelector(`.absent-btn[data-employee-id="${employeeId}"]`);
+            
+            if (presentBtn && absentBtn) {
+                // Actualizar clases de los botones
+                if (status) {
+                    presentBtn.classList.remove('btn-outline-success');
+                    presentBtn.classList.add('btn-success');
+                    absentBtn.classList.remove('btn-danger');
+                    absentBtn.classList.add('btn-outline-danger');
+                } else {
+                    presentBtn.classList.remove('btn-success');
+                    presentBtn.classList.add('btn-outline-success');
+                    absentBtn.classList.remove('btn-outline-danger');
+                    absentBtn.classList.add('btn-danger');
+                }
+            }
+        }
+
+        // Mostrar modal para mover empleado
+        function showMoveModal(employee) {
+            currentEmployeeForAction = employee;
+            
+            // Configurar modal
+            document.getElementById('employeeName').textContent = `${employee.nombre} (${employee.codigo})`;
+            
+            // Mostrar información de restricciones según el puesto
+            const isCaporal = employee.puesto && employee.puesto.toLowerCase().includes('caporal');
+            const restrictionsInfo = document.getElementById('restrictions-text');
+            
+            if (isCaporal) {
+                restrictionsInfo.textContent = 'Este empleado es Caporal y puede tener múltiples invernaderos asignados. Al agregar uno nuevo, se mantendrán los existentes.';
+            } else {
+                restrictionsInfo.textContent = 'Este empleado solo puede tener un invernadero asignado. Al seleccionar uno nuevo, se eliminará automáticamente del anterior.';
+            }
+            
+            // Mostrar área actual
+            const currentAreaDisplay = document.getElementById('currentAreaDisplay');
+            if (employee.invernaderos && employee.invernaderos.length > 0) {
+                currentAreaDisplay.value = employee.invernaderos.map(area => {
+                    if (area === 'Fitosanidad' || area === 'Riego' || area === 'Acopio' || area === 'Áreas Verdes') {
+                        return area;
+                    } else {
+                        return 'Invernadero ' + area;
+                    }
+                }).join(', ');
+            } else {
+                currentAreaDisplay.value = 'Sin área asignada';
+            }
+            
+            // Resetear selector de nueva área
+            document.getElementById('newAreaSelect').value = '';
+            
+            // Mostrar modal
+            const moveModal = new bootstrap.Modal(document.getElementById('moveEmployeeModal'));
+            moveModal.show();
+        }
+
+        // Mostrar modal para eliminar empleado
+        function showDeleteModal(employee) {
+            currentEmployeeForAction = employee;
+            
+            // Configurar modal
+            document.getElementById('deleteEmployeeName').textContent = `${employee.nombre} (${employee.codigo})`;
+            
+            // Mostrar modal
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
+            deleteModal.show();
+        }
+
+        // Mover empleado a otro invernadero/área
+        function moveEmployee() {
+            const newArea = document.getElementById('newAreaSelect').value;
+            
+            if (!newArea) {
+                alert('Por favor seleccione un área destino');
+                return;
+            }
+            
+            if (!currentEmployeeForAction) {
+                alert('Error: No se ha seleccionado un empleado');
+                return;
+            }
+            
+            // Verificar si el empleado ya está en esta área
+            if (currentEmployeeForAction.invernaderos && currentEmployeeForAction.invernaderos.includes(newArea)) {
+                alert('El empleado ya está asignado a esta área');
+                return;
+            }
+            
+            // Determinar si es caporal (puede tener múltiples invernaderos)
+            const isCaporal = currentEmployeeForAction.puesto && 
+                              currentEmployeeForAction.puesto.toLowerCase().includes('caporal');
+            
+            // Obtener las áreas actuales del empleado
+            const currentAreas = currentEmployeeForAction.invernaderos || [];
+            
+            // Preparar las áreas actualizadas
+            let updatedAreas;
+            
+            if (isCaporal) {
+                // Caporal: mantener áreas existentes y agregar la nueva
+                updatedAreas = [...currentAreas, newArea];
+            } else {
+                // No caporal: reemplazar todas las áreas por la nueva
+                updatedAreas = [newArea];
+            }
+            
+            // Actualizar el empleado en Firebase
+            const employeeRef = personalRef.child(currentEmployeeForAction.id);
+            
+            // Actualizar en Firebase
+            employeeRef.update({ invernaderos: updatedAreas })
+                .then(() => {
+                    alert(`Empleado ${isCaporal ? 'agregado a nueva área' : 'movido'} exitosamente`);
+                    
+                    // Actualizar la lista local de empleados
+                    const employeeIndex = allEmployees.findIndex(e => e.id === currentEmployeeForAction.id);
+                    if (employeeIndex !== -1) {
+                        allEmployees[employeeIndex].invernaderos = updatedAreas;
+                    }
+                    
+                    // Recargar la lista de asistencia si estamos en el área actual
+                    if (currentArea) {
+                        filterEmployeesByArea(currentArea);
+                    }
+                    
+                    // Cerrar modal
+                    const moveModal = bootstrap.Modal.getInstance(document.getElementById('moveEmployeeModal'));
+                    moveModal.hide();
+                })
+                .catch((error) => {
+                    console.error('Error al mover empleado:', error);
+                    alert('Error al mover empleado. Por favor, intente nuevamente.');
+                });
+        }
+
+        // Eliminar empleado
+        function deleteEmployee() {
+            if (!currentEmployeeForAction) {
+                alert('Error: No se ha seleccionado un empleado');
+                return;
+            }
+            
+            // Confirmación adicional
+            if (!confirm('¿Está completamente seguro de que desea eliminar permanentemente a este empleado?')) {
+                return;
+            }
+            
+            // Eliminar el empleado de Firebase
+            personalRef.child(currentEmployeeForAction.id).remove()
+                .then(() => {
+                    alert('Empleado eliminado exitosamente');
+                    
+                    // Actualizar la lista local de empleados
+                    allEmployees = allEmployees.filter(e => e.id !== currentEmployeeForAction.id);
+                    
+                    // Recargar la lista de asistencia si estamos en el área actual
+                    if (currentArea) {
+                        filterEmployeesByArea(currentArea);
+                    }
+                    
+                    // Cerrar modal
+                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteEmployeeModal'));
+                    deleteModal.hide();
+                })
+                .catch((error) => {
+                    console.error('Error al eliminar empleado:', error);
+                    alert('Error al eliminar empleado. Por favor, intente nuevamente.');
+                });
+        }
+
+        // Marcar todos como presentes
+        function markAllPresent() {
+            filteredEmployees.forEach(employee => {
+                savedAttendance[employee.id] = true;
+                updateAttendanceUI(employee.id, true);
+            });
+            updateCounters();
+        }
+
+        // Actualizar contadores
+        function updateCounters() {
+            const total = filteredEmployees.length;
+            const present = Object.values(savedAttendance).filter(status => status === true).length;
+            const absent = total - present;
+            
+            document.getElementById('total-employees').textContent = total;
+            document.getElementById('present-count').textContent = present;
+            document.getElementById('absent-count').textContent = absent;
+        }
+
+        // Guardar asistencia en Firebase
+        function saveAttendance() {
+            if (!currentArea) {
+                alert('Por favor seleccione un área primero');
+                return;
+            }
+            
+            // Guardar en Firebase para el área actual
+            attendanceRef.child(dateId).child(currentArea).set(savedAttendance)
+                .then(() => {
+                    alert(`Asistencia guardada correctamente para ${document.getElementById('current-area-select').options[document.getElementById('current-area-select').selectedIndex].text}`);
+                })
+                .catch((error) => {
+                    console.error('Error al guardar la asistencia:', error);
+                    alert('Error al guardar la asistencia. Por favor, intente nuevamente.');
+                });
+        }
+    </script>
+</body>
+</html>
