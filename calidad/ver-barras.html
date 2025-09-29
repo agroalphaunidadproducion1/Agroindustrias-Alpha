@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor - Códigos Guardados</title>
+    <link rel="stylesheet" href="/calidad/ver-barras.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Códigos de Barras Guardados</h1>
+            <nav>
+                <a href="index.html" class="nav-link">📷 Volver a Escanear</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Filtros -->
+            <section class="filters-section">
+                <h2>Filtros</h2>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filterFecha">Filtrar por Fecha:</label>
+                        <input type="date" id="filterFecha">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterContenedor">Filtrar por Contenedor:</label>
+                        <input type="text" id="filterContenedor" placeholder="Ej: CONT-001">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filterCodigo">Buscar por Código:</label>
+                        <input type="text" id="filterCodigo" placeholder="Buscar código...">
+                    </div>
+
+                    <div class="filter-actions">
+                        <button id="clearFilters" class="btn-secondary">Limpiar Filtros</button>
+                        <button id="exportData" class="btn-export">📊 Exportar Datos</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Estadísticas -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCodes">0</div>
+                        <div class="stat-label">Total Códigos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="uniqueContainers">0</div>
+                        <div class="stat-label">Contenedores Únicos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDates">0</div>
+                        <div class="stat-label">Fechas Diferentes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="filteredCodes">0</div>
+                        <div class="stat-label">Mostrando</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista de códigos -->
+            <section class="codes-section">
+                <div class="section-header">
+                    <h2>Códigos Escaneados</h2>
+                    <div class="view-options">
+                        <button id="toggleView" class="btn-view">📋 Vista Lista</button>
+                    </div>
+                </div>
+                
+                <div id="loadingIndicator" class="loading-indicator">
+                    <div class="spinner"></div>
+                    <span>Cargando códigos...</span>
+                </div>
+
+                <div id="barcodesList" class="barcodes-list grid-view">
+                    <!-- Los códigos se mostrarán aquí -->
+                </div>
+
+                <div id="emptyState" class="empty-state hidden">
+                    <p>No se encontraron códigos con los filtros aplicados</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para ver detalles -->
+    <div id="detailModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Detalles del Código</h3>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <!-- JsBarcode para generar códigos de barras visuales -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+    <script src="/calidad/ver-barras.js"></script>
+     <script src="/footer.js"></script>
+</body>
+</html>
