@@ -351,6 +351,34 @@
             border-color: var(--primary-color);
         }
         
+        .permission-status {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .permission-granted {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success-color);
+            border-left: 3px solid var(--success-color);
+        }
+        
+        .permission-denied {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+            border-left: 3px solid var(--danger-color);
+        }
+        
+        .permission-pending {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+            border-left: 3px solid var(--warning-color);
+        }
+        
         @media (max-width: 768px) {
             .scan-section {
                 flex-direction: column;
@@ -412,6 +440,8 @@
                         </div>
                         
                         <div id="cameraSection" class="hidden">
+                            <div id="permissionStatus" class="permission-status hidden"></div>
+                            
                             <div class="camera-section">
                                 <div id="cameraView">
                                     <div class="scanner-overlay">
@@ -472,6 +502,9 @@
         // Variables globales
         let isCameraActive = false;
         let currentScanOption = 'manual';
+        let cameraPermissionGranted = false;
+        let cameraStream = null;
+        let quaggaInitialized = false;
         
         // Elementos DOM
         const barcodeForm = document.getElementById('barcodeForm');
@@ -490,12 +523,44 @@
         const manualInputSection = document.getElementById('manualInputSection');
         const cameraSection = document.getElementById('cameraSection');
         const fileSection = document.getElementById('fileSection');
+        const permissionStatus = document.getElementById('permissionStatus');
         
         // Establecer fecha actual por defecto
         window.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             fechaInput.value = today;
+            
+            // Verificar si ya tenemos permiso de cámara guardado
+            checkExistingCameraPermission();
         });
+        
+        // Verificar si ya tenemos permiso de cámara
+        async function checkExistingCameraPermission() {
+            try {
+                // Verificar si ya tenemos permiso
+                const permissionStatus = await navigator.permissions.query({ name: 'camera' });
+                
+                if (permissionStatus.state === 'granted') {
+                    cameraPermissionGranted = true;
+                    updatePermissionStatus('granted', 'Permiso de cámara concedido');
+                } else if (permissionStatus.state === 'denied') {
+                    updatePermissionStatus('denied', 'Permiso de cámara denegado. Por favor, habilita la cámara en la configuración de tu navegador.');
+                }
+                
+                // Escuchar cambios en el permiso
+                permissionStatus.onchange = function() {
+                    if (this.state === 'granted') {
+                        cameraPermissionGranted = true;
+                        updatePermissionStatus('granted', 'Permiso de cámara concedido');
+                    } else if (this.state === 'denied') {
+                        cameraPermissionGranted = false;
+                        updatePermissionStatus('denied', 'Permiso de cámara denegado');
+                    }
+                };
+            } catch (error) {
+                console.log('No se pudo verificar el estado del permiso:', error);
+            }
+        }
         
         // Manejar cambio de opciones de escaneo
         scanOptionBtns.forEach(btn => {
@@ -517,6 +582,11 @@
                     barcodeInput.focus();
                 } else if (currentScanOption === 'camera') {
                     cameraSection.classList.remove('hidden');
+                    
+                    // Si ya tenemos permiso, mostrar estado
+                    if (cameraPermissionGranted) {
+                        updatePermissionStatus('granted', 'Permiso de cámara concedido - Listo para usar');
+                    }
                 } else if (currentScanOption === 'file') {
                     fileSection.classList.remove('hidden');
                 }
@@ -534,9 +604,66 @@
         // Detener cámara
         stopCameraBtn.addEventListener('click', stopCamera);
         
+        // Función para solicitar permiso de cámara una sola vez
+        async function requestCameraPermission() {
+            if (cameraPermissionGranted) {
+                return true;
+            }
+            
+            try {
+                updatePermissionStatus('pending', 'Solicitando permiso de cámara...');
+                
+                // Solicitar acceso a la cámara
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: "environment",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                // Detener el stream inmediatamente después de obtener permiso
+                stream.getTracks().forEach(track => track.stop());
+                
+                cameraPermissionGranted = true;
+                updatePermissionStatus('granted', 'Permiso de cámara concedido');
+                
+                return true;
+            } catch (error) {
+                console.error('Error al solicitar permiso de cámara:', error);
+                
+                let errorMessage = 'No se pudo acceder a la cámara. ';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += 'Permiso denegado por el usuario.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'No se encontró ninguna cámara.';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage += 'El navegador no soporta el acceso a la cámara.';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage += 'La cámara ya está en uso por otra aplicación.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                updatePermissionStatus('denied', errorMessage);
+                showMessage(errorMessage, "error");
+                
+                return false;
+            }
+        }
+        
         // Función para iniciar la cámara
-        function startCamera() {
+        async function startCamera() {
             if (isCameraActive) return;
+            
+            // Solicitar permiso si no lo tenemos
+            if (!cameraPermissionGranted) {
+                const permissionGranted = await requestCameraPermission();
+                if (!permissionGranted) {
+                    return;
+                }
+            }
             
             // Actualizar UI
             scannerStatus.classList.remove('hidden');
@@ -545,100 +672,123 @@
             stopCameraBtn.classList.remove('hidden');
             cameraView.classList.add('active');
             
-            // Configurar QuaggaJS
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: cameraView,
-                    constraints: {
-                        width: 640,
-                        height: 480,
-                        facingMode: "environment" // Usar cámara trasera
-                    }
-                },
-                decoder: {
-                    readers: [
-                        "code_128_reader",
-                        "ean_reader",
-                        "ean_8_reader",
-                        "code_39_reader",
-                        "code_39_vin_reader",
-                        "codabar_reader",
-                        "upc_reader",
-                        "upc_e_reader",
-                        "i2of5_reader"
-                    ]
-                },
-                locator: {
-                    patchSize: "medium",
-                    halfSample: true
-                }
-            }, function(err) {
-                if (err) {
-                    console.error(err);
-                    showMessage("Error al iniciar la cámara: " + err.message, "error");
-                    updateScannerStatus('error', 'Error');
-                    return;
+            try {
+                // Inicializar QuaggaJS si no está inicializado
+                if (!quaggaInitialized) {
+                    await initializeQuagga();
+                    quaggaInitialized = true;
+                } else {
+                    // Si ya está inicializado, simplemente iniciar
+                    Quagga.start();
                 }
                 
                 isCameraActive = true;
-                Quagga.start();
                 
                 // Mostrar mensaje de éxito
                 showMessage("Cámara activada. Acerca el código de barras al marco.", "success");
+            } catch (error) {
+                console.error("Error al iniciar la cámara:", error);
+                showMessage("Error al iniciar la cámara: " + error.message, "error");
+                updateScannerStatus('error', 'Error');
+                stopCamera();
+            }
+        }
+        
+        // Función para inicializar Quagga
+        function initializeQuagga() {
+            return new Promise((resolve, reject) => {
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: cameraView,
+                        constraints: {
+                            width: 640,
+                            height: 480,
+                            facingMode: "environment"
+                        }
+                    },
+                    decoder: {
+                        readers: [
+                            "code_128_reader",
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_39_reader",
+                            "code_39_vin_reader",
+                            "codabar_reader",
+                            "upc_reader",
+                            "upc_e_reader",
+                            "i2of5_reader"
+                        ]
+                    },
+                    locator: {
+                        patchSize: "medium",
+                        halfSample: true
+                    }
+                }, function(err) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    
+                    // Configurar detectores de códigos
+                    Quagga.onDetected(onBarcodeDetected);
+                    Quagga.onProcessed(onProcessed);
+                    
+                    resolve();
+                });
             });
-            
-            // Detectar códigos
-            Quagga.onDetected(function(result) {
-                if (result && result.codeResult) {
-                    const code = result.codeResult.code;
+        }
+        
+        // Función para manejar códigos detectados
+        function onBarcodeDetected(result) {
+            if (result && result.codeResult) {
+                const code = result.codeResult.code;
+                
+                // Mostrar overlay de detección
+                showDetectionOverlay(code);
+                
+                // Actualizar el campo de entrada
+                barcodeInput.value = code;
+                
+                // Detener la cámara después de la detección
+                setTimeout(() => {
+                    stopCamera();
+                    showMessage(`Código detectado: ${code}`, "success");
                     
-                    // Mostrar overlay de detección
-                    showDetectionOverlay(code);
-                    
-                    // Actualizar el campo de entrada
-                    barcodeInput.value = code;
-                    
-                    // Detener la cámara después de la detección
-                    setTimeout(() => {
-                        stopCamera();
-                        showMessage(`Código detectado: ${code}`, "success");
-                        
-                        // Cambiar a modo manual después de la detección
-                        scanOptionBtns.forEach(btn => {
-                            if (btn.dataset.option === 'manual') {
-                                btn.click();
-                            }
-                        });
-                    }, 1500);
+                    // Cambiar a modo manual después de la detección
+                    scanOptionBtns.forEach(btn => {
+                        if (btn.dataset.option === 'manual') {
+                            btn.click();
+                        }
+                    });
+                }, 1500);
+            }
+        }
+        
+        // Función para procesar resultados
+        function onProcessed(result) {
+            if (result) {
+                const drawingCtx = Quagga.canvas.ctx.overlay;
+                const drawingCanvas = Quagga.canvas.dom.overlay;
+                
+                if (result.boxes) {
+                    drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                    result.boxes.filter(function(box) {
+                        return box !== result.box;
+                    }).forEach(function(box) {
+                        Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+                    });
                 }
-            });
-            
-            // Manejar eventos de proceso
-            Quagga.onProcessed(function(result) {
-                if (result) {
-                    const drawingCtx = Quagga.canvas.ctx.overlay;
-                    const drawingCanvas = Quagga.canvas.dom.overlay;
-                    
-                    if (result.boxes) {
-                        drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
-                        result.boxes.filter(function(box) {
-                            return box !== result.box;
-                        }).forEach(function(box) {
-                            Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
-                        });
-                    }
-                    
-                    if (result.box) {
-                        Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
-                    }
-                    
-                    if (result.codeResult && result.codeResult.code) {
-                        Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
-                    }
+                
+                if (result.box) {
+                    Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
                 }
-            });
+                
+                if (result.codeResult && result.codeResult.code) {
+                    Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+                }
+            }
         }
         
         // Función para detener la cámara
@@ -663,6 +813,9 @@
                     </div>
                 </div>
             `;
+            
+            // Reasignar el elemento scannerMessage
+            scannerMessage = document.getElementById('scannerMessage');
         }
         
         // Función para mostrar overlay de detección
@@ -676,6 +829,16 @@
                 </div>
             `;
             cameraView.appendChild(overlay);
+        }
+        
+        // Función para actualizar el estado del permiso
+        function updatePermissionStatus(status, message) {
+            permissionStatus.className = 'permission-status';
+            permissionStatus.classList.add(`permission-${status}`);
+            permissionStatus.innerHTML = `
+                <span>${message}</span>
+            `;
+            permissionStatus.classList.remove('hidden');
         }
         
         // Función para actualizar el estado del escáner
