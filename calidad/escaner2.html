@@ -112,7 +112,7 @@
             flex: 1;
         }
         
-        .btn-scan, .btn-stop, .btn-primary {
+        .btn-scan, .btn-stop, .btn-primary, .btn-secondary, .btn-success {
             padding: 10px 15px;
             border: none;
             border-radius: 4px;
@@ -152,6 +152,24 @@
         }
         
         .btn-primary:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-secondary {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
             background-color: #27ae60;
         }
         
@@ -241,25 +259,45 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(46, 204, 113, 0.7);
+            background-color: rgba(46, 204, 113, 0.9);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 20;
             animation: fadeIn 0.3s;
+            flex-direction: column;
+            gap: 20px;
         }
         
         .detected-message {
             background-color: white;
-            padding: 15px 25px;
+            padding: 20px 30px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             text-align: center;
+            max-width: 90%;
         }
         
         .detected-message h3 {
             color: var(--success-color);
             margin-bottom: 10px;
+        }
+        
+        .detected-code {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border: 1px dashed #ddd;
+        }
+        
+        .detection-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
         @keyframes fadeIn {
@@ -379,6 +417,12 @@
             border-left: 3px solid var(--warning-color);
         }
         
+        .camera-placeholder {
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
         @media (max-width: 768px) {
             .scan-section {
                 flex-direction: column;
@@ -393,6 +437,14 @@
             .scanner-frame {
                 width: 90%;
                 height: 120px;
+            }
+            
+            .detection-actions {
+                flex-direction: column;
+            }
+            
+            .detection-actions button {
+                width: 100%;
             }
         }
     </style>
@@ -444,7 +496,10 @@
                             
                             <div class="camera-section">
                                 <div id="cameraView">
-                                    <div class="scanner-overlay">
+                                    <div class="camera-placeholder">
+                                        <p>Presiona "Activar Cámara" para comenzar a escanear</p>
+                                    </div>
+                                    <div class="scanner-overlay hidden">
                                         <div class="scanner-frame"></div>
                                         <div class="scanner-status" id="scannerMessage">
                                             Acerca el código de barras al marco para escanear
@@ -503,8 +558,8 @@
         let isCameraActive = false;
         let currentScanOption = 'manual';
         let cameraPermissionGranted = false;
-        let cameraStream = null;
         let quaggaInitialized = false;
+        let detectedCode = null;
         
         // Elementos DOM
         const barcodeForm = document.getElementById('barcodeForm');
@@ -518,12 +573,14 @@
         const statusText = document.getElementById('statusText');
         const statusDot = document.querySelector('.status-dot');
         const scannerMessage = document.getElementById('scannerMessage');
+        const scannerOverlay = document.querySelector('.scanner-overlay');
         const messageArea = document.getElementById('messageArea');
         const scanOptionBtns = document.querySelectorAll('.scan-option-btn');
         const manualInputSection = document.getElementById('manualInputSection');
         const cameraSection = document.getElementById('cameraSection');
         const fileSection = document.getElementById('fileSection');
         const permissionStatus = document.getElementById('permissionStatus');
+        const cameraPlaceholder = document.querySelector('.camera-placeholder');
         
         // Establecer fecha actual por defecto
         window.addEventListener('DOMContentLoaded', () => {
@@ -616,9 +673,7 @@
                 // Solicitar acceso a la cámara
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
-                        facingMode: "environment",
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
+                        facingMode: "environment"
                     } 
                 });
                 
@@ -671,6 +726,8 @@
             startCameraBtn.classList.add('hidden');
             stopCameraBtn.classList.remove('hidden');
             cameraView.classList.add('active');
+            cameraPlaceholder.classList.add('hidden');
+            scannerOverlay.classList.remove('hidden');
             
             try {
                 // Inicializar QuaggaJS si no está inicializado
@@ -733,7 +790,6 @@
                     
                     // Configurar detectores de códigos
                     Quagga.onDetected(onBarcodeDetected);
-                    Quagga.onProcessed(onProcessed);
                     
                     resolve();
                 });
@@ -742,71 +798,101 @@
         
         // Función para manejar códigos detectados
         function onBarcodeDetected(result) {
-            if (result && result.codeResult) {
+            if (result && result.codeResult && result.codeResult.code) {
                 const code = result.codeResult.code;
+                detectedCode = code;
                 
-                // Mostrar overlay de detección
-                showDetectionOverlay(code);
+                // Detener el escaneo
+                Quagga.stop();
+                isCameraActive = false;
                 
-                // Actualizar el campo de entrada
-                barcodeInput.value = code;
-                
-                // Detener la cámara después de la detección
-                setTimeout(() => {
-                    stopCamera();
-                    showMessage(`Código detectado: ${code}`, "success");
-                    
-                    // Cambiar a modo manual después de la detección
-                    scanOptionBtns.forEach(btn => {
-                        if (btn.dataset.option === 'manual') {
-                            btn.click();
-                        }
-                    });
-                }, 1500);
+                // Mostrar overlay de análisis
+                showAnalysisOverlay(code);
             }
         }
         
-        // Función para procesar resultados
-        function onProcessed(result) {
-            if (result) {
-                const drawingCtx = Quagga.canvas.ctx.overlay;
-                const drawingCanvas = Quagga.canvas.dom.overlay;
+        // Función para mostrar overlay de análisis
+        function showAnalysisOverlay(code) {
+            const overlay = document.createElement('div');
+            overlay.className = 'detected-overlay';
+            overlay.innerHTML = `
+                <div class="detected-message">
+                    <h3>✓ Código Detectado</h3>
+                    <p>Se ha detectado un código de barras:</p>
+                    <div class="detected-code">${code}</div>
+                    <p>¿Qué deseas hacer?</p>
+                    <div class="detection-actions">
+                        <button type="button" id="retryScan" class="btn-secondary">
+                            🔄 Reintentar Escaneo
+                        </button>
+                        <button type="button" id="useCode" class="btn-success">
+                            💾 Usar este Código
+                        </button>
+                    </div>
+                </div>
+            `;
+            cameraView.appendChild(overlay);
+            
+            // Configurar eventos de los botones
+            document.getElementById('retryScan').addEventListener('click', () => {
+                overlay.remove();
+                restartCamera();
+            });
+            
+            document.getElementById('useCode').addEventListener('click', () => {
+                // Actualizar el campo de entrada
+                barcodeInput.value = code;
                 
-                if (result.boxes) {
-                    drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
-                    result.boxes.filter(function(box) {
-                        return box !== result.box;
-                    }).forEach(function(box) {
-                        Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
-                    });
-                }
+                // Cambiar a modo manual
+                scanOptionBtns.forEach(btn => {
+                    if (btn.dataset.option === 'manual') {
+                        btn.click();
+                    }
+                });
                 
-                if (result.box) {
-                    Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
-                }
+                // Mostrar mensaje de éxito
+                showMessage(`Código "${code}" cargado correctamente`, "success");
                 
-                if (result.codeResult && result.codeResult.code) {
-                    Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
-                }
-            }
+                // Limpiar la cámara
+                stopCamera();
+            });
+        }
+        
+        // Función para reiniciar la cámara
+        function restartCamera() {
+            stopCamera();
+            setTimeout(() => {
+                startCamera();
+            }, 500);
         }
         
         // Función para detener la cámara
         function stopCamera() {
-            if (!isCameraActive) return;
+            if (quaggaInitialized) {
+                Quagga.stop();
+            }
             
-            Quagga.stop();
             isCameraActive = false;
+            detectedCode = null;
             
             // Actualizar UI
             startCameraBtn.classList.remove('hidden');
             stopCameraBtn.classList.add('hidden');
             cameraView.classList.remove('active');
+            cameraPlaceholder.classList.remove('hidden');
+            scannerOverlay.classList.add('hidden');
             updateScannerStatus('inactive', 'Inactivo');
             
-            // Limpiar cámara
+            // Limpiar overlays
+            const overlays = cameraView.querySelectorAll('.detected-overlay');
+            overlays.forEach(overlay => overlay.remove());
+            
+            // Restaurar vista original
             cameraView.innerHTML = `
-                <div class="scanner-overlay">
+                <div class="camera-placeholder">
+                    <p>Presiona "Activar Cámara" para comenzar a escanear</p>
+                </div>
+                <div class="scanner-overlay hidden">
                     <div class="scanner-frame"></div>
                     <div class="scanner-status" id="scannerMessage">
                         Acerca el código de barras al marco para escanear
@@ -814,21 +900,10 @@
                 </div>
             `;
             
-            // Reasignar el elemento scannerMessage
-            scannerMessage = document.getElementById('scannerMessage');
-        }
-        
-        // Función para mostrar overlay de detección
-        function showDetectionOverlay(code) {
-            const overlay = document.createElement('div');
-            overlay.className = 'detected-overlay';
-            overlay.innerHTML = `
-                <div class="detected-message">
-                    <h3>✓ Código Detectado</h3>
-                    <p>${code}</p>
-                </div>
-            `;
-            cameraView.appendChild(overlay);
+            // Reasignar elementos
+            scannerOverlay = cameraView.querySelector('.scanner-overlay');
+            scannerMessage = cameraView.querySelector('.scanner-status');
+            cameraPlaceholder = cameraView.querySelector('.camera-placeholder');
         }
         
         // Función para actualizar el estado del permiso
