@@ -3,16 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escanear Códigos de Barras</title>
-    
-    <!-- Meta tags esenciales para PWA -->
-    <meta name="theme-color" content="#3498db">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Escaner Códigos">
-    
-    <link rel="manifest" href="manifest.json">
-    
+    <title>Diagnóstico - Escáner Códigos</title>
     <style>
         :root {
             --primary-color: #3498db;
@@ -20,8 +11,6 @@
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
             --dark-color: #2c3e50;
-            --light-color: #ecf0f1;
-            --gray-color: #95a5a6;
         }
         
         * {
@@ -35,1091 +24,507 @@
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
             padding: 20px;
         }
         
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
             margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
         }
         
         h1 {
             color: var(--dark-color);
-            font-size: 1.8rem;
+            margin-bottom: 10px;
         }
         
-        .nav-link {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s;
-        }
-        
-        .nav-link:hover {
-            background-color: #2980b9;
-        }
-        
-        .form-section {
-            background-color: white;
-            border-radius: 8px;
+        .diagnostic-section {
+            background: white;
+            border-radius: 10px;
             padding: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         h2 {
             color: var(--dark-color);
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+            margin-bottom: 15px;
         }
         
-        .form-group {
-            margin-bottom: 20px;
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--gray-color);
         }
         
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark-color);
+        .test-success {
+            border-left-color: var(--success-color);
+            background: rgba(46, 204, 113, 0.1);
         }
         
-        input[type="date"],
-        input[type="text"],
-        input[type="file"] {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
+        .test-warning {
+            border-left-color: var(--warning-color);
+            background: rgba(243, 156, 18, 0.1);
+        }
+        
+        .test-error {
+            border-left-color: var(--danger-color);
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        .test-info {
+            border-left-color: var(--primary-color);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
         }
         
-        input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
+        .status-success { background: var(--success-color); color: white; }
+        .status-warning { background: var(--warning-color); color: white; }
+        .status-error { background: var(--danger-color); color: white; }
+        .status-info { background: var(--primary-color); color: white; }
         
-        .scan-section {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .scan-section input {
-            flex: 1;
-        }
-        
-        .btn-scan, .btn-stop, .btn-primary, .btn-secondary, .btn-success {
-            padding: 12px 15px;
+        .btn {
+            padding: 12px 20px;
             border: none;
             border-radius: 6px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            font-size: 1rem;
-            min-height: 44px; /* Tamaño mínimo para touch */
-        }
-        
-        .btn-scan {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .btn-scan:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn-stop {
-            background-color: var(--danger-color);
-            color: white;
-        }
-        
-        .btn-stop:hover {
-            background-color: #c0392b;
-        }
-        
-        .btn-primary {
-            background-color: var(--success-color);
-            color: white;
-            width: 100%;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-        
-        .btn-primary:hover {
-            background-color: #27ae60;
-        }
-        
-        .btn-secondary {
-            background-color: var(--warning-color);
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #e67e22;
-        }
-        
-        .btn-success {
-            background-color: var(--success-color);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background-color: #27ae60;
-        }
-        
-        .camera-section {
-            margin-top: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        
-        .camera-section.active {
-            border: 2px solid var(--primary-color);
-        }
-        
-        #cameraView {
-            width: 100%;
-            height: 300px;
-            background-color: #000;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        
-        #cameraView video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .scanner-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-        
-        .scanner-frame {
-            width: 70%;
-            height: 150px;
-            border: 2px solid var(--primary-color);
-            border-radius: 8px;
-            position: relative;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
-        }
-        
-        .scanner-frame::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--primary-color);
-            animation: scan 2s infinite linear;
-        }
-        
-        @keyframes scan {
-            0% {
-                top: 0;
-            }
-            100% {
-                top: 100%;
-            }
-        }
-        
-        .scanner-status {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-weight: 500;
-            z-index: 11;
-        }
-        
-        .detected-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(46, 204, 113, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 20;
-            animation: fadeIn 0.3s;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-        }
-        
-        .detected-message {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        .detected-message h3 {
-            color: var(--success-color);
-            margin-bottom: 10px;
-        }
-        
-        .detected-code {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin: 15px 0;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            border: 1px dashed #ddd;
-            word-break: break-all;
-        }
-        
-        .detection-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-        
-        .permission-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-        
-        .permission-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        
-        .permission-content h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        
-        .permission-content p {
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .permission-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .file-help {
-            display: block;
-            margin-top: 5px;
-            color: var(--gray-color);
-            font-size: 0.85rem;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        .status-indicator {
+            margin: 5px;
             display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-left: 10px;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-        
-        .status-inactive {
-            background-color: var(--gray-color);
-        }
-        
-        .status-active {
-            background-color: var(--success-color);
-        }
-        
-        .status-scanning {
-            background-color: var(--warning-color);
-        }
-        
-        .status-error {
-            background-color: var(--danger-color);
-        }
-        
-        .error-message {
-            background-color: rgba(231, 76, 60, 0.1);
-            color: var(--danger-color);
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-top: 10px;
-            border-left: 3px solid var(--danger-color);
-        }
-        
-        .success-message {
-            background-color: rgba(46, 204, 113, 0.1);
-            color: var(--success-color);
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin-top: 10px;
-            border-left: 3px solid var(--success-color);
-        }
-        
-        .scan-options {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .scan-option-btn {
-            flex: 1;
-            padding: 12px 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .scan-option-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        
-        .permission-status {
-            margin-top: 10px;
-            padding: 10px 12px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        .permission-granted {
-            background-color: rgba(46, 204, 113, 0.1);
-            color: var(--success-color);
-            border-left: 3px solid var(--success-color);
-        }
-        
-        .permission-denied {
-            background-color: rgba(231, 76, 60, 0.1);
-            color: var(--danger-color);
-            border-left: 3px solid var(--danger-color);
-        }
-        
-        .permission-pending {
-            background-color: rgba(243, 156, 18, 0.1);
-            color: var(--warning-color);
-            border-left: 3px solid var(--warning-color);
-        }
-        
-        .camera-placeholder {
+        .btn-primary {
+            background: var(--primary-color);
             color: white;
-            text-align: center;
-            padding: 20px;
         }
         
-        .install-prompt {
-            background-color: var(--warning-color);
+        .btn-success {
+            background: var(--success-color);
             color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .camera-test {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #cameraPreview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .install-btn {
-            background-color: white;
-            color: var(--warning-color);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
             margin-top: 10px;
-            cursor: pointer;
-            font-weight: bold;
         }
         
-        @media (max-width: 768px) {
-            .scan-section {
-                flex-direction: column;
-            }
-            
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .scanner-frame {
-                width: 90%;
-                height: 120px;
-            }
-            
-            .detection-actions {
-                flex-direction: column;
-            }
-            
-            .detection-actions button {
-                width: 100%;
-            }
-            
-            .permission-actions {
-                flex-direction: column;
-            }
-            
-            .permission-actions button {
-                width: 100%;
-            }
+        .solution-box {
+            background: #e8f4fd;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .solution-step {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .solution-step:before {
+            content: "👉";
+            position: absolute;
+            left: 0;
+        }
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div id="installPrompt" class="install-prompt hidden">
-        <p>📱 Instala esta app para mejor experiencia</p>
-        <button id="installBtn" class="install-btn">Instalar App</button>
-    </div>
-
     <div class="container">
         <header>
-            <h1>📷 Escanear Códigos</h1>
-            <nav>
-                <a href="viewer.html" class="nav-link">📋 Ver Códigos</a>
-            </nav>
+            <h1>🔍 Diagnóstico de Cámara</h1>
+            <p>Identifiquemos el problema con los permisos de cámara</p>
         </header>
 
-        <main>
-            <section class="form-section">
-                <h2>Nuevo Escaneo</h2>
-                <form id="barcodeForm">
-                    <div class="form-group">
-                        <label for="fecha">Fecha:</label>
-                        <input type="date" id="fecha" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="numeroContenedor">Número de Contenedor:</label>
-                        <input type="text" id="numeroContenedor" required placeholder="Ej: CONT-001">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="barcodeInput">
-                            Código de Barras:
-                            <span id="scannerStatus" class="status-indicator hidden">
-                                <span class="status-dot status-inactive"></span>
-                                <span id="statusText">Inactivo</span>
-                            </span>
-                        </label>
-                        
-                        <div class="scan-options">
-                            <div class="scan-option-btn active" data-option="manual">Ingreso Manual</div>
-                            <div class="scan-option-btn" data-option="camera">Escáner Cámara</div>
-                            <div class="scan-option-btn" data-option="file">Cargar Archivo</div>
-                        </div>
-                        
-                        <div class="scan-section" id="manualInputSection">
-                            <input type="text" id="barcodeInput" required placeholder="Ingresa el código manualmente" autofocus>
-                        </div>
-                        
-                        <div id="cameraSection" class="hidden">
-                            <div id="permissionStatus" class="permission-status hidden"></div>
-                            
-                            <div class="camera-section">
-                                <div id="cameraView">
-                                    <div class="camera-placeholder">
-                                        <p>Presiona "Activar Cámara" para comenzar</p>
-                                    </div>
-                                    <div class="scanner-overlay hidden">
-                                        <div class="scanner-frame"></div>
-                                        <div class="scanner-status" id="scannerMessage">
-                                            Acerca el código al marco para escanear
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="scan-controls" style="display: flex; gap: 10px; margin-top: 10px;">
-                                    <button type="button" id="startCamera" class="btn-scan">
-                                        📷 Activar Cámara
-                                    </button>
-                                    <button type="button" id="stopCamera" class="btn-stop hidden">
-                                        ⏹️ Detener
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="fileSection" class="hidden">
-                            <input type="file" id="fileInput" accept=".txt,.csv,.json" class="file-input">
-                            <small class="file-help">Formatos: TXT, CSV, JSON</small>
-                        </div>
-                    </div>
-
-                    <div id="messageArea"></div>
-
-                    <button type="submit" class="btn-primary">💾 Guardar Código</button>
-                </form>
-            </section>
-        </main>
-    </div>
-
-    <!-- Modal de permisos -->
-    <div id="permissionModal" class="permission-modal hidden">
-        <div class="permission-content">
-            <h3>Permiso de Cámara Requerido</h3>
-            <p>Para usar el escáner de códigos de barras, necesitamos acceso a tu cámara. Esta aplicación solo usa la cámara para escanear códigos y no guarda imágenes.</p>
-            <div class="permission-actions">
-                <button id="grantPermission" class="btn-scan">✅ Permitir Cámara</button>
-                <button id="denyPermission" class="btn-stop">❌ Cancelar</button>
+        <section class="diagnostic-section">
+            <h2>1. Información del Navegador</h2>
+            <div id="browserInfo" class="test-item test-info">
+                Analizando tu navegador...
             </div>
-        </div>
+        </section>
+
+        <section class="diagnostic-section">
+            <h2>2. Verificación de APIs</h2>
+            <div id="apiTests" class="test-item test-info">
+                Verificando APIs disponibles...
+            </div>
+        </section>
+
+        <section class="diagnostic-section">
+            <h2>3. Prueba Directa de Cámara</h2>
+            <div class="test-item test-info">
+                <p>Prueba básica de acceso a cámara sin librerías externas</p>
+                <div class="camera-test" id="cameraTest">
+                    <p>Presiona el botón para probar la cámara</p>
+                    <button id="testCameraBtn" class="btn btn-primary">🎥 Probar Cámara</button>
+                </div>
+                <div id="cameraResult"></div>
+            </div>
+        </section>
+
+        <section class="diagnostic-section">
+            <h2>4. Prueba con QuaggaJS</h2>
+            <div class="test-item test-info">
+                <p>Probando la librería de escaneo QuaggaJS</p>
+                <button id="testQuaggaBtn" class="btn btn-warning">📷 Probar QuaggaJS</button>
+                <div id="quaggaResult"></div>
+            </div>
+        </section>
+
+        <section class="diagnostic-section">
+            <h2>5. Log de Eventos</h2>
+            <div class="log-container" id="eventLog">
+                Iniciando diagnóstico...<br>
+            </div>
+        </section>
+
+        <section class="diagnostic-section" id="solutionsSection" style="display: none;">
+            <h2>🔧 Soluciones Recomendadas</h2>
+            <div class="solution-box" id="solutionsBox">
+                <!-- Las soluciones se generarán aquí -->
+            </div>
+        </section>
     </div>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    
-    <!-- QuaggaJS para escaneo de códigos de barras -->
+    <!-- QuaggaJS -->
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
-    
+
     <script>
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "tu-api-key",
-            authDomain: "tu-proyecto.firebaseapp.com",
-            databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
-            projectId: "tu-proyecto",
-            storageBucket: "tu-proyecto.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "tu-app-id"
-        };
-        
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // Variables globales
-        let isCameraActive = false;
-        let currentScanOption = 'manual';
-        let cameraPermissionGranted = false;
-        let quaggaInitialized = false;
-        let detectedCode = null;
-        let deferredPrompt = null;
-        
         // Elementos DOM
-        const barcodeForm = document.getElementById('barcodeForm');
-        const fechaInput = document.getElementById('fecha');
-        const numeroContenedorInput = document.getElementById('numeroContenedor');
-        const barcodeInput = document.getElementById('barcodeInput');
-        const startCameraBtn = document.getElementById('startCamera');
-        const stopCameraBtn = document.getElementById('stopCamera');
-        const cameraView = document.getElementById('cameraView');
-        const scannerStatus = document.getElementById('scannerStatus');
-        const statusText = document.getElementById('statusText');
-        const statusDot = document.querySelector('.status-dot');
-        const scannerMessage = document.getElementById('scannerMessage');
-        const scannerOverlay = document.querySelector('.scanner-overlay');
-        const messageArea = document.getElementById('messageArea');
-        const scanOptionBtns = document.querySelectorAll('.scan-option-btn');
-        const manualInputSection = document.getElementById('manualInputSection');
-        const cameraSection = document.getElementById('cameraSection');
-        const fileSection = document.getElementById('fileSection');
-        const permissionStatus = document.getElementById('permissionStatus');
-        const cameraPlaceholder = document.querySelector('.camera-placeholder');
-        const permissionModal = document.getElementById('permissionModal');
-        const grantPermissionBtn = document.getElementById('grantPermission');
-        const denyPermissionBtn = document.getElementById('denyPermission');
-        const installPrompt = document.getElementById('installPrompt');
-        const installBtn = document.getElementById('installBtn');
+        const browserInfo = document.getElementById('browserInfo');
+        const apiTests = document.getElementById('apiTests');
+        const cameraTest = document.getElementById('cameraTest');
+        const testCameraBtn = document.getElementById('testCameraBtn');
+        const cameraResult = document.getElementById('cameraResult');
+        const testQuaggaBtn = document.getElementById('testQuaggaBtn');
+        const quaggaResult = document.getElementById('quaggaResult');
+        const eventLog = document.getElementById('eventLog');
+        const solutionsSection = document.getElementById('solutionsSection');
+        const solutionsBox = document.getElementById('solutionsBox');
 
-        // Establecer fecha actual por defecto
-        window.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            fechaInput.value = today;
+        let currentStream = null;
+
+        // Función para agregar logs
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span style="color: #888">[${timestamp}]</span> ${message}`;
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // 1. Información del navegador
+        function checkBrowserInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                vendor: navigator.vendor,
+                cookieEnabled: navigator.cookieEnabled,
+                language: navigator.language,
+                onLine: navigator.onLine
+            };
+
+            browserInfo.innerHTML = `
+                <p><strong>User Agent:</strong> ${info.userAgent}</p>
+                <p><strong>Plataforma:</strong> ${info.platform}</p>
+                <p><strong>Navegador:</strong> ${info.vendor}</p>
+                <p><strong>Idioma:</strong> ${info.language}</p>
+                <p><strong>Cookies:</strong> ${info.cookieEnabled ? '<span class="status status-success">Habilitadas</span>' : '<span class="status status-error">Deshabilitadas</span>'}</p>
+                <p><strong>Conexión:</strong> ${info.onLine ? '<span class="status status-success">En línea</span>' : '<span class="status status-error">Sin conexión</span>'}</p>
+            `;
+
+            addLog('Información del navegador recopilada');
+        }
+
+        // 2. Verificación de APIs
+        function checkAPIs() {
+            const apis = {
+                mediaDevices: !!navigator.mediaDevices,
+                getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+                permissions: !!navigator.permissions,
+                serviceWorker: !!navigator.serviceWorker,
+                storage: !!navigator.storage
+            };
+
+            let html = '<p>Verificando APIs necesarias:</p><ul>';
             
-            // Verificar si ya tenemos permiso de cámara
-            checkExistingCameraPermission();
+            for (const [api, available] of Object.entries(apis)) {
+                const status = available ? 'status-success' : 'status-error';
+                const text = available ? 'Disponible' : 'No disponible';
+                html += `<li>${api}: <span class="status ${status}">${text}</span></li>`;
+            }
             
-            // Configurar PWA
-            setupPWA();
-        });
+            html += '</ul>';
 
-        // Configurar PWA
-        function setupPWA() {
-            // Evento para instalar la app
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installPrompt.classList.remove('hidden');
-            });
+            apiTests.innerHTML = html;
+            addLog('APIs verificadas');
 
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        installPrompt.classList.add('hidden');
-                    }
-                    deferredPrompt = null;
-                }
-            });
-
-            // Verificar si ya está instalada
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                installPrompt.classList.add('hidden');
+            // Mostrar advertencias
+            if (!apis.getUserMedia) {
+                addLog('❌ getUserMedia no disponible - Problema crítico', 'error');
+            }
+            if (!apis.mediaDevices) {
+                addLog('❌ mediaDevices no disponible - Problema crítico', 'error');
             }
         }
 
-        // Verificar permisos existentes
-        async function checkExistingCameraPermission() {
+        // 3. Prueba directa de cámara
+        async function testCameraDirect() {
+            addLog('Iniciando prueba directa de cámara...');
+            
             try {
-                if (navigator.permissions && navigator.permissions.query) {
-                    const permissionStatus = await navigator.permissions.query({ name: 'camera' });
-                    
-                    if (permissionStatus.state === 'granted') {
-                        cameraPermissionGranted = true;
-                        updatePermissionStatus('granted', 'Permiso de cámara concedido');
-                    } else if (permissionStatus.state === 'denied') {
-                        updatePermissionStatus('denied', 'Permiso de cámara denegado');
-                    }
-                    
-                    permissionStatus.onchange = function() {
-                        if (this.state === 'granted') {
-                            cameraPermissionGranted = true;
-                            updatePermissionStatus('granted', 'Permiso de cámara concedido');
-                        } else if (this.state === 'denied') {
-                            cameraPermissionGranted = false;
-                            updatePermissionStatus('denied', 'Permiso de cámara denegado');
-                        }
-                    };
+                // Detener stream anterior si existe
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
                 }
-            } catch (error) {
-                console.log('No se pudo verificar el estado del permiso:', error);
-            }
-        }
-        
-        // Manejar cambio de opciones de escaneo
-        scanOptionBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                scanOptionBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                manualInputSection.classList.add('hidden');
-                cameraSection.classList.add('hidden');
-                fileSection.classList.add('hidden');
-                
-                currentScanOption = btn.dataset.option;
-                if (currentScanOption === 'manual') {
-                    manualInputSection.classList.remove('hidden');
-                    barcodeInput.focus();
-                } else if (currentScanOption === 'camera') {
-                    cameraSection.classList.remove('hidden');
-                    if (cameraPermissionGranted) {
-                        updatePermissionStatus('granted', 'Permiso de cámara concedido - Listo para usar');
-                    }
-                } else if (currentScanOption === 'file') {
-                    fileSection.classList.remove('hidden');
-                }
-                
-                if (currentScanOption !== 'camera' && isCameraActive) {
-                    stopCamera();
-                }
-            });
-        });
-        
-        // Iniciar cámara
-        startCameraBtn.addEventListener('click', startCamera);
-        
-        // Detener cámara
-        stopCameraBtn.addEventListener('click', stopCamera);
-        
-        // Modal de permisos
-        grantPermissionBtn.addEventListener('click', async () => {
-            permissionModal.classList.add('hidden');
-            const granted = await requestCameraPermission();
-            if (granted) {
-                startCamera();
-            }
-        });
-        
-        denyPermissionBtn.addEventListener('click', () => {
-            permissionModal.classList.add('hidden');
-            showMessage("No se puede usar el escáner sin permiso de cámara", "error");
-        });
 
-        // Solicitar permiso de cámara
-        async function requestCameraPermission() {
-            try {
-                updatePermissionStatus('pending', 'Solicitando permiso de cámara...');
-                
-                // Intentar acceso directo a la cámara
+                // Solicitar acceso a cámara
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
-                        facingMode: "environment",
+                        facingMode: 'environment',
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     } 
                 });
+
+                currentStream = stream;
                 
-                // Detener el stream inmediatamente
-                stream.getTracks().forEach(track => track.stop());
+                // Mostrar video
+                const video = document.createElement('video');
+                video.id = 'cameraPreview';
+                video.autoplay = true;
+                video.playsInline = true;
+                video.srcObject = stream;
                 
-                cameraPermissionGranted = true;
-                updatePermissionStatus('granted', 'Permiso de cámara concedido');
-                return true;
-                
+                cameraTest.innerHTML = '';
+                cameraTest.appendChild(video);
+
+                cameraResult.innerHTML = `
+                    <div class="test-item test-success">
+                        <p>✅ <strong>Cámara funcionando correctamente</strong></p>
+                        <p>Se obtuvo acceso a la cámara sin problemas</p>
+                        <button id="stopCameraBtn" class="btn btn-warning">⏹️ Detener Cámara</button>
+                    </div>
+                `;
+
+                document.getElementById('stopCameraBtn').addEventListener('click', stopCameraTest);
+                addLog('✅ Prueba de cámara exitosa');
+
             } catch (error) {
-                console.error('Error al solicitar permiso:', error);
-                let errorMessage = 'No se pudo acceder a la cámara. ';
-                
-                if (error.name === 'NotAllowedError') {
-                    errorMessage += 'Permiso denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.';
-                } else if (error.name === 'NotFoundError') {
-                    errorMessage += 'No se encontró ninguna cámara.';
-                } else if (error.name === 'NotSupportedError') {
-                    errorMessage += 'Tu navegador no soporta el acceso a la cámara.';
-                } else if (error.name === 'NotReadableError') {
-                    errorMessage += 'La cámara está en uso por otra aplicación.';
-                } else {
-                    errorMessage += error.message;
-                }
-                
-                updatePermissionStatus('denied', errorMessage);
-                showMessage(errorMessage, "error");
-                return false;
+                cameraResult.innerHTML = `
+                    <div class="test-item test-error">
+                        <p>❌ <strong>Error al acceder a la cámara</strong></p>
+                        <p><strong>Tipo:</strong> ${error.name}</p>
+                        <p><strong>Mensaje:</strong> ${error.message}</p>
+                    </div>
+                `;
+                addLog(`❌ Error en prueba de cámara: ${error.name} - ${error.message}`, 'error');
+                analyzeCameraError(error);
             }
         }
-        
-        // Iniciar cámara
-        async function startCamera() {
-            if (isCameraActive) return;
-            
-            if (!cameraPermissionGranted) {
-                // Mostrar modal explicativo en lugar de solicitud directa
-                permissionModal.classList.remove('hidden');
-                return;
+
+        function stopCameraTest() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
             }
-            
-            // Actualizar UI
-            scannerStatus.classList.remove('hidden');
-            updateScannerStatus('active', 'Escaneando...');
-            startCameraBtn.classList.add('hidden');
-            stopCameraBtn.classList.remove('hidden');
-            cameraView.classList.add('active');
-            cameraPlaceholder.classList.add('hidden');
-            scannerOverlay.classList.remove('hidden');
+            cameraTest.innerHTML = `
+                <p>Presiona el botón para probar la cámara</p>
+                <button id="testCameraBtn" class="btn btn-primary">🎥 Probar Cámara</button>
+            `;
+            document.getElementById('testCameraBtn').addEventListener('click', testCameraDirect);
+            cameraResult.innerHTML = '<p>Cámara detenida</p>';
+            addLog('Cámara detenida');
+        }
+
+        // 4. Prueba con QuaggaJS
+        async function testQuagga() {
+            addLog('Iniciando prueba con QuaggaJS...');
             
             try {
-                if (!quaggaInitialized) {
-                    await initializeQuagga();
-                    quaggaInitialized = true;
-                } else {
-                    Quagga.start();
-                }
-                
-                isCameraActive = true;
-                showMessage("Cámara activada. Acerca el código al marco.", "success");
-            } catch (error) {
-                console.error("Error al iniciar cámara:", error);
-                showMessage("Error: " + error.message, "error");
-                updateScannerStatus('error', 'Error');
-                stopCamera();
-            }
-        }
-        
-        // Inicializar Quagga
-        function initializeQuagga() {
-            return new Promise((resolve, reject) => {
-                Quagga.init({
+                // Configuración mínima de Quagga
+                await Quagga.init({
                     inputStream: {
                         name: "Live",
                         type: "LiveStream",
-                        target: cameraView,
+                        target: document.querySelector('#cameraTest'),
                         constraints: {
+                            facingMode: "environment",
                             width: 640,
-                            height: 480,
-                            facingMode: "environment"
+                            height: 480
                         }
                     },
                     decoder: {
-                        readers: [
-                            "code_128_reader",
-                            "ean_reader", 
-                            "ean_8_reader",
-                            "code_39_reader",
-                            "upc_reader",
-                            "upc_e_reader"
-                        ]
-                    },
-                    locator: {
-                        patchSize: "medium",
-                        halfSample: true
-                    },
-                    numOfWorkers: 2
-                }, function(err) {
-                    if (err) {
-                        reject(err);
-                        return;
+                        readers: ["code_128_reader"]
                     }
-                    
-                    Quagga.onDetected(onBarcodeDetected);
-                    resolve();
                 });
-            });
-        }
-        
-        // Manejar código detectado
-        function onBarcodeDetected(result) {
-            if (result && result.codeResult && result.codeResult.code) {
-                const code = result.codeResult.code;
-                detectedCode = code;
-                
-                Quagga.stop();
-                isCameraActive = false;
-                
-                showAnalysisOverlay(code);
-            }
-        }
-        
-        // Mostrar overlay de análisis
-        function showAnalysisOverlay(code) {
-            const overlay = document.createElement('div');
-            overlay.className = 'detected-overlay';
-            overlay.innerHTML = `
-                <div class="detected-message">
-                    <h3>✅ Código Detectado</h3>
-                    <p>Se ha escaneado correctamente:</p>
-                    <div class="detected-code">${code}</div>
-                    <div class="detection-actions">
-                        <button type="button" id="retryScan" class="btn-secondary">
-                            🔄 Reintentar
-                        </button>
-                        <button type="button" id="useCode" class="btn-success">
-                            💾 Usar Código
-                        </button>
+
+                quaggaResult.innerHTML = `
+                    <div class="test-item test-success">
+                        <p>✅ <strong>QuaggaJS inicializado correctamente</strong></p>
+                        <p>La librería puede acceder a la cámara</p>
+                        <button id="startQuaggaBtn" class="btn btn-success">▶️ Iniciar Escaneo</button>
+                        <button id="stopQuaggaBtn" class="btn btn-warning">⏹️ Detener</button>
                     </div>
-                </div>
-            `;
-            cameraView.appendChild(overlay);
-            
-            document.getElementById('retryScan').addEventListener('click', () => {
-                overlay.remove();
-                restartCamera();
-            });
-            
-            document.getElementById('useCode').addEventListener('click', () => {
-                barcodeInput.value = code;
-                scanOptionBtns.forEach(btn => {
-                    if (btn.dataset.option === 'manual') btn.click();
-                });
-                showMessage(`Código "${code}" cargado`, "success");
-                stopCamera();
-            });
-        }
-        
-        // Reiniciar cámara
-        function restartCamera() {
-            stopCamera();
-            setTimeout(() => startCamera(), 500);
-        }
-        
-        // Detener cámara
-        function stopCamera() {
-            if (quaggaInitialized) {
-                Quagga.stop();
-            }
-            
-            isCameraActive = false;
-            detectedCode = null;
-            
-            startCameraBtn.classList.remove('hidden');
-            stopCameraBtn.classList.add('hidden');
-            cameraView.classList.remove('active');
-            cameraPlaceholder.classList.remove('hidden');
-            scannerOverlay.classList.add('hidden');
-            updateScannerStatus('inactive', 'Inactivo');
-            
-            const overlays = cameraView.querySelectorAll('.detected-overlay');
-            overlays.forEach(overlay => overlay.remove());
-            
-            cameraView.innerHTML = `
-                <div class="camera-placeholder">
-                    <p>Presiona "Activar Cámara" para comenzar</p>
-                </div>
-                <div class="scanner-overlay hidden">
-                    <div class="scanner-frame"></div>
-                    <div class="scanner-status" id="scannerMessage">
-                        Acerca el código al marco para escanear
+                `;
+
+                document.getElementById('startQuaggaBtn').addEventListener('click', startQuaggaScan);
+                document.getElementById('stopQuaggaBtn').addEventListener('click', stopQuaggaScan);
+
+                addLog('✅ QuaggaJS inicializado correctamente');
+
+            } catch (error) {
+                quaggaResult.innerHTML = `
+                    <div class="test-item test-error">
+                        <p>❌ <strong>Error en QuaggaJS</strong></p>
+                        <p><strong>Tipo:</strong> ${error.name}</p>
+                        <p><strong>Mensaje:</strong> ${error.message}</p>
                     </div>
-                </div>
-            `;
-            
-            // Reasignar elementos
-            scannerOverlay = cameraView.querySelector('.scanner-overlay');
-            scannerMessage = cameraView.querySelector('.scanner-status');
-            cameraPlaceholder = cameraView.querySelector('.camera-placeholder');
-        }
-        
-        // Actualizar estado de permisos
-        function updatePermissionStatus(status, message) {
-            permissionStatus.className = 'permission-status';
-            permissionStatus.classList.add(`permission-${status}`);
-            permissionStatus.innerHTML = `<span>${message}</span>`;
-            permissionStatus.classList.remove('hidden');
-        }
-        
-        // Actualizar estado del escáner
-        function updateScannerStatus(status, text) {
-            statusText.textContent = text;
-            statusDot.className = 'status-dot';
-            statusDot.classList.add(`status-${status}`);
-        }
-        
-        // Mostrar mensajes
-        function showMessage(message, type) {
-            messageArea.innerHTML = '';
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
-            messageDiv.textContent = message;
-            messageArea.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                if (messageDiv.parentNode) messageDiv.remove();
-            }, 5000);
-        }
-        
-        // Envío del formulario
-        barcodeForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!fechaInput.value || !numeroContenedorInput.value || !barcodeInput.value) {
-                showMessage("Completa todos los campos", "error");
-                return;
+                `;
+                addLog(`❌ Error en QuaggaJS: ${error.message}`, 'error');
             }
+        }
+
+        function startQuaggaScan() {
+            Quagga.start();
+            addLog('QuaggaJS iniciado - Escaneando códigos...');
+        }
+
+        function stopQuaggaScan() {
+            Quagga.stop();
+            addLog('QuaggaJS detenido');
+        }
+
+        // Analizar errores de cámara
+        function analyzeCameraError(error) {
+            const solutions = [];
             
-            const barcodeData = {
-                fecha: fechaInput.value,
-                numeroContenedor: numeroContenedorInput.value,
-                codigoBarras: barcodeInput.value,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-            
-            const newBarcodeRef = database.ref('codigos').push();
-            newBarcodeRef.set(barcodeData)
-                .then(() => {
-                    showMessage("✅ Código guardado", "success");
-                    numeroContenedorInput.value = '';
-                    barcodeInput.value = '';
-                    barcodeInput.focus();
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    showMessage("Error al guardar: " + error.message, "error");
-                });
-        });
-        
-        // Carga de archivos
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const content = e.target.result;
-                    let codes = [];
+            switch(error.name) {
+                case 'NotAllowedError':
+                    solutions.push(
+                        "Permiso de cámara denegado",
+                        "Haz clic en el ícono de candado en la barra de URL y permite la cámara",
+                        "Verifica la configuración de permisos de tu navegador",
+                        "Si estás en modo incógnito, sal de ese modo"
+                    );
+                    break;
                     
-                    if (file.name.endsWith('.txt')) {
-                        codes = content.split('\n').filter(code => code.trim() !== '');
-                    } else if (file.name.endsWith('.csv')) {
-                        const lines = content.split('\n');
-                        codes = lines.map(line => {
-                            const values = line.split(',');
-                            return values[0] ? values[0].trim() : null;
-                        }).filter(code => code !== null);
-                    } else if (file.name.endsWith('.json')) {
-                        const data = JSON.parse(content);
-                        if (Array.isArray(data)) {
-                            codes = data.map(item => 
-                                typeof item === 'string' ? item : item.codigo || item.code
-                            ).filter(code => code !== undefined);
-                        }
-                    }
+                case 'NotFoundError':
+                    solutions.push(
+                        "No se encontró cámara trasera",
+                        "Verifica que tu dispositivo tenga cámara",
+                        "Intenta con 'facingMode: user' para cámara frontal"
+                    );
+                    break;
                     
-                    if (codes.length > 0) {
-                        barcodeInput.value = codes[0];
-                        showMessage(`Cargados ${codes.length} códigos. Usando: ${codes[0]}`, "success");
-                    } else {
-                        showMessage("No se encontraron códigos", "error");
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    showMessage("Error al procesar archivo", "error");
-                }
-            };
-            reader.readAsText(file);
-        });
+                case 'NotSupportedError':
+                    solutions.push(
+                        "Tu navegador no soporta acceso a cámara",
+                        "Actualiza tu navegador",
+                        "Prueba con Chrome, Firefox o Safari"
+                    );
+                    break;
+                    
+                case 'NotReadableError':
+                    solutions.push(
+                        "La cámara está en uso por otra aplicación",
+                        "Cierra otras apps que usen la cámara",
+                        "Reinicia tu navegador"
+                    );
+                    break;
+                    
+                default:
+                    solutions.push(
+                        "Error desconocido",
+                        "Revisa la consola del navegador para más detalles",
+                        "Prueba en un dispositivo diferente"
+                    );
+            }
+
+            showSolutions(solutions);
+        }
+
+        function showSolutions(solutions) {
+            solutionsSection.style.display = 'block';
+            let html = '<h3>Posibles soluciones:</h3>';
+            
+            solutions.forEach((solution, index) => {
+                html += `<div class="solution-step">${solution}</div>`;
+            });
+
+            solutionsBox.innerHTML = html;
+        }
+
+        // Inicializar diagnóstico
+        function initDiagnostic() {
+            addLog('Iniciando diagnóstico completo...');
+            
+            // 1. Información del navegador
+            checkBrowserInfo();
+            
+            // 2. Verificación de APIs
+            checkAPIs();
+            
+            // 3. Configurar botones de prueba
+            testCameraBtn.addEventListener('click', testCameraDirect);
+            testQuaggaBtn.addEventListener('click', testQuagga);
+            
+            addLog('Diagnóstico listo - Realiza las pruebas');
+        }
+
+        // Iniciar cuando la página cargue
+        window.addEventListener('load', initDiagnostic);
     </script>
 </body>
 </html>
