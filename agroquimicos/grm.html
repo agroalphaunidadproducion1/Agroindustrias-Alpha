@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manejo de Resistencias en Agroquímicos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border-color: #1b5e20;
+        }
+        
+        .card.insecticides:hover {
+            border-color: #1b5e20;
+        }
+        
+        .card.fungicides:hover {
+            border-color: #1b5e20;
+        }
+        
+        .icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+        
+        .card.fungicides .icon {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+        }
+        
+        .card h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .features {
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+        
+        .features li {
+            color: #555;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .features li:before {
+            content: "✓";
+            color: #1b5e20;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .card.fungicides .features li:before {
+            color: #1b5e20;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(27, 94, 32, 0.3);
+        }
+        
+        .card.fungicides .btn {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            box-shadow: 0 5px 15px rgba(27, 94, 32, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(27, 94, 32, 0.4);
+        }
+        
+        .card.fungicides .btn:hover {
+            box-shadow: 0 8px 20px rgba(27, 94, 32, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                padding: 2rem;
+            }
+        }
+        
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Manejo de Resistencias en Agroquímicos</h1>
+            <p>Herramientas especializadas para la prevención y manejo de resistencias en plagas y enfermedades</p>
+        </div>
+        
+        <div class="cards-container">
+            <!-- Tarjeta Insecticidas -->
+            <div class="card insecticides" onclick="location.href='buscador_insecticidas.html'">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/>
+                        <path d="M10 2c1 .5 2 2 2 5"/>
+                    </svg>
+                </div>
+                <h2>Buscador de Insecticidas</h2>
+                <p>Clasificación IRAC - Manejo de resistencia en insectos</p>
+                
+                <ul class="features">
+                    <li>Base de datos completa de ingredientes activos</li>
+                    <li>Clasificación por grupos de modo de acción</li>
+                    <li>Recomendaciones para rotación efectiva</li>
+                    <li>Información sobre funciones fisiológicas</li>
+                    <li>Búsqueda inteligente con sugerencias</li>
+                </ul>
+                
+                <a href="irac-insecticidas.html" class="btn">Abrir Buscador IRAC</a>
+            </div>
+            
+            <!-- Tarjeta Fungicidas -->
+            <div class="card fungicides" onclick="location.href='buscador_fungicidas.html'">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <path d="M12 6v6"/>
+                    </svg>
+                </div>
+                <h2>Buscador de Fungicidas</h2>
+                <p>Clasificación FRAC - Manejo de resistencia en hongos</p>
+                
+                <ul class="features">
+                    <li>Base de datos según clasificación FRAC</li>
+                    <li>Información sobre sitios de acción</li>
+                    <li>Evaluación de riesgo de resistencia</li>
+                    <li>Estrategias de manejo anti-resistencia</li>
+                    <li>Búsqueda avanzada por múltiples criterios</li>
+                </ul>
+                
+                <a href="fraac-fungicidas.html" class="btn">Abrir Buscador FRAC</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Efectos de hover mejorados
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+            
+            // Click en cualquier parte de la tarjeta
+            card.addEventListener('click', function() {
+                const link = this.querySelector('a');
+                if (link) {
+                    window.location.href = link.href;
+                }
+            });
+        });
+        
+        // Efecto de tecleo en el título
+        const title = document.querySelector('.header h1');
+        const originalText = title.textContent;
+        title.textContent = '';
+        
+        let i = 0;
+        const typeWriter = () => {
+            if (i < originalText.length) {
+                title.textContent += originalText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        };
+        
+        // Iniciar efecto después de un breve delay
+        setTimeout(typeWriter, 500);
+    </script>
+</body>
+</html>
