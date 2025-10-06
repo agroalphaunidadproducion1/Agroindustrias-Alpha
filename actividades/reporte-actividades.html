@@ -18,7 +18,6 @@
             --header-color: #1b5e20;
             --table-header: #2e7d32;
             --completed-color: #4caf50;
-            --recent-activity: #00c853;
         }
         
         body {
@@ -26,7 +25,7 @@
             padding-top: 20px;
             padding-bottom: 40px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: margin-left 0.3s;
+            transition: all 0.3s ease;
         }
         
         .header {
@@ -121,174 +120,71 @@
             color: var(--completed-color);
         }
         
-        .week-selector {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .recent-activity {
-            color: var(--recent-activity);
-            margin-left: 5px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .invernadero-cell {
-            position: relative;
-            font-weight: bold;
-        }
-        
-        .activity-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--recent-activity);
-            border-radius: 50%;
-            margin-left: 5px;
-            animation: pulse 2s infinite;
-        }
-        
         /* Estilos para el menú hamburguesa */
-        .hamburger-menu {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        .navbar {
+            background: linear-gradient(135deg, var(--header-color), var(--secondary-color));
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
-        .hamburger-menu i {
-            color: white;
-            font-size: 1.5rem;
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
         }
         
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 300px;
-            height: 100%;
-            background-color: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-            z-index: 999;
-            padding: 20px;
-            overflow-y: auto;
-            transition: left 0.3s;
-        }
-        
-        .sidebar.open {
-            left: 0;
-        }
-        
-        .sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .sidebar-title {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        .close-sidebar {
-            background: none;
+        .navbar-toggler {
             border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #777;
+            padding: 5px 10px;
         }
         
-        .sidebar-option {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            cursor: pointer;
-            transition: background-color 0.2s;
+        .navbar-toggler:focus {
+            box-shadow: none;
         }
         
-        .sidebar-option:hover {
-            background-color: #e9ecef;
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
         
-        .sidebar-option i {
-            margin-right: 10px;
-            color: var(--primary-color);
+        .offcanvas {
+            background-color: var(--light-bg);
         }
         
-        /* Estilos para el interruptor de reinicio */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-            float: right;
+        .offcanvas-header {
+            background: linear-gradient(135deg, var(--header-color), var(--secondary-color));
+            color: white;
         }
         
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .offcanvas-title {
+            font-weight: 600;
         }
         
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
+        .btn-close {
             background-color: white;
-            transition: .4s;
-            border-radius: 50%;
         }
         
-        input:checked + .slider {
-            background-color: var(--primary-color);
+        /* Estilos para el interruptor */
+        .form-check-input:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
         }
         
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        .form-check-label {
+            font-weight: 500;
         }
         
-        .main-content {
-            transition: margin-left 0.3s;
+        /* Estilos para cuando el interruptor está activo */
+        .hide-completed .completed {
+            background-color: transparent !important;
+            color: #ccc !important;
         }
         
-        .main-content.shifted {
-            margin-left: 300px;
+        .hide-completed .completed::after {
+            display: none;
+        }
+        
+        .hide-completed .completed .info-hover {
+            color: #ccc;
         }
         
         @media (max-width: 768px) {
@@ -312,69 +208,54 @@
             .completed::after {
                 font-size: 8px;
             }
-            
-            .recent-activity {
-                font-size: 0.8rem;
-            }
-            
-            .activity-indicator {
-                width: 6px;
-                height: 6px;
-            }
-            
-            .sidebar {
-                width: 250px;
-                left: -250px;
-            }
-            
-            .main-content.shifted {
-                margin-left: 250px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Menú hamburguesa -->
-    <div class="hamburger-menu" id="hamburgerMenu">
-        <i class="fas fa-bars"></i>
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h5 class="sidebar-title">Ajustes</h5>
-            <button class="close-sidebar" id="closeSidebar">
-                <i class="fas fa-times"></i>
+    <!-- Menú de navegación -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-seedling me-2"></i>Agro Alpha
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
             </button>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+                        <i class="fas fa-cogs me-2"></i>Configuración
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="hideCompletedSwitch" checked>
+                                <label class="form-check-label" for="hideCompletedSwitch">
+                                    Ocultar actividades completadas
+                                </label>
+                            </div>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <div class="alert alert-info p-2">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Cuando está activo, las actividades completadas se muestran en 0 y sin color.
+                                </small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        
-        <div class="sidebar-option">
-            <i class="fas fa-sync-alt"></i> Ocultar metas completadas
-            <label class="switch">
-                <input type="checkbox" id="resetToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-        
-        <div class="sidebar-option">
-            <i class="fas fa-info-circle"></i> Acerca de
-        </div>
-        
-        <div class="sidebar-option">
-            <i class="fas fa-cog"></i> Configuración
-        </div>
-    </div>
+    </nav>
 
-    <div class="container main-content" id="mainContent">
+    <div class="container">
         <div class="header text-center">
             <h1><i class="fas fa-seedling me-2"></i>Reporte de Actividades</h1>
             <p class="lead">Agroalpha - Unidad de producción 1</p>
-            <div class="week-selector mt-3">
-                <label for="weekSelector" class="me-2">Semana:</label>
-                <select id="weekSelector" class="form-select d-inline-block" style="width: auto;">
-                    <!-- Se llenará dinámicamente -->
-                </select>
-            </div>
         </div>
 
         <!-- Sección de Tomate -->
@@ -394,7 +275,7 @@
                                         <th>Bajado</th>
                                         <th>Deshoje</th>
                                         <th>Desbrote</th>
-                                        <th>Cosecha</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaResumenTomate">
@@ -422,7 +303,7 @@
                                         <th>Bajado</th>
                                         <th>Deshoje</th>
                                         <th>Desbrote</th>
-                                        <th>Cosecha</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaRendimientosTomate">
@@ -452,7 +333,7 @@
                                         <th>Poda</th>
                                         <th>Amarrado</th>
                                         <th>Raleo</th>
-                                        <th>Cosecha</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaResumenChile">
@@ -480,7 +361,7 @@
                                         <th>Poda</th>
                                         <th>Amarrado</th>
                                         <th>Raleo</th>
-                                        <th>Cosecha</th>
+                                        <th>Cosecha</th> <!-- Cosecha movida al final -->
                                     </tr>
                                 </thead>
                                 <tbody id="tablaRendimientosChile">
@@ -543,100 +424,39 @@
 
         // Variables globales
         let actividadesData = [];
-        let selectedWeek = getWeekNumber(new Date()).week;
-        let selectedYear = new Date().getFullYear();
-        let invernaderosRecientes = new Set();
-        let estadoSemanas = {}; // Almacenará el estado de cada semana
-        let actividadRecientePorInvernadero = {}; // Almacenará la actividad reciente por invernadero
-        let resetMode = false; // Controla si estamos en modo de reinicio
+        let hideCompleted = true; // Por defecto, ocultar actividades completadas
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            // Configurar selector de semanas
-            setupWeekSelector();
+            // Configurar el interruptor
+            const hideCompletedSwitch = document.getElementById('hideCompletedSwitch');
+            hideCompletedSwitch.checked = hideCompleted;
             
-            // Configurar menú hamburguesa
-            setupHamburgerMenu();
+            // Aplicar estado inicial
+            toggleCompletedVisibility();
             
-            // Configurar toggle de reinicio
-            setupResetToggle();
+            // Escuchar cambios en el interruptor
+            hideCompletedSwitch.addEventListener('change', function() {
+                hideCompleted = this.checked;
+                toggleCompletedVisibility();
+            });
             
             // Cargar datos de Firebase
             cargarDatosActividades();
         });
 
-        // Configurar el menú hamburguesa
-        function setupHamburgerMenu() {
-            const hamburgerMenu = document.getElementById('hamburgerMenu');
-            const sidebar = document.getElementById('sidebar');
-            const closeSidebar = document.getElementById('closeSidebar');
-            const mainContent = document.getElementById('mainContent');
-            
-            hamburgerMenu.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-                mainContent.classList.toggle('shifted');
-            });
-            
-            closeSidebar.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                mainContent.classList.remove('shifted');
-            });
-        }
-
-        // Configurar el toggle de reinicio
-        function setupResetToggle() {
-            const resetToggle = document.getElementById('resetToggle');
-            
-            resetToggle.addEventListener('change', function() {
-                resetMode = this.checked;
-                procesarDatos();
-            });
-        }
-
-        // Configurar el selector de semanas
-        function setupWeekSelector() {
-            const weekSelector = document.getElementById('weekSelector');
-            const currentWeek = getWeekNumber(new Date()).week;
-            const currentYear = new Date().getFullYear();
-            
-            // Limpiar opciones existentes
-            weekSelector.innerHTML = '';
-            
-            // Agregar semanas (desde la 1 hasta la semana actual)
-            for (let week = 1; week <= currentWeek; week++) {
-                const option = document.createElement('option');
-                option.value = week;
-                option.textContent = `Semana ${week} (${currentYear})`;
-                if (week === currentWeek) {
-                    option.selected = true;
-                }
-                weekSelector.appendChild(option);
+        // Función para alternar la visibilidad de actividades completadas
+        function toggleCompletedVisibility() {
+            if (hideCompleted) {
+                document.body.classList.add('hide-completed');
+            } else {
+                document.body.classList.remove('hide-completed');
             }
             
-            // Agregar evento para cambiar semana
-            weekSelector.addEventListener('change', function() {
-                selectedWeek = parseInt(this.value);
-                selectedYear = currentYear;
+            // Si ya tenemos datos, actualizar las tablas
+            if (actividadesData.length > 0) {
                 procesarDatos();
-            });
-        }
-
-        // Obtener el número de semana de una fecha
-        function getWeekNumber(d) {
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            return {week: weekNo, year: d.getUTCFullYear()};
-        }
-
-        // Obtener el lunes de la semana específica
-        function getMondayOfWeek(week, year) {
-            const janFirst = new Date(year, 0, 1);
-            const daysOffset = 1 - janFirst.getDay(); // 1 for Monday
-            const firstMonday = new Date(year, 0, janFirst.getDate() + daysOffset);
-            const result = new Date(firstMonday.setDate(firstMonday.getDate() + (week - 1) * 7));
-            return result;
+            }
         }
 
         // Cargar datos de actividades desde Firebase
@@ -649,211 +469,12 @@
                     actividadesData.push(childSnapshot.val());
                 });
                 
-                // Identificar invernaderos con actividad reciente (últimas 24 horas)
-                identificarActividadReciente();
-                
-                // Calcular el estado de todas las semanas
-                calcularEstadoSemanas();
-                
                 // Procesar y mostrar datos
                 procesarDatos();
+            }, (error) => {
+                console.error("Error al cargar datos de Firebase:", error);
+                mostrarMensajeError("No se pudieron cargar los datos. Verifique la conexión.");
             });
-        }
-
-        // Identificar invernaderos con actividad en las últimas 24 horas
-        function identificarActividadReciente() {
-            invernaderosRecientes.clear();
-            actividadRecientePorInvernadero = {};
-            const ahora = new Date();
-            const hace24Horas = new Date(ahora.getTime() - (24 * 60 * 60 * 1000));
-            
-            actividadesData.forEach(item => {
-                if (!item.fecha || !item.invernadero) return;
-                
-                const fechaItem = new Date(item.fecha);
-                if (fechaItem >= hace24Horas && fechaItem <= ahora) {
-                    invernaderosRecientes.add(item.invernadero);
-                    
-                    // Guardar la actividad reciente para este invernadero
-                    if (!actividadRecientePorInvernadero[item.invernadero]) {
-                        actividadRecientePorInvernadero[item.invernadero] = [];
-                    }
-                    actividadRecientePorInvernadero[item.invernadero].push(item);
-                }
-            });
-        }
-
-        // Calcular el estado de todas las semanas
-        function calcularEstadoSemanas() {
-            estadoSemanas = {};
-            const currentWeek = getWeekNumber(new Date()).week;
-            const currentYear = new Date().getFullYear();
-            
-            // Procesar cada semana desde la 1 hasta la actual
-            for (let week = 1; week <= currentWeek; week++) {
-                estadoSemanas[week] = {};
-                
-                // Procesar todos los invernaderos de ambos cultivos
-                const allInvernaderos = [...invernaderosPorCultivo.tomate, ...invernaderosPorCultivo.chile];
-                
-                allInvernaderos.forEach(invernadero => {
-                    estadoSemanas[week][invernadero] = {};
-                    
-                    // Determinar el tipo de cultivo según el invernadero
-                    const tipoCultivo = invernaderosPorCultivo.tomate.includes(invernadero) ? 'tomate' : 'chile';
-                    const actividades = actividadesPorCultivo[tipoCultivo];
-                    
-                    // Para cada actividad, calcular el estado al final de la semana
-                    actividades.forEach(actividad => {
-                        const datosActividad = actividadesData.filter(item => 
-                            item.invernadero === invernadero && 
-                            item.actividad === actividad
-                        );
-                        
-                        if (datosActividad.length > 0) {
-                            const metaCamas = metasCamas[invernadero] || 0;
-                            
-                            if (actividad === 'Cosecha') {
-                                // Para cosecha, obtener la última entrada de la semana
-                                const ultimaCosecha = obtenerUltimaCosechaSemana(datosActividad, week, currentYear);
-                                estadoSemanas[week][invernadero][actividad] = {
-                                    camas: ultimaCosecha ? ultimaCosecha.camas : 0,
-                                    completado: ultimaCosecha ? ultimaCosecha.camas >= metaCamas : false
-                                };
-                                
-                                // Guardar también el rendimiento si existe
-                                if (ultimaCosecha && ultimaCosecha.rendimiento) {
-                                    estadoSemanas[week][invernadero][actividad].rendimiento = ultimaCosecha.rendimiento;
-                                }
-                            } else {
-                                // Para otras actividades, obtener la última vuelta de la semana
-                                const ultimaVuelta = obtenerUltimaVueltaSemana(datosActividad, week, currentYear, metaCamas);
-                                
-                                estadoSemanas[week][invernadero][actividad] = {
-                                    vuelta: ultimaVuelta.vuelta,
-                                    camas: ultimaVuelta.camas,
-                                    completado: ultimaVuelta.completado || false
-                                };
-                            }
-                        }
-                    });
-                });
-            }
-        }
-
-        // Obtener la última cosecha de la semana específica
-        function obtenerUltimaCosechaSemana(datosActividad, week, year) {
-            if (week < 1) return null;
-            
-            const startDate = getMondayOfWeek(week, year);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-            
-            let ultimaCosecha = null;
-            let ultimaFecha = null;
-            
-            datosActividad.forEach(item => {
-                if (!item.fecha) return;
-                
-                const itemDate = new Date(item.fecha);
-                if (itemDate >= startDate && itemDate <= endDate) {
-                    if (!ultimaFecha || itemDate > ultimaFecha) {
-                        ultimaFecha = itemDate;
-                        ultimaCosecha = item;
-                    }
-                }
-            });
-            
-            return ultimaCosecha;
-        }
-
-        // Obtener la última vuelta de la semana específica - MODIFICADA
-        function obtenerUltimaVueltaSemana(datosActividad, week, year, metaCamas) {
-            if (week < 1) return { vuelta: 0, camas: 0, completado: false };
-            
-            const startDate = getMondayOfWeek(week, year);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-            
-            // Filtrar actividades de esta semana
-            const actividadesSemana = datosActividad.filter(item => {
-                if (!item.fecha) return false;
-                const itemDate = new Date(item.fecha);
-                return itemDate >= startDate && itemDate <= endDate;
-            });
-            
-            if (actividadesSemana.length === 0) {
-                // Si no hay actividades esta semana, usar el estado de la semana anterior
-                if (week > 1) {
-                    const estadoSemanaAnterior = estadoSemanas[week-1] && 
-                                               estadoSemanas[week-1][datosActividad[0].invernadero] &&
-                                               estadoSemanas[week-1][datosActividad[0].invernadero][datosActividad[0].actividad];
-                    
-                    if (estadoSemanaAnterior) {
-                        // MODIFICACIÓN: Si se completó la meta la semana anterior, mantener el valor completo
-                        if (estadoSemanaAnterior.completado) {
-                            return { 
-                                vuelta: estadoSemanaAnterior.vuelta, 
-                                camas: metaCamas, // Mostrar el valor completo en lugar de 0
-                                completado: true
-                            };
-                        }
-                        
-                        return { 
-                            vuelta: estadoSemanaAnterior.vuelta, 
-                            camas: estadoSemanaAnterior.camas,
-                            completado: false
-                        };
-                    }
-                }
-                return { vuelta: 0, camas: 0, completado: false };
-            }
-            
-            // Obtener el estado de la semana anterior
-            let vueltaAnterior = 0;
-            let camasAcumuladasAnterior = 0;
-            let completadoAnterior = false;
-            
-            if (week > 1) {
-                const estadoSemanaAnterior = estadoSemanas[week-1] && 
-                                           estadoSemanas[week-1][datosActividad[0].invernadero] &&
-                                           estadoSemanas[week-1][datosActividad[0].invernadero][datosActividad[0].actividad];
-                
-                if (estadoSemanaAnterior) {
-                    vueltaAnterior = estadoSemanaAnterior.vuelta;
-                    camasAcumuladasAnterior = estadoSemanaAnterior.camas;
-                    completadoAnterior = estadoSemanaAnterior.completado || false;
-                }
-            }
-            
-            // Si la semana anterior estaba completada, reiniciar el contador para la nueva vuelta
-            if (completadoAnterior) {
-                camasAcumuladasAnterior = 0;
-            }
-            
-            // Calcular el total de camas de esta semana
-            const totalCamasSemana = actividadesSemana.reduce((sum, item) => sum + (item.camas || 0), 0);
-            
-            // Calcular la vuelta actual y las camas
-            const camasAcumuladas = camasAcumuladasAnterior + totalCamasSemana;
-            const vueltaActual = vueltaAnterior + Math.floor(camasAcumuladas / metaCamas);
-            const camasActual = camasAcumuladas % metaCamas;
-            
-            // MODIFICACIÓN: Si se completa la meta esta semana, mostrar el valor completo
-            // en lugar de 0, hasta que comience una nueva semana
-            if (camasActual === 0 && camasAcumuladas > 0) {
-                return {
-                    vuelta: vueltaActual,
-                    camas: metaCamas, // Mostrar el valor completo
-                    completado: true
-                };
-            }
-            
-            return {
-                vuelta: vueltaActual,
-                camas: camasActual,
-                completado: camasActual >= metaCamas
-            };
         }
 
         // Procesar datos y actualizar la interfaz
@@ -870,6 +491,11 @@
         // Mostrar tabla resumen por tipo de cultivo
         function mostrarTablaResumen(tipoCultivo, contenedorId) {
             const contenedor = document.getElementById(contenedorId);
+            if (!contenedor) {
+                console.error(`Contenedor ${contenedorId} no encontrado`);
+                return;
+            }
+            
             contenedor.innerHTML = '';
             
             const invernaderos = invernaderosPorCultivo[tipoCultivo];
@@ -880,65 +506,79 @@
                 
                 // Celda de invernadero (abreviado)
                 const celdaInvernadero = document.createElement('td');
-                celdaInvernadero.classList.add('invernadero-cell');
-                
-                // Verificar si este invernadero tiene actividad reciente
-                const tieneActividadReciente = invernaderosRecientes.has(invernadero);
-                
-                let contenido = invernadero === 'vivero' ? 'Viv' : invernadero;
-                
-                if (tieneActividadReciente) {
-                    contenido += ' <span class="activity-indicator" title="Actividad en las últimas 24 horas"></span>';
-                }
-                
-                celdaInvernadero.innerHTML = contenido;
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('fw-bold');
                 fila.appendChild(celdaInvernadero);
                 
                 // Celdas para cada actividad
                 actividades.forEach(actividad => {
                     const celda = document.createElement('td');
                     
-                    // Obtener el estado de la semana seleccionada para este invernadero y actividad
-                    const estadoSemana = estadoSemanas[selectedWeek] && 
-                                        estadoSemanas[selectedWeek][invernadero] && 
-                                        estadoSemanas[selectedWeek][invernadero][actividad];
+                    // Filtrar datos para esta actividad e invernadero
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && item.actividad === actividad
+                    );
                     
-                    if (estadoSemana) {
+                    if (datosActividad.length > 0) {
+                        // Calcular total de camas para esta actividad
+                        const totalCamas = datosActividad.reduce((sum, item) => sum + (item.camas || 0), 0);
                         const metaCamas = metasCamas[invernadero] || 0;
                         
                         if (actividad === 'Cosecha') {
-                            // Para cosecha, mostrar el valor de la última cosecha de la semana
-                            celda.textContent = estadoSemana.camas;
+                            // Para cosecha, mostrar el total de camas de la última cosecha
+                            const ultimaCosecha = datosActividad[datosActividad.length - 1];
+                            const camasCosecha = ultimaCosecha.camas || 0;
                             
-                            // Verificar si se completó la meta
-                            if (estadoSemana.completado && !resetMode) {
+                            // Verificar si se completó una vuelta (múltiplo de la meta)
+                            if (camasCosecha >= metaCamas) {
                                 celda.classList.add('completed');
+                            }
+                            
+                            // Si hideCompleted está activo y está completado, mostrar 0
+                            if (hideCompleted && camasCosecha >= metaCamas) {
+                                celda.textContent = '0';
+                            } else {
+                                celda.textContent = camasCosecha;
                             }
                         } else {
-                            // Para otras actividades, mostrar la última vuelta y camas
-                            let valorMostrar = estadoSemana.camas;
+                            const vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
+                            const camasVueltaActual = totalCamas % metaCamas;
                             
-                            // Si estamos en modo reinicio y la actividad está completada, mostrar 0
-                            if (resetMode && estadoSemana.completado && actividad !== 'Cosecha') {
-                                valorMostrar = 0;
+                            // Mostrar el número de camas (si completó vuelta, mostrar la meta en lugar del total)
+                            let camasAMostrar = camasVueltaActual;
+                            let esCompletado = false;
+                            
+                            if (camasVueltaActual === 0 && totalCamas > 0) {
+                                // Cuando se completa una vuelta, mostrar la meta (no el total acumulado)
+                                camasAMostrar = metaCamas;
+                                celda.classList.add('completed');
+                                esCompletado = true;
                             }
                             
-                            const infoText = estadoSemana.vuelta > 0 ? 
-                                `Vuelta ${estadoSemana.vuelta}: ${estadoSemana.camas}/${metaCamas}` : 
-                                `${estadoSemana.camas}/${metaCamas}`;
-                            
-                            celda.innerHTML = `
-                                <div class="info-hover">
-                                    ${valorMostrar}
-                                    <div class="tooltip-info">
-                                        ${infoText}
+                            // Si hideCompleted está activo y está completado, mostrar 0
+                            if (hideCompleted && esCompletado) {
+                                celda.innerHTML = `
+                                    <div class="info-hover">
+                                        0
+                                        <div class="tooltip-info">
+                                            Vuelta ${vueltaActual}<br>
+                                            Progreso: 100%<br>
+                                            Meta: ${metaCamas} camas<br>
+                                            <small>Completado</small>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
-                            
-                            // Verificar si se completó la vuelta
-                            if (estadoSemana.completado && !resetMode) {
-                                celda.classList.add('completed');
+                                `;
+                            } else {
+                                celda.innerHTML = `
+                                    <div class="info-hover">
+                                        ${camasAMostrar}
+                                        <div class="tooltip-info">
+                                            Vuelta ${vueltaActual}<br>
+                                            Progreso: ${Math.min(100, (totalCamas / metaCamas) * 100).toFixed(1)}%<br>
+                                            Meta: ${metaCamas} camas
+                                        </div>
+                                    </div>
+                                `;
                             }
                         }
                     } else {
@@ -955,6 +595,11 @@
         // Mostrar tabla de rendimientos por tipo de cultivo
         function mostrarTablaRendimientos(tipoCultivo, contenedorId) {
             const contenedor = document.getElementById(contenedorId);
+            if (!contenedor) {
+                console.error(`Contenedor ${contenedorId} no encontrado`);
+                return;
+            }
+            
             contenedor.innerHTML = '';
             
             const invernaderos = invernaderosPorCultivo[tipoCultivo];
@@ -965,18 +610,7 @@
                 
                 // Celda de invernadero (abreviado)
                 const celdaInvernadero = document.createElement('td');
-                celdaInvernadero.classList.add('invernadero-cell');
-                
-                // Verificar si este invernadero tiene actividad reciente
-                const tieneActividadReciente = invernaderosRecientes.has(invernadero);
-                
-                let contenido = invernadero === 'vivero' ? 'Viv' : invernadero;
-                
-                if (tieneActividadReciente) {
-                    contenido += ' <span class="activity-indicator" title="Actividad en las últimas 24 horas"></span>';
-                }
-                
-                celdaInvernadero.innerHTML = contenido;
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
                 celdaInvernadero.classList.add('fw-bold');
                 fila.appendChild(celdaInvernadero);
                 
@@ -984,21 +618,19 @@
                 actividades.forEach(actividad => {
                     const celda = document.createElement('td');
                     
-                    // Obtener el estado de la semana seleccionada para este invernadero y actividad
-                    const estadoSemana = estadoSemanas[selectedWeek] && 
-                                        estadoSemanas[selectedWeek][invernadero] && 
-                                        estadoSemanas[selectedWeek][invernadero][actividad];
+                    // Filtrar datos para esta actividad e invernadero con rendimiento
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && 
+                        item.actividad === actividad &&
+                        item.rendimiento > 0
+                    );
                     
-                    if (estadoSemana && estadoSemana.rendimiento) {
-                        celda.innerHTML = `<span class="rendimiento-cell">${estadoSemana.rendimiento}</span>`;
+                    if (datosActividad.length > 0) {
+                        // Obtener el último registro con rendimiento
+                        const ultimoRegistro = datosActividad[datosActividad.length - 1];
+                        celda.innerHTML = `<span class="rendimiento-cell">${ultimoRegistro.rendimiento}</span>`;
                     } else {
-                        // Si no hay rendimiento, buscar en los datos originales
-                        const rendimiento = obtenerRendimiento(invernadero, actividad, selectedWeek, selectedYear);
-                        if (rendimiento) {
-                            celda.innerHTML = `<span class="rendimiento-cell">${rendimiento}</span>`;
-                        } else {
-                            celda.innerHTML = '<span class="text-muted">-</span>';
-                        }
+                        celda.innerHTML = '<span class="text-muted">-</span>';
                     }
                     
                     fila.appendChild(celda);
@@ -1008,38 +640,19 @@
             });
         }
 
-        // Función mejorada para obtener rendimientos de los datos originales
-        function obtenerRendimiento(invernadero, actividad, semana, año) {
-            // Buscar en los datos de actividades
-            const actividadesFiltradas = actividadesData.filter(item => 
-                item.invernadero === invernadero && 
-                item.actividad === actividad
-            );
+        // Función para mostrar mensajes de error
+        function mostrarMensajeError(mensaje) {
+            // Crear un elemento de alerta de Bootstrap
+            const alerta = document.createElement('div');
+            alerta.className = 'alert alert-danger alert-dismissible fade show';
+            alerta.innerHTML = `
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
             
-            if (actividadesFiltradas.length === 0) return null;
-            
-            // Obtener el lunes de la semana
-            const startDate = getMondayOfWeek(semana, año);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-            
-            // Buscar la última actividad de la semana con rendimiento
-            let ultimaActividad = null;
-            let ultimaFecha = null;
-            
-            actividadesFiltradas.forEach(item => {
-                if (!item.fecha) return;
-                
-                const itemDate = new Date(item.fecha);
-                if (itemDate >= startDate && itemDate <= endDate && item.rendimiento) {
-                    if (!ultimaFecha || itemDate > ultimaFecha) {
-                        ultimaFecha = itemDate;
-                        ultimaActividad = item;
-                    }
-                }
-            });
-            
-            return ultimaActividad ? ultimaActividad.rendimiento : null;
+            // Insertar al principio del contenedor
+            const container = document.querySelector('.container');
+            container.insertBefore(alerta, container.firstChild);
         }
     </script>
 </body>
