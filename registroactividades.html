@@ -129,6 +129,7 @@
             padding: 15px;
             margin-bottom: 15px;
             border: 1px solid #dee2e6;
+            position: relative;
         }
         
         .actividad-header {
@@ -162,6 +163,21 @@
         
         .input-group-sm {
             max-width: 300px;
+        }
+        
+        .dropdown-toggle::after {
+            display: none;
+        }
+        
+        .actividad-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .actividad-menu .btn {
+            padding: 4px 8px;
+            font-size: 0.8rem;
         }
         
         @media (max-width: 768px) {
@@ -460,6 +476,14 @@
                 const actividadDiv = document.createElement('div');
                 actividadDiv.className = 'actividad-item';
                 actividadDiv.innerHTML = `
+                    <div class="actividad-menu dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item culminar-vuelta-btn" href="#" data-actividad="${actividad}"><i class="fas fa-flag-checkered me-2"></i>Culminar vuelta</a></li>
+                        </ul>
+                    </div>
                     <div class="actividad-header">
                         <label class="form-check-label fw-bold">${actividad}</label>
                         <span class="vuelta-badge" id="vuelta-badge-${actividad}">Vuelta: Cargando...</span>
@@ -488,6 +512,15 @@
                 
                 // Cargar información de vueltas para esta actividad
                 cargarInfoVueltas(actividad, metaCamas);
+            });
+            
+            // Agregar event listeners para los botones de culminar vuelta
+            document.querySelectorAll('.culminar-vuelta-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const actividad = this.getAttribute('data-actividad');
+                    culminarVuelta(actividad);
+                });
             });
         }
 
@@ -561,6 +594,71 @@
                     const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
                     badgeElement.textContent = 'Error al cargar';
                 });
+        }
+
+        // Culminar vuelta para una actividad específica
+        function culminarVuelta(actividad) {
+            if (actividad === 'Cosecha') {
+                showAlert('La función "Culminar vuelta" no está disponible para la actividad Cosecha', 'info');
+                return;
+            }
+            
+            const invernadero = preferenciasUsuario.invernadero;
+            const metaCamas = metasCamas[invernadero] || 0;
+            
+            if (metaCamas === 0) {
+                showAlert('No se puede culminar vuelta: meta de camas no definida', 'danger');
+                return;
+            }
+            
+            const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
+            const totalCamasAnterior = parseInt(badgeElement.getAttribute('data-total-camas') || 0);
+            const camasEnVueltaActual = totalCamasAnterior % metaCamas;
+            
+            if (camasEnVueltaActual === 0) {
+                showAlert('Esta vuelta ya está completa', 'info');
+                return;
+            }
+            
+            const camasFaltantes = metaCamas - camasEnVueltaActual;
+            
+            if (confirm(`¿Desea culminar la vuelta actual? Se registrarán automáticamente ${camasFaltantes} camas para completar la vuelta.`)) {
+                const fecha = document.getElementById('fecha').value;
+                
+                const actividadData = {
+                    fecha: fecha,
+                    cultivo: preferenciasUsuario.cultivo,
+                    invernadero: invernadero,
+                    actividad: actividad,
+                    camas: camasFaltantes,
+                    rendimiento: 0,
+                    timestamp: new Date().toISOString(),
+                    vueltaCompletada: true
+                };
+                
+                // Calcular vuelta anterior y nueva
+                const totalCamasNuevo = totalCamasAnterior + camasFaltantes;
+                const vueltaAnterior = Math.floor(totalCamasAnterior / metaCamas) + 1;
+                const vueltaNueva = Math.floor(totalCamasNuevo / metaCamas) + 1;
+                
+                actividadData.vuelta = vueltaAnterior; // Se guarda como la vuelta que se completó
+                actividadData.camasAcumuladas = totalCamasNuevo;
+                
+                // Guardar en Firebase
+                const activitiesRef = database.ref('unidad_produccion_1/actividades');
+                
+                activitiesRef.push().set(actividadData)
+                    .then(() => {
+                        showAlert(`Vuelta ${vueltaAnterior} de ${actividad} completada. Se registraron ${camasFaltantes} camas automáticamente.`, 'success');
+                        
+                        // Actualizar información de vueltas
+                        cargarInfoVueltas(actividad, metaCamas);
+                    })
+                    .catch((error) => {
+                        console.error('Error al culminar vuelta:', error);
+                        showAlert('Error al culminar vuelta: ' + error.message, 'danger');
+                    });
+            }
         }
 
         // Guardar todas las actividades en Firebase
