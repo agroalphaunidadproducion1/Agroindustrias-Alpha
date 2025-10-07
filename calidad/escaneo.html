@@ -414,6 +414,10 @@
         .btn-process:hover {
             background-color: #e67e22;
         }
+        
+        .image-processing-canvas {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -491,6 +495,9 @@
                         </button>
                     </div>
 
+                    <!-- Canvas para procesamiento de imágenes -->
+                    <canvas id="imageProcessingCanvas" class="image-processing-canvas"></canvas>
+
                     <button type="submit" class="btn-primary" id="submitBtn">Guardar Código</button>
                 </form>
                 
@@ -511,7 +518,7 @@
     <!-- QuaggaJS para escaneo de códigos de barras -->
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     
-    <!-- jsQR para escanear códigos de barras en imágenes estáticas -->
+    <!-- jsQR para escanear códigos QR en imágenes estáticas -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
     <script>
@@ -551,6 +558,7 @@
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
         const imagePreview = document.getElementById('imagePreview');
         const processImageBtn = document.getElementById('processImage');
+        const imageProcessingCanvas = document.getElementById('imageProcessingCanvas');
         
         // Establecer fecha actual por defecto
         window.addEventListener('DOMContentLoaded', () => {
@@ -920,19 +928,20 @@
             processImageBtn.innerHTML = '<span class="loading"></span> Procesando...';
             
             // Crear un canvas para procesar la imagen
-            const canvas = document.createElement('canvas');
+            const canvas = imageProcessingCanvas;
             const ctx = canvas.getContext('2d');
             const img = new Image();
             
             img.onload = function() {
+                // Configurar el canvas con las dimensiones de la imagen
                 canvas.width = img.width;
                 canvas.height = img.height;
+                
+                // Dibujar la imagen en el canvas
                 ctx.drawImage(img, 0, 0, img.width, img.height);
                 
-                // Obtener datos de la imagen para jsQR
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                
                 // Intentar detectar códigos QR primero
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
                 
                 if (qrCode) {
@@ -948,7 +957,15 @@
                 }
                 
                 // Si no se detecta código QR, intentar con Quagga para códigos de barras
-                Quagga.decodeSingle({
+                // Primero, preparar la imagen para Quagga
+                const config = {
+                    inputStream: {
+                        size: Math.min(img.width, img.height)
+                    },
+                    locator: {
+                        patchSize: "large",
+                        halfSample: false
+                    },
                     decoder: {
                         readers: [
                             "code_128_reader",
@@ -963,8 +980,11 @@
                         ]
                     },
                     locate: true,
-                    src: imagePreview.src
-                }, function(result) {
+                    src: canvas.toDataURL()
+                };
+                
+                // Usar Quagga para decodificar la imagen
+                Quagga.decodeSingle(config, function(result) {
                     processImageBtn.disabled = false;
                     processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
                     
@@ -975,12 +995,97 @@
                         addToScannedCodes(code);
                         showStatus('Código de barras detectado: ' + code, 'success');
                     } else {
-                        showStatus('No se pudo detectar ningún código de barras en la imagen', 'error');
+                        // Si Quagga no funciona, intentar con un enfoque alternativo
+                        tryAlternativeBarcodeDetection(canvas, ctx);
                     }
                 });
             };
             
+            img.onerror = function() {
+                processImageBtn.disabled = false;
+                processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                showStatus('Error al cargar la imagen para procesamiento', 'error');
+            };
+            
             img.src = imagePreview.src;
+        }
+        
+        // Función alternativa para detectar códigos de barras
+        function tryAlternativeBarcodeDetection(canvas, ctx) {
+            // Intentar con diferentes configuraciones de procesamiento de imagen
+            // 1. Convertir a escala de grises
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const grayscaleData = convertToGrayscale(imageData);
+            
+            // 2. Aplicar contraste
+            const contrastedData = applyContrast(grayscaleData, 1.5);
+            
+            // 3. Volver a dibujar en el canvas
+            ctx.putImageData(contrastedData, 0, 0);
+            
+            // 4. Intentar nuevamente con Quagga
+            const config = {
+                inputStream: {
+                    size: Math.min(canvas.width, canvas.height)
+                },
+                locator: {
+                    patchSize: "large",
+                    halfSample: false
+                },
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_39_vin_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader"
+                    ]
+                },
+                locate: true,
+                src: canvas.toDataURL()
+            };
+            
+            Quagga.decodeSingle(config, function(result) {
+                if (result && result.codeResult) {
+                    const code = result.codeResult.code;
+                    barcodeInput.value = code;
+                    currentScanResult = code;
+                    addToScannedCodes(code);
+                    showStatus('Código de barras detectado: ' + code, 'success');
+                } else {
+                    showStatus('No se pudo detectar ningún código de barras en la imagen', 'error');
+                    console.log("No se detectaron códigos en la imagen procesada");
+                }
+            });
+        }
+        
+        // Función para convertir imagen a escala de grises
+        function convertToGrayscale(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = avg;     // rojo
+                data[i + 1] = avg; // verde
+                data[i + 2] = avg; // azul
+            }
+            return imageData;
+        }
+        
+        // Función para aplicar contraste a la imagen
+        function applyContrast(imageData, contrast) {
+            const data = imageData.data;
+            const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+            
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = factor * (data[i] - 128) + 128;     // rojo
+                data[i + 1] = factor * (data[i + 1] - 128) + 128; // verde
+                data[i + 2] = factor * (data[i + 2] - 128) + 128; // azul
+            }
+            return imageData;
         }
         
         // Función para mostrar mensajes de estado
