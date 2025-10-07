@@ -389,6 +389,31 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* Estilos para la vista previa de imágenes */
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 15px auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .image-preview-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .btn-process {
+            background-color: var(--warning-color);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .btn-process:hover {
+            background-color: #e67e22;
+        }
     </style>
 </head>
 <body>
@@ -454,8 +479,16 @@
 
                     <div class="form-group">
                         <label for="fileInput">O subir desde archivo:</label>
-                        <input type="file" id="fileInput" accept=".txt,.csv,.json" class="file-input">
-                        <small class="file-help">Formatos: TXT (un código por línea), CSV, JSON</small>
+                        <input type="file" id="fileInput" accept=".txt,.csv,.json,.png,.jpg,.jpeg,.gif,.bmp,.webp" class="file-input">
+                        <small class="file-help">Formatos: TXT, CSV, JSON o imágenes (PNG, JPG, JPEG, GIF, BMP, WEBP)</small>
+                    </div>
+
+                    <!-- Vista previa de imagen y botón para procesar -->
+                    <div id="imagePreviewContainer" class="image-preview-container hidden">
+                        <img id="imagePreview" class="image-preview" alt="Vista previa de la imagen">
+                        <button type="button" id="processImage" class="btn-process">
+                            🔍 Procesar Código de Barras
+                        </button>
                     </div>
 
                     <button type="submit" class="btn-primary" id="submitBtn">Guardar Código</button>
@@ -477,6 +510,9 @@
     
     <!-- QuaggaJS para escaneo de códigos de barras -->
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    
+    <!-- jsQR para escanear códigos de barras en imágenes estáticas -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     
     <script>
         // Configuración de Firebase
@@ -512,6 +548,9 @@
         const contenedorActualTexto = document.getElementById('contenedorActualTexto');
         const cambiarContenedorBtn = document.getElementById('cambiarContenedor');
         const contenedorInputGroup = document.getElementById('contenedorInputGroup');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const processImageBtn = document.getElementById('processImage');
         
         // Establecer fecha actual por defecto
         window.addEventListener('DOMContentLoaded', () => {
@@ -542,6 +581,9 @@
         
         // Manejar cambio en el input del contenedor
         numeroContenedorInput.addEventListener('change', guardarContenedor);
+        
+        // Procesar imagen para detectar códigos de barras
+        processImageBtn.addEventListener('click', processImageForBarcodes);
         
         // Función para cargar el contenedor guardado
         function cargarContenedorGuardado() {
@@ -598,16 +640,22 @@
                 return;
             }
             
-            // Configuración de Quagga
+            // Configuración mejorada de Quagga
             Quagga.init({
                 inputStream: {
                     name: "Live",
                     type: "LiveStream",
                     target: cameraView,
                     constraints: {
-                        width: 640,
-                        height: 480,
+                        width: 1280,
+                        height: 720,
                         facingMode: "environment" // Usar cámara trasera en dispositivos móviles
+                    },
+                    area: { // Definir área de escaneo para mejorar precisión
+                        top: "25%",
+                        right: "10%",
+                        left: "10%",
+                        bottom: "25%"
                     }
                 },
                 decoder: {
@@ -619,15 +667,23 @@
                         "code_39_vin_reader",
                         "codabar_reader",
                         "upc_reader",
-                        "upc_e_reader"
+                        "upc_e_reader",
+                        "i2of5_reader" // Agregar más lectores
                     ]
                 },
                 locator: {
-                    patchSize: "medium",
-                    halfSample: true
+                    patchSize: "large", // Mejorar detección
+                    halfSample: false
                 },
                 locate: true,
-                numOfWorkers: 4
+                numOfWorkers: navigator.hardwareConcurrency || 4, // Usar todos los núcleos disponibles
+                frequency: 10, // Mayor frecuencia de escaneo
+                debug: {
+                    drawBoundingBox: true,
+                    showFrequency: true,
+                    drawScanline: true,
+                    showPattern: true
+                }
             }, function(err) {
                 if (err) {
                     console.error("Error al inicializar Quagga:", err);
@@ -654,12 +710,13 @@
             Quagga.onDetected(function(result) {
                 if (result && result.codeResult) {
                     const code = result.codeResult.code;
-                    console.log("Código detectado:", code);
+                    console.log("Código detectado:", code, "Formato:", result.codeResult.format);
                     
                     // Mostrar indicador de escaneo exitoso
                     scanningOverlay.innerHTML = `
                         <div style="color: #2ecc71; font-weight: bold;">¡Código detectado!</div>
                         <div>${code}</div>
+                        <div style="font-size: 14px;">Formato: ${result.codeResult.format}</div>
                     `;
                     scanningOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
                     
@@ -794,39 +851,53 @@
             reader.onload = function(event) {
                 try {
                     const content = event.target.result;
-                    let codes = [];
                     
-                    // Determinar el tipo de archivo y procesarlo
-                    if (file.name.endsWith('.txt')) {
-                        codes = content.split('\n')
-                            .map(line => line.trim())
-                            .filter(line => line.length > 0);
-                    } else if (file.name.endsWith('.csv')) {
-                        codes = content.split('\n')
-                            .map(line => {
-                                const parts = line.split(',');
-                                return parts.length > 0 ? parts[0].trim() : '';
-                            })
-                            .filter(line => line.length > 0);
-                    } else if (file.name.endsWith('.json')) {
-                        const jsonData = JSON.parse(content);
-                        // Asumimos que es un array de códigos o un objeto con una propiedad codes
-                        if (Array.isArray(jsonData)) {
-                            codes = jsonData;
-                        } else if (jsonData.codes && Array.isArray(jsonData.codes)) {
-                            codes = jsonData.codes;
-                        }
-                    }
+                    // Verificar si es un archivo de imagen
+                    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'];
+                    const isImage = imageExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
                     
-                    if (codes.length > 0) {
-                        // Tomar el primer código para el formulario actual
-                        barcodeInput.value = codes[0];
-                        showStatus(`Se cargaron ${codes.length} códigos. El primero se ha insertado.`, 'success');
-                        
-                        // Agregar todos los códigos a la lista
-                        codes.forEach(code => addToScannedCodes(code));
+                    if (isImage) {
+                        // Mostrar vista previa de la imagen
+                        imagePreview.src = content;
+                        imagePreviewContainer.classList.remove('hidden');
+                        showStatus('Imagen cargada. Haz clic en "Procesar Código de Barras" para escanear.', 'info');
                     } else {
-                        showStatus('No se encontraron códigos en el archivo', 'error');
+                        // Procesar archivos de texto
+                        imagePreviewContainer.classList.add('hidden');
+                        let codes = [];
+                        
+                        // Determinar el tipo de archivo y procesarlo
+                        if (file.name.endsWith('.txt')) {
+                            codes = content.split('\n')
+                                .map(line => line.trim())
+                                .filter(line => line.length > 0);
+                        } else if (file.name.endsWith('.csv')) {
+                            codes = content.split('\n')
+                                .map(line => {
+                                    const parts = line.split(',');
+                                    return parts.length > 0 ? parts[0].trim() : '';
+                                })
+                                .filter(line => line.length > 0);
+                        } else if (file.name.endsWith('.json')) {
+                            const jsonData = JSON.parse(content);
+                            // Asumimos que es un array de códigos o un objeto con una propiedad codes
+                            if (Array.isArray(jsonData)) {
+                                codes = jsonData;
+                            } else if (jsonData.codes && Array.isArray(jsonData.codes)) {
+                                codes = jsonData.codes;
+                            }
+                        }
+                        
+                        if (codes.length > 0) {
+                            // Tomar el primer código para el formulario actual
+                            barcodeInput.value = codes[0];
+                            showStatus(`Se cargaron ${codes.length} códigos. El primero se ha insertado.`, 'success');
+                            
+                            // Agregar todos los códigos a la lista
+                            codes.forEach(code => addToScannedCodes(code));
+                        } else {
+                            showStatus('No se encontraron códigos en el archivo', 'error');
+                        }
                     }
                 } catch (error) {
                     console.error("Error al procesar archivo:", error);
@@ -834,7 +905,82 @@
                 }
             };
             
-            reader.readAsText(file);
+            reader.readAsDataURL(file); // Usar readAsDataURL para imágenes
+        }
+        
+        // Función para procesar imagen y detectar códigos de barras
+        function processImageForBarcodes() {
+            if (!imagePreview.src) {
+                showStatus('No hay imagen para procesar', 'error');
+                return;
+            }
+            
+            showStatus('Procesando imagen...', 'info');
+            processImageBtn.disabled = true;
+            processImageBtn.innerHTML = '<span class="loading"></span> Procesando...';
+            
+            // Crear un canvas para procesar la imagen
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                
+                // Obtener datos de la imagen para jsQR
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Intentar detectar códigos QR primero
+                const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (qrCode) {
+                    // Código QR detectado
+                    const code = qrCode.data;
+                    barcodeInput.value = code;
+                    currentScanResult = code;
+                    addToScannedCodes(code);
+                    showStatus('Código QR detectado: ' + code, 'success');
+                    processImageBtn.disabled = false;
+                    processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                    return;
+                }
+                
+                // Si no se detecta código QR, intentar con Quagga para códigos de barras
+                Quagga.decodeSingle({
+                    decoder: {
+                        readers: [
+                            "code_128_reader",
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_39_reader",
+                            "code_39_vin_reader",
+                            "codabar_reader",
+                            "upc_reader",
+                            "upc_e_reader",
+                            "i2of5_reader"
+                        ]
+                    },
+                    locate: true,
+                    src: imagePreview.src
+                }, function(result) {
+                    processImageBtn.disabled = false;
+                    processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                    
+                    if (result && result.codeResult) {
+                        const code = result.codeResult.code;
+                        barcodeInput.value = code;
+                        currentScanResult = code;
+                        addToScannedCodes(code);
+                        showStatus('Código de barras detectado: ' + code, 'success');
+                    } else {
+                        showStatus('No se pudo detectar ningún código de barras en la imagen', 'error');
+                    }
+                });
+            };
+            
+            img.src = imagePreview.src;
         }
         
         // Función para mostrar mensajes de estado
