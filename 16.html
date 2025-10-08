@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabla de Productos</title>
+  <style>
+    :root {
+      --primary-color: #2e7d32;
+      --primary-hover: #1b5e20;
+      --light-bg: #f3fdf5;
+      --light-border: #c8e6c9;
+      --table-header: #a5d6a7;
+      --table-hover: #e8f5e9;
+      --danger: #c62828;
+      --danger-hover: #b71c1c;
+      --white: #ffffff;
+      --modal-bg: rgba(0, 0, 0, 0.5);
+      --link-color: #1565c0;
+      --link-hover: #0d47a1;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--light-bg);
+      color: #222;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    h2 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-top: 0;
+    }
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .filters-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      flex: 1;
+    }
+    
+    .filter-container {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    #filtro-categoria, #filtro-cultivo, #buscador {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--light-border);
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    
+    .menu-button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      height: 40px;
+      width: 40px;
+    }
+    
+    .menu-button:hover {
+      background: var(--primary-hover);
+    }
+    
+    .menu-line {
+      height: 3px;
+      width: 100%;
+      background-color: white;
+      border-radius: 2px;
+    }
+    
+    /* Nuevo estilo para el botón de normativa EPA */
+    .epa-button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      height: 40px;
+    }
+    
+    .epa-button:hover {
+      background: var(--primary-hover);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--modal-bg);
+      z-index: 1000;
+      justify-content: flex-end;
+    }
+    
+    .modal-content {
+      background-color: var(--white);
+      width: 200px;
+      height: 100%;
+      padding: 20px;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .modal-actions button {
+      background: var(--primary-color);
+      color: white;
+      padding: 12px;
+      text-decoration: none;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    .modal-actions button:hover {
+      background: var(--primary-hover);
+    }
+    
+    .close-modal {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--primary-color);
+    }
+    
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: var(--white);
+      min-width: 1100px;
+    }
+    
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    
+    th {
+      background-color: var(--table-header);
+      color: var(--primary-hover);
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:hover {
+      background-color: var(--table-hover);
+    }
+    
+    .banda-color {
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+      margin-top: auto;
+    }
+    
+    .footer p {
+      margin: 5px 0;
+    }
+    
+    /* Estilos para enlaces EPA */
+    .epa-link {
+      color: var(--link-color);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .epa-link:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
+    
+    .epa-link::after {
+      content: "↗";
+      font-size: 0.9em;
+    }
+    
+    .no-link {
+      color: #666;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+      }
+      
+      .filters-container {
+        width: 100%;
+      }
+      
+      .epa-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Productos Químicos Registrados</h2>
+
+  <div class="header-container">
+    <div class="filters-container">
+      <div class="filter-container">
+        <select id="filtro-categoria">
+          <option value="">Todas las categorías</option>
+          <option value="Insecticida">Insecticida</option>
+          <option value="Fungicida">Fungicida</option>
+          <option value="Aminoácido">Aminoácido</option>
+          <option value="Herbicida">Herbicida</option>
+          <option value="Bactericida">Bactericida</option>
+        </select>
+      </div>
+      <div class="filter-container">
+        <input type="text" id="buscador" placeholder="Buscar por nombre, ingrediente o plaga...">
+      </div>
+      <div class="filter-container">
+        <select id="filtro-cultivo">
+          <option value="">Todos los cultivos</option>
+          <option value="mini">MINI</option>
+          <option value="tomate">TOMATE</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Botón de normativa EPA agregado aquí -->
+    <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-E/part-180/subpart-B/section-180.41" target="_blank" class="epa-button">
+      📋 Ver normativa EPA
+    </a>
+    
+    <button class="menu-button" id="menu-button">
+      <div class="menu-line"></div>
+      <div class="menu-line"></div>
+      <div class="menu-line"></div>
+    </button>
+  </div>
+
+  <!-- Modal para acciones -->
+  <div class="modal" id="actions-modal">
+    <div class="modal-content">
+      <button class="close-modal" id="close-modal">&times;</button>
+      <div class="modal-actions">
+        <a href="formulario.html" style="display: contents;">
+          <button>➕ Agregar</button>
+        </a>
+        <button onclick="exportarExcel()">📊 Excel</button>
+        <button onclick="capturarTabla()">🖼️ Imagen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="tabla-productos-completa">
+      <thead>
+        <tr>
+          <th>Nombre Comercial</th>
+          <th>Grupo Químico</th>
+          <th>Familia Química</th>
+          <th>Ingrediente Activo</th>
+          <th>Dosis/Litro</th>
+          <th>Días a Cosecha</th>
+          <!-- Nuevo orden de columnas -->
+          <th>Periodo de Reingreso</th>
+          <th>Dosis Máxima</th>
+          <th>Plagas</th>
+          <th>Registro EPA</th>
+          <th>Registro Senasa</th>
+          <th>Banda</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-productos"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>Sistema Agroalpha © 2025 | Unidad produccion 1</p>
+    <p>Versión 2.0 - Módulo completo</p>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <!-- html2canvas para capturar la tabla como imagen -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDN0rsDAaXoZ9ERSQF2WdDB4IIevYAyp1k",
+      authDomain: "agro-productos.firebaseapp.com",
+      databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+      projectId: "agro-productos",
+      storageBucket: "agro-productos.appspot.com",
+      messagingSenderId: "196774282512",
+      appId: "1:196774282512:web:92697209153eac8acb1195"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const tabla = document.getElementById("tabla-productos");
+    const filtroCategoria = document.getElementById("filtro-categoria");
+    const buscador = document.getElementById("buscador");
+    const filtroCultivo = document.getElementById("filtro-cultivo");
+    const menuButton = document.getElementById("menu-button");
+    const actionsModal = document.getElementById("actions-modal");
+    const closeModal = document.getElementById("close-modal");
+    
+    let productos = [];
+
+    // Manejar el modal de acciones
+    menuButton.addEventListener("click", () => {
+      actionsModal.style.display = "flex";
+    });
+    
+    closeModal.addEventListener("click", () => {
+      actionsModal.style.display = "none";
+    });
+    
+    window.addEventListener("click", (event) => {
+      if (event.target === actionsModal) {
+        actionsModal.style.display = "none";
+      }
+    });
+
+    // Cargar datos
+    db.ref("productos").on("value", snapshot => {
+      productos = [];
+      snapshot.forEach(child => {
+        const producto = child.val();
+        producto.id = child.key;
+        productos.push(producto);
+      });
+      
+      // Ordenar productos por nombre comercial (alfabéticamente)
+      productos.sort((a, b) => {
+        const nombreA = a.nombre || '';
+        const nombreB = b.nombre || '';
+        return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+      });
+      
+      mostrarProductos(productos);
+    });
+
+    // Filtrar productos
+    function filtrarProductos() {
+      const categoria = filtroCategoria.value;
+      const cultivo = filtroCultivo.value;
+      const termino = buscador.value.toLowerCase().trim();
+      
+      const resultados = productos.filter(p => {
+        const coincideCategoria = !categoria || p.categoria === categoria;
+        
+        // Filtro por cultivo
+        let coincideCultivo = true;
+        if (cultivo === "mini") {
+          coincideCultivo = p.dias_mini || p.reingreso_mini || p.plagas_mini;
+        } else if (cultivo === "tomate") {
+          coincideCultivo = p.dias_tomate || p.reingreso_tomate || p.plagas_tomate;
+        }
+        
+        // Filtro por búsqueda
+        let coincideBusqueda = true;
+        if (termino) {
+          coincideBusqueda = (
+            (p.nombre && p.nombre.toLowerCase().includes(termino)) ||
+            (p.ingredientes && p.ingredientes.toLowerCase().includes(termino)) ||
+            (p.plagas_mini && p.plagas_mini.toLowerCase().includes(termino)) ||
+            (p.plagas_tomate && p.plagas_tomate.toLowerCase().includes(termino))
+          );
+        }
+        
+        return coincideCategoria && coincideCultivo && coincideBusqueda;
+      });
+      
+      mostrarProductos(resultados);
+    }
+
+    // Función para obtener color según la banda (compatible con español e inglés)
+    function obtenerColorBanda(banda) {
+      if (!banda) return '#9E9E9E'; // Gris para bandas desconocidas
+      
+      const bandaLower = banda.toLowerCase();
+      
+      // Verde / Green
+      if (bandaLower.includes('verde') || bandaLower.includes('green')) return '#4CAF50';
+      
+      // Azul / Blue
+      if (bandaLower.includes('azul') || bandaLower.includes('blue')) return '#2196F3';
+      
+      // Amarilla / Yellow
+      if (bandaLower.includes('amarill') || bandaLower.includes('yellow')) return '#FFEB3B';
+      
+      // Roja / Red
+      if (bandaLower.includes('roja') || bandaLower.includes('rojo') || 
+          bandaLower.includes('red')) return '#F44336';
+      
+      return '#9E9E9E'; // Gris por defecto
+    }
+
+    // Función para crear enlaces EPA (compatible con formato antiguo y nuevo)
+    function crearEnlacesEPA(producto) {
+      // Formato nuevo: array de registros EPA
+      if (producto.registros_epa && Array.isArray(producto.registros_epa) && producto.registros_epa.length > 0) {
+        let enlacesHTML = '';
+        
+        producto.registros_epa.forEach((registro, index) => {
+          if (registro.registro) {
+            if (registro.enlace) {
+              // Verificar si el enlace ya tiene protocolo, si no, agregar https://
+              let url = registro.enlace;
+              if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+              }
+              
+              enlacesHTML += `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${registro.registro}</a>`;
+            } else {
+              enlacesHTML += `<span title="Sin enlace EPA">${registro.registro}</span>`;
+            }
+            
+            // Agregar separador si hay más registros
+            if (index < producto.registros_epa.length - 1) {
+              enlacesHTML += ', ';
+            }
+          }
+        });
+        
+        return enlacesHTML || '<span class="no-link">-</span>';
+      }
+      // Formato antiguo: campos individuales
+      else if (producto.epa) {
+        if (producto.enlace_epa) {
+          // Verificar si el enlace ya tiene protocolo, si no, agregar https://
+          let url = producto.enlace_epa;
+          if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+          }
+          
+          return `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${producto.epa}</a>`;
+        }
+        
+        return `<span title="Sin enlace EPA">${producto.epa}</span>`;
+      }
+      
+      return '<span class="no-link">-</span>';
+    }
+
+    // Mostrar productos en tabla
+    function mostrarProductos(lista) {
+      // Asegurar que la lista esté ordenada por nombre comercial
+      lista.sort((a, b) => {
+        const nombreA = a.nombre || '';
+        const nombreB = b.nombre || '';
+        return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+      });
+      
+      tabla.innerHTML = lista.map(p => {
+        // Determinar qué datos mostrar según el filtro de cultivo
+        const cultivoFiltro = filtroCultivo.value;
+        let dias, reingreso, plagas, dosisMaxima, dosisLitro;
+        
+        if (cultivoFiltro === "mini" || (!cultivoFiltro && p.dias_mini)) {
+          dias = p.dias_mini;
+          reingreso = p.reingreso_mini;
+          plagas = p.plagas_mini;
+          dosisMaxima = p.dosis_maxima_mini;
+          dosisLitro = p.dosis_litro_mini;
+        } else if (cultivoFiltro === "tomate" || (!cultivoFiltro && p.dias_tomate && !p.dias_mini)) {
+          dias = p.dias_tomate;
+          reingreso = p.reingreso_tomate;
+          plagas = p.plagas_tomate;
+          dosisMaxima = p.dosis_maxima_tomate;
+          dosisLitro = p.dosis_litro_tomate;
+        } else {
+          // Si no hay filtro y hay datos para ambos cultivos, mostrar MINI por defecto
+          dias = p.dias_mini || p.dias_tomate;
+          reingreso = p.reingreso_mini || p.reingreso_tomate;
+          plagas = p.plagas_mini || p.plagas_tomate;
+          dosisMaxima = p.dosis_maxima_mini || p.dosis_maxima_tomate;
+          dosisLitro = p.dosis_litro_mini || p.dosis_litro_tomate;
+        }
+        
+        // Obtener color para la banda
+        const colorBanda = obtenerColorBanda(p.banda);
+        
+        // Crear enlaces EPA (compatible con formato antiguo y nuevo)
+        const enlacesEPA = crearEnlacesEPA(p);
+        
+        return `
+          <tr>
+            <td>${p.nombre || '-'}</td>
+            <td>${p.grupo_quimico || '-'}</td>
+            <td>${p.familia_quimica || '-'}</td>
+            <td>${p.ingredientes || '-'}</td>
+            <td>${dosisLitro || '-'}</td>
+            <td>${dias || '-'}</td>
+            <!-- Nuevo orden de columnas -->
+            <td>${reingreso || '-'}</td>
+            <td>${dosisMaxima || '-'}</td>
+            <td>${plagas || '-'}</td>
+            <td>${enlacesEPA}</td>
+            <td>${p.senasa || '-'}</td>
+            <td><div class="banda-color" style="background-color: ${colorBanda}" title="${p.banda || 'Sin banda'}"></div></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Exportar a Excel (simulado)
+    function exportarExcel() {
+      const cultivoFiltro = filtroCultivo.value;
+      
+      // Crear tabla HTML para exportar
+      let tablaHTML = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            td { mso-number-format:"\\@"; }
+          </style>
+        </head>
+        <body>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre Comercial</th>
+                <th>Grupo Químico</th>
+                <th>Familia Química</th>
+                <th>Ingrediente Activo</th>
+                <th>Dosis/Litro</th>
+                <th>Días a Cosecha</th>
+                <!-- Nuevo orden de columnas -->
+                <th>Periodo de Reingreso</th>
+                <th>Dosis Máxima</th>
+                <th>Plagas</th>
+                <th>Registro EPA</th>
+                <th>Registro Senasa</th>
+                <th>Banda</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      // Ordenar productos para exportación
+      const productosOrdenados = [...productos].sort((a, b) => {
+        const nombreA = a.nombre || '';
+        const nombreB = b.nombre || '';
+        return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+      });
+      
+      productosOrdenados.forEach(p => {
+        // Para exportar, incluimos ambos cultivos si no hay filtro
+        if (!cultivoFiltro) {
+          if (p.dias_mini) {
+            // Formatear registros EPA para exportación (compatible con ambos formatos)
+            let epaText = '';
+            if (p.registros_epa && Array.isArray(p.registros_epa)) {
+              epaText = p.registros_epa.map(r => r.registro).filter(r => r).join(', ');
+            } else if (p.epa) {
+              epaText = p.epa;
+            }
+            
+            tablaHTML += `
+              <tr>
+                <td>${p.nombre || ''}</td>
+                <td>${p.grupo_quimico || ''}</td>
+                <td>${p.familia_quimica || ''}</td>
+                <td>${p.ingredientes || ''}</td>
+                <td>${p.dosis_litro_mini || ''}</td>
+                <td>${p.dias_mini || ''}</td>
+                <!-- Nuevo orden de columnas -->
+                <td>${p.reingreso_mini || ''}</td>
+                <td>${p.dosis_maxima_mini || ''}</td>
+                <td>${p.plagas_mini || ''}</td>
+                <td>${epaText || ''}</td>
+                <td>${p.senasa || ''}</td>
+                <td>${p.banda || ''}</td>
+              </tr>
+            `;
+          }
+          if (p.dias_tomate) {
+            // Formatear registros EPA para exportación (compatible con ambos formatos)
+            let epaText = '';
+            if (p.registros_epa && Array.isArray(p.registros_epa)) {
+              epaText = p.registros_epa.map(r => r.registro).filter(r => r).join(', ');
+            } else if (p.epa) {
+              epaText = p.epa;
+            }
+            
+            tablaHTML += `
+              <tr>
+                <td>${p.nombre || ''}</td>
+                <td>${p.grupo_quimico || ''}</td>
+                <td>${p.familia_quimica || ''}</td>
+                <td>${p.ingredientes || ''}</td>
+                <td>${p.dosis_litro_tomate || ''}</td>
+                <td>${p.dias_tomate || ''}</td>
+                <!-- Nuevo orden de columnas -->
+                <td>${p.reingreso_tomate || ''}</td>
+                <td>${p.dosis_maxima_tomate || ''}</td>
+                <td>${p.plagas_tomate || ''}</td>
+                <td>${epaText || ''}</td>
+                <td>${p.senasa || ''}</td>
+                <td>${p.banda || ''}</td>
+              </tr>
+            `;
+          }
+        } else {
+          // Si hay filtro, exportar solo el cultivo seleccionado
+          const datos = cultivoFiltro === "mini" ? 
+            {dias: p.dias_mini, reingreso: p.reingreso_mini, plagas: p.plagas_mini, 
+             dosisMaxima: p.dosis_maxima_mini, dosisLitro: p.dosis_litro_mini, cultivo: "MINI"} :
+            {dias: p.dias_tomate, reingreso: p.reingreso_tomate, plagas: p.plagas_tomate, 
+             dosisMaxima: p.dosis_maxima_tomate, dosisLitro: p.dosis_litro_tomate, cultivo: "TOMATE"};
+          
+          if (datos.dias || datos.reingreso || datos.plagas) {
+            // Formatear registros EPA para exportación (compatible con ambos formatos)
+            let epaText = '';
+            if (p.registros_epa && Array.isArray(p.registros_epa)) {
+              epaText = p.registros_epa.map(r => r.registro).filter(r => r).join(', ');
+            } else if (p.epa) {
+              epaText = p.epa;
+            }
+            
+            tablaHTML += `
+              <tr>
+                <td>${p.nombre || ''}</td>
+                <td>${p.grupo_quimico || ''}</td>
+                <td>${p.familia_quimica || ''}</td>
+                <td>${p.ingredientes || ''}</td>
+                <td>${datos.dosisLitro || ''}</td>
+                <td>${datos.dias || ''}</td>
+                <!-- Nuevo orden de columnas -->
+                <td>${datos.reingreso || ''}</td>
+                <td>${datos.dosisMaxima || ''}</td>
+                <td>${datos.plagas || ''}</td>
+                <td>${epaText || ''}</td>
+                <td>${p.senasa || ''}</td>
+                <td>${p.banda || ''}</td>
+              </tr>
+            `;
+          }
+        }
+      });
+      
+      tablaHTML += `
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+      
+      const blob = new Blob([tablaHTML], { type: "application/vnd.ms-excel" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute("href", url);
+      link.setAttribute("download", "productos_quimicos.xls");
+      link.style.visibility = "hidden";
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Cerrar el modal después de la acción
+      actionsModal.style.display = "none";
+    }
+
+    // Capturar tabla como imagen
+    function capturarTabla() {
+      html2canvas(document.getElementById("tabla-productos-completa")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "tabla_productos.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+      
+      // Cerrar el modal después de la acción
+      actionsModal.style.display = "none";
+    }
+
+    // Eventos
+    filtroCategoria.addEventListener("change", filtrarProductos);
+    buscador.addEventListener("input", filtrarProductos);
+    filtroCultivo.addEventListener("change", filtrarProductos);
+  </script>
+</body>
+</html>
