@@ -255,6 +255,22 @@
                             </div>
                         </div>
 
+                        <!-- Selección de fecha -->
+                        <div class="current-area mb-4">
+                            <h5 class="section-title"><i class="fas fa-calendar-alt me-2"></i>Fecha de Asistencia</h5>
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <label class="form-label"><strong>Seleccione la fecha:</strong></label>
+                                    <input type="date" class="form-control" id="attendance-date" value="">
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="selected-date-display">
+                                        <strong>Fecha seleccionada:</strong> <span id="selected-date-name" class="fw-bold text-primary"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="search-container">
@@ -342,6 +358,7 @@
                     <div class="card-body">
                         <ol>
                             <li>Seleccione el área donde está tomando asistencia</li>
+                            <li>Seleccione la fecha para la cual está registrando asistencia</li>
                             <li>Se mostrará automáticamente el personal de esa área</li>
                             <li>Busque empleados por nombre o código si es necesario</li>
                             <li>Seleccione "Presente" o "Ausente" para cada empleado</li>
@@ -478,19 +495,6 @@
         const personalRef = database.ref('personal');
         const attendanceRef = database.ref('asistencia');
 
-        // Mostrar fecha actual
-        const today = new Date();
-        const formattedDate = today.toLocaleDateString('es-ES', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-        document.getElementById('current-date').textContent = formattedDate;
-
-        // Formatear fecha como YYYY-MM-DD para usar como ID
-        const dateId = today.toISOString().split('T')[0];
-
         // Variables globales
         let allEmployees = [];
         let filteredEmployees = [];
@@ -499,9 +503,31 @@
         let currentArea = '';
         let allAreas = [];
         let currentEmployeeForAction = null;
+        let selectedDate = '';
+        let dateId = '';
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
+            // Establecer fecha actual como predeterminada
+            const today = new Date();
+            dateId = today.toISOString().split('T')[0];
+            selectedDate = dateId;
+            
+            // Formatear fecha para mostrar
+            const formattedDate = today.toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('current-date').textContent = formattedDate;
+            
+            // Configurar selector de fecha
+            const dateInput = document.getElementById('attendance-date');
+            dateInput.value = dateId;
+            updateSelectedDateDisplay(dateId);
+            
+            // Cargar empleados y configurar eventos
             loadEmployees();
             setupEventListeners();
         });
@@ -514,6 +540,18 @@
                 const areaName = this.options[this.selectedIndex].text;
                 document.getElementById('current-area-name').textContent = areaName;
                 loadAttendanceForArea(currentArea);
+            });
+
+            // Selección de fecha
+            document.getElementById('attendance-date').addEventListener('change', function() {
+                selectedDate = this.value;
+                dateId = selectedDate;
+                updateSelectedDateDisplay(selectedDate);
+                
+                // Recargar asistencia si hay un área seleccionada
+                if (currentArea) {
+                    loadAttendanceForArea(currentArea);
+                }
             });
 
             // Búsqueda con sugerencias
@@ -541,6 +579,18 @@
             // Event listeners para modales
             document.getElementById('confirmMove').addEventListener('click', moveEmployee);
             document.getElementById('confirmDelete').addEventListener('click', deleteEmployee);
+        }
+
+        // Actualizar la visualización de la fecha seleccionada
+        function updateSelectedDateDisplay(dateString) {
+            const date = new Date(dateString);
+            const formattedDate = date.toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('selected-date-name').textContent = formattedDate;
         }
 
         // Cargar empleados desde Firebase
@@ -1079,10 +1129,15 @@
                 return;
             }
             
-            // Guardar en Firebase para el área actual
+            if (!dateId) {
+                alert('Por favor seleccione una fecha válida');
+                return;
+            }
+            
+            // Guardar en Firebase para el área actual y fecha seleccionada
             attendanceRef.child(dateId).child(currentArea).set(savedAttendance)
                 .then(() => {
-                    alert(`Asistencia guardada correctamente para ${document.getElementById('current-area-select').options[document.getElementById('current-area-select').selectedIndex].text}`);
+                    alert(`Asistencia guardada correctamente para ${document.getElementById('current-area-select').options[document.getElementById('current-area-select').selectedIndex].text} en la fecha ${document.getElementById('selected-date-name').textContent}`);
                 })
                 .catch((error) => {
                     console.error('Error al guardar la asistencia:', error);
