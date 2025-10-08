@@ -223,12 +223,7 @@
             margin-right: 3px;
         }
         
-        /* Estilos para actividad reciente */
-        .recent-activity {
-            background-color: rgba(255, 193, 7, 0.2) !important;
-            font-weight: bold;
-        }
-        
+        /* Estilos para flecha de actividad reciente */
         .recent-indicator {
             position: absolute;
             top: 1px;
@@ -259,6 +254,14 @@
             align-items: center;
             justify-content: center;
             position: relative;
+        }
+        
+        .has-recent-activity .recent-btn {
+            display: inline-block;
+        }
+        
+        .no-recent-activity .recent-btn {
+            display: none;
         }
         
         @media (max-width: 768px) {
@@ -355,9 +358,6 @@
                         </select>
                         <button class="btn btn-outline-primary" id="nextWeek">
                             <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button class="btn btn-warning ms-2" id="recentActivityBtn">
-                            <i class="fas fa-history me-1"></i>Actividad Reciente (24h)
                         </button>
                     </div>
                     <div class="week-info" id="weekRange"></div>
@@ -535,11 +535,12 @@
         };
 
         // Variables globales
-        let actividadesData = [];
+        let vueltasData = []; // CAMBIO: Ahora usamos vueltasData en lugar de actividadesData
         let hideCompleted = true; // Por defecto, ocultar actividades completadas
         let currentWeek = getCurrentWeek(); // Semana actual por defecto
         let weeksList = []; // Lista de semanas disponibles
-        let vueltaData = {}; // Almacenar datos de vueltas por invernadero y actividad
+        let vueltaCalculadaData = {}; // Almacenar datos de vueltas calculadas por invernadero y actividad
+        let invernaderosConActividadReciente = new Set(); // Almacenar invernaderos con actividad reciente
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -550,9 +551,6 @@
             // Configurar navegación de semanas
             setupWeekNavigation();
             
-            // Configurar botón de actividad reciente
-            setupRecentActivity();
-            
             // Aplicar estado inicial
             toggleCompletedVisibility();
             
@@ -562,8 +560,8 @@
                 toggleCompletedVisibility();
             });
             
-            // Cargar datos de Firebase
-            cargarDatosActividades();
+            // Cargar datos de Firebase desde la tabla "vueltas"
+            cargarDatosVueltas();
         });
 
         // Configurar navegación de semanas
@@ -599,7 +597,7 @@
             weekSelect.addEventListener('change', function() {
                 currentWeek = parseInt(this.value);
                 updateWeekInfo();
-                if (actividadesData.length > 0) {
+                if (vueltasData.length > 0) {
                     procesarDatos();
                 }
             });
@@ -610,7 +608,7 @@
                     currentWeek = weeksList[currentIndex - 1];
                     weekSelect.value = currentWeek;
                     updateWeekInfo();
-                    if (actividadesData.length > 0) {
+                    if (vueltasData.length > 0) {
                         procesarDatos();
                     }
                 }
@@ -622,94 +620,10 @@
                     currentWeek = weeksList[currentIndex + 1];
                     weekSelect.value = currentWeek;
                     updateWeekInfo();
-                    if (actividadesData.length > 0) {
+                    if (vueltasData.length > 0) {
                         procesarDatos();
                     }
                 }
-            });
-        }
-
-        // Configurar botón de actividad reciente
-        function setupRecentActivity() {
-            const recentBtn = document.getElementById('recentActivityBtn');
-            recentBtn.addEventListener('click', function() {
-                highlightRecentActivity();
-            });
-        }
-
-        // Resaltar actividad reciente (últimas 24 horas)
-        function highlightRecentActivity() {
-            // Quitar resaltado anterior
-            document.querySelectorAll('.recent-activity').forEach(el => {
-                el.classList.remove('recent-activity');
-            });
-            
-            document.querySelectorAll('.recent-indicator').forEach(el => {
-                el.remove();
-            });
-            
-            const ahora = new Date();
-            const hace24Horas = new Date(ahora.getTime() - (24 * 60 * 60 * 1000));
-            
-            // Resaltar actividad en las últimas 24 horas por invernadero
-            Object.keys(invernaderosPorCultivo).forEach(tipoCultivo => {
-                invernaderosPorCultivo[tipoCultivo].forEach(invernadero => {
-                    const actividades = actividadesPorCultivo[tipoCultivo];
-                    
-                    // Encontrar la actividad más reciente en las últimas 24 horas para este invernadero
-                    let actividadMasReciente = null;
-                    let fechaMasReciente = null;
-                    
-                    actividades.forEach(actividad => {
-                        const datosActividad = actividadesData.filter(item => 
-                            item.invernadero === invernadero && 
-                            item.actividad === actividad &&
-                            item.fecha
-                        );
-                        
-                        if (datosActividad.length > 0) {
-                            const ultimaActividad = datosActividad[datosActividad.length - 1];
-                            const fechaActividad = new Date(ultimaActividad.fecha);
-                            
-                            // Verificar si está en las últimas 24 horas
-                            if (fechaActividad >= hace24Horas) {
-                                if (!fechaMasReciente || fechaActividad > fechaMasReciente) {
-                                    fechaMasReciente = fechaActividad;
-                                    actividadMasReciente = actividad;
-                                }
-                            }
-                        }
-                    });
-                    
-                    // Resaltar la actividad más reciente en las últimas 24 horas
-                    if (actividadMasReciente) {
-                        const tablaId = `tablaResumen${tipoCultivo.charAt(0).toUpperCase() + tipoCultivo.slice(1)}`;
-                        const tabla = document.getElementById(tablaId);
-                        if (tabla) {
-                            const filas = tabla.getElementsByTagName('tr');
-                            for (let fila of filas) {
-                                const celdaInvernadero = fila.cells[0];
-                                if (celdaInvernadero && celdaInvernadero.textContent.trim() === (invernadero === 'vivero' ? 'Viv' : invernadero)) {
-                                    const indiceActividad = actividades.indexOf(actividadMasReciente);
-                                    if (indiceActividad !== -1) {
-                                        const celdaActividad = fila.cells[indiceActividad + 1]; // +1 por la celda de invernadero
-                                        if (celdaActividad) {
-                                            celdaActividad.classList.add('recent-activity');
-                                            
-                                            // Agregar indicador visual (flecha pequeña)
-                                            const indicator = document.createElement('span');
-                                            indicator.className = 'recent-indicator';
-                                            indicator.innerHTML = '↗';
-                                            indicator.title = `Actividad reciente (24h): ${actividadMasReciente} - ${fechaMasReciente.toLocaleDateString()}`;
-                                            celdaActividad.appendChild(indicator);
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                });
             });
         }
 
@@ -719,13 +633,26 @@
             const haceUnaSemana = new Date(ahora.getTime() - (7 * 24 * 60 * 60 * 1000));
             
             // Buscar cualquier actividad en la última semana
-            const actividadReciente = actividadesData.some(item => 
+            const actividadReciente = vueltasData.some(item => 
                 item.invernadero === invernadero && 
                 item.fecha && 
                 new Date(item.fecha) >= haceUnaSemana
             );
             
             return !actividadReciente;
+        }
+
+        // Verificar si un invernadero tiene actividad en las últimas 24 horas
+        function tieneActividadReciente(invernadero) {
+            const ahora = new Date();
+            const hace24Horas = new Date(ahora.getTime() - (24 * 60 * 60 * 1000));
+            
+            // Buscar cualquier actividad en las últimas 24 horas
+            return vueltasData.some(item => 
+                item.invernadero === invernadero && 
+                item.fecha && 
+                new Date(item.fecha) >= hace24Horas
+            );
         }
 
         // Actualizar información de la semana seleccionada
@@ -769,7 +696,7 @@
 
         // Calcular vueltas acumuladas hasta una semana específica
         function calcularVueltasHastaSemana(invernadero, actividad, semanaLimite) {
-            const datosActividad = actividadesData.filter(item => 
+            const datosActividad = vueltasData.filter(item => 
                 item.invernadero === invernadero && 
                 item.actividad === actividad &&
                 item.fecha
@@ -811,20 +738,25 @@
             }
             
             // Si ya tenemos datos, actualizar las tablas
-            if (actividadesData.length > 0) {
+            if (vueltasData.length > 0) {
                 procesarDatos();
             }
         }
 
-        // Cargar datos de actividades desde Firebase
-        function cargarDatosActividades() {
-            const actividadesRef = database.ref('unidad_produccion_1/actividades');
+        // CAMBIO: Cargar datos de vueltas desde Firebase (tabla "vueltas")
+        function cargarDatosVueltas() {
+            const vueltasRef = database.ref('unidad_produccion_1/vueltas');
             
-            actividadesRef.on('value', (snapshot) => {
-                actividadesData = [];
+            vueltasRef.on('value', (snapshot) => {
+                vueltasData = [];
                 snapshot.forEach(childSnapshot => {
-                    actividadesData.push(childSnapshot.val());
+                    vueltasData.push(childSnapshot.val());
                 });
+                
+                console.log("Datos cargados desde tabla 'vueltas':", vueltasData.length, "registros");
+                
+                // Identificar invernaderos con actividad reciente
+                identificarActividadReciente();
                 
                 // Procesar y mostrar datos
                 procesarDatos();
@@ -832,6 +764,21 @@
                 console.error("Error al cargar datos de Firebase:", error);
                 mostrarMensajeError("No se pudieron cargar los datos. Verifique la conexión.");
             });
+        }
+
+        // Identificar invernaderos con actividad en las últimas 24 horas
+        function identificarActividadReciente() {
+            invernaderosConActividadReciente.clear();
+            
+            Object.keys(invernaderosPorCultivo).forEach(tipoCultivo => {
+                invernaderosPorCultivo[tipoCultivo].forEach(invernadero => {
+                    if (tieneActividadReciente(invernadero)) {
+                        invernaderosConActividadReciente.add(invernadero);
+                    }
+                });
+            });
+            
+            console.log("Invernaderos con actividad reciente (24h):", Array.from(invernaderosConActividadReciente));
         }
 
         // Procesar datos y actualizar la interfaz
@@ -850,24 +797,24 @@
 
         // Calcular datos de vueltas para todas las semanas
         function calcularDatosVueltas() {
-            vueltaData = {};
+            vueltaCalculadaData = {};
             
             Object.keys(invernaderosPorCultivo).forEach(tipoCultivo => {
                 invernaderosPorCultivo[tipoCultivo].forEach(invernadero => {
                     const actividades = actividadesPorCultivo[tipoCultivo];
                     
-                    if (!vueltaData[invernadero]) {
-                        vueltaData[invernadero] = {};
+                    if (!vueltaCalculadaData[invernadero]) {
+                        vueltaCalculadaData[invernadero] = {};
                     }
                     
                     actividades.forEach(actividad => {
-                        if (!vueltaData[invernadero][actividad]) {
-                            vueltaData[invernadero][actividad] = {};
+                        if (!vueltaCalculadaData[invernadero][actividad]) {
+                            vueltaCalculadaData[invernadero][actividad] = {};
                         }
                         
                         // Calcular para cada semana
                         weeksList.forEach(semana => {
-                            vueltaData[invernadero][actividad][semana] = 
+                            vueltaCalculadaData[invernadero][actividad][semana] = 
                                 calcularVueltasHastaSemana(invernadero, actividad, semana);
                         });
                     });
@@ -891,7 +838,7 @@
             invernaderos.forEach(invernadero => {
                 const fila = document.createElement('tr');
                 
-                // Celda de invernadero (abreviado) con flechita pequeña
+                // Celda de invernadero (abreviado) con flechita solo si tiene actividad reciente
                 const celdaInvernadero = document.createElement('td');
                 celdaInvernadero.className = 'invernadero-header';
                 
@@ -899,18 +846,25 @@
                 invernaderoText.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
                 invernaderoText.className = 'fw-bold';
                 
-                // Flechita pequeña para actividad reciente
-                const recentArrow = document.createElement('button');
-                recentArrow.className = 'recent-btn';
-                recentArrow.innerHTML = '↗';
-                recentArrow.title = 'Ver actividad más reciente';
-                recentArrow.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    mostrarActividadRecienteInvernadero(invernadero, tipoCultivo);
-                });
-                
                 celdaInvernadero.appendChild(invernaderoText);
-                celdaInvernadero.appendChild(recentArrow);
+                
+                // Agregar flechita solo si el invernadero tiene actividad reciente
+                if (invernaderosConActividadReciente.has(invernadero)) {
+                    const recentArrow = document.createElement('button');
+                    recentArrow.className = 'recent-btn';
+                    recentArrow.innerHTML = '↗';
+                    recentArrow.title = 'Actividad reciente (24h) - Click para ver detalles';
+                    recentArrow.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        mostrarActividadRecienteInvernadero(invernadero, tipoCultivo);
+                    });
+                    
+                    celdaInvernadero.appendChild(recentArrow);
+                    celdaInvernadero.classList.add('has-recent-activity');
+                } else {
+                    celdaInvernadero.classList.add('no-recent-activity');
+                }
+                
                 fila.appendChild(celdaInvernadero);
                 
                 // Verificar si el invernadero está inactivo
@@ -924,14 +878,14 @@
                     if (inactivo) {
                         celda.innerHTML = '<span class="inactive">-</span>';
                     } else {
-                        const datosVuelta = vueltaData[invernadero]?.[actividad]?.[currentWeek];
+                        const datosVuelta = vueltaCalculadaData[invernadero]?.[actividad]?.[currentWeek];
                         
                         if (datosVuelta && datosVuelta.totalCamas > 0) {
                             const { totalCamas, vueltaActual, camasVueltaActual, metaCamas } = datosVuelta;
                             
                             if (actividad === 'Cosecha') {
                                 // Para cosecha, buscar datos específicos de la semana
-                                const datosSemana = actividadesData.filter(item => 
+                                const datosSemana = vueltasData.filter(item => 
                                     item.invernadero === invernadero && 
                                     item.actividad === actividad &&
                                     item.fecha
@@ -1003,7 +957,7 @@
             let datosActividad = null;
             
             actividades.forEach(actividad => {
-                const datos = actividadesData.filter(item => 
+                const datos = vueltasData.filter(item => 
                     item.invernadero === invernadero && 
                     item.actividad === actividad &&
                     item.fecha
@@ -1022,10 +976,17 @@
             });
             
             if (actividadMasReciente && datosActividad) {
-                const mensaje = `Invernadero ${invernadero}: ${actividadMasReciente}\n` +
-                               `Fecha: ${fechaMasReciente.toLocaleDateString()}\n` +
+                const tiempoTranscurrido = Math.floor((new Date() - fechaMasReciente) / (1000 * 60 * 60));
+                const horas = tiempoTranscurrido;
+                const minutos = Math.floor((new Date() - fechaMasReciente) / (1000 * 60)) % 60;
+                
+                const mensaje = `Invernadero ${invernadero}\n` +
+                               `Actividad: ${actividadMasReciente}\n` +
                                `Camas: ${datosActividad.camas || 0}\n` +
-                               (datosActividad.rendimiento ? `Rendimiento: ${datosActividad.rendimiento}` : '');
+                               (datosActividad.rendimiento ? `Rendimiento: ${datosActividad.rendimiento}\n` : '') +
+                               `Fecha: ${fechaMasReciente.toLocaleDateString()}\n` +
+                               `Hora: ${fechaMasReciente.toLocaleTimeString()}\n` +
+                               `Hace: ${horas}h ${minutos}min`;
                 
                 alert(mensaje);
             } else {
@@ -1049,7 +1010,7 @@
             invernaderos.forEach(invernadero => {
                 const fila = document.createElement('tr');
                 
-                // Celda de invernadero (abreviado) con flechita pequeña
+                // Celda de invernadero (abreviado) con flechita solo si tiene actividad reciente
                 const celdaInvernadero = document.createElement('td');
                 celdaInvernadero.className = 'invernadero-header';
                 
@@ -1057,18 +1018,25 @@
                 invernaderoText.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
                 invernaderoText.className = 'fw-bold';
                 
-                // Flechita pequeña para rendimiento reciente
-                const recentArrow = document.createElement('button');
-                recentArrow.className = 'recent-btn';
-                recentArrow.innerHTML = '↗';
-                recentArrow.title = 'Ver rendimiento más reciente';
-                recentArrow.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    mostrarRendimientoRecienteInvernadero(invernadero, tipoCultivo);
-                });
-                
                 celdaInvernadero.appendChild(invernaderoText);
-                celdaInvernadero.appendChild(recentArrow);
+                
+                // Agregar flechita solo si el invernadero tiene actividad reciente
+                if (invernaderosConActividadReciente.has(invernadero)) {
+                    const recentArrow = document.createElement('button');
+                    recentArrow.className = 'recent-btn';
+                    recentArrow.innerHTML = '↗';
+                    recentArrow.title = 'Rendimiento reciente (24h) - Click para ver detalles';
+                    recentArrow.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        mostrarRendimientoRecienteInvernadero(invernadero, tipoCultivo);
+                    });
+                    
+                    celdaInvernadero.appendChild(recentArrow);
+                    celdaInvernadero.classList.add('has-recent-activity');
+                } else {
+                    celdaInvernadero.classList.add('no-recent-activity');
+                }
+                
                 fila.appendChild(celdaInvernadero);
                 
                 // Verificar si el invernadero está inactivo
@@ -1083,7 +1051,7 @@
                         celda.innerHTML = '<span class="inactive">-</span>';
                     } else {
                         // Filtrar datos para esta actividad e invernadero con rendimiento
-                        const datosActividad = actividadesData.filter(item => 
+                        const datosActividad = vueltasData.filter(item => 
                             item.invernadero === invernadero && 
                             item.actividad === actividad &&
                             item.rendimiento > 0
@@ -1137,7 +1105,7 @@
             let actividadMasReciente = null;
             
             actividades.forEach(actividad => {
-                const datos = actividadesData.filter(item => 
+                const datos = vueltasData.filter(item => 
                     item.invernadero === invernadero && 
                     item.actividad === actividad &&
                     item.rendimiento > 0 &&
@@ -1157,10 +1125,16 @@
             });
             
             if (rendimientoMasReciente && actividadMasReciente) {
+                const tiempoTranscurrido = Math.floor((new Date() - fechaMasReciente) / (1000 * 60 * 60));
+                const horas = tiempoTranscurrido;
+                const minutos = Math.floor((new Date() - fechaMasReciente) / (1000 * 60)) % 60;
+                
                 const mensaje = `Invernadero ${invernadero}\n` +
                                `Actividad: ${actividadMasReciente}\n` +
                                `Rendimiento: ${rendimientoMasReciente}\n` +
-                               `Fecha: ${fechaMasReciente.toLocaleDateString()}`;
+                               `Fecha: ${fechaMasReciente.toLocaleDateString()}\n` +
+                               `Hora: ${fechaMasReciente.toLocaleTimeString()}\n` +
+                               `Hace: ${horas}h ${minutos}min`;
                 
                 alert(mensaje);
             } else {
