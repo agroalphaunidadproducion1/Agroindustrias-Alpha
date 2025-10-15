@@ -21,7 +21,7 @@
             --error-color: #f44336;
             --light-gray: #f5f5f5;
             --white: #ffffff;
-            --dark-gray: #333;
+            --dark-gray: #000000; /* Cambiado a negro */
             --sidebar-bg: #2c3e50;
             --sidebar-hover: #34495e;
             --sidebar-active: #3498db;
@@ -35,10 +35,49 @@
         }
         
         body {
-            display: flex;
             background-color: var(--light-gray);
-            color: var(--dark-gray);
+            color: var(--dark-gray); /* Texto en negro */
             min-height: 100vh;
+            transition: margin-left 0.3s;
+        }
+        
+        /* Header con botón hamburguesa */
+        .header {
+            background-color: var(--white);
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark-gray);
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .menu-toggle:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .brand h1 {
+            font-size: 20px;
+            color: var(--dark-gray);
         }
         
         /* Sidebar */
@@ -48,19 +87,40 @@
             color: white;
             height: 100vh;
             position: fixed;
+            top: 0;
+            left: -250px;
             padding: 20px 0;
             overflow-y: auto;
+            transition: left 0.3s;
+            z-index: 200;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .close-menu {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            cursor: pointer;
         }
         
         .logo {
             padding: 0 20px 20px;
             border-bottom: 1px solid #34495e;
             margin-bottom: 20px;
+            margin-top: 10px;
         }
         
         .logo h1 {
             font-size: 24px;
             font-weight: 600;
+            color: white;
         }
         
         .user-info {
@@ -72,6 +132,7 @@
         .user-info p {
             margin-bottom: 5px;
             font-size: 14px;
+            color: white;
         }
         
         .role-badge {
@@ -113,6 +174,8 @@
             align-items: center;
             cursor: pointer;
             transition: background-color 0.3s;
+            color: white;
+            text-decoration: none;
         }
         
         .nav-item:hover {
@@ -129,15 +192,29 @@
             text-align: center;
         }
         
+        /* Overlay para cerrar menú al hacer clic fuera */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 150;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
         /* Main Content */
         .main-content {
-            flex: 1;
-            margin-left: 250px;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
+            min-height: calc(100vh - 70px);
         }
         
         .container {
@@ -150,18 +227,10 @@
             margin-top: 20px;
         }
         
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        
         .breadcrumb {
             font-size: 14px;
             color: #7f8c8d;
+            margin-bottom: 15px;
         }
         
         .breadcrumb a {
@@ -197,6 +266,7 @@
             box-sizing: border-box;
             margin-bottom: 5px;
             transition: border-color 0.3s;
+            color: var(--dark-gray);
         }
         
         input:focus, select:focus {
@@ -234,6 +304,7 @@
             border-radius: 4px;
             font-size: 14px;
             display: none;
+            color: var(--dark-gray);
         }
         
         .success {
@@ -268,33 +339,36 @@
         
         /* Responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 70px;
-                overflow: hidden;
-            }
-            
-            .logo h1, .user-info p, .nav-section h3, .nav-item span {
-                display: none;
-            }
-            
-            .nav-item {
-                justify-content: center;
-            }
-            
-            .nav-item i {
-                margin-right: 0;
-                font-size: 18px;
+            .container {
+                padding: 20px;
             }
             
             .main-content {
-                margin-left: 70px;
+                padding: 15px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Overlay para cerrar menú -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Header con botón hamburguesa -->
+    <div class="header">
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="brand">
+            <h1>Agroalpha</h1>
+        </div>
+    </div>
+    
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+        <button class="close-menu" id="closeMenu">
+            <i class="fas fa-times"></i>
+        </button>
+        
         <div class="logo">
             <h1>Agroalpha</h1>
         </div>
@@ -307,10 +381,10 @@
         
         <div class="nav-section">
             <h3>Navegación Principal</h3>
-            <div class="nav-item" onclick="window.location.href='/dashboard.html'">
+            <a class="nav-item" href="dashboard.html">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
-            </div>
+            </a>
             <div class="nav-item">
                 <i class="fas fa-bell"></i>
                 <span>Notificaciones</span>
@@ -355,10 +429,8 @@
     <!-- Main Content -->
     <div class="main-content">
         <div class="container">
-            <div class="header">
-                <div class="breadcrumb">
-                    <a href="/dashboard.html">Dashboard</a> / Crear Usuario
-                </div>
+            <div class="breadcrumb">
+                <a href="dashboard.html">Dashboard</a> / Crear Usuario
             </div>
             
             <h1>Crear Nuevo Usuario</h1>
@@ -437,13 +509,35 @@
         const createButton = document.getElementById('createButton');
         const buttonText = document.getElementById('buttonText');
         const messageDiv = document.getElementById('message');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeMenu = document.getElementById('closeMenu');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        // Funciones para el menú hamburguesa
+        function openMenu() {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Event listeners para el menú
+        menuToggle.addEventListener('click', openMenu);
+        closeMenu.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
         
         // Verificar sesión al cargar
         document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(sessionStorage.getItem('currentUser'));
             
             if (!userData || !userData.username) {
-                window.location.href = '/index.html';
+                window.location.href = 'index.html';
                 return;
             }
             
@@ -580,11 +674,9 @@
             // Generar elementos de navegación
             container.innerHTML = '';
             accessibleModules.forEach(module => {
-                const navItem = document.createElement('div');
+                const navItem = document.createElement('a');
                 navItem.className = 'nav-item';
-                navItem.onclick = function() {
-                    window.location.href = module.link || '#';
-                };
+                navItem.href = module.link || '#';
                 
                 navItem.innerHTML = `
                     <i class="fas ${module.icon || 'fa-cube'}"></i>
@@ -712,7 +804,7 @@
                     });
             } else {
                 sessionStorage.removeItem('currentUser');
-                window.location.href = '/index.html';
+                window.location.href = 'index.html';
             }
         }
     </script>
