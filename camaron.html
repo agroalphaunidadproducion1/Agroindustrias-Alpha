@@ -19,8 +19,9 @@
             --riego-color: #0097A7;
             --invitado-color: #616161;
             --personal-color: #9C27B0;
-            --parametros-color: #7B1FA2; /* Color para parámetros */
-            --agua-color: #0097A7; /* Color para calidad del agua */
+            --parametros-color: #2E7D32; /* Verde para parámetros */
+            --agua-color: #2E7D32; /* Verde para calidad del agua */
+            --registros-color: #2E7D32; /* Verde para registros */
             --light-gray: #f8f9fa;
             --white: #ffffff;
             --dark-gray: #343a40;
@@ -166,6 +167,7 @@
             justify-content: space-between;
             align-items: center;
             transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid var(--primary-light);
         }
         
         .card:active {
@@ -176,11 +178,13 @@
         .card-icon {
             font-size: 1.8rem;
             margin-bottom: 8px;
+            color: var(--primary-color) !important;
         }
         
-        /* Colores específicos para cada tipo de registro */
-        .card[onclick*="parametros"] .card-icon { color: var(--parametros-color); }
-        .card[onclick*="calidad-agua"] .card-icon { color: var(--agua-color); }
+        /* Todos los botones en verde */
+        .card .card-icon { 
+            color: var(--primary-color) !important; 
+        }
         
         .card h3 {
             color: var(--primary-dark);
@@ -228,6 +232,15 @@
                 font-size: 1.3rem;
             }
         }
+
+        /* Efecto hover para desktop */
+        @media (min-width: 768px) {
+            .card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                cursor: pointer;
+            }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -272,10 +285,15 @@
             </div>
             
             <!-- Botón de Calidad del Agua -->
-            <div class="card" onclick="navigateTo('Versión 4.0.0/Configuraciones/Camarón
-/calidad-agua.html')">
+            <div class="card" onclick="navigateTo('Camarón/calidad-agua.html')">
                 <div class="card-icon"><i class="fas fa-tint"></i></div>
                 <h3>Calidad del Agua</h3>
+            </div>
+            
+            <!-- Nuevo Botón de Registros -->
+            <div class="card" onclick="navigateTo('registros.html')">
+                <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
+                <h3>Registros</h3>
             </div>
         </div>
     </div>
