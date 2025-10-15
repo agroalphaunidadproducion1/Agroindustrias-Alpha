@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Calidad de Agua</title>
+    <style>
+        :root {
+            --primary-color: #2c7fb8;
+            --secondary-color: #7fcdbb;
+            --accent-color: #edf8b1;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-color: #ddd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(44, 127, 184, 0.3);
+        }
+        
+        .range-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .parameters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .parameter-card {
+            background-color: var(--accent-color);
+            border-radius: 6px;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .parameter-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background-color: #1d6fa5;
+        }
+        
+        .btn-reset {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .error {
+            color: var(--danger-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .week-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Calidad de Agua</h1>
+        
+        <form id="waterQualityForm">
+            <div class="form-group">
+                <label for="week">Semana del año:</label>
+                <select id="week" name="week" required>
+                    <option value="">Seleccione una semana</option>
+                    <!-- Las opciones se generarán con JavaScript -->
+                </select>
+                <div class="week-info">Seleccione la semana del año para la que desea registrar los datos</div>
+            </div>
+            
+            <div class="parameters-grid">
+                <div class="parameter-card">
+                    <h3>Nitrito (NO₂)</h3>
+                    <div class="form-group">
+                        <label for="nitrite">Concentración (mg/L):</label>
+                        <input type="number" id="nitrite" name="nitrite" step="0.01" min="0" max="10" required>
+                        <div class="range-info">Rango recomendado: 0 - 1 mg/L</div>
+                        <div class="error" id="nitriteError">Valor fuera del rango recomendado</div>
+                    </div>
+                </div>
+                
+                <div class="parameter-card">
+                    <h3>Amonio (NH₄⁺)</h3>
+                    <div class="form-group">
+                        <label for="ammonium">Concentración (mg/L):</label>
+                        <input type="number" id="ammonium" name="ammonium" step="0.01" min="0" max="10" required>
+                        <div class="range-info">Rango recomendado: 0 - 0.5 mg/L</div>
+                        <div class="error" id="ammoniumError">Valor fuera del rango recomendado</div>
+                    </div>
+                </div>
+                
+                <div class="parameter-card">
+                    <h3>pH</h3>
+                    <div class="form-group">
+                        <label for="ph">Valor de pH:</label>
+                        <input type="number" id="ph" name="ph" step="0.1" min="0" max="14" required>
+                        <div class="range-info">Rango recomendado: 6.5 - 8.5</div>
+                        <div class="error" id="phError">Valor fuera del rango recomendado</div>
+                    </div>
+                </div>
+                
+                <div class="parameter-card">
+                    <h3>Alcalinidad</h3>
+                    <div class="form-group">
+                        <label for="alkalinity">Concentración (mg/L CaCO₃):</label>
+                        <input type="number" id="alkalinity" name="alkalinity" step="1" min="0" max="500" required>
+                        <div class="range-info">Rango recomendado: 50 - 150 mg/L</div>
+                        <div class="error" id="alkalinityError">Valor fuera del rango recomendado</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Observaciones:</label>
+                <textarea id="notes" name="notes" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;"></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button type="reset" class="btn-reset">Limpiar Formulario</button>
+                <button type="submit" class="btn-submit">Guardar Datos</button>
+            </div>
+        </form>
+        
+        <div class="success-message" id="successMessage">
+            ¡Datos guardados exitosamente!
+        </div>
+    </div>
+
+    <script>
+        // Generar opciones para las semanas del año
+        const weekSelect = document.getElementById('week');
+        for (let i = 1; i <= 52; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Semana ${i}`;
+            weekSelect.appendChild(option);
+        }
+        
+        // Establecer la semana actual por defecto
+        const currentDate = new Date();
+        const startDate = new Date(currentDate.getFullYear(), 0, 1);
+        const days = Math.floor((currentDate - startDate) / (24 * 60 * 60 * 1000));
+        const currentWeek = Math.ceil(days / 7);
+        weekSelect.value = currentWeek;
+        
+        // Elementos del formulario
+        const form = document.getElementById('waterQualityForm');
+        const nitriteInput = document.getElementById('nitrite');
+        const ammoniumInput = document.getElementById('ammonium');
+        const phInput = document.getElementById('ph');
+        const alkalinityInput = document.getElementById('alkalinity');
+        const successMessage = document.getElementById('successMessage');
+        
+        // Validación en tiempo real
+        nitriteInput.addEventListener('input', function() {
+            validateRange(nitriteInput, 0, 1, 'nitriteError');
+        });
+        
+        ammoniumInput.addEventListener('input', function() {
+            validateRange(ammoniumInput, 0, 0.5, 'ammoniumError');
+        });
+        
+        phInput.addEventListener('input', function() {
+            validateRange(phInput, 6.5, 8.5, 'phError');
+        });
+        
+        alkalinityInput.addEventListener('input', function() {
+            validateRange(alkalinityInput, 50, 150, 'alkalinityError');
+        });
+        
+        // Función para validar rangos
+        function validateRange(input, min, max, errorId) {
+            const value = parseFloat(input.value);
+            const errorElement = document.getElementById(errorId);
+            
+            if (isNaN(value) || value < min || value > max) {
+                errorElement.style.display = 'block';
+                input.style.borderColor = 'var(--danger-color)';
+            } else {
+                errorElement.style.display = 'none';
+                input.style.borderColor = 'var(--border-color)';
+            }
+        }
+        
+        // Manejo del envío del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar todos los campos
+            let isValid = true;
+            
+            if (!validateRange(nitriteInput, 0, 1, 'nitriteError')) isValid = false;
+            if (!validateRange(ammoniumInput, 0, 0.5, 'ammoniumError')) isValid = false;
+            if (!validateRange(phInput, 6.5, 8.5, 'phError')) isValid = false;
+            if (!validateRange(alkalinityInput, 50, 150, 'alkalinityError')) isValid = false;
+            
+            if (isValid) {
+                // Aquí normalmente enviaríamos los datos al servidor
+                // Por ahora, solo mostramos un mensaje de éxito
+                successMessage.style.display = 'block';
+                
+                // Ocultar mensaje después de 3 segundos
+                setTimeout(function() {
+                    successMessage.style.display = 'none';
+                }, 3000);
+                
+                // Podríamos resetear el formulario si se desea
+                // form.reset();
+            }
+        });
+        
+        // Resetear errores al limpiar el formulario
+        form.addEventListener('reset', function() {
+            document.querySelectorAll('.error').forEach(error => {
+                error.style.display = 'none';
+            });
+            document.querySelectorAll('input').forEach(input => {
+                input.style.borderColor = 'var(--border-color)';
+            });
+            successMessage.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
