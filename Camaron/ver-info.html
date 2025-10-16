@@ -81,35 +81,22 @@
             background-color: var(--light-gray);
         }
         
-        .parameter-column {
-            background-color: var(--accent-color);
+        .parameter-header {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
             font-weight: 600;
-            text-align: left;
-            width: 200px;
+            min-width: 120px;
         }
         
         .week-header {
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            min-width: 120px;
+            background-color: var(--primary-color);
+            color: white;
+            min-width: 80px;
         }
         
         .current-week {
             background-color: #e8f5e8 !important;
             font-weight: bold;
-            position: relative;
-        }
-        
-        .current-week::after {
-            content: "Actual";
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            font-size: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 2px 4px;
-            border-radius: 3px;
         }
         
         .loading {
@@ -137,6 +124,14 @@
         .data-value {
             font-weight: 600;
             color: var(--text-color);
+        }
+        
+        .parameter-range {
+            font-size: 12px;
+            font-weight: normal;
+            display: block;
+            margin-top: 5px;
+            opacity: 0.9;
         }
         
         /* Estilos para el menú hamburguesa */
@@ -248,8 +243,12 @@
                 font-size: 14px;
             }
             
-            .parameter-column {
-                width: 150px;
+            .parameter-header {
+                min-width: 100px;
+            }
+            
+            .parameter-range {
+                font-size: 11px;
             }
             
             .pond-selector {
@@ -507,24 +506,54 @@
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
             
-            // Celda vacía para la esquina superior izquierda
-            const emptyHeader = document.createElement('th');
-            headerRow.appendChild(emptyHeader);
+            // Celda con "Semana" en la posición izquierda
+            const semanaHeader = document.createElement('th');
+            semanaHeader.textContent = 'Semana';
+            semanaHeader.className = 'parameter-header';
+            headerRow.appendChild(semanaHeader);
             
-            const currentWeek = getCurrentWeek();
-            
-            // Encabezados de semanas
-            weeks.forEach(week => {
-                const weekHeader = document.createElement('th');
-                weekHeader.textContent = `Semana ${week}`;
-                weekHeader.className = 'week-header';
-                
-                // Resaltar semana actual
-                if (week === currentWeek) {
-                    weekHeader.classList.add('current-week');
+            // Parámetros a mostrar con sus rangos
+            const parameters = [
+                { 
+                    key: 'nitrite', 
+                    label: 'Nitrito ppm', 
+                    range: '(0.9 a 1.0)',
+                    type: 'number', 
+                    decimals: 2 
+                },
+                { 
+                    key: 'ammonium', 
+                    label: 'Amonio ppm', 
+                    range: '(0.5 a 1.0)',
+                    type: 'number', 
+                    decimals: 2 
+                },
+                { 
+                    key: 'alkalinity', 
+                    label: 'Alcalinidad ppm', 
+                    range: '(80 a 120)',
+                    type: 'number', 
+                    decimals: 0 
                 }
+            ];
+            
+            // Celdas de parámetros en la cabecera
+            parameters.forEach(param => {
+                const paramHeader = document.createElement('th');
+                paramHeader.className = 'week-header';
                 
-                headerRow.appendChild(weekHeader);
+                // Crear contenido con nombre y rango
+                const paramName = document.createElement('div');
+                paramName.textContent = param.label;
+                
+                const paramRange = document.createElement('div');
+                paramRange.textContent = param.range;
+                paramRange.className = 'parameter-range';
+                
+                paramHeader.appendChild(paramName);
+                paramHeader.appendChild(paramRange);
+                
+                headerRow.appendChild(paramHeader);
             });
             
             thead.appendChild(headerRow);
@@ -532,27 +561,26 @@
             
             // Crear cuerpo de la tabla
             const tbody = document.createElement('tbody');
+            const currentWeek = getCurrentWeek();
             
-            // Parámetros a mostrar
-            const parameters = [
-                { key: 'nitrite', label: 'Nitrito (NO₂) ppm', type: 'number', decimals: 2 },
-                { key: 'ammonium', label: 'Amonio (NH₄⁺) ppm', type: 'number', decimals: 2 },
-                { key: 'ph', label: 'pH', type: 'number', decimals: 1 },
-                { key: 'alkalinity', label: 'Alcalinidad ppm CaCO₃', type: 'number', decimals: 0 }
-            ];
-            
-            // Crear filas para cada parámetro
-            parameters.forEach(param => {
+            // Crear filas para cada semana
+            weeks.forEach(week => {
                 const row = document.createElement('tr');
                 
-                // Celda del parámetro
-                const paramCell = document.createElement('td');
-                paramCell.textContent = param.label;
-                paramCell.className = 'parameter-column';
-                row.appendChild(paramCell);
+                // Celda con el número de semana
+                const weekCell = document.createElement('td');
+                weekCell.textContent = week;
+                weekCell.className = 'parameter-header';
                 
-                // Celdas de datos por semana
-                weeks.forEach(week => {
+                // Resaltar semana actual
+                if (week === currentWeek) {
+                    weekCell.classList.add('current-week');
+                }
+                
+                row.appendChild(weekCell);
+                
+                // Celdas de datos para cada parámetro
+                parameters.forEach(param => {
                     const dataCell = document.createElement('td');
                     
                     // Buscar datos para esta semana y laguna
@@ -574,11 +602,11 @@
                                 dataCell.title = `Promedio de ${values.length} registros`;
                             }
                         } else {
-                            dataCell.textContent = 'Sin datos';
+                            dataCell.textContent = '-';
                             dataCell.className = 'empty-cell';
                         }
                     } else {
-                        dataCell.textContent = 'Sin datos';
+                        dataCell.textContent = '-';
                         dataCell.className = 'empty-cell';
                     }
                     
