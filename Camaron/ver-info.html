@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Últimas 5 Semanas - Calidad de Agua</title>
+    <title>Dashboard - Calidad de Agua</title>
     <style>
         :root {
             --primary-color: #2c7fb8;
@@ -36,6 +36,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
+            position: relative;
         }
         
         h1 {
@@ -51,38 +52,6 @@
             color: #666;
             margin-bottom: 25px;
             font-size: 16px;
-        }
-        
-        .current-week-info {
-            text-align: center;
-            background-color: var(--accent-color);
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        button:hover {
-            background-color: #1d6fa5;
         }
         
         .data-container {
@@ -170,6 +139,105 @@
             color: var(--text-color);
         }
         
+        /* Estilos para el menú hamburguesa */
+        .menu-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 100;
+        }
+        
+        .menu-toggle:hover {
+            background-color: #1d6fa5;
+        }
+        
+        .weeks-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            width: 250px;
+            z-index: 99;
+            display: none;
+        }
+        
+        .weeks-menu.active {
+            display: block;
+        }
+        
+        .weeks-menu h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        
+        .week-option {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .week-option:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .week-option.selected {
+            background-color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .pond-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .pond-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px 10px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .pond-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .pond-option.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        .pond-option .pond-number {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .pond-option .pond-label {
+            font-size: 14px;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -183,26 +251,65 @@
             .parameter-column {
                 width: 150px;
             }
+            
+            .pond-selector {
+                flex-wrap: wrap;
+            }
+            
+            .pond-option {
+                flex: 0 0 33.333%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .pond-option {
+                flex: 0 0 50%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Datos de Calidad de Agua</h1>
-        <div class="subtitle">Últimas 5 semanas registradas</div>
+        <h1>Dashboard de Calidad de Agua</h1>
+        <div class="subtitle">Últimas 3 semanas registradas</div>
         
-        <div class="current-week-info" id="currentWeekInfo">
-            <!-- Se llenará con JavaScript -->
+        <!-- Selector de lagunas -->
+        <div class="pond-selector">
+            <div class="pond-option active" data-pond="1">
+                <div class="pond-number">1</div>
+                <div class="pond-label">Laguna 1</div>
+            </div>
+            <div class="pond-option" data-pond="2">
+                <div class="pond-number">2</div>
+                <div class="pond-label">Laguna 2</div>
+            </div>
+            <div class="pond-option" data-pond="3">
+                <div class="pond-number">3</div>
+                <div class="pond-label">Laguna 3</div>
+            </div>
+            <div class="pond-option" data-pond="4">
+                <div class="pond-number">4</div>
+                <div class="pond-label">Laguna 4</div>
+            </div>
+            <div class="pond-option" data-pond="5">
+                <div class="pond-number">5</div>
+                <div class="pond-label">Laguna 5</div>
+            </div>
         </div>
         
-        <div class="controls">
-            <button id="refreshBtn">🔄 Actualizar Datos</button>
+        <!-- Menú hamburguesa -->
+        <button class="menu-toggle" id="menuToggle">☰ Seleccionar Semanas</button>
+        <div class="weeks-menu" id="weeksMenu">
+            <h3>Seleccionar Semanas</h3>
+            <div id="weeksList">
+                <!-- Las opciones de semanas se generarán con JavaScript -->
+            </div>
         </div>
         
         <div class="data-container">
             <div class="loading" id="loadingMessage">Cargando datos...</div>
             <div class="no-data" id="noDataMessage" style="display: none;">
-                No hay datos disponibles para las últimas 5 semanas.
+                No hay datos disponibles para las últimas 3 semanas.
                 <br><br>
                 <small>Los datos aparecerán aquí una vez que se registren mediciones.</small>
             </div>
@@ -227,11 +334,16 @@
         const database = firebase.database();
         
         // Elementos del DOM
-        const refreshBtn = document.getElementById('refreshBtn');
         const loadingMessage = document.getElementById('loadingMessage');
         const noDataMessage = document.getElementById('noDataMessage');
         const dataTable = document.getElementById('dataTable');
-        const currentWeekInfo = document.getElementById('currentWeekInfo');
+        const menuToggle = document.getElementById('menuToggle');
+        const weeksMenu = document.getElementById('weeksMenu');
+        const weeksList = document.getElementById('weeksList');
+        
+        // Variables globales
+        let selectedPond = 1;
+        let selectedWeeks = [];
         
         // Obtener semana actual
         function getCurrentWeek() {
@@ -241,12 +353,12 @@
             return Math.ceil(days / 7);
         }
         
-        // Obtener las últimas 5 semanas anteriores
-        function getLast5Weeks() {
+        // Obtener las últimas 3 semanas anteriores
+        function getLast3Weeks() {
             const currentWeek = getCurrentWeek();
             const weeks = [];
             
-            for (let i = 4; i >= 0; i--) {
+            for (let i = 2; i >= 0; i--) {
                 let weekNumber = currentWeek - i;
                 
                 // Manejar cambio de año
@@ -260,23 +372,90 @@
             return weeks;
         }
         
-        // Actualizar información de semana actual
-        function updateCurrentWeekInfo() {
-            const currentWeek = getCurrentWeek();
-            currentWeekInfo.textContent = `Semana actual: ${currentWeek} | Mostrando semanas: ${getLast5Weeks().join(', ')}`;
-        }
-        
         // Cargar datos al iniciar
         window.addEventListener('DOMContentLoaded', function() {
-            updateCurrentWeekInfo();
+            // Inicializar semanas seleccionadas
+            selectedWeeks = getLast3Weeks();
+            
+            // Configurar el selector de lagunas
+            document.querySelectorAll('.pond-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remover clase activa de todas las opciones
+                    document.querySelectorAll('.pond-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Añadir clase activa a la opción seleccionada
+                    this.classList.add('active');
+                    
+                    // Actualizar la laguna seleccionada
+                    selectedPond = parseInt(this.getAttribute('data-pond'));
+                    
+                    // Recargar datos
+                    loadData();
+                });
+            });
+            
+            // Configurar menú hamburguesa
+            menuToggle.addEventListener('click', function() {
+                weeksMenu.classList.toggle('active');
+            });
+            
+            // Cerrar menú al hacer clic fuera de él
+            document.addEventListener('click', function(event) {
+                if (!weeksMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                    weeksMenu.classList.remove('active');
+                }
+            });
+            
+            // Generar opciones de semanas
+            generateWeekOptions();
+            
+            // Cargar datos iniciales
             loadData();
         });
         
-        // Recargar datos al hacer clic en el botón
-        refreshBtn.addEventListener('click', function() {
-            updateCurrentWeekInfo();
-            loadData();
-        });
+        // Generar opciones de semanas en el menú
+        function generateWeekOptions() {
+            weeksList.innerHTML = '';
+            
+            // Generar opciones para todas las semanas del año
+            for (let i = 1; i <= 52; i++) {
+                const weekOption = document.createElement('div');
+                weekOption.className = 'week-option';
+                if (selectedWeeks.includes(i)) {
+                    weekOption.classList.add('selected');
+                }
+                weekOption.textContent = `Semana ${i}`;
+                weekOption.dataset.week = i;
+                
+                weekOption.addEventListener('click', function() {
+                    const week = parseInt(this.dataset.week);
+                    
+                    // Si ya está seleccionada, quitarla
+                    if (selectedWeeks.includes(week)) {
+                        selectedWeeks = selectedWeeks.filter(w => w !== week);
+                        this.classList.remove('selected');
+                    } else {
+                        // Si no está seleccionada, agregarla (máximo 3 semanas)
+                        if (selectedWeeks.length < 3) {
+                            selectedWeeks.push(week);
+                            this.classList.add('selected');
+                        } else {
+                            alert('Solo puedes seleccionar hasta 3 semanas');
+                        }
+                    }
+                    
+                    // Ordenar semanas de menor a mayor
+                    selectedWeeks.sort((a, b) => a - b);
+                    
+                    // Recargar datos
+                    loadData();
+                });
+                
+                weeksList.appendChild(weekOption);
+            }
+        }
         
         // Función para cargar datos desde Firebase
         function loadData() {
@@ -301,12 +480,12 @@
         function displayData(data) {
             loadingMessage.style.display = 'none';
             
-            // Obtener las últimas 5 semanas
-            const last5Weeks = getLast5Weeks();
-            
-            // Verificar si hay datos para alguna de estas semanas
-            const hasData = data ? last5Weeks.some(week => 
-                Object.values(data).some(record => parseInt(record.week) === week)
+            // Verificar si hay datos para la laguna y semanas seleccionadas
+            const hasData = data ? selectedWeeks.some(week => 
+                Object.values(data).some(record => 
+                    parseInt(record.week) === week && 
+                    parseInt(record.pond) === selectedPond
+                )
             ) : false;
             
             if (!hasData) {
@@ -315,7 +494,7 @@
             }
             
             // Crear tabla
-            createTable(last5Weeks, data);
+            createTable(selectedWeeks, data);
             dataTable.style.display = 'table';
         }
         
@@ -334,7 +513,7 @@
             
             const currentWeek = getCurrentWeek();
             
-            // Encabezados de semanas (de más antigua a más reciente)
+            // Encabezados de semanas
             weeks.forEach(week => {
                 const weekHeader = document.createElement('th');
                 weekHeader.textContent = `Semana ${week}`;
@@ -356,10 +535,10 @@
             
             // Parámetros a mostrar
             const parameters = [
-                { key: 'nitrite', label: 'Nitrito (NO₂) mg/L', type: 'number', decimals: 2 },
-                { key: 'ammonium', label: 'Amonio (NH₄⁺) mg/L', type: 'number', decimals: 2 },
+                { key: 'nitrite', label: 'Nitrito (NO₂) ppm', type: 'number', decimals: 2 },
+                { key: 'ammonium', label: 'Amonio (NH₄⁺) ppm', type: 'number', decimals: 2 },
                 { key: 'ph', label: 'pH', type: 'number', decimals: 1 },
-                { key: 'alkalinity', label: 'Alcalinidad mg/L CaCO₃', type: 'number', decimals: 0 }
+                { key: 'alkalinity', label: 'Alcalinidad ppm CaCO₃', type: 'number', decimals: 0 }
             ];
             
             // Crear filas para cada parámetro
@@ -376,8 +555,8 @@
                 weeks.forEach(week => {
                     const dataCell = document.createElement('td');
                     
-                    // Buscar datos para esta semana
-                    const weekData = findWeekData(allData, week);
+                    // Buscar datos para esta semana y laguna
+                    const weekData = findWeekData(allData, week, selectedPond);
                     
                     if (weekData && weekData.length > 0) {
                         // Calcular promedio si hay múltiples registros
@@ -412,12 +591,13 @@
             dataTable.appendChild(tbody);
         }
         
-        // Función para encontrar datos de una semana específica
-        function findWeekData(allData, week) {
+        // Función para encontrar datos de una semana y laguna específica
+        function findWeekData(allData, week, pond) {
             if (!allData) return null;
             
             return Object.values(allData).filter(record => 
-                parseInt(record.week) === week
+                parseInt(record.week) === week && 
+                parseInt(record.pond) === pond
             );
         }
     </script>
