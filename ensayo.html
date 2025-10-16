@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Códigos de Barras - Ingreso</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -77,7 +76,7 @@
             color: #2c3e50;
         }
 
-        input, select, button, textarea {
+        input, select, button {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #ddd;
@@ -86,7 +85,7 @@
             transition: all 0.3s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #3498db;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -115,42 +114,11 @@
             background: linear-gradient(135deg, #27ae60, #229954);
         }
 
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
         .btn-secondary {
             background: linear-gradient(135deg, #95a5a6, #7f8c8d);
         }
 
-        .camera-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        #camera-preview {
-            width: 100%;
-            height: 300px;
-            background-color: #000;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-        }
-
-        .camera-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .camera-controls button {
-            flex: 1;
-        }
-
-        .captured-image-container {
+        .image-container {
             margin-top: 20px;
             text-align: center;
         }
@@ -192,16 +160,6 @@
             border: 1px solid #f5c6cb;
         }
 
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-        }
-
-        .hidden {
-            display: none;
-        }
-
         .stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -226,6 +184,10 @@
         .stat-label {
             color: #7f8c8d;
             font-size: 0.9em;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -256,46 +218,39 @@
             <div class="card">
                 <h2>📷 Escanear Código</h2>
                 
-                <!-- Cámara para capturar imagen -->
-                <div class="camera-container">
-                    <div id="camera-preview">
-                        <div id="camera-message">Presiona "Activar Cámara" para comenzar</div>
-                        <video id="video-preview" class="hidden" autoplay playsinline></video>
-                    </div>
-                    <div class="camera-controls">
-                        <button id="btn-activate-camera" class="btn-success">Activar Cámara</button>
-                        <button id="btn-capture" class="btn-secondary" disabled>Capturar Imagen</button>
-                    </div>
-                </div>
-                
-                <!-- Imagen capturada -->
-                <div class="captured-image-container">
-                    <img id="captured-image" alt="Imagen capturada">
-                    <div class="image-actions">
-                        <button id="btn-copy-image" class="btn-success" disabled>Copiar Imagen</button>
-                        <button id="btn-reset-camera" class="btn-secondary" disabled>Volver a Capturar</button>
-                    </div>
-                </div>
-                
                 <!-- Formulario de ingreso -->
                 <div class="form-group">
-                    <label for="selectContenedor">Seleccionar Contenedor:</label>
+                    <label for="selectContenedor">Contenedor:</label>
                     <select id="selectContenedor">
                         <option value="">Cargando contenedores...</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="codigoBarras">Código de Barras:</label>
-                    <input type="text" id="codigoBarras" placeholder="Ej: 7501033911309" maxlength="50">
+                    <input type="text" id="codigoBarras" placeholder="Escanea o pega el código aquí" maxlength="50">
                 </div>
+                
+                <!-- Área para pegar imagen -->
                 <div class="form-group">
-                    <label for="nombreProducto">Nombre del Producto (opcional):</label>
-                    <input type="text" id="nombreProducto" placeholder="Ej: Laptop Dell XPS 13">
+                    <label for="image-input">Pegar imagen del código de barras:</label>
+                    <div style="border: 2px dashed #3498db; border-radius: 8px; padding: 20px; text-align: center; background: #f8f9fa; cursor: pointer;"
+                         id="drop-area"
+                         onclick="document.getElementById('file-input').click()">
+                        <p>📎 Haz clic aquí o arrastra una imagen</p>
+                        <p style="font-size: 0.8em; color: #7f8c8d; margin-top: 5px;">También puedes pegar con Ctrl+V</p>
+                    </div>
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
                 </div>
-                <div class="form-group">
-                    <label for="notas">Notas adicionales (opcional):</label>
-                    <textarea id="notas" rows="3" placeholder="Información adicional sobre el producto..."></textarea>
+                
+                <!-- Imagen capturada -->
+                <div class="image-container">
+                    <img id="captured-image" alt="Imagen del código de barras">
+                    <div class="image-actions">
+                        <button id="btn-copy-image" class="btn-success" disabled>Copiar Imagen</button>
+                        <button id="btn-clear-image" class="btn-secondary" disabled>Eliminar Imagen</button>
+                    </div>
                 </div>
+                
                 <button onclick="escanearCodigo()" class="btn-success">Guardar Código</button>
             </div>
         </div>
@@ -308,18 +263,16 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Variables para la cámara
-        let stream = null;
+        // Variables globales
+        let ultimoContenedorId = null;
         let capturedImageData = null;
 
         // Elementos DOM
-        const videoPreview = document.getElementById('video-preview');
-        const cameraMessage = document.getElementById('camera-message');
-        const btnActivateCamera = document.getElementById('btn-activate-camera');
-        const btnCapture = document.getElementById('btn-capture');
-        const btnCopyImage = document.getElementById('btn-copy-image');
-        const btnResetCamera = document.getElementById('btn-reset-camera');
         const capturedImage = document.getElementById('captured-image');
+        const btnCopyImage = document.getElementById('btn-copy-image');
+        const btnClearImage = document.getElementById('btn-clear-image');
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
 
         // Alertas
         function mostrarAlerta(mensaje, tipo = 'success') {
@@ -345,7 +298,7 @@
                 if (error) throw error;
 
                 const select = document.getElementById('selectContenedor');
-                select.innerHTML = '<option value="">Selecciona un contenedor</option>';
+                select.innerHTML = '';
                 
                 data.forEach(contenedor => {
                     const option = document.createElement('option');
@@ -353,6 +306,16 @@
                     option.textContent = `${contenedor.nombre} - ${contenedor.descripcion || 'Sin descripción'}`;
                     select.appendChild(option);
                 });
+
+                // Si hay un último contenedor usado, seleccionarlo
+                if (ultimoContenedorId) {
+                    select.value = ultimoContenedorId;
+                }
+                
+                // Si no hay último contenedor, seleccionar el primero
+                if (!ultimoContenedorId && data.length > 0) {
+                    select.value = data[0].id;
+                }
 
                 return data;
             } catch (error) {
@@ -362,90 +325,28 @@
             }
         }
 
-        // Activar cámara
-        async function activarCamara() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
-                });
-                
-                videoPreview.srcObject = stream;
-                videoPreview.classList.remove('hidden');
-                cameraMessage.classList.add('hidden');
-                
-                btnActivateCamera.disabled = true;
-                btnCapture.disabled = false;
-                btnCapture.textContent = 'Capturar Imagen';
-                
-            } catch (error) {
-                console.error('Error al acceder a la cámara:', error);
-                mostrarAlerta('No se pudo acceder a la cámara. Asegúrate de permitir el acceso.', 'error');
-            }
+        // Guardar el último contenedor seleccionado
+        function guardarUltimoContenedor() {
+            const select = document.getElementById('selectContenedor');
+            ultimoContenedorId = select.value;
         }
 
-        // Capturar imagen
-        function capturarImagen() {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
+        // Cargar imagen desde archivo
+        function cargarImagenDesdeArchivo(file) {
+            const reader = new FileReader();
             
-            canvas.width = videoPreview.videoWidth;
-            canvas.height = videoPreview.videoHeight;
+            reader.onload = function(e) {
+                capturedImageData = e.target.result;
+                capturedImage.src = capturedImageData;
+                capturedImage.style.display = 'block';
+                
+                btnCopyImage.disabled = false;
+                btnClearImage.disabled = false;
+                
+                mostrarAlerta('Imagen cargada correctamente');
+            };
             
-            context.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
-            
-            // Detener la cámara
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-            
-            // Mostrar imagen capturada
-            capturedImageData = canvas.toDataURL('image/jpeg');
-            capturedImage.src = capturedImageData;
-            capturedImage.style.display = 'block';
-            
-            // Ocultar video
-            videoPreview.classList.add('hidden');
-            cameraMessage.textContent = 'Imagen capturada. Puedes copiarla o volver a capturar.';
-            cameraMessage.classList.remove('hidden');
-            
-            // Habilitar botones
-            btnCopyImage.disabled = false;
-            btnResetCamera.disabled = false;
-            btnCapture.disabled = true;
-            btnActivateCamera.disabled = false;
-            btnActivateCamera.textContent = 'Activar Cámara Nuevamente';
-            
-            // Intentar leer código de barras de la imagen
-            leerCodigoDeImagen(canvas);
-        }
-
-        // Leer código de barras de la imagen capturada
-        function leerCodigoDeImagen(canvas) {
-            // Esta función intenta leer el código de barras usando QuaggaJS
-            // Nota: QuaggaJS puede necesitar configuración específica según el tipo de código de barras
-            try {
-                Quagga.decodeSingle({
-                    decoder: {
-                        readers: ['code_128_reader', 'ean_reader', 'ean_8_reader', 'code_39_reader', 'upc_reader']
-                    },
-                    locate: true,
-                    src: canvas.toDataURL()
-                }, function(result) {
-                    if (result && result.codeResult) {
-                        document.getElementById('codigoBarras').value = result.codeResult.code;
-                        mostrarAlerta(`Código detectado: ${result.codeResult.code}`, 'success');
-                    } else {
-                        console.log('No se pudo detectar un código de barras en la imagen');
-                    }
-                });
-            } catch (error) {
-                console.error('Error al intentar leer código de barras:', error);
-            }
+            reader.readAsDataURL(file);
         }
 
         // Copiar imagen al portapapeles
@@ -469,25 +370,22 @@
             }
         }
 
-        // Resetear cámara
-        function resetearCamara() {
+        // Limpiar imagen
+        function limpiarImagen() {
             capturedImage.style.display = 'none';
             capturedImageData = null;
+            capturedImage.src = '';
             
             btnCopyImage.disabled = true;
-            btnResetCamera.disabled = true;
+            btnClearImage.disabled = true;
             
-            cameraMessage.textContent = 'Presiona "Activar Cámara" para comenzar';
-            
-            activarCamara();
+            fileInput.value = '';
         }
 
         // Escanear código
         async function escanearCodigo() {
             const contenedorId = document.getElementById('selectContenedor').value;
             const codigo = document.getElementById('codigoBarras').value.trim();
-            const productoNombre = document.getElementById('nombreProducto').value.trim();
-            const notas = document.getElementById('notas').value.trim();
 
             if (!contenedorId) {
                 mostrarAlerta('Por favor selecciona un contenedor', 'error');
@@ -505,8 +403,6 @@
                     .insert([{ 
                         contenedor_id: contenedorId,
                         codigo: codigo,
-                        producto_nombre: productoNombre || null,
-                        notas: notas || null,
                         imagen_codigo: capturedImageData || null
                     }])
                     .select();
@@ -515,19 +411,18 @@
 
                 mostrarAlerta(`Código ${codigo} guardado exitosamente!`);
                 
+                // Guardar el contenedor como último usado
+                guardarUltimoContenedor();
+                
                 // Limpiar formulario
                 document.getElementById('codigoBarras').value = '';
-                document.getElementById('nombreProducto').value = '';
-                document.getElementById('notas').value = '';
-                
-                // Limpiar imagen
-                capturedImage.style.display = 'none';
-                capturedImageData = null;
-                btnCopyImage.disabled = true;
-                btnResetCamera.disabled = true;
+                limpiarImagen();
                 
                 // Recargar estadísticas
                 await cargarEstadisticas();
+                
+                // Volver a enfocar el campo de código
+                document.getElementById('codigoBarras').focus();
                 
             } catch (error) {
                 console.error('Error guardando código:', error);
@@ -573,11 +468,51 @@
             await cargarContenedores();
             await cargarEstadisticas();
             
-            // Configurar eventos de la cámara
-            btnActivateCamera.addEventListener('click', activarCamara);
-            btnCapture.addEventListener('click', capturarImagen);
+            // Configurar eventos
             btnCopyImage.addEventListener('click', copiarImagen);
-            btnResetCamera.addEventListener('click', resetearCamara);
+            btnClearImage.addEventListener('click', limpiarImagen);
+            
+            // Evento para selección de archivo
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    cargarImagenDesdeArchivo(this.files[0]);
+                }
+            });
+            
+            // Evento para arrastrar y soltar
+            dropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.background = '#e9ecef';
+            });
+            
+            dropArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.background = '#f8f9fa';
+            });
+            
+            dropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.background = '#f8f9fa';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    cargarImagenDesdeArchivo(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // Evento para pegar imagen (Ctrl+V)
+            document.addEventListener('paste', function(e) {
+                const items = e.clipboardData?.items;
+                
+                if (items) {
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].type.indexOf('image') !== -1) {
+                            const file = items[i].getAsFile();
+                            cargarImagenDesdeArchivo(file);
+                            break;
+                        }
+                    }
+                }
+            });
             
             // Auto-focus en código de barras
             document.getElementById('codigoBarras').focus();
@@ -588,6 +523,9 @@
                     escanearCodigo();
                 }
             });
+            
+            // Guardar último contenedor cuando cambie
+            document.getElementById('selectContenedor').addEventListener('change', guardarUltimoContenedor);
         }
 
         // Iniciar cuando la página cargue
