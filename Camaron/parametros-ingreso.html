@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parámetros del Agua - Diario</title>
+    <style>
+        :root {
+            --primary-color: #2c7fb8;
+            --secondary-color: #7fcdbb;
+            --accent-color: #edf8b1;
+            --danger-color: #e74c3c;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-color: #ddd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(44, 127, 184, 0.3);
+        }
+        
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .parameters-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .parameter-card {
+            background-color: var(--accent-color);
+            border-radius: 6px;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .parameter-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-submit:hover {
+            background-color: #1d6fa5;
+        }
+        
+        .btn-reset {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .error {
+            color: var(--danger-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .week-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .pond-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .pond-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .pond-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .pond-option.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        .pond-option .pond-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .pond-option .pond-label {
+            font-size: 14px;
+        }
+        
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .current-pond {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: var(--accent-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        
+        /* Estilos para el menú hamburguesa */
+        .menu-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 100;
+        }
+        
+        .menu-toggle:hover {
+            background-color: #1d6fa5;
+        }
+        
+        .history-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            width: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            z-index: 99;
+            display: none;
+        }
+        
+        .history-menu.active {
+            display: block;
+        }
+        
+        .history-menu h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        
+        .history-item {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: var(--light-gray);
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .history-pond {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .history-time {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .history-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .history-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        
+        .no-history {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        @media (max-width: 600px) {
+            .pond-selector {
+                flex-wrap: wrap;
+            }
+            
+            .pond-option {
+                flex: 0 0 33.333%;
+            }
+            
+            .history-menu {
+                width: 300px;
+                right: 10px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .pond-option {
+                flex: 0 0 50%;
+            }
+            
+            .history-menu {
+                width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Parámetros del Agua - Diario</h1>
+        
+        <!-- Menú hamburguesa para historial -->
+        <button class="menu-toggle" id="menuToggle">☰ Últimos Registros</button>
+        <div class="history-menu" id="historyMenu">
+            <h3>Registros de los últimos 7 días</h3>
+            <div id="historyList">
+                <!-- Los registros se cargarán aquí -->
+            </div>
+        </div>
+        
+        <div class="pond-selector">
+            <div class="pond-option active" data-pond="1">
+                <div class="pond-number">1</div>
+                <div class="pond-label">Laguna 1</div>
+            </div>
+            <div class="pond-option" data-pond="2">
+                <div class="pond-number">2</div>
+                <div class="pond-label">Laguna 2</div>
+            </div>
+            <div class="pond-option" data-pond="3">
+                <div class="pond-number">3</div>
+                <div class="pond-label">Laguna 3</div>
+            </div>
+            <div class="pond-option" data-pond="4">
+                <div class="pond-number">4</div>
+                <div class="pond-label">Laguna 4</div>
+            </div>
+            <div class="pond-option" data-pond="5">
+                <div class="pond-number">5</div>
+                <div class="pond-label">Laguna 5</div>
+            </div>
+        </div>
+        
+        <form id="waterParametersForm">
+            <div class="form-header">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="date">Fecha:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="current-pond">Laguna: <span id="currentPondDisplay">1</span></div>
+            </div>
+            
+            <div class="parameters-grid">
+                <div class="parameter-card">
+                    <h3>Oxígeno</h3>
+                    <div class="form-group">
+                        <label for="oxygen">Concentración (ppm):</label>
+                        <input type="number" id="oxygen" name="oxygen" step="0.1" min="0" max="20" required>
+                        <div class="error" id="oxygenError">Valor inválido (0-20 ppm)</div>
+                    </div>
+                </div>
+                
+                <div class="parameter-card">
+                    <h3>Temperatura</h3>
+                    <div class="form-group">
+                        <label for="temperature">Temperatura (°C):</label>
+                        <input type="number" id="temperature" name="temperature" step="0.1" min="0" max="40" required>
+                        <div class="error" id="temperatureError">Valor inválido (0-40°C)</div>
+                    </div>
+                </div>
+                
+                <div class="parameter-card">
+                    <h3>pH</h3>
+                    <div class="form-group">
+                        <label for="ph">Valor de pH:</label>
+                        <input type="number" id="ph" name="ph" step="0.1" min="0" max="14" required>
+                        <div class="error" id="phError">Valor inválido (0-14)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Observaciones:</label>
+                <textarea id="notes" name="notes" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px;"></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button type="reset" class="btn-reset">Limpiar Formulario</button>
+                <button type="submit" class="btn-submit">Guardar Parámetros</button>
+            </div>
+        </form>
+        
+        <div class="loading" id="loadingMessage">
+            Guardando parámetros...
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            ¡Parámetros guardados exitosamente!
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://calida-8e85b-default-rtdb.firebaseio.com/"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Elementos del formulario
+        const form = document.getElementById('waterParametersForm');
+        const dateInput = document.getElementById('date');
+        const oxygenInput = document.getElementById('oxygen');
+        const temperatureInput = document.getElementById('temperature');
+        const phInput = document.getElementById('ph');
+        const successMessage = document.getElementById('successMessage');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const currentPondDisplay = document.getElementById('currentPondDisplay');
+        const menuToggle = document.getElementById('menuToggle');
+        const historyMenu = document.getElementById('historyMenu');
+        const historyList = document.getElementById('historyList');
+        
+        // Variable para almacenar la laguna seleccionada
+        let selectedPond = 1;
+        
+        // Establecer fecha actual por defecto
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        dateInput.value = formattedDate;
+        
+        // Configurar el selector de lagunas
+        document.querySelectorAll('.pond-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remover clase activa de todas las opciones
+                document.querySelectorAll('.pond-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Añadir clase activa a la opción seleccionada
+                this.classList.add('active');
+                
+                // Actualizar la laguna seleccionada
+                selectedPond = parseInt(this.getAttribute('data-pond'));
+                
+                // Actualizar el display
+                currentPondDisplay.textContent = selectedPond;
+            });
+        });
+        
+        // Configurar menú hamburguesa
+        menuToggle.addEventListener('click', function() {
+            historyMenu.classList.toggle('active');
+            if (historyMenu.classList.contains('active')) {
+                loadRecentRecords();
+            }
+        });
+        
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            if (!historyMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                historyMenu.classList.remove('active');
+            }
+        });
+        
+        // Validación en tiempo real
+        oxygenInput.addEventListener('input', function() {
+            validateOxygen(oxygenInput, 'oxygenError');
+        });
+        
+        temperatureInput.addEventListener('input', function() {
+            validateTemperature(temperatureInput, 'temperatureError');
+        });
+        
+        phInput.addEventListener('input', function() {
+            validatePH(phInput, 'phError');
+        });
+        
+        // Función para validar oxígeno (0-20 ppm)
+        function validateOxygen(input, errorId) {
+            const value = parseFloat(input.value);
+            const errorElement = document.getElementById(errorId);
+            
+            if (isNaN(value) || value < 0 || value > 20) {
+                errorElement.style.display = 'block';
+                input.style.borderColor = 'var(--danger-color)';
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                input.style.borderColor = 'var(--border-color)';
+                return true;
+            }
+        }
+        
+        // Función para validar temperatura (0-40°C)
+        function validateTemperature(input, errorId) {
+            const value = parseFloat(input.value);
+            const errorElement = document.getElementById(errorId);
+            
+            if (isNaN(value) || value < 0 || value > 40) {
+                errorElement.style.display = 'block';
+                input.style.borderColor = 'var(--danger-color)';
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                input.style.borderColor = 'var(--border-color)';
+                return true;
+            }
+        }
+        
+        // Función para validar el pH (rango especial 0-14)
+        function validatePH(input, errorId) {
+            const value = parseFloat(input.value);
+            const errorElement = document.getElementById(errorId);
+            
+            if (isNaN(value) || value < 0 || value > 14) {
+                errorElement.style.display = 'block';
+                input.style.borderColor = 'var(--danger-color)';
+                return false;
+            } else {
+                errorElement.style.display = 'none';
+                input.style.borderColor = 'var(--border-color)';
+                return true;
+            }
+        }
+        
+        // Manejo del envío del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar todos los campos
+            let isValid = true;
+            
+            if (!validateOxygen(oxygenInput, 'oxygenError')) isValid = false;
+            if (!validateTemperature(temperatureInput, 'temperatureError')) isValid = false;
+            if (!validatePH(phInput, 'phError')) isValid = false;
+            
+            if (isValid) {
+                // Mostrar mensaje de carga
+                loadingMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                
+                // Preparar datos para enviar
+                const formData = {
+                    pond: selectedPond,
+                    date: dateInput.value,
+                    oxygen: parseFloat(oxygenInput.value),
+                    temperature: parseFloat(temperatureInput.value),
+                    ph: parseFloat(phInput.value),
+                    notes: document.getElementById('notes').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Guardar en Firebase en tabla diferente
+                saveToFirebase(formData);
+            }
+        });
+        
+        // Función para guardar datos en Firebase (tabla waterParametersDaily)
+        function saveToFirebase(data) {
+            // Generar una clave única para el registro
+            const newRecordKey = database.ref().child('waterParametersDaily').push().key;
+            
+            // Guardar en la base de datos en tabla waterParametersDaily
+            database.ref('waterParametersDaily/' + newRecordKey).set(data)
+                .then(() => {
+                    // Éxito
+                    loadingMessage.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    // Ocultar mensaje después de 3 segundos
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                    
+                    // Limpiar formulario (pero mantener la laguna seleccionada)
+                    form.reset();
+                    
+                    // Restablecer la fecha actual
+                    dateInput.value = formattedDate;
+                    
+                    // Actualizar el historial si está abierto
+                    if (historyMenu.classList.contains('active')) {
+                        loadRecentRecords();
+                    }
+                })
+                .catch((error) => {
+                    // Error
+                    loadingMessage.style.display = 'none';
+                    alert('Error al guardar los parámetros: ' + error.message);
+                });
+        }
+        
+        // Función para cargar registros recientes (últimos 7 días)
+        function loadRecentRecords() {
+            historyList.innerHTML = '<div class="loading">Cargando registros...</div>';
+            
+            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            
+            database.ref('waterParametersDaily').orderByChild('timestamp').startAt(sevenDaysAgo).once('value')
+                .then((snapshot) => {
+                    const data = snapshot.val();
+                    displayRecentRecords(data);
+                })
+                .catch((error) => {
+                    console.error('Error al cargar registros recientes:', error);
+                    historyList.innerHTML = '<div class="no-history">Error al cargar registros</div>';
+                });
+        }
+        
+        // Función para mostrar registros recientes
+        function displayRecentRecords(data) {
+            historyList.innerHTML = '';
+            
+            if (!data) {
+                historyList.innerHTML = '<div class="no-history">No hay registros en los últimos 7 días</div>';
+                return;
+            }
+            
+            // Convertir objeto a array y ordenar por timestamp (más reciente primero)
+            const records = Object.entries(data)
+                .map(([key, value]) => ({ key, ...value }))
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if (records.length === 0) {
+                historyList.innerHTML = '<div class="no-history">No hay registros en los últimos 7 días</div>';
+                return;
+            }
+            
+            records.forEach(record => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const date = new Date(record.timestamp);
+                const timeString = date.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                const dateString = date.toLocaleDateString('es-ES');
+                
+                historyItem.innerHTML = `
+                    <div class="history-header">
+                        <div class="history-pond">Laguna ${record.pond} - ${record.date}</div>
+                        <div class="history-time">${dateString} ${timeString}</div>
+                    </div>
+                    <div class="history-data">
+                        <div>Oxígeno: ${record.oxygen} ppm</div>
+                        <div>Temperatura: ${record.temperature}°C</div>
+                        <div>pH: ${record.ph}</div>
+                        ${record.notes ? `<div colspan="2">Observaciones: ${record.notes}</div>` : ''}
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn-delete" data-key="${record.key}">Eliminar</button>
+                    </div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+            
+            // Agregar event listeners para los botones de eliminar
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', function() {
+                    const recordKey = this.getAttribute('data-key');
+                    deleteRecord(recordKey);
+                });
+            });
+        }
+        
+        // Función para eliminar un registro
+        function deleteRecord(recordKey) {
+            if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
+                database.ref('waterParametersDaily/' + recordKey).remove()
+                    .then(() => {
+                        // Recargar la lista de registros
+                        loadRecentRecords();
+                    })
+                    .catch((error) => {
+                        alert('Error al eliminar el registro: ' + error.message);
+                    });
+            }
+        }
+        
+        // Resetear errores al limpiar el formulario
+        form.addEventListener('reset', function() {
+            document.querySelectorAll('.error').forEach(error => {
+                error.style.display = 'none';
+            });
+            document.querySelectorAll('input').forEach(input => {
+                input.style.borderColor = 'var(--border-color)';
+            });
+            successMessage.style.display = 'none';
+            loadingMessage.style.display = 'none';
+            
+            // Restablecer la fecha actual
+            dateInput.value = formattedDate;
+        });
+    </script>
+</body>
+</html>
