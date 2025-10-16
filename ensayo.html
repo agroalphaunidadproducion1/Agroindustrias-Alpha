@@ -3,208 +3,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Usuarios - Sistema Agroalpha</title>
+    <title>Sistema de Códigos de Barras - Ingreso</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     <style>
-        :root {
-            --primary-color: #2E7D32;
-            --primary-light: #4CAF50;
-            --primary-dark: #1B5E20;
-            --white: #ffffff;
-            --light-gray: #f5f5f5;
-            --dark-gray: #333;
-            --shadow: 0 2px 10px rgba(0,0,0,0.1);
-            --shadow-hover: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-gray);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            padding: 20px;
         }
-        
-        /* Header */
-        .main-header {
-            background: var(--white);
-            box-shadow: var(--shadow);
-            padding: 12px 25px;
-        }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-        
-        .logo-icon {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-        }
-        
-        .logo-text h1 {
-            color: var(--primary-dark);
-            font-size: 1.1rem;
-            margin: 0;
-        }
-        
-        .logo-text span {
-            font-size: 0.7rem;
-            color: var(--dark-gray);
-        }
-        
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 25px;
-            max-width: 1000px;
+
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            width: 100%;
-        }
-        
-        .page-header {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .page-header h1 {
-            color: var(--primary-dark);
-            font-size: 2rem;
-            margin-bottom: 8px;
-        }
-        
-        .breadcrumb {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        /* Action Buttons - Diseño Compacto */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .action-button {
-            background-color: var(--white);
-            color: var(--dark-gray);
-            padding: 22px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-            text-align: center;
-            position: relative;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-        
-        .action-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select, button, textarea {
             width: 100%;
-            height: 4px;
-            background-color: var(--primary-color);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
-        }
-        
-        .action-button:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .action-button:hover::before {
-            transform: scaleX(1);
-        }
-        
-        .action-button i {
-            font-size: 2rem;
-            color: var(--primary-color);
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
             transition: all 0.3s ease;
         }
-        
-        .action-button:hover i {
-            transform: scale(1.05);
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
-        
-        .button-title {
+
+        button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            cursor: pointer;
             font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
-        .button-description {
-            font-size: 0.85rem;
-            color: #666;
-            line-height: 1.4;
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+
+        .camera-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #camera-preview {
+            width: 100%;
+            height: 300px;
+            background-color: #000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .camera-controls button {
+            flex: 1;
+        }
+
+        .captured-image-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #captured-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .image-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .image-actions button {
+            flex: 1;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Main Header -->
-    <header class="main-header">
-        <div class="header-content">
-            <a href="dashboard.html" class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-seedling"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>Agroalpha</h1>
-                    <span>Gestión de Usuarios</span>
-                </div>
-            </a>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="page-header">
-            <h1>Gestión de Usuarios</h1>
-            <div class="breadcrumb">Sistema Agroalpha - Unidad de Producción 1</div>
+    <div class="container">
+        <div class="header">
+            <h1>📦 Sistema de Códigos de Barras</h1>
+            <p>Módulo de Ingreso - Escanea y guarda códigos de barras</p>
         </div>
 
-        <div class="action-buttons">
-            <a href="Crearusuario.html" class="action-button">
-                <i class="fas fa-user-plus"></i>
-                <div class="button-title">Crear Usuario</div>
-                <div class="button-description">Registrar nuevos usuarios con diferentes roles y permisos en el sistema</div>
-            </a>
-            <a href="veruser.html" class="action-button">
-                <i class="fas fa-users"></i>
-                <div class="button-title">Ver Usuarios</div>
-                <div class="button-description">Consultar, editar y administrar los usuarios existentes en el sistema</div>
-            </a>
-            <a href="roles-permisos.html" class="action-button">
-                <i class="fas fa-user-shield"></i>
-                <div class="button-title">Roles y Permisos</div>
-                <div class="button-description">Configurar niveles de acceso para cada tipo de usuario del sistema</div>
-            </a>
+        <div class="main-content">
+            <!-- Estadísticas -->
+            <div class="card">
+                <h2>📊 Estadísticas de Hoy</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCodigosHoy">0</div>
+                        <div class="stat-label">Códigos Hoy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="codigosUltimaHora">0</div>
+                        <div class="stat-label">Última Hora</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Escanear Código -->
+            <div class="card">
+                <h2>📷 Escanear Código</h2>
+                
+                <!-- Cámara para capturar imagen -->
+                <div class="camera-container">
+                    <div id="camera-preview">
+                        <div id="camera-message">Presiona "Activar Cámara" para comenzar</div>
+                        <video id="video-preview" class="hidden" autoplay playsinline></video>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="btn-activate-camera" class="btn-success">Activar Cámara</button>
+                        <button id="btn-capture" class="btn-secondary" disabled>Capturar Imagen</button>
+                    </div>
+                </div>
+                
+                <!-- Imagen capturada -->
+                <div class="captured-image-container">
+                    <img id="captured-image" alt="Imagen capturada">
+                    <div class="image-actions">
+                        <button id="btn-copy-image" class="btn-success" disabled>Copiar Imagen</button>
+                        <button id="btn-reset-camera" class="btn-secondary" disabled>Volver a Capturar</button>
+                    </div>
+                </div>
+                
+                <!-- Formulario de ingreso -->
+                <div class="form-group">
+                    <label for="selectContenedor">Seleccionar Contenedor:</label>
+                    <select id="selectContenedor">
+                        <option value="">Cargando contenedores...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="codigoBarras">Código de Barras:</label>
+                    <input type="text" id="codigoBarras" placeholder="Ej: 7501033911309" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="nombreProducto">Nombre del Producto (opcional):</label>
+                    <input type="text" id="nombreProducto" placeholder="Ej: Laptop Dell XPS 13">
+                </div>
+                <div class="form-group">
+                    <label for="notas">Notas adicionales (opcional):</label>
+                    <textarea id="notas" rows="3" placeholder="Información adicional sobre el producto..."></textarea>
+                </div>
+                <button onclick="escanearCodigo()" class="btn-success">Guardar Código</button>
+            </div>
         </div>
-    </main>
-      <script src="footer.js"></script>
+    </div>
+
+    <script>
+        // Configuración Supabase - REEMPLAZA CON TUS DATOS
+        const SUPABASE_URL = 'https://cswpqntkwvusnssizfpf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzd3BxbnRrd3Z1c25zc2l6ZnBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MTg1ODUsImV4cCI6MjA3NjE5NDU4NX0.6-CfaN8TMGC6m87toNvbnNgeSTXtBvZj0muJuauBmWs';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Variables para la cámara
+        let stream = null;
+        let capturedImageData = null;
+
+        // Elementos DOM
+        const videoPreview = document.getElementById('video-preview');
+        const cameraMessage = document.getElementById('camera-message');
+        const btnActivateCamera = document.getElementById('btn-activate-camera');
+        const btnCapture = document.getElementById('btn-capture');
+        const btnCopyImage = document.getElementById('btn-copy-image');
+        const btnResetCamera = document.getElementById('btn-reset-camera');
+        const capturedImage = document.getElementById('captured-image');
+
+        // Alertas
+        function mostrarAlerta(mensaje, tipo = 'success') {
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo}`;
+            alerta.textContent = mensaje;
+            
+            document.querySelector('.main-content').prepend(alerta);
+            
+            setTimeout(() => {
+                alerta.remove();
+            }, 5000);
+        }
+
+        // Cargar contenedores en el select
+        async function cargarContenedores() {
+            try {
+                const { data, error } = await supabase
+                    .from('contenedores')
+                    .select('*')
+                    .order('nombre');
+
+                if (error) throw error;
+
+                const select = document.getElementById('selectContenedor');
+                select.innerHTML = '<option value="">Selecciona un contenedor</option>';
+                
+                data.forEach(contenedor => {
+                    const option = document.createElement('option');
+                    option.value = contenedor.id;
+                    option.textContent = `${contenedor.nombre} - ${contenedor.descripcion || 'Sin descripción'}`;
+                    select.appendChild(option);
+                });
+
+                return data;
+            } catch (error) {
+                console.error('Error cargando contenedores:', error);
+                mostrarAlerta('Error cargando contenedores', 'error');
+                return [];
+            }
+        }
+
+        // Activar cámara
+        async function activarCamara() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                videoPreview.srcObject = stream;
+                videoPreview.classList.remove('hidden');
+                cameraMessage.classList.add('hidden');
+                
+                btnActivateCamera.disabled = true;
+                btnCapture.disabled = false;
+                btnCapture.textContent = 'Capturar Imagen';
+                
+            } catch (error) {
+                console.error('Error al acceder a la cámara:', error);
+                mostrarAlerta('No se pudo acceder a la cámara. Asegúrate de permitir el acceso.', 'error');
+            }
+        }
+
+        // Capturar imagen
+        function capturarImagen() {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = videoPreview.videoWidth;
+            canvas.height = videoPreview.videoHeight;
+            
+            context.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
+            
+            // Detener la cámara
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            // Mostrar imagen capturada
+            capturedImageData = canvas.toDataURL('image/jpeg');
+            capturedImage.src = capturedImageData;
+            capturedImage.style.display = 'block';
+            
+            // Ocultar video
+            videoPreview.classList.add('hidden');
+            cameraMessage.textContent = 'Imagen capturada. Puedes copiarla o volver a capturar.';
+            cameraMessage.classList.remove('hidden');
+            
+            // Habilitar botones
+            btnCopyImage.disabled = false;
+            btnResetCamera.disabled = false;
+            btnCapture.disabled = true;
+            btnActivateCamera.disabled = false;
+            btnActivateCamera.textContent = 'Activar Cámara Nuevamente';
+            
+            // Intentar leer código de barras de la imagen
+            leerCodigoDeImagen(canvas);
+        }
+
+        // Leer código de barras de la imagen capturada
+        function leerCodigoDeImagen(canvas) {
+            // Esta función intenta leer el código de barras usando QuaggaJS
+            // Nota: QuaggaJS puede necesitar configuración específica según el tipo de código de barras
+            try {
+                Quagga.decodeSingle({
+                    decoder: {
+                        readers: ['code_128_reader', 'ean_reader', 'ean_8_reader', 'code_39_reader', 'upc_reader']
+                    },
+                    locate: true,
+                    src: canvas.toDataURL()
+                }, function(result) {
+                    if (result && result.codeResult) {
+                        document.getElementById('codigoBarras').value = result.codeResult.code;
+                        mostrarAlerta(`Código detectado: ${result.codeResult.code}`, 'success');
+                    } else {
+                        console.log('No se pudo detectar un código de barras en la imagen');
+                    }
+                });
+            } catch (error) {
+                console.error('Error al intentar leer código de barras:', error);
+            }
+        }
+
+        // Copiar imagen al portapapeles
+        async function copiarImagen() {
+            try {
+                // Convertir data URL a blob
+                const response = await fetch(capturedImageData);
+                const blob = await response.blob();
+                
+                // Copiar al portapapeles
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'image/png': blob
+                    })
+                ]);
+                
+                mostrarAlerta('Imagen copiada al portapapeles', 'success');
+            } catch (error) {
+                console.error('Error al copiar imagen:', error);
+                mostrarAlerta('No se pudo copiar la imagen. Tu navegador podría no soportar esta función.', 'error');
+            }
+        }
+
+        // Resetear cámara
+        function resetearCamara() {
+            capturedImage.style.display = 'none';
+            capturedImageData = null;
+            
+            btnCopyImage.disabled = true;
+            btnResetCamera.disabled = true;
+            
+            cameraMessage.textContent = 'Presiona "Activar Cámara" para comenzar';
+            
+            activarCamara();
+        }
+
+        // Escanear código
+        async function escanearCodigo() {
+            const contenedorId = document.getElementById('selectContenedor').value;
+            const codigo = document.getElementById('codigoBarras').value.trim();
+            const productoNombre = document.getElementById('nombreProducto').value.trim();
+            const notas = document.getElementById('notas').value.trim();
+
+            if (!contenedorId) {
+                mostrarAlerta('Por favor selecciona un contenedor', 'error');
+                return;
+            }
+
+            if (!codigo) {
+                mostrarAlerta('Por favor ingresa un código de barras', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('codigos_barras')
+                    .insert([{ 
+                        contenedor_id: contenedorId,
+                        codigo: codigo,
+                        producto_nombre: productoNombre || null,
+                        notas: notas || null,
+                        imagen_codigo: capturedImageData || null
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                mostrarAlerta(`Código ${codigo} guardado exitosamente!`);
+                
+                // Limpiar formulario
+                document.getElementById('codigoBarras').value = '';
+                document.getElementById('nombreProducto').value = '';
+                document.getElementById('notas').value = '';
+                
+                // Limpiar imagen
+                capturedImage.style.display = 'none';
+                capturedImageData = null;
+                btnCopyImage.disabled = true;
+                btnResetCamera.disabled = true;
+                
+                // Recargar estadísticas
+                await cargarEstadisticas();
+                
+            } catch (error) {
+                console.error('Error guardando código:', error);
+                if (error.code === '23505') {
+                    mostrarAlerta('Este código de barras ya existe en el sistema', 'error');
+                } else {
+                    mostrarAlerta('Error guardando código de barras', 'error');
+                }
+            }
+        }
+
+        // Cargar estadísticas
+        async function cargarEstadisticas() {
+            try {
+                // Códigos de hoy
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                
+                const { count: codigosHoy } = await supabase
+                    .from('codigos_barras')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('escaneado_en', hoy.toISOString());
+
+                // Códigos de la última hora
+                const unaHoraAtras = new Date();
+                unaHoraAtras.setHours(unaHoraAtras.getHours() - 1);
+                
+                const { count: codigosUltimaHora } = await supabase
+                    .from('codigos_barras')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('escaneado_en', unaHoraAtras.toISOString());
+
+                document.getElementById('totalCodigosHoy').textContent = codigosHoy || 0;
+                document.getElementById('codigosUltimaHora').textContent = codigosUltimaHora || 0;
+
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Inicializar la aplicación
+        async function init() {
+            await cargarContenedores();
+            await cargarEstadisticas();
+            
+            // Configurar eventos de la cámara
+            btnActivateCamera.addEventListener('click', activarCamara);
+            btnCapture.addEventListener('click', capturarImagen);
+            btnCopyImage.addEventListener('click', copiarImagen);
+            btnResetCamera.addEventListener('click', resetearCamara);
+            
+            // Auto-focus en código de barras
+            document.getElementById('codigoBarras').focus();
+            
+            // Enter para escanear
+            document.getElementById('codigoBarras').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    escanearCodigo();
+                }
+            });
+        }
+
+        // Iniciar cuando la página cargue
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
