@@ -36,6 +36,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
+            position: relative;
         }
         
         h1 {
@@ -128,6 +129,17 @@
             background-color: #7f8c8d;
         }
         
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
         .error {
             color: var(--danger-color);
             font-size: 14px;
@@ -211,6 +223,96 @@
             border-radius: 20px;
         }
         
+        /* Estilos para el menú hamburguesa */
+        .menu-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 100;
+        }
+        
+        .menu-toggle:hover {
+            background-color: #1d6fa5;
+        }
+        
+        .history-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            width: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            z-index: 99;
+            display: none;
+        }
+        
+        .history-menu.active {
+            display: block;
+        }
+        
+        .history-menu h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        
+        .history-item {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: var(--light-gray);
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .history-pond {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .history-time {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .history-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .history-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        
+        .no-history {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
         @media (max-width: 600px) {
             .pond-selector {
                 flex-wrap: wrap;
@@ -219,11 +321,20 @@
             .pond-option {
                 flex: 0 0 33.333%;
             }
+            
+            .history-menu {
+                width: 300px;
+                right: 10px;
+            }
         }
         
         @media (max-width: 400px) {
             .pond-option {
                 flex: 0 0 50%;
+            }
+            
+            .history-menu {
+                width: 280px;
             }
         }
     </style>
@@ -231,6 +342,15 @@
 <body>
     <div class="container">
         <h1>Registro de Calidad de Agua</h1>
+        
+        <!-- Menú hamburguesa para historial -->
+        <button class="menu-toggle" id="menuToggle">☰ Últimos Registros</button>
+        <div class="history-menu" id="historyMenu">
+            <h3>Registros de las últimas 24 horas</h3>
+            <div id="historyList">
+                <!-- Los registros se cargarán aquí -->
+            </div>
+        </div>
         
         <div class="pond-selector">
             <div class="pond-option active" data-pond="1">
@@ -287,15 +407,6 @@
                 </div>
                 
                 <div class="parameter-card">
-                    <h3>pH</h3>
-                    <div class="form-group">
-                        <label for="ph">Valor de pH:</label>
-                        <input type="number" id="ph" name="ph" step="0.1" min="0" max="14" required>
-                        <div class="error" id="phError">Valor inválido (0-14)</div>
-                    </div>
-                </div>
-                
-                <div class="parameter-card">
                     <h3>Alcalinidad</h3>
                     <div class="form-group">
                         <label for="alkalinity">Concentración (ppm CaCO₃):</label>
@@ -344,11 +455,13 @@
         const weekSelect = document.getElementById('week');
         const nitriteInput = document.getElementById('nitrite');
         const ammoniumInput = document.getElementById('ammonium');
-        const phInput = document.getElementById('ph');
         const alkalinityInput = document.getElementById('alkalinity');
         const successMessage = document.getElementById('successMessage');
         const loadingMessage = document.getElementById('loadingMessage');
         const currentPondDisplay = document.getElementById('currentPondDisplay');
+        const menuToggle = document.getElementById('menuToggle');
+        const historyMenu = document.getElementById('historyMenu');
+        const historyList = document.getElementById('historyList');
         
         // Variable para almacenar la laguna seleccionada
         let selectedPond = 1;
@@ -387,6 +500,21 @@
             });
         });
         
+        // Configurar menú hamburguesa
+        menuToggle.addEventListener('click', function() {
+            historyMenu.classList.toggle('active');
+            if (historyMenu.classList.contains('active')) {
+                loadRecentRecords();
+            }
+        });
+        
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            if (!historyMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                historyMenu.classList.remove('active');
+            }
+        });
+        
         // Validación en tiempo real
         nitriteInput.addEventListener('input', function() {
             validateInput(nitriteInput, 'nitriteError');
@@ -394,10 +522,6 @@
         
         ammoniumInput.addEventListener('input', function() {
             validateInput(ammoniumInput, 'ammoniumError');
-        });
-        
-        phInput.addEventListener('input', function() {
-            validatePH(phInput, 'phError');
         });
         
         alkalinityInput.addEventListener('input', function() {
@@ -420,22 +544,6 @@
             }
         }
         
-        // Función para validar el pH (rango especial 0-14)
-        function validatePH(input, errorId) {
-            const value = parseFloat(input.value);
-            const errorElement = document.getElementById(errorId);
-            
-            if (isNaN(value) || value < 0 || value > 14) {
-                errorElement.style.display = 'block';
-                input.style.borderColor = 'var(--danger-color)';
-                return false;
-            } else {
-                errorElement.style.display = 'none';
-                input.style.borderColor = 'var(--border-color)';
-                return true;
-            }
-        }
-        
         // Manejo del envío del formulario
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -445,7 +553,6 @@
             
             if (!validateInput(nitriteInput, 'nitriteError')) isValid = false;
             if (!validateInput(ammoniumInput, 'ammoniumError')) isValid = false;
-            if (!validatePH(phInput, 'phError')) isValid = false;
             if (!validateInput(alkalinityInput, 'alkalinityError')) isValid = false;
             
             if (isValid) {
@@ -459,7 +566,6 @@
                     week: weekSelect.value,
                     nitrite: parseFloat(nitriteInput.value),
                     ammonium: parseFloat(ammoniumInput.value),
-                    ph: parseFloat(phInput.value),
                     alkalinity: parseFloat(alkalinityInput.value),
                     notes: document.getElementById('notes').value,
                     timestamp: new Date().toISOString()
@@ -492,12 +598,106 @@
                     
                     // Restablecer la semana actual
                     weekSelect.value = currentWeek;
+                    
+                    // Actualizar el historial si está abierto
+                    if (historyMenu.classList.contains('active')) {
+                        loadRecentRecords();
+                    }
                 })
                 .catch((error) => {
                     // Error
                     loadingMessage.style.display = 'none';
                     alert('Error al guardar los datos: ' + error.message);
                 });
+        }
+        
+        // Función para cargar registros recientes (últimas 24 horas)
+        function loadRecentRecords() {
+            historyList.innerHTML = '<div class="loading">Cargando registros...</div>';
+            
+            const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+            
+            database.ref('waterQuality').orderByChild('timestamp').startAt(twentyFourHoursAgo).once('value')
+                .then((snapshot) => {
+                    const data = snapshot.val();
+                    displayRecentRecords(data);
+                })
+                .catch((error) => {
+                    console.error('Error al cargar registros recientes:', error);
+                    historyList.innerHTML = '<div class="no-history">Error al cargar registros</div>';
+                });
+        }
+        
+        // Función para mostrar registros recientes
+        function displayRecentRecords(data) {
+            historyList.innerHTML = '';
+            
+            if (!data) {
+                historyList.innerHTML = '<div class="no-history">No hay registros en las últimas 24 horas</div>';
+                return;
+            }
+            
+            // Convertir objeto a array y ordenar por timestamp (más reciente primero)
+            const records = Object.entries(data)
+                .map(([key, value]) => ({ key, ...value }))
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if (records.length === 0) {
+                historyList.innerHTML = '<div class="no-history">No hay registros en las últimas 24 horas</div>';
+                return;
+            }
+            
+            records.forEach(record => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const date = new Date(record.timestamp);
+                const timeString = date.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                const dateString = date.toLocaleDateString('es-ES');
+                
+                historyItem.innerHTML = `
+                    <div class="history-header">
+                        <div class="history-pond">Laguna ${record.pond} - Semana ${record.week}</div>
+                        <div class="history-time">${dateString} ${timeString}</div>
+                    </div>
+                    <div class="history-data">
+                        <div>Nitrito: ${record.nitrite} ppm</div>
+                        <div>Amonio: ${record.ammonium} ppm</div>
+                        <div>Alcalinidad: ${record.alkalinity} ppm</div>
+                        ${record.notes ? `<div colspan="2">Observaciones: ${record.notes}</div>` : ''}
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn-delete" data-key="${record.key}">Eliminar</button>
+                    </div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+            
+            // Agregar event listeners para los botones de eliminar
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', function() {
+                    const recordKey = this.getAttribute('data-key');
+                    deleteRecord(recordKey);
+                });
+            });
+        }
+        
+        // Función para eliminar un registro
+        function deleteRecord(recordKey) {
+            if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
+                database.ref('waterQuality/' + recordKey).remove()
+                    .then(() => {
+                        // Recargar la lista de registros
+                        loadRecentRecords();
+                    })
+                    .catch((error) => {
+                        alert('Error al eliminar el registro: ' + error.message);
+                    });
+            }
         }
         
         // Resetear errores al limpiar el formulario
