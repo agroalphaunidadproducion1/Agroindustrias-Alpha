@@ -107,7 +107,7 @@
             border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
         }
         
         .btn-submit {
@@ -155,27 +155,123 @@
             text-align: center;
             margin-top: 20px;
         }
+        
+        .pond-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .pond-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .pond-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .pond-option.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        .pond-option .pond-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .pond-option .pond-label {
+            font-size: 14px;
+        }
+        
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .current-pond {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: var(--accent-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .pond-selector {
+                flex-wrap: wrap;
+            }
+            
+            .pond-option {
+                flex: 0 0 33.333%;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .pond-option {
+                flex: 0 0 50%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Registro de Calidad de Agua</h1>
         
+        <div class="pond-selector">
+            <div class="pond-option active" data-pond="1">
+                <div class="pond-number">1</div>
+                <div class="pond-label">Laguna 1</div>
+            </div>
+            <div class="pond-option" data-pond="2">
+                <div class="pond-number">2</div>
+                <div class="pond-label">Laguna 2</div>
+            </div>
+            <div class="pond-option" data-pond="3">
+                <div class="pond-number">3</div>
+                <div class="pond-label">Laguna 3</div>
+            </div>
+            <div class="pond-option" data-pond="4">
+                <div class="pond-number">4</div>
+                <div class="pond-label">Laguna 4</div>
+            </div>
+            <div class="pond-option" data-pond="5">
+                <div class="pond-number">5</div>
+                <div class="pond-label">Laguna 5</div>
+            </div>
+        </div>
+        
         <form id="waterQualityForm">
-            <div class="form-group">
-                <label for="week">Semana del año:</label>
-                <select id="week" name="week" required>
-                    <option value="">Seleccione una semana</option>
-                    <!-- Las opciones se generarán con JavaScript -->
-                </select>
-                <div class="week-info">Seleccione la semana del año para la que desea registrar los datos</div>
+            <div class="form-header">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="week">Semana del año:</label>
+                    <select id="week" name="week" required>
+                        <option value="">Seleccione una semana</option>
+                        <!-- Las opciones se generarán con JavaScript -->
+                    </select>
+                </div>
+                <div class="current-pond">Laguna: <span id="currentPondDisplay">1</span></div>
             </div>
             
             <div class="parameters-grid">
                 <div class="parameter-card">
                     <h3>Nitrito (NO₂)</h3>
                     <div class="form-group">
-                        <label for="nitrite">Concentración (mg/L):</label>
+                        <label for="nitrite">Concentración (ppm):</label>
                         <input type="number" id="nitrite" name="nitrite" step="0.01" min="0" required>
                         <div class="error" id="nitriteError">Valor inválido</div>
                     </div>
@@ -184,7 +280,7 @@
                 <div class="parameter-card">
                     <h3>Amonio (NH₄⁺)</h3>
                     <div class="form-group">
-                        <label for="ammonium">Concentración (mg/L):</label>
+                        <label for="ammonium">Concentración (ppm):</label>
                         <input type="number" id="ammonium" name="ammonium" step="0.01" min="0" required>
                         <div class="error" id="ammoniumError">Valor inválido</div>
                     </div>
@@ -195,14 +291,14 @@
                     <div class="form-group">
                         <label for="ph">Valor de pH:</label>
                         <input type="number" id="ph" name="ph" step="0.1" min="0" max="14" required>
-                        <div class="error" id="phError">Valor inválido</div>
+                        <div class="error" id="phError">Valor inválido (0-14)</div>
                     </div>
                 </div>
                 
                 <div class="parameter-card">
                     <h3>Alcalinidad</h3>
                     <div class="form-group">
-                        <label for="alkalinity">Concentración (mg/L CaCO₃):</label>
+                        <label for="alkalinity">Concentración (ppm CaCO₃):</label>
                         <input type="number" id="alkalinity" name="alkalinity" step="1" min="0" required>
                         <div class="error" id="alkalinityError">Valor inválido</div>
                     </div>
@@ -243,8 +339,21 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        // Generar opciones para las semanas del año
+        // Elementos del formulario
+        const form = document.getElementById('waterQualityForm');
         const weekSelect = document.getElementById('week');
+        const nitriteInput = document.getElementById('nitrite');
+        const ammoniumInput = document.getElementById('ammonium');
+        const phInput = document.getElementById('ph');
+        const alkalinityInput = document.getElementById('alkalinity');
+        const successMessage = document.getElementById('successMessage');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const currentPondDisplay = document.getElementById('currentPondDisplay');
+        
+        // Variable para almacenar la laguna seleccionada
+        let selectedPond = 1;
+        
+        // Generar opciones para las semanas del año
         for (let i = 1; i <= 52; i++) {
             const option = document.createElement('option');
             option.value = i;
@@ -259,14 +368,24 @@
         const currentWeek = Math.ceil(days / 7);
         weekSelect.value = currentWeek;
         
-        // Elementos del formulario
-        const form = document.getElementById('waterQualityForm');
-        const nitriteInput = document.getElementById('nitrite');
-        const ammoniumInput = document.getElementById('ammonium');
-        const phInput = document.getElementById('ph');
-        const alkalinityInput = document.getElementById('alkalinity');
-        const successMessage = document.getElementById('successMessage');
-        const loadingMessage = document.getElementById('loadingMessage');
+        // Configurar el selector de lagunas
+        document.querySelectorAll('.pond-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remover clase activa de todas las opciones
+                document.querySelectorAll('.pond-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Añadir clase activa a la opción seleccionada
+                this.classList.add('active');
+                
+                // Actualizar la laguna seleccionada
+                selectedPond = parseInt(this.getAttribute('data-pond'));
+                
+                // Actualizar el display
+                currentPondDisplay.textContent = selectedPond;
+            });
+        });
         
         // Validación en tiempo real
         nitriteInput.addEventListener('input', function() {
@@ -278,14 +397,14 @@
         });
         
         phInput.addEventListener('input', function() {
-            validateInput(phInput, 'phError');
+            validatePH(phInput, 'phError');
         });
         
         alkalinityInput.addEventListener('input', function() {
             validateInput(alkalinityInput, 'alkalinityError');
         });
         
-        // Función para validar entradas
+        // Función para validar entradas numéricas
         function validateInput(input, errorId) {
             const value = parseFloat(input.value);
             const errorElement = document.getElementById(errorId);
@@ -336,7 +455,8 @@
                 
                 // Preparar datos para enviar
                 const formData = {
-                    week: document.getElementById('week').value,
+                    pond: selectedPond,
+                    week: weekSelect.value,
                     nitrite: parseFloat(nitriteInput.value),
                     ammonium: parseFloat(ammoniumInput.value),
                     ph: parseFloat(phInput.value),
@@ -367,7 +487,7 @@
                         successMessage.style.display = 'none';
                     }, 3000);
                     
-                    // Limpiar formulario
+                    // Limpiar formulario (pero mantener la laguna seleccionada)
                     form.reset();
                     
                     // Restablecer la semana actual
