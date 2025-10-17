@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizador de Códigos Escaneados</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
         :root {
             --primary-color: #3498db;
@@ -126,12 +127,14 @@
             cursor: pointer;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            position: relative;
         }
         
         .contenedor-info {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex: 1;
         }
         
         .contenedor-icon {
@@ -153,6 +156,63 @@
         .toggle-icon {
             font-size: 1.5rem;
             transition: transform 0.3s;
+        }
+        
+        .contenedor-actions {
+            position: relative;
+        }
+        
+        .menu-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .menu-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            z-index: 10;
+            min-width: 150px;
+            display: none;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .dropdown-item.delete {
+            color: var(--danger-color);
         }
         
         .contenedor-codes {
@@ -188,34 +248,25 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .barcode {
-            height: 80px;
-            background: 
-                repeating-linear-gradient(90deg, 
-                    #000 0px, #000 2px, 
-                    transparent 2px, transparent 4px);
+            width: 100%;
+            max-width: 400px;
+            height: 120px;
             margin-bottom: 10px;
-            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
-        .barcode::before,
-        .barcode::after {
-            content: '';
-            position: absolute;
-            height: 100%;
-            width: 4px;
-            background: #000;
-            top: 0;
-        }
-        
-        .barcode::before {
-            left: 0;
-        }
-        
-        .barcode::after {
-            right: 0;
+        .barcode svg {
+            max-width: 100%;
+            height: auto;
         }
         
         .code-number {
@@ -224,6 +275,9 @@
             font-weight: bold;
             color: #333;
             letter-spacing: 2px;
+            word-break: break-all;
+            text-align: center;
+            margin-top: 10px;
         }
         
         .code-meta {
@@ -232,6 +286,7 @@
             color: #666;
             font-size: 0.9rem;
             margin-top: 10px;
+            width: 100%;
         }
         
         .empty-state {
@@ -278,33 +333,6 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 768px) {
-            .contenedor-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .contenedor-info {
-                width: 100%;
-            }
-            
-            .nav-buttons {
-                flex-direction: column;
-            }
-            
-            .code-meta {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .mini-stats {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
         }
         
         .search-container {
@@ -354,6 +382,204 @@
         .btn-control:hover {
             background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
+        }
+        
+        /* Modal para renombrar */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .contenedor-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .contenedor-info {
+                width: 100%;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .code-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .mini-stats {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .btn-control {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .barcode {
+                height: 80px;
+            }
+            
+            .code-number {
+                font-size: 1rem;
+            }
+            
+            .dropdown-menu {
+                right: -10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .contenedor-header {
+                padding: 15px;
+            }
+            
+            .contenedor-icon {
+                font-size: 1.5rem;
+            }
+            
+            .contenedor-details h3 {
+                font-size: 1.1rem;
+            }
+            
+            .contenedor-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .code-item {
+                padding: 15px;
+            }
+            
+            .barcode-container {
+                padding: 15px;
+            }
+            
+            .barcode {
+                height: 60px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -426,6 +652,25 @@
         </div>
     </div>
 
+    <!-- Modal para renombrar contenedor -->
+    <div class="modal" id="renameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Renombrar Contenedor</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="newContenedorName">Nuevo nombre del contenedor</label>
+                    <input type="text" class="form-input" id="newContenedorName" placeholder="Ingresa el nuevo nombre">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRenameModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmRename()">Renombrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -450,16 +695,29 @@
         const codigosHoyElement = document.getElementById('codigosHoy');
         const ultimoEscaneoElement = document.getElementById('ultimoEscaneo');
         const miniStatsElement = document.getElementById('miniStats');
+        const renameModal = document.getElementById('renameModal');
+        const newContenedorNameInput = document.getElementById('newContenedorName');
         
         // Variables globales
         let allScans = [];
         let filteredScans = [];
+        let currentContenedorToRename = null;
+        let currentContenedorToDelete = null;
         
         // Cargar datos cuando la página esté lista
         document.addEventListener('DOMContentLoaded', loadScans);
         
         // Configurar búsqueda en tiempo real
         searchInput.addEventListener('input', filterScans);
+        
+        // Cerrar menús desplegables al hacer clic fuera de ellos
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.contenedor-actions')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
         
         // Función para cargar todos los escaneos
         function loadScans() {
@@ -537,7 +795,7 @@
                 const codigosCount = scans.length;
                 
                 html += `
-                    <div class="contenedor-item">
+                    <div class="contenedor-item" id="contenedor-${contenedor.replace(/\s+/g, '-')}">
                         <div class="contenedor-header" onclick="toggleContenedor(this)">
                             <div class="contenedor-info">
                                 <div class="contenedor-icon">📦</div>
@@ -550,12 +808,25 @@
                                 </div>
                             </div>
                             <div class="toggle-icon">▼</div>
+                            <div class="contenedor-actions">
+                                <button class="menu-button" onclick="event.stopPropagation(); toggleMenu(this)">⋯</button>
+                                <div class="dropdown-menu">
+                                    <div class="dropdown-item" onclick="openRenameModal('${contenedor}')">
+                                        <span>✏️</span> Renombrar
+                                    </div>
+                                    <div class="dropdown-item delete" onclick="confirmDelete('${contenedor}')">
+                                        <span>🗑️</span> Eliminar
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="contenedor-codes">
                             ${scans.map(scan => `
                                 <div class="code-item">
                                     <div class="barcode-container">
-                                        <div class="barcode" style="background: repeating-linear-gradient(90deg, #000 0px, #000 ${generateBarcodePattern(scan.codigoBarras)});"></div>
+                                        <div class="barcode">
+                                            <svg id="barcode-${scan.id}"></svg>
+                                        </div>
                                         <div class="code-number">${scan.codigoBarras}</div>
                                         <div class="code-meta">
                                             <span>Fecha: ${scan.fecha}</span>
@@ -570,6 +841,24 @@
             });
             
             contenedoresContainer.innerHTML = html;
+            
+            // Generar códigos de barras después de renderizar
+            setTimeout(() => {
+                filteredScans.forEach(scan => {
+                    try {
+                        JsBarcode(`#barcode-${scan.id}`, scan.codigoBarras, {
+                            format: "CODE128",
+                            lineColor: "#000",
+                            width: 2,
+                            height: 80,
+                            displayValue: false,
+                            margin: 10
+                        });
+                    } catch (error) {
+                        console.error("Error generando código de barras:", error);
+                    }
+                });
+            }, 100);
         }
         
         // Función para actualizar mini estadísticas
@@ -603,19 +892,123 @@
         // Función para expandir/contraer contenedor
         function toggleContenedor(element) {
             const contenedorItem = element.parentElement;
+            const wasExpanded = contenedorItem.classList.contains('expanded');
+            
+            // Cerrar todos los menús desplegables
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+            
+            // Alternar estado del contenedor
             contenedorItem.classList.toggle('expanded');
+            
+            // Si se está expandiendo, hacer scroll para mostrar el contenido completo
+            if (!wasExpanded && contenedorItem.classList.contains('expanded')) {
+                setTimeout(() => {
+                    const codesContainer = contenedorItem.querySelector('.contenedor-codes');
+                    if (codesContainer) {
+                        codesContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }, 300); // Esperar a que termine la animación de expansión
+            }
         }
         
-        // Función para generar patrón de código de barras (simulado)
-        function generateBarcodePattern(code) {
-            // Simula un patrón de barras basado en el código
-            let pattern = '';
-            for (let i = 0; i < code.length; i++) {
-                const charCode = code.charCodeAt(i);
-                const barWidth = (charCode % 4) + 1;
-                pattern += `${barWidth}px, transparent ${barWidth}px, transparent ${barWidth + 2}px, `;
+        // Función para mostrar/ocultar menú de opciones
+        function toggleMenu(button) {
+            const menu = button.nextElementSibling;
+            const isShowing = menu.classList.contains('show');
+            
+            // Cerrar todos los menús primero
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                m.classList.remove('show');
+            });
+            
+            // Abrir el menú actual si no estaba abierto
+            if (!isShowing) {
+                menu.classList.add('show');
             }
-            return pattern.slice(0, -2);
+        }
+        
+        // Función para abrir modal de renombrar
+        function openRenameModal(contenedorName) {
+            currentContenedorToRename = contenededorName;
+            newContenedorNameInput.value = contenededorName;
+            renameModal.classList.add('show');
+            
+            // Cerrar menú desplegable
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+        
+        // Función para cerrar modal de renombrar
+        function closeRenameModal() {
+            renameModal.classList.remove('show');
+            currentContenedorToRename = null;
+        }
+        
+        // Función para confirmar renombrar contenedor
+        function confirmRename() {
+            const newName = newContenedorNameInput.value.trim();
+            
+            if (!newName) {
+                alert('Por favor ingresa un nombre válido para el contenedor');
+                return;
+            }
+            
+            if (newName === currentContenedorToRename) {
+                closeRenameModal();
+                return;
+            }
+            
+            // Actualizar todos los escaneos con el nuevo nombre de contenedor
+            const updates = {};
+            allScans.forEach(scan => {
+                if (scan.numeroContenedor === currentContenedorToRename) {
+                    updates[`scans/${scan.id}/numeroContenedor`] = newName;
+                }
+            });
+            
+            database.ref().update(updates)
+                .then(() => {
+                    console.log('Contenedor renombrado exitosamente');
+                    closeRenameModal();
+                    loadScans(); // Recargar los datos
+                })
+                .catch(error => {
+                    console.error('Error al renombrar contenedor:', error);
+                    alert('Error al renombrar el contenedor. Intenta nuevamente.');
+                });
+        }
+        
+        // Función para confirmar eliminación de contenedor
+        function confirmDelete(contenedorName) {
+            currentContenedorToDelete = contenedorName;
+            
+            if (confirm(`¿Estás seguro de que deseas eliminar el contenedor "${contenedorName}" y todos sus códigos?`)) {
+                // Eliminar todos los escaneos de este contenedor
+                const updates = {};
+                allScans.forEach(scan => {
+                    if (scan.numeroContenedor === currentContenedorToDelete) {
+                        updates[`scans/${scan.id}`] = null;
+                    }
+                });
+                
+                database.ref().update(updates)
+                    .then(() => {
+                        console.log('Contenedor eliminado exitosamente');
+                        loadScans(); // Recargar los datos
+                    })
+                    .catch(error => {
+                        console.error('Error al eliminar contenedor:', error);
+                        alert('Error al eliminar el contenedor. Intenta nuevamente.');
+                    });
+            }
+            
+            // Cerrar menú desplegable
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
         }
         
         // Función para formatear fecha
