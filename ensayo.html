@@ -3,533 +3,931 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Códigos de Barras - Ingreso</title>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <title>Lector EAN-13</title>
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark-color);
             min-height: 100vh;
             padding: 20px;
         }
-
+        
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
+        
+        h1 {
+            font-size: 2.5rem;
             margin-bottom: 10px;
+            color: var(--primary-color);
         }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
+        
+        .description {
+            font-size: 1.1rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
         }
-
+        
         .main-content {
-            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
         }
-
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         .card {
-            background: #f8f9fa;
-            border-radius: 10px;
+            background: white;
+            border-radius: 15px;
             padding: 25px;
-            border: 1px solid #e9ecef;
-            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-
+        
         .card h2 {
-            color: #2c3e50;
             margin-bottom: 20px;
-            font-size: 1.5em;
-            border-bottom: 2px solid #3498db;
+            color: var(--primary-color);
+            border-bottom: 2px solid #e2e8f0;
             padding-bottom: 10px;
         }
-
-        .form-group {
+        
+        .scanner-section {
+            position: relative;
+        }
+        
+        #scanner-container {
+            width: 100%;
+            height: 300px;
+            background-color: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        #scanner-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: rgba(30, 41, 59, 0.7);
+            color: white;
+        }
+        
+        .scanner-frame {
+            width: 80%;
+            height: 150px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        }
+        
+        .scanner-line {
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            background: var(--primary-color);
+            top: 50%;
+            animation: scan 2s infinite linear;
+        }
+        
+        @keyframes scan {
+            0% { top: 10%; }
+            50% { top: 90%; }
+            100% { top: 10%; }
+        }
+        
+        .scanner-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #0da271;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e58c08;
+        }
+        
+        .btn-error {
+            background-color: var(--error-color);
+        }
+        
+        .btn-error:hover {
+            background-color: #dc2626;
+        }
+        
+        .result-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .result-display {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .barcode-result {
+            text-align: center;
+            padding: 30px;
+            background: #f1f5f9;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
-
+        
+        .barcode-value {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        
+        .barcode-status {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .status-valid {
+            background-color: #d1fae5;
+            color: var(--success-color);
+        }
+        
+        .status-invalid {
+            background-color: #fee2e2;
+            color: var(--error-color);
+        }
+        
+        .barcode-info {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #64748b;
+        }
+        
+        .info-value {
+            font-weight: 500;
+        }
+        
+        .manual-input {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #2c3e50;
         }
-
-        input, select, button {
+        
+        input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            font-size: 1rem;
+            transition: border 0.3s;
         }
-
-        input:focus, select:focus {
+        
+        input:focus {
+            border-color: var(--primary-color);
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
-
-        button {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        
+        .history-section {
+            margin-top: 25px;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60, #229954);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-        }
-
-        .image-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #captured-image {
-            max-width: 100%;
-            max-height: 300px;
+        
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: none;
         }
-
-        .image-actions {
-            margin-top: 10px;
+        
+        .history-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
         }
-
-        .image-actions button {
-            flex: 1;
+        
+        .history-item:last-child {
+            border-bottom: none;
         }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
+        
+        .history-code {
+            font-weight: 600;
+            letter-spacing: 1px;
         }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        
+        .history-time {
+            font-size: 0.85rem;
+            color: #64748b;
         }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
+        
+        .empty-state {
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px 20px;
+            color: #94a3b8;
         }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #3498db;
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
         }
-
-        .stat-label {
-            color: #7f8c8d;
-            font-size: 0.9em;
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-
-        .hidden {
-            display: none;
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+        }
+        
+        .notification.error {
+            background-color: var(--error-color);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .ean13-structure {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .ean13-structure h4 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📦 Sistema de Códigos de Barras</h1>
-            <p>Módulo de Ingreso - Escanea y guarda códigos de barras</p>
-        </div>
-
+        <header>
+            <h1>Lector de Códigos EAN-13</h1>
+            <p class="description">Escanea o ingresa manualmente códigos de barras EAN-13 y valida su formato correcto</p>
+        </header>
+        
         <div class="main-content">
-            <!-- Estadísticas -->
-            <div class="card">
-                <h2>📊 Estadísticas de Hoy</h2>
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalCodigosHoy">0</div>
-                        <div class="stat-label">Códigos Hoy</div>
+            <div class="card scanner-section">
+                <h2>Escáner de Códigos</h2>
+                <div id="scanner-container">
+                    <div class="scanner-overlay">
+                        <div class="scanner-frame">
+                            <div class="scanner-line"></div>
+                        </div>
+                        <p>Enfoca un código EAN-13 dentro del marco</p>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="codigosUltimaHora">0</div>
-                        <div class="stat-label">Última Hora</div>
+                </div>
+                
+                <div class="scanner-controls">
+                    <button id="start-scanner" class="btn btn-success">
+                        <span>▶</span> Iniciar Escáner
+                    </button>
+                    <button id="stop-scanner" class="btn btn-error" disabled>
+                        <span>⏹</span> Detener Escáner
+                    </button>
+                    <button id="toggle-camera" class="btn btn-warning">
+                        <span>🔄</span> Cambiar Cámara
+                    </button>
+                </div>
+                
+                <div class="manual-input">
+                    <h3>Ingreso Manual</h3>
+                    <div class="form-group">
+                        <label for="manual-code">Código EAN-13</label>
+                        <input type="text" id="manual-code" placeholder="Ingresa un código de 13 dígitos" maxlength="13">
                     </div>
+                    <button id="validate-manual" class="btn btn-block">Validar Código</button>
                 </div>
             </div>
-
-            <!-- Escanear Código -->
-            <div class="card">
-                <h2>📷 Escanear Código</h2>
-                
-                <!-- Formulario de ingreso -->
-                <div class="form-group">
-                    <label for="selectContenedor">Contenedor:</label>
-                    <select id="selectContenedor">
-                        <option value="">Cargando contenedores...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="codigoBarras">Código de Barras:</label>
-                    <input type="text" id="codigoBarras" placeholder="Escanea o pega el código aquí" maxlength="50">
-                </div>
-                
-                <!-- Área para pegar imagen -->
-                <div class="form-group">
-                    <label for="image-input">Pegar imagen del código de barras:</label>
-                    <div style="border: 2px dashed #3498db; border-radius: 8px; padding: 20px; text-align: center; background: #f8f9fa; cursor: pointer;"
-                         id="drop-area"
-                         onclick="document.getElementById('file-input').click()">
-                        <p>📎 Haz clic aquí o arrastra una imagen</p>
-                        <p style="font-size: 0.8em; color: #7f8c8d; margin-top: 5px;">También puedes pegar con Ctrl+V</p>
+            
+            <div class="card result-section">
+                <h2>Resultado</h2>
+                <div class="result-display">
+                    <div class="barcode-result">
+                        <div class="barcode-value" id="barcode-value">---</div>
+                        <div class="barcode-status" id="barcode-status">Esperando código...</div>
+                        
+                        <div class="barcode-info">
+                            <div class="info-item">
+                                <span class="info-label">Longitud:</span>
+                                <span class="info-value" id="info-length">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">País:</span>
+                                <span class="info-value" id="info-country">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Empresa:</span>
+                                <span class="info-value" id="info-company">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Producto:</span>
+                                <span class="info-value" id="info-product">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Dígito Verificador:</span>
+                                <span class="info-value" id="info-checkdigit">-</span>
+                            </div>
+                        </div>
                     </div>
-                    <input type="file" id="file-input" accept="image/*" style="display: none;">
-                </div>
-                
-                <!-- Imagen capturada -->
-                <div class="image-container">
-                    <img id="captured-image" alt="Imagen del código de barras">
-                    <div class="image-actions">
-                        <button id="btn-copy-image" class="btn-success" disabled>Copiar Imagen</button>
-                        <button id="btn-clear-image" class="btn-secondary" disabled>Eliminar Imagen</button>
+                    
+                    <div class="ean13-structure">
+                        <h4>Estructura EAN-13</h4>
+                        <p>• 3 primeros dígitos: Prefijo del país</p>
+                        <p>• 4-6 dígitos siguientes: Código de empresa</p>
+                        <p>• 5-3 dígitos siguientes: Código de producto</p>
+                        <p>• Último dígito: Dígito de control</p>
                     </div>
                 </div>
                 
-                <button onclick="escanearCodigo()" class="btn-success">Guardar Código</button>
+                <div class="history-section">
+                    <h3>Historial de Escaneos</h3>
+                    <div id="history-list" class="history-list">
+                        <div class="empty-state">
+                            <i>📋</i>
+                            <p>No hay escaneos recientes</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <footer>
+            <p>Lector EAN-13 &copy; 2023 - Especializado en validación de códigos de barras</p>
+        </footer>
     </div>
+    
+    <div id="notification" class="notification"></div>
 
     <script>
-        // Configuración Supabase - REEMPLAZA CON TUS DATOS
-        const SUPABASE_URL = 'https://cswpqntkwvusnssizfpf.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzd3BxbnRrd3Z1c25zc2l6ZnBmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MTg1ODUsImV4cCI6MjA3NjE5NDU4NX0.6-CfaN8TMGC6m87toNvbnNgeSTXtBvZj0muJuauBmWs';
+        // Elementos del DOM
+        const startScannerBtn = document.getElementById('start-scanner');
+        const stopScannerBtn = document.getElementById('stop-scanner');
+        const toggleCameraBtn = document.getElementById('toggle-camera');
+        const validateManualBtn = document.getElementById('validate-manual');
+        const manualCodeInput = document.getElementById('manual-code');
+        const scannerContainer = document.getElementById('scanner-container');
+        const barcodeValue = document.getElementById('barcode-value');
+        const barcodeStatus = document.getElementById('barcode-status');
+        const historyList = document.getElementById('history-list');
+        const notification = document.getElementById('notification');
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Variables globales
-        let ultimoContenedorId = null;
-        let capturedImageData = null;
-
-        // Elementos DOM
-        const capturedImage = document.getElementById('captured-image');
-        const btnCopyImage = document.getElementById('btn-copy-image');
-        const btnClearImage = document.getElementById('btn-clear-image');
-        const dropArea = document.getElementById('drop-area');
-        const fileInput = document.getElementById('file-input');
-
-        // Alertas
-        function mostrarAlerta(mensaje, tipo = 'success') {
-            const alerta = document.createElement('div');
-            alerta.className = `alert alert-${tipo}`;
-            alerta.textContent = mensaje;
+        // Elementos de información
+        const infoLength = document.getElementById('info-length');
+        const infoCountry = document.getElementById('info-country');
+        const infoCompany = document.getElementById('info-company');
+        const infoProduct = document.getElementById('info-product');
+        const infoCheckdigit = document.getElementById('info-checkdigit');
+        
+        // Estado de la aplicación
+        let scannerActive = false;
+        let currentCamera = 'environment';
+        let scanHistory = [];
+        
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            loadScanHistory();
+        });
+        
+        // Manejar el inicio del escáner
+        startScannerBtn.addEventListener('click', startScanner);
+        
+        // Manejar la detención del escáner
+        stopScannerBtn.addEventListener('click', stopScanner);
+        
+        // Manejar el cambio de cámara
+        toggleCameraBtn.addEventListener('click', toggleCamera);
+        
+        // Manejar la validación manual
+        validateManualBtn.addEventListener('click', validateManualCode);
+        
+        // Permitir validación con Enter
+        manualCodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                validateManualCode();
+            }
+        });
+        
+        // Iniciar el escáner
+        function startScanner() {
+            if (scannerActive) return;
             
-            document.querySelector('.main-content').prepend(alerta);
+            scannerActive = true;
+            startScannerBtn.disabled = true;
+            stopScannerBtn.disabled = false;
             
-            setTimeout(() => {
-                alerta.remove();
-            }, 5000);
+            // Configurar QuaggaJS para EAN-13
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: scannerContainer,
+                    constraints: {
+                        facingMode: currentCamera
+                    }
+                },
+                decoder: {
+                    readers: ["ean_reader"]
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                locate: true,
+                numOfWorkers: 2
+            }, function(err) {
+                if (err) {
+                    console.error(err);
+                    showNotification('Error al iniciar el escáner: ' + err, 'error');
+                    stopScanner();
+                    return;
+                }
+                Quagga.start();
+            });
+            
+            // Detectar códigos
+            Quagga.onDetected(function(result) {
+                if (result && result.codeResult && result.codeResult.code) {
+                    const code = result.codeResult.code;
+                    processScannedCode(code);
+                }
+            });
+            
+            showNotification('Escáner activado', 'success');
         }
-
-        // Cargar contenedores en el select
-        async function cargarContenedores() {
-            try {
-                const { data, error } = await supabase
-                    .from('contenedores')
-                    .select('*')
-                    .order('nombre');
-
-                if (error) throw error;
-
-                const select = document.getElementById('selectContenedor');
-                select.innerHTML = '';
-                
-                data.forEach(contenedor => {
-                    const option = document.createElement('option');
-                    option.value = contenedor.id;
-                    option.textContent = `${contenedor.nombre} - ${contenedor.descripcion || 'Sin descripción'}`;
-                    select.appendChild(option);
-                });
-
-                // Si hay un último contenedor usado, seleccionarlo
-                if (ultimoContenedorId) {
-                    select.value = ultimoContenedorId;
-                }
-                
-                // Si no hay último contenedor, seleccionar el primero
-                if (!ultimoContenedorId && data.length > 0) {
-                    select.value = data[0].id;
-                }
-
-                return data;
-            } catch (error) {
-                console.error('Error cargando contenedores:', error);
-                mostrarAlerta('Error cargando contenedores', 'error');
-                return [];
+        
+        // Detener el escáner
+        function stopScanner() {
+            if (!scannerActive) return;
+            
+            scannerActive = false;
+            startScannerBtn.disabled = false;
+            stopScannerBtn.disabled = true;
+            
+            Quagga.stop();
+            showNotification('Escáner detenido', 'error');
+        }
+        
+        // Cambiar entre cámara frontal y trasera
+        function toggleCamera() {
+            currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+            if (scannerActive) {
+                stopScanner();
+                setTimeout(startScanner, 500);
+            }
+            showNotification(`Cámara cambiada a: ${currentCamera === 'environment' ? 'Posterior' : 'Frontal'}`, 'success');
+        }
+        
+        // Procesar código escaneado
+        function processScannedCode(code) {
+            // Limpiar el código (eliminar caracteres no numéricos)
+            const cleanCode = code.replace(/\D/g, '');
+            
+            // Validar formato EAN-13
+            const isValid = validateEAN13(cleanCode);
+            
+            // Mostrar resultado
+            displayResult(cleanCode, isValid);
+            
+            // Agregar al historial
+            addToHistory(cleanCode, isValid);
+            
+            // Detener el escáner temporalmente después de un escaneo exitoso
+            if (isValid) {
+                setTimeout(stopScanner, 2000);
             }
         }
-
-        // Guardar el último contenedor seleccionado
-        function guardarUltimoContenedor() {
-            const select = document.getElementById('selectContenedor');
-            ultimoContenedorId = select.value;
-        }
-
-        // Cargar imagen desde archivo
-        function cargarImagenDesdeArchivo(file) {
-            const reader = new FileReader();
+        
+        // Validar código manual
+        function validateManualCode() {
+            const code = manualCodeInput.value.trim();
             
-            reader.onload = function(e) {
-                capturedImageData = e.target.result;
-                capturedImage.src = capturedImageData;
-                capturedImage.style.display = 'block';
+            if (!code) {
+                showNotification('Por favor ingresa un código', 'error');
+                return;
+            }
+            
+            // Limpiar el código (eliminar caracteres no numéricos)
+            const cleanCode = code.replace(/\D/g, '');
+            
+            // Validar formato EAN-13
+            const isValid = validateEAN13(cleanCode);
+            
+            // Mostrar resultado
+            displayResult(cleanCode, isValid);
+            
+            // Agregar al historial
+            addToHistory(cleanCode, isValid);
+            
+            // Limpiar el campo de entrada
+            manualCodeInput.value = '';
+        }
+        
+        // Validar formato EAN-13
+        function validateEAN13(code) {
+            // Verificar longitud
+            if (code.length !== 13) {
+                return false;
+            }
+            
+            // Verificar que todos los caracteres sean números
+            if (!/^\d+$/.test(code)) {
+                return false;
+            }
+            
+            // Calcular dígito de control
+            const checkDigit = calculateEAN13CheckDigit(code.substring(0, 12));
+            
+            // Comparar con el dígito de control proporcionado
+            return parseInt(code[12]) === checkDigit;
+        }
+        
+        // Calcular dígito de control EAN-13
+        function calculateEAN13CheckDigit(first12Digits) {
+            let sum = 0;
+            
+            for (let i = 0; i < 12; i++) {
+                const digit = parseInt(first12Digits[i]);
+                // Multiplicar por 1 o 3 alternativamente
+                sum += digit * (i % 2 === 0 ? 1 : 3);
+            }
+            
+            const remainder = sum % 10;
+            return remainder === 0 ? 0 : 10 - remainder;
+        }
+        
+        // Mostrar resultado
+        function displayResult(code, isValid) {
+            barcodeValue.textContent = code;
+            
+            if (isValid) {
+                barcodeStatus.textContent = '✓ CÓDIGO VÁLIDO';
+                barcodeStatus.className = 'barcode-status status-valid';
                 
-                btnCopyImage.disabled = false;
-                btnClearImage.disabled = false;
+                // Mostrar información del código
+                displayCodeInfo(code);
+            } else {
+                barcodeStatus.textContent = '✗ CÓDIGO INVÁLIDO';
+                barcodeStatus.className = 'barcode-status status-invalid';
                 
-                mostrarAlerta('Imagen cargada correctamente');
+                // Limpiar información
+                clearCodeInfo();
+            }
+        }
+        
+        // Mostrar información del código
+        function displayCodeInfo(code) {
+            infoLength.textContent = `${code.length} dígitos`;
+            
+            // Obtener información del país (primeros 3 dígitos)
+            const countryCode = code.substring(0, 3);
+            infoCountry.textContent = getCountryName(countryCode);
+            
+            // Obtener información de la empresa (dígitos 4-7 aproximadamente)
+            const companyCode = code.substring(3, 7);
+            infoCompany.textContent = `Código: ${companyCode}`;
+            
+            // Obtener información del producto (dígitos 8-12)
+            const productCode = code.substring(7, 12);
+            infoProduct.textContent = `Código: ${productCode}`;
+            
+            // Mostrar dígito de control
+            infoCheckdigit.textContent = code[12];
+        }
+        
+        // Limpiar información del código
+        function clearCodeInfo() {
+            infoLength.textContent = '-';
+            infoCountry.textContent = '-';
+            infoCompany.textContent = '-';
+            infoProduct.textContent = '-';
+            infoCheckdigit.textContent = '-';
+        }
+        
+        // Obtener nombre del país basado en el código
+        function getCountryName(countryCode) {
+            const countryCodes = {
+                '000': 'EE.UU./Canadá',
+                '010': 'EE.UU./Canadá',
+                '030': 'EE.UU./Canadá',
+                '039': 'EE.UU./Canadá',
+                '050': 'Libros (EE.UU.)',
+                '060': 'EE.UU./Canadá',
+                '070': 'Noruega',
+                '073': 'Suecia',
+                '076': 'Suiza',
+                '080': 'Italia',
+                '083': 'Italia',
+                '084': 'España',
+                '087': 'Países Bajos',
+                '089': 'Corea del Sur',
+                '090': 'Austria',
+                '093': 'Australia',
+                '094': 'Nueva Zelanda',
+                '100': 'Francia',
+                '300': 'Francia',
+                '380': 'Bulgaria',
+                '383': 'Eslovenia',
+                '385': 'Croacia',
+                '387': 'Bosnia y Herzegovina',
+                '400': 'Alemania',
+                '450': 'Japón',
+                '490': 'Japón',
+                '500': 'Reino Unido',
+                '520': 'Grecia',
+                '528': 'Líbano',
+                '529': 'Chipre',
+                '530': 'Albania',
+                '535': 'Malta',
+                '539': 'Irlanda',
+                '540': 'Bélgica/Luxemburgo',
+                '560': 'Portugal',
+                '569': 'Islandia',
+                '570': 'Dinamarca',
+                '590': 'Polonia',
+                '594': 'Rumanía',
+                '599': 'Hungría',
+                '600': 'Sudáfrica',
+                '615': 'Nigeria',
+                '616': 'Kenia',
+                '619': 'Túnez',
+                '621': 'Siria',
+                '622': 'Egipto',
+                '624': 'Libia',
+                '625': 'Jordania',
+                '626': 'Irán',
+                '627': 'Kuwait',
+                '628': 'Arabia Saudita',
+                '629': 'Emiratos Árabes Unidos',
+                '640': 'Finlandia',
+                '690': 'China',
+                '700': 'Noruega',
+                '729': 'Israel',
+                '730': 'Suecia',
+                '740': 'Guatemala',
+                '745': 'Panamá',
+                '746': 'República Dominicana',
+                '750': 'México',
+                '759': 'Venezuela',
+                '760': 'Suiza',
+                '770': 'Colombia',
+                '773': 'Uruguay',
+                '775': 'Perú',
+                '777': 'Bolivia',
+                '779': 'Argentina',
+                '780': 'Chile',
+                '784': 'Paraguay',
+                '786': 'Ecuador',
+                '789': 'Brasil',
+                '800': 'Italia',
+                '840': 'España',
+                '850': 'Cuba',
+                '858': 'Eslovaquia',
+                '859': 'República Checa',
+                '860': 'Serbia',
+                '865': 'Mongolia',
+                '867': 'Corea del Norte',
+                '869': 'Turquía',
+                '870': 'Países Bajos',
+                '880': 'Corea del Sur',
+                '884': 'Camboya',
+                '885': 'Tailandia',
+                '888': 'Singapur',
+                '890': 'India',
+                '893': 'Vietnam',
+                '896': 'Pakistán',
+                '899': 'Indonesia',
+                '900': 'Austria',
+                '930': 'Australia',
+                '940': 'Nueva Zelanda',
+                '950': 'GS1 Oficina Global',
+                '955': 'Malasia',
+                '958': 'Macao',
+                '960': 'GS1 UK',
+                '967': 'Sudáfrica',
+                '968': 'GS1 Global',
+                '969': 'Irán',
+                '977': 'Publicaciones periódicas (ISSN)',
+                '978': 'Libros (ISBN)',
+                '979': 'Partituras (ISMN)',
+                '980': 'Comprobantes de devolución',
+                '981': 'Monedas comunes',
+                '982': 'Cupones'
             };
             
-            reader.readAsDataURL(file);
+            return countryCodes[countryCode] || `Código: ${countryCode}`;
         }
-
-        // Copiar imagen al portapapeles
-        async function copiarImagen() {
-            try {
-                // Convertir data URL a blob
-                const response = await fetch(capturedImageData);
-                const blob = await response.blob();
-                
-                // Copiar al portapapeles
-                await navigator.clipboard.write([
-                    new ClipboardItem({
-                        'image/png': blob
-                    })
-                ]);
-                
-                mostrarAlerta('Imagen copiada al portapapeles', 'success');
-            } catch (error) {
-                console.error('Error al copiar imagen:', error);
-                mostrarAlerta('No se pudo copiar la imagen. Tu navegador podría no soportar esta función.', 'error');
+        
+        // Agregar código al historial
+        function addToHistory(code, isValid) {
+            const timestamp = new Date().toLocaleTimeString();
+            
+            scanHistory.unshift({
+                code: code,
+                valid: isValid,
+                timestamp: timestamp
+            });
+            
+            // Mantener solo los últimos 10 elementos
+            if (scanHistory.length > 10) {
+                scanHistory.pop();
             }
-        }
-
-        // Limpiar imagen
-        function limpiarImagen() {
-            capturedImage.style.display = 'none';
-            capturedImageData = null;
-            capturedImage.src = '';
             
-            btnCopyImage.disabled = true;
-            btnClearImage.disabled = true;
+            // Guardar en localStorage
+            saveScanHistory();
             
-            fileInput.value = '';
+            // Actualizar la vista
+            updateHistoryView();
         }
-
-        // Escanear código
-        async function escanearCodigo() {
-            const contenedorId = document.getElementById('selectContenedor').value;
-            const codigo = document.getElementById('codigoBarras').value.trim();
-
-            if (!contenedorId) {
-                mostrarAlerta('Por favor selecciona un contenedor', 'error');
+        
+        // Actualizar vista del historial
+        function updateHistoryView() {
+            if (scanHistory.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-state">
+                        <i>📋</i>
+                        <p>No hay escaneos recientes</p>
+                    </div>
+                `;
                 return;
             }
-
-            if (!codigo) {
-                mostrarAlerta('Por favor ingresa un código de barras', 'error');
-                return;
-            }
-
-            try {
-                const { data, error } = await supabase
-                    .from('codigos_barras')
-                    .insert([{ 
-                        contenedor_id: contenedorId,
-                        codigo: codigo,
-                        imagen_codigo: capturedImageData || null
-                    }])
-                    .select();
-
-                if (error) throw error;
-
-                mostrarAlerta(`Código ${codigo} guardado exitosamente!`);
+            
+            historyList.innerHTML = '';
+            
+            scanHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="history-code">${item.code}</div>
+                        <div class="history-time">${item.timestamp}</div>
+                    </div>
+                    <div class="barcode-status ${item.valid ? 'status-valid' : 'status-invalid'}">
+                        ${item.valid ? '✓' : '✗'}
+                    </div>
+                `;
                 
-                // Guardar el contenedor como último usado
-                guardarUltimoContenedor();
-                
-                // Limpiar formulario
-                document.getElementById('codigoBarras').value = '';
-                limpiarImagen();
-                
-                // Recargar estadísticas
-                await cargarEstadisticas();
-                
-                // Volver a enfocar el campo de código
-                document.getElementById('codigoBarras').focus();
-                
-            } catch (error) {
-                console.error('Error guardando código:', error);
-                if (error.code === '23505') {
-                    mostrarAlerta('Este código de barras ya existe en el sistema', 'error');
-                } else {
-                    mostrarAlerta('Error guardando código de barras', 'error');
-                }
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Guardar historial en localStorage
+        function saveScanHistory() {
+            localStorage.setItem('ean13ScanHistory', JSON.stringify(scanHistory));
+        }
+        
+        // Cargar historial desde localStorage
+        function loadScanHistory() {
+            const savedHistory = localStorage.getItem('ean13ScanHistory');
+            if (savedHistory) {
+                scanHistory = JSON.parse(savedHistory);
+                updateHistoryView();
             }
         }
-
-        // Cargar estadísticas
-        async function cargarEstadisticas() {
-            try {
-                // Códigos de hoy
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                
-                const { count: codigosHoy } = await supabase
-                    .from('codigos_barras')
-                    .select('*', { count: 'exact', head: true })
-                    .gte('escaneado_en', hoy.toISOString());
-
-                // Códigos de la última hora
-                const unaHoraAtras = new Date();
-                unaHoraAtras.setHours(unaHoraAtras.getHours() - 1);
-                
-                const { count: codigosUltimaHora } = await supabase
-                    .from('codigos_barras')
-                    .select('*', { count: 'exact', head: true })
-                    .gte('escaneado_en', unaHoraAtras.toISOString());
-
-                document.getElementById('totalCodigosHoy').textContent = codigosHoy || 0;
-                document.getElementById('codigosUltimaHora').textContent = codigosUltimaHora || 0;
-
-            } catch (error) {
-                console.error('Error cargando estadísticas:', error);
-            }
+        
+        // Mostrar notificación
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
-
-        // Inicializar la aplicación
-        async function init() {
-            await cargarContenedores();
-            await cargarEstadisticas();
-            
-            // Configurar eventos
-            btnCopyImage.addEventListener('click', copiarImagen);
-            btnClearImage.addEventListener('click', limpiarImagen);
-            
-            // Evento para selección de archivo
-            fileInput.addEventListener('change', function(e) {
-                if (this.files && this.files[0]) {
-                    cargarImagenDesdeArchivo(this.files[0]);
-                }
-            });
-            
-            // Evento para arrastrar y soltar
-            dropArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.background = '#e9ecef';
-            });
-            
-            dropArea.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                this.style.background = '#f8f9fa';
-            });
-            
-            dropArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.background = '#f8f9fa';
-                
-                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    cargarImagenDesdeArchivo(e.dataTransfer.files[0]);
-                }
-            });
-            
-            // Evento para pegar imagen (Ctrl+V)
-            document.addEventListener('paste', function(e) {
-                const items = e.clipboardData?.items;
-                
-                if (items) {
-                    for (let i = 0; i < items.length; i++) {
-                        if (items[i].type.indexOf('image') !== -1) {
-                            const file = items[i].getAsFile();
-                            cargarImagenDesdeArchivo(file);
-                            break;
-                        }
-                    }
-                }
-            });
-            
-            // Auto-focus en código de barras
-            document.getElementById('codigoBarras').focus();
-            
-            // Enter para escanear
-            document.getElementById('codigoBarras').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    escanearCodigo();
-                }
-            });
-            
-            // Guardar último contenedor cuando cambie
-            document.getElementById('selectContenedor').addEventListener('change', guardarUltimoContenedor);
-        }
-
-        // Iniciar cuando la página cargue
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
