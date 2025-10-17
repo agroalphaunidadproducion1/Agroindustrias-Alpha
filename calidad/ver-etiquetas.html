@@ -84,7 +84,7 @@
         }
         
         .stats-container {
-            display: none; /* Ocultamos las estadísticas */
+            display: none;
         }
         
         .mini-stats {
@@ -223,30 +223,34 @@
         }
         
         .contenedor-item.expanded .contenedor-codes {
-            max-height: 1000px;
+            max-height: none;
+            height: auto;
+            overflow: visible;
+            padding: 10px 0;
         }
         
         .contenedor-item.expanded .toggle-icon {
             transform: rotate(180deg);
         }
         
-        .code-item {
-            padding: 20px;
-            border-bottom: 1px solid #e1e5e9;
-            display: flex;
-            flex-direction: column;
+        .codes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 15px;
+            padding: 0 15px;
         }
         
-        .code-item:last-child {
-            border-bottom: none;
+        .code-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
         
         .barcode-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -256,12 +260,12 @@
         
         .barcode {
             width: 100%;
-            max-width: 400px;
-            height: 120px;
+            height: 100px;
             margin-bottom: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
         
         .barcode svg {
@@ -271,22 +275,30 @@
         
         .code-number {
             font-family: 'Courier New', monospace;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             color: #333;
-            letter-spacing: 2px;
             word-break: break-all;
             text-align: center;
-            margin-top: 10px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            width: 100%;
         }
         
         .code-meta {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 5px;
             color: #666;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            width: 100%;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .code-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .empty-state {
@@ -496,11 +508,6 @@
                 flex-direction: column;
             }
             
-            .code-meta {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
             .mini-stats {
                 flex-direction: column;
                 gap: 10px;
@@ -528,10 +535,17 @@
             
             .code-number {
                 font-size: 1rem;
+                padding: 8px;
             }
             
             .dropdown-menu {
                 right: -10px;
+            }
+            
+            .codes-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 0 10px;
             }
         }
         
@@ -566,19 +580,21 @@
             }
             
             .code-item {
-                padding: 15px;
-            }
-            
-            .barcode-container {
-                padding: 15px;
+                padding: 12px;
             }
             
             .barcode {
-                height: 60px;
+                height: 70px;
             }
             
             .modal-content {
                 padding: 20px;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .codes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             }
         }
     </style>
@@ -603,7 +619,6 @@
             <input type="text" class="search-box" id="searchInput" placeholder="🔍 Buscar contenedor o código...">
         </div>
 
-        <!-- Estadísticas ocultas -->
         <div class="stats-container" style="display: none;">
             <div class="stat-card">
                 <div class="stat-number" id="totalContenedores">0</div>
@@ -821,20 +836,22 @@
                             </div>
                         </div>
                         <div class="contenedor-codes">
-                            ${scans.map(scan => `
-                                <div class="code-item">
-                                    <div class="barcode-container">
-                                        <div class="barcode">
-                                            <svg id="barcode-${scan.id}"></svg>
-                                        </div>
-                                        <div class="code-number">${scan.codigoBarras}</div>
-                                        <div class="code-meta">
-                                            <span>Fecha: ${scan.fecha}</span>
-                                            <span>Hora: ${formatTime(scan.timestamp)}</span>
+                            <div class="codes-grid">
+                                ${scans.map(scan => `
+                                    <div class="code-item">
+                                        <div class="barcode-container">
+                                            <div class="barcode">
+                                                <svg id="barcode-${scan.id}"></svg>
+                                            </div>
+                                            <div class="code-number">${scan.codigoBarras}</div>
+                                            <div class="code-meta">
+                                                <span>📅 Fecha: ${scan.fecha}</span>
+                                                <span>🕒 Hora: ${formatTime(scan.timestamp)}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `).join('')}
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -907,9 +924,9 @@
                 setTimeout(() => {
                     const codesContainer = contenedorItem.querySelector('.contenedor-codes');
                     if (codesContainer) {
-                        codesContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        codesContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
-                }, 300); // Esperar a que termine la animación de expansión
+                }, 50);
             }
         }
         
