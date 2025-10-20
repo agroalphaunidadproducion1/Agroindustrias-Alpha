@@ -165,6 +165,17 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
+        .btn-fullscreen {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-fullscreen:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
         .btn-primary {
             background-color: var(--success-color);
             color: white;
@@ -374,6 +385,10 @@
                 align-items: flex-start;
                 gap: 10px;
             }
+            
+            .camera-controls {
+                flex-direction: column;
+            }
         }
         
         .loading {
@@ -467,6 +482,71 @@
             margin-bottom: 0;
             font-weight: normal;
         }
+        
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        /* Estilos para pantalla completa */
+        .fullscreen-camera {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .fullscreen-camera video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .fullscreen-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 1001;
+        }
+        
+        .fullscreen-scan-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 40%;
+            border: 3px dashed var(--primary-color);
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 1001;
+        }
+        
+        .fullscreen-feedback {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            z-index: 1001;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -547,16 +627,17 @@
                                     <input type="checkbox" id="enableQR" checked>
                                     <label for="enableQR">QR</label>
                                 </div>
-                                <div class="config-option">
-                                    <input type="checkbox" id="enableAutoFocus" checked>
-                                    <label for="enableAutoFocus">Enfoque automático</label>
-                                </div>
                             </div>
                         </div>
                         
-                        <button type="button" id="stopCamera" class="btn-stop">
-                            ⏹️ Detener Cámara
-                        </button>
+                        <div class="camera-controls">
+                            <button type="button" id="toggleFullscreen" class="btn-fullscreen">
+                                ⛶ Pantalla Completa
+                            </button>
+                            <button type="button" id="stopCamera" class="btn-stop">
+                                ⏹️ Detener Cámara
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -589,12 +670,23 @@
         </main>
     </div>
 
+    <!-- Pantalla completa para la cámara -->
+    <div id="fullscreenCamera" class="fullscreen-camera hidden">
+        <div class="fullscreen-scan-guide"></div>
+        <div class="fullscreen-feedback" id="fullscreenFeedback"></div>
+        <div class="fullscreen-controls">
+            <button type="button" id="exitFullscreen" class="btn-stop">
+                ⏹️ Salir de Pantalla Completa
+            </button>
+        </div>
+    </div>
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
-    <!-- QuaggaJS para escaneo de códigos de barras -->
-    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    <!-- InstascanJS para escaneo de códigos de barras -->
+    <script src="https://cdn.jsdelivr.net/npm/instascan@2.0.0/dist/instascan.min.js"></script>
     
     <!-- jsQR para escanear códigos QR en imágenes estáticas -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
@@ -610,11 +702,12 @@
         const database = firebase.database();
         
         // Variables globales
+        let scanner = null;
         let isCameraActive = false;
+        let isFullscreen = false;
         let currentScanResult = null;
         let scannedCodes = [];
         let contenedorActual = null;
-        let quaggaInitialized = false;
         let lastScanTime = 0;
         const SCAN_COOLDOWN = 1000; // 1 segundo de espera entre escaneos
         
@@ -625,8 +718,11 @@
         const barcodeInput = document.getElementById('barcodeInput');
         const startCameraBtn = document.getElementById('startCamera');
         const stopCameraBtn = document.getElementById('stopCamera');
+        const toggleFullscreenBtn = document.getElementById('toggleFullscreen');
+        const exitFullscreenBtn = document.getElementById('exitFullscreen');
         const cameraSection = document.getElementById('cameraSection');
         const cameraView = document.getElementById('cameraView');
+        const fullscreenCamera = document.getElementById('fullscreenCamera');
         const fileInput = document.getElementById('fileInput');
         const statusMessage = document.getElementById('statusMessage');
         const submitBtn = document.getElementById('submitBtn');
@@ -641,13 +737,13 @@
         const processImageBtn = document.getElementById('processImage');
         const imageProcessingCanvas = document.getElementById('imageProcessingCanvas');
         const scanFeedback = document.getElementById('scanFeedback');
+        const fullscreenFeedback = document.getElementById('fullscreenFeedback');
         
         // Configuración de escáner
         const enableCode128 = document.getElementById('enableCode128');
         const enableEAN = document.getElementById('enableEAN');
         const enableCode39 = document.getElementById('enableCode39');
         const enableQR = document.getElementById('enableQR');
-        const enableAutoFocus = document.getElementById('enableAutoFocus');
         
         // Establecer fecha actual por defecto
         window.addEventListener('DOMContentLoaded', () => {
@@ -666,6 +762,12 @@
         
         // Detener cámara
         stopCameraBtn.addEventListener('click', stopCameraScan);
+        
+        // Alternar pantalla completa
+        toggleFullscreenBtn.addEventListener('click', toggleFullscreen);
+        
+        // Salir de pantalla completa
+        exitFullscreenBtn.addEventListener('click', exitFullscreen);
         
         // Manejar envío del formulario
         barcodeForm.addEventListener('submit', handleFormSubmit);
@@ -721,111 +823,53 @@
             numeroContenedorInput.select();
         }
         
-        // Función para obtener los lectores activos según la configuración
-        function getActiveReaders() {
-            const readers = [];
+        // Función para obtener los formatos activos según la configuración
+        function getActiveFormats() {
+            const formats = [];
             
-            if (enableCode128.checked) readers.push("code_128_reader");
+            if (enableCode128.checked) formats.push(Instascan.Scanner.FORMAT.CODE_128);
             if (enableEAN.checked) {
-                readers.push("ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader");
+                formats.push(
+                    Instascan.Scanner.FORMAT.EAN_13,
+                    Instascan.Scanner.FORMAT.EAN_8,
+                    Instascan.Scanner.FORMAT.UPC_A,
+                    Instascan.Scanner.FORMAT.UPC_E
+                );
             }
-            if (enableCode39.checked) readers.push("code_39_reader", "code_39_vin_reader");
-            if (enableQR.checked) readers.push("qr_code_reader");
+            if (enableCode39.checked) formats.push(Instascan.Scanner.FORMAT.CODE_39);
+            if (enableQR.checked) formats.push(Instascan.Scanner.FORMAT.QR_CODE);
             
             // Asegurarse de que al menos Code 128 esté activo
-            if (readers.length === 0) readers.push("code_128_reader");
+            if (formats.length === 0) formats.push(Instascan.Scanner.FORMAT.CODE_128);
             
-            return readers;
+            return formats;
         }
         
         // Función para iniciar el escaneo con cámara
-        function startCameraScan() {
+        async function startCameraScan() {
             if (isCameraActive) return;
             
             showStatus('Iniciando cámara...', 'info');
             startCameraBtn.disabled = true;
             startCameraBtn.innerHTML = '<span class="loading"></span> Iniciando...';
             
-            // Verificar si el navegador soporta getUserMedia
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showStatus('Tu navegador no soporta el acceso a la cámara', 'error');
-                startCameraBtn.disabled = false;
-                startCameraBtn.innerHTML = '📷 Activar Cámara';
-                return;
-            }
-            
-            // Obtener lectores activos
-            const activeReaders = getActiveReaders();
-            
-            // Configuración optimizada para Code 128
-            const config = {
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: cameraView,
-                    constraints: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        aspectRatio: { ideal: 1.7777777778 }, // 16:9
-                        facingMode: "environment", // Usar cámara trasera en dispositivos móviles
-                        focusMode: enableAutoFocus.checked ? "continuous" : "manual"
-                    },
-                    area: { // Definir área de escaneo para mejorar precisión
-                        top: "20%",
-                        right: "10%",
-                        left: "10%",
-                        bottom: "20%"
-                    }
-                },
-                decoder: {
-                    readers: activeReaders
-                },
-                locator: {
-                    patchSize: "medium", // Tamaño medio para mejor detección
-                    halfSample: true // Mejorar rendimiento
-                },
-                locate: true,
-                numOfWorkers: Math.min(navigator.hardwareConcurrency || 2, 4), // Usar hasta 4 núcleos
-                frequency: 15, // Mayor frecuencia de escaneo
-                debug: {
-                    drawBoundingBox: false,
-                    showFrequency: false,
-                    drawScanline: true,
-                    showPattern: false
-                }
-            };
-            
-            // Si Quagga ya está inicializado, reiniciar con nueva configuración
-            if (quaggaInitialized) {
-                Quagga.stop();
-            }
-            
-            Quagga.init(config, function(err) {
-                if (err) {
-                    console.error("Error al inicializar Quagga:", err);
-                    showStatus('Error al iniciar la cámara: ' + err.message, 'error');
-                    startCameraBtn.disabled = false;
-                    startCameraBtn.innerHTML = '📷 Activar Cámara';
-                    return;
-                }
+            try {
+                // Obtener formatos activos
+                const activeFormats = getActiveFormats();
                 
-                console.log("Quagga inicializado correctamente");
-                Quagga.start();
-                isCameraActive = true;
-                quaggaInitialized = true;
-                cameraSection.classList.remove('hidden');
-                scanningOverlay.classList.remove('hidden');
-                startCameraBtn.disabled = false;
-                startCameraBtn.innerHTML = '📷 Activar Cámara';
-                showStatus('Cámara activa. Enfoca un código de barras para escanear.', 'info');
+                // Configurar el escáner
+                scanner = new Instascan.Scanner({
+                    video: cameraView,
+                    scanPeriod: 5, // Escanear cada 5ms para mayor velocidad
+                    mirror: false,
+                    captureImage: false,
+                    backgroundScan: true,
+                    refractoryPeriod: 1000, // Período de espera después de un escaneo exitoso
+                    continuous: true // Escaneo continuo
+                });
                 
-                // Desplazar la vista hacia la cámara
-                cameraSection.scrollIntoView({ behavior: 'smooth' });
-            });
-            
-            // Detectar cuando se escanea un código
-            Quagga.onDetected(function(result) {
-                if (result && result.codeResult) {
+                // Manejar códigos escaneados
+                scanner.addListener('scan', function(content, image) {
                     const currentTime = Date.now();
                     
                     // Evitar múltiples detecciones en un corto período
@@ -835,109 +879,165 @@
                     
                     lastScanTime = currentTime;
                     
-                    const code = result.codeResult.code;
-                    const format = result.codeResult.format;
+                    console.log("Código detectado:", content);
                     
-                    console.log("Código detectado:", code, "Formato:", format);
-                    
-                    // Validar el código según el formato
-                    if (!validateBarcode(code, format)) {
-                        scanFeedback.textContent = "Código no válido";
-                        scanFeedback.style.color = "#e74c3c";
-                        setTimeout(() => {
-                            scanFeedback.textContent = "";
-                        }, 2000);
+                    // Validar el código
+                    if (!validateBarcode(content)) {
+                        updateScanFeedback("Código no válido", false);
                         return;
                     }
                     
-                    // Mostrar indicador de escaneo exitoso
-                    scanningOverlay.innerHTML = `
-                        <div style="color: #2ecc71; font-weight: bold;">¡Código detectado!</div>
-                        <div>${code}</div>
-                        <div style="font-size: 14px;">Formato: ${format}</div>
-                    `;
-                    scanningOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-                    
                     // Actualizar el campo de entrada
-                    barcodeInput.value = code;
-                    currentScanResult = code;
+                    barcodeInput.value = content;
+                    currentScanResult = content;
                     
                     // Agregar a la lista de códigos escaneados
-                    addToScannedCodes(code);
+                    addToScannedCodes(content);
                     
                     // Mostrar feedback visual
-                    scanFeedback.textContent = "✓ Código detectado";
-                    scanFeedback.style.color = "#2ecc71";
+                    updateScanFeedback("✓ Código detectado: " + content, true);
                     
                     // Detener la cámara después de un escaneo exitoso
                     setTimeout(() => {
                         stopCameraScan();
-                        showStatus('Código escaneado correctamente: ' + code, 'success');
+                        showStatus('Código escaneado correctamente: ' + content, 'success');
                     }, 1500);
-                }
-            });
-            
-            // Manejar errores de Quagga
-            Quagga.onProcessed(function(result) {
-                if (result) {
-                    const drawingCtx = Quagga.canvas.ctx.overlay;
-                    const drawingCanvas = Quagga.canvas.dom.overlay;
-                    
-                    if (result.boxes) {
-                        drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
-                        result.boxes.filter(function(box) {
-                            return box !== result.box;
-                        }).forEach(function(box) {
-                            Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
-                        });
-                    }
-                    
-                    if (result.box) {
-                        Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
-                    }
-                    
-                    if (result.codeResult && result.codeResult.code) {
-                        Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
-                    }
-                }
-            });
-        }
-        
-        // Función para validar códigos de barras según su formato
-        function validateBarcode(code, format) {
-            // Validación básica para Code 128
-            if (format === "code_128") {
-                // Code 128 puede contener cualquier carácter ASCII
-                // Validar longitud mínima y máxima
-                if (code.length < 2 || code.length > 80) {
-                    return false;
+                });
+                
+                // Obtener cámaras disponibles
+                const cameras = await Instascan.Camera.getCameras();
+                
+                if (cameras.length === 0) {
+                    throw new Error('No se encontraron cámaras en el dispositivo');
                 }
                 
-                // Validar que no contenga caracteres no imprimibles (excepto los caracteres de control de Code 128)
-                // En la práctica, Code 128 puede codificar todos los caracteres ASCII
-                return true;
+                // Seleccionar cámara trasera si está disponible
+                let selectedCamera = cameras[0];
+                for (let camera of cameras) {
+                    if (camera.name.toLowerCase().includes('back') || 
+                        camera.name.toLowerCase().includes('rear') ||
+                        camera.name === 'camera2 0') { // Algunos dispositivos Android
+                        selectedCamera = camera;
+                        break;
+                    }
+                }
+                
+                // Iniciar el escáner
+                await scanner.start(selectedCamera);
+                
+                isCameraActive = true;
+                cameraSection.classList.remove('hidden');
+                scanningOverlay.classList.remove('hidden');
+                startCameraBtn.disabled = false;
+                startCameraBtn.innerHTML = '📷 Activar Cámara';
+                showStatus('Cámara activa. Enfoca un código de barras para escanear.', 'info');
+                
+                // Desplazar la vista hacia la cámara
+                cameraSection.scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error("Error al iniciar cámara:", error);
+                showStatus('Error al iniciar la cámara: ' + error.message, 'error');
+                startCameraBtn.disabled = false;
+                startCameraBtn.innerHTML = '📷 Activar Cámara';
+            }
+        }
+        
+        // Función para actualizar el feedback de escaneo
+        function updateScanFeedback(message, isSuccess) {
+            if (isFullscreen) {
+                fullscreenFeedback.textContent = message;
+                fullscreenFeedback.style.color = isSuccess ? "#2ecc71" : "#e74c3c";
+            } else {
+                scanFeedback.textContent = message;
+                scanFeedback.style.color = isSuccess ? "#2ecc71" : "#e74c3c";
             }
             
-            // Para otros formatos, aceptar por ahora
-            return true;
+            // Limpiar el mensaje después de 2 segundos
+            setTimeout(() => {
+                if (isFullscreen) {
+                    fullscreenFeedback.textContent = "";
+                } else {
+                    scanFeedback.textContent = "";
+                }
+            }, 2000);
+        }
+        
+        // Función para validar códigos de barras
+        function validateBarcode(code) {
+            // Validación básica para Code 128
+            // Code 128 puede contener cualquier carácter ASCII
+            // Validar longitud mínima y máxima
+            if (code.length < 2 || code.length > 80) {
+                return false;
+            }
+            
+            // Validar que no esté vacío
+            return code.trim().length > 0;
         }
         
         // Función para detener el escaneo con cámara
         function stopCameraScan() {
-            if (!isCameraActive) return;
+            if (!isCameraActive || !scanner) return;
             
-            Quagga.stop();
+            scanner.stop();
             isCameraActive = false;
             cameraSection.classList.add('hidden');
             scanningOverlay.classList.add('hidden');
-            scanningOverlay.innerHTML = `
-                <div>Enfoca el código de barras</div>
-                <div class="scan-line"></div>
-            `;
-            scanningOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
             scanFeedback.textContent = "";
             
+            // Si estamos en pantalla completa, salir
+            if (isFullscreen) {
+                exitFullscreen();
+            }
+            
             showStatus('Cámara desactivada', 'info');
+        }
+        
+        // Función para alternar pantalla completa
+        function toggleFullscreen() {
+            if (!isCameraActive) return;
+            
+            if (!isFullscreen) {
+                enterFullscreen();
+            } else {
+                exitFullscreen();
+            }
+        }
+        
+        // Función para entrar en pantalla completa
+        function enterFullscreen() {
+            fullscreenCamera.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevenir scroll
+            
+            // Mover el video a pantalla completa
+            const videoElement = cameraView.querySelector('video');
+            if (videoElement) {
+                fullscreenCamera.appendChild(videoElement);
+                videoElement.style.width = '100%';
+                videoElement.style.height = '100%';
+                videoElement.style.objectFit = 'cover';
+            }
+            
+            isFullscreen = true;
+        }
+        
+        // Función para salir de pantalla completa
+        function exitFullscreen() {
+            fullscreenCamera.classList.add('hidden');
+            document.body.style.overflow = ''; // Restaurar scroll
+            
+            // Devolver el video a su contenedor original
+            const videoElement = fullscreenCamera.querySelector('video');
+            if (videoElement) {
+                cameraView.appendChild(videoElement);
+                videoElement.style.width = '';
+                videoElement.style.height = '';
+                videoElement.style.objectFit = '';
+            }
+            
+            fullscreenFeedback.textContent = "";
+            isFullscreen = false;
         }
         
         // Función para manejar el envío del formulario
@@ -1110,39 +1210,36 @@
                     return;
                 }
                 
-                // Si no se detecta código QR, intentar con Quagga para códigos de barras
-                // Obtener lectores activos
-                const activeReaders = getActiveReaders();
-                
-                // Configuración para procesamiento de imagen estática
-                const config = {
-                    decoder: {
-                        readers: activeReaders
-                    },
-                    locate: true,
-                    src: canvas.toDataURL()
-                };
-                
-                // Usar Quagga para decodificar la imagen
-                Quagga.decodeSingle(config, function(result) {
-                    processImageBtn.disabled = false;
-                    processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
-                    
-                    if (result && result.codeResult) {
-                        const code = result.codeResult.code;
-                        const format = result.codeResult.format;
+                // Para códigos de barras, usar Instascan
+                Instascan.Camera.getCameras().then(function(cameras) {
+                    if (cameras.length > 0) {
+                        const tempScanner = new Instascan.Scanner({
+                            scanPeriod: 1,
+                            mirror: false
+                        });
                         
-                        if (validateBarcode(code, format)) {
-                            barcodeInput.value = code;
-                            currentScanResult = code;
-                            addToScannedCodes(code);
-                            showStatus('Código de barras detectado: ' + code, 'success');
-                        } else {
-                            showStatus('Código detectado pero no válido: ' + code, 'error');
-                        }
-                    } else {
-                        // Si Quagga no funciona, intentar con un enfoque alternativo
-                        tryAlternativeBarcodeDetection(canvas, ctx);
+                        tempScanner.scan(canvas).then(function(result) {
+                            processImageBtn.disabled = false;
+                            processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                            
+                            if (result) {
+                                const code = result;
+                                if (validateBarcode(code)) {
+                                    barcodeInput.value = code;
+                                    currentScanResult = code;
+                                    addToScannedCodes(code);
+                                    showStatus('Código de barras detectado: ' + code, 'success');
+                                } else {
+                                    showStatus('Código detectado pero no válido: ' + code, 'error');
+                                }
+                            } else {
+                                showStatus('No se pudo detectar ningún código de barras en la imagen', 'error');
+                            }
+                        }).catch(function(error) {
+                            processImageBtn.disabled = false;
+                            processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                            showStatus('Error al procesar la imagen: ' + error.message, 'error');
+                        });
                     }
                 });
             };
@@ -1154,74 +1251,6 @@
             };
             
             img.src = imagePreview.src;
-        }
-        
-        // Función alternativa para detectar códigos de barras
-        function tryAlternativeBarcodeDetection(canvas, ctx) {
-            // Intentar con diferentes configuraciones de procesamiento de imagen
-            // 1. Convertir a escala de grises
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const grayscaleData = convertToGrayscale(imageData);
-            
-            // 2. Aplicar contraste
-            const contrastedData = applyContrast(grayscaleData, 1.5);
-            
-            // 3. Volver a dibujar en el canvas
-            ctx.putImageData(contrastedData, 0, 0);
-            
-            // 4. Intentar nuevamente con Quagga
-            const activeReaders = getActiveReaders();
-            const config = {
-                decoder: {
-                    readers: activeReaders
-                },
-                locate: true,
-                src: canvas.toDataURL()
-            };
-            
-            Quagga.decodeSingle(config, function(result) {
-                if (result && result.codeResult) {
-                    const code = result.codeResult.code;
-                    const format = result.codeResult.format;
-                    
-                    if (validateBarcode(code, format)) {
-                        barcodeInput.value = code;
-                        currentScanResult = code;
-                        addToScannedCodes(code);
-                        showStatus('Código de barras detectado: ' + code, 'success');
-                    } else {
-                        showStatus('Código detectado pero no válido: ' + code, 'error');
-                    }
-                } else {
-                    showStatus('No se pudo detectar ningún código de barras en la imagen', 'error');
-                    console.log("No se detectaron códigos en la imagen procesada");
-                }
-            });
-        }
-        
-        // Función para convertir imagen a escala de grises
-        function convertToGrayscale(imageData) {
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                data[i] = avg;     // rojo
-                data[i + 1] = avg; // verde
-                data[i + 2] = avg; // azul
-            }
-            return imageData;
-        }
-        
-        // Función para aplicar contraste a la imagen
-        function applyContrast(imageData, contrast) {
-            const data = imageData.data;
-            const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
-            
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] = factor * (data[i] - 128) + 128;     // rojo
-                data[i + 1] = factor * (data[i + 1] - 128) + 128; // verde
-                data[i + 2] = factor * (data[i + 2] - 128) + 128; // azul
-            }
-            return imageData;
         }
         
         // Función para mostrar mensajes de estado
@@ -1307,8 +1336,15 @@
         
         // Limpiar recursos cuando se cierre la página
         window.addEventListener('beforeunload', () => {
-            if (isCameraActive) {
-                Quagga.stop();
+            if (isCameraActive && scanner) {
+                scanner.stop();
+            }
+        });
+        
+        // Manejar la tecla Escape para salir de pantalla completa
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isFullscreen) {
+                exitFullscreen();
             }
         });
     </script>
