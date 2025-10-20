@@ -668,6 +668,16 @@
             tomate: ["13", "14", "15", "16"]
         };
         
+        // Función para truncar a 2 decimales sin redondear
+        function truncarADosDecimales(numero) {
+            if (typeof numero === 'number' || !isNaN(parseFloat(numero))) {
+                const numeroFloat = parseFloat(numero);
+                // Multiplicar por 100, truncar la parte decimal, y dividir por 100
+                return Math.floor(numeroFloat * 100) / 100;
+            }
+            return numero;
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Cargar filtro de invernaderos
             cargarFiltroInvernaderos();
@@ -881,6 +891,9 @@
                                     capillasTexto = capillasArray.map(c => c.trim()).join(', ');
                                 }
                                 
+                                // Truncar el área a 2 decimales sin redondear
+                                const areaTruncada = truncarADosDecimales(aplicacion.area);
+                                
                                 // Determinar clase según estado
                                 const estadoTexto = aplicacion.estaVencida ? 'Vencida' : 'Activa';
                                 const estadoBadgeClase = aplicacion.estaVencida ? 'estado-vencida' : 'estado-activa';
@@ -892,7 +905,7 @@
                                     fila.innerHTML = `
                                         <td class="cultivo-cell" rowspan="${rowspan}">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
                                         <td class="invernadero-cell" rowspan="${rowspan}">${aplicacion.invernadero}</td>
-                                        <td>${aplicacion.area} ha</td>
+                                        <td>${areaTruncada} ha</td>
                                         <td class="capillas-cell">${capillasTexto}</td>
                                         <td class="producto-cell">${aplicacion.producto}</td>
                                         <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
@@ -902,7 +915,7 @@
                                 } else {
                                     // Filas siguientes
                                     fila.innerHTML = `
-                                        <td>${aplicacion.area} ha</td>
+                                        <td>${areaTruncada} ha</td>
                                         <td class="capillas-cell">${capillasTexto}</td>
                                         <td class="producto-cell">${aplicacion.producto}</td>
                                         <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
@@ -919,7 +932,7 @@
                                     filaMobile.innerHTML = `
                                         <td class="cultivo-cell" rowspan="${rowspan}">${aplicacion.cultivo === 'mini' ? 'Mini' : 'Tomate'}</td>
                                         <td class="invernadero-cell" rowspan="${rowspan}">${aplicacion.invernadero}</td>
-                                        <td>${aplicacion.area} ha</td>
+                                        <td>${areaTruncada} ha</td>
                                         <td class="capillas-cell">${capillasTexto}</td>
                                         <td class="producto-cell">${aplicacion.producto}</td>
                                         <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
@@ -929,7 +942,7 @@
                                 } else {
                                     // Filas siguientes
                                     filaMobile.innerHTML = `
-                                        <td>${aplicacion.area} ha</td>
+                                        <td>${areaTruncada} ha</td>
                                         <td class="capillas-cell">${capillasTexto}</td>
                                         <td class="producto-cell">${aplicacion.producto}</td>
                                         <td class="fecha-cell">${aplicacion.fechaAplicacion}</td>
