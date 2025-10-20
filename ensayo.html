@@ -165,17 +165,6 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        .btn-fullscreen {
-            background-color: var(--warning-color);
-            color: white;
-        }
-        
-        .btn-fullscreen:hover {
-            background-color: #e67e22;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
         .btn-primary {
             background-color: var(--success-color);
             color: white;
@@ -490,63 +479,6 @@
             margin-top: 15px;
             flex-wrap: wrap;
         }
-        
-        /* Estilos para pantalla completa */
-        .fullscreen-camera {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: black;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .fullscreen-camera video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .fullscreen-controls {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            z-index: 1001;
-        }
-        
-        .fullscreen-scan-guide {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70%;
-            height: 40%;
-            border: 3px dashed var(--primary-color);
-            border-radius: 12px;
-            pointer-events: none;
-            z-index: 1001;
-        }
-        
-        .fullscreen-feedback {
-            position: absolute;
-            top: 20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            z-index: 1001;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -631,9 +563,6 @@
                         </div>
                         
                         <div class="camera-controls">
-                            <button type="button" id="toggleFullscreen" class="btn-fullscreen">
-                                ⛶ Pantalla Completa
-                            </button>
                             <button type="button" id="stopCamera" class="btn-stop">
                                 ⏹️ Detener Cámara
                             </button>
@@ -670,17 +599,6 @@
         </main>
     </div>
 
-    <!-- Pantalla completa para la cámara -->
-    <div id="fullscreenCamera" class="fullscreen-camera hidden">
-        <div class="fullscreen-scan-guide"></div>
-        <div class="fullscreen-feedback" id="fullscreenFeedback"></div>
-        <div class="fullscreen-controls">
-            <button type="button" id="exitFullscreen" class="btn-stop">
-                ⏹️ Salir de Pantalla Completa
-            </button>
-        </div>
-    </div>
-
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -704,7 +622,6 @@
         // Variables globales
         let scanner = null;
         let isCameraActive = false;
-        let isFullscreen = false;
         let currentScanResult = null;
         let scannedCodes = [];
         let contenedorActual = null;
@@ -718,11 +635,8 @@
         const barcodeInput = document.getElementById('barcodeInput');
         const startCameraBtn = document.getElementById('startCamera');
         const stopCameraBtn = document.getElementById('stopCamera');
-        const toggleFullscreenBtn = document.getElementById('toggleFullscreen');
-        const exitFullscreenBtn = document.getElementById('exitFullscreen');
         const cameraSection = document.getElementById('cameraSection');
         const cameraView = document.getElementById('cameraView');
-        const fullscreenCamera = document.getElementById('fullscreenCamera');
         const fileInput = document.getElementById('fileInput');
         const statusMessage = document.getElementById('statusMessage');
         const submitBtn = document.getElementById('submitBtn');
@@ -737,7 +651,6 @@
         const processImageBtn = document.getElementById('processImage');
         const imageProcessingCanvas = document.getElementById('imageProcessingCanvas');
         const scanFeedback = document.getElementById('scanFeedback');
-        const fullscreenFeedback = document.getElementById('fullscreenFeedback');
         
         // Configuración de escáner
         const enableCode128 = document.getElementById('enableCode128');
@@ -762,12 +675,6 @@
         
         // Detener cámara
         stopCameraBtn.addEventListener('click', stopCameraScan);
-        
-        // Alternar pantalla completa
-        toggleFullscreenBtn.addEventListener('click', toggleFullscreen);
-        
-        // Salir de pantalla completa
-        exitFullscreenBtn.addEventListener('click', exitFullscreen);
         
         // Manejar envío del formulario
         barcodeForm.addEventListener('submit', handleFormSubmit);
@@ -945,21 +852,12 @@
         
         // Función para actualizar el feedback de escaneo
         function updateScanFeedback(message, isSuccess) {
-            if (isFullscreen) {
-                fullscreenFeedback.textContent = message;
-                fullscreenFeedback.style.color = isSuccess ? "#2ecc71" : "#e74c3c";
-            } else {
-                scanFeedback.textContent = message;
-                scanFeedback.style.color = isSuccess ? "#2ecc71" : "#e74c3c";
-            }
+            scanFeedback.textContent = message;
+            scanFeedback.style.color = isSuccess ? "#2ecc71" : "#e74c3c";
             
             // Limpiar el mensaje después de 2 segundos
             setTimeout(() => {
-                if (isFullscreen) {
-                    fullscreenFeedback.textContent = "";
-                } else {
-                    scanFeedback.textContent = "";
-                }
+                scanFeedback.textContent = "";
             }, 2000);
         }
         
@@ -986,58 +884,7 @@
             scanningOverlay.classList.add('hidden');
             scanFeedback.textContent = "";
             
-            // Si estamos en pantalla completa, salir
-            if (isFullscreen) {
-                exitFullscreen();
-            }
-            
             showStatus('Cámara desactivada', 'info');
-        }
-        
-        // Función para alternar pantalla completa
-        function toggleFullscreen() {
-            if (!isCameraActive) return;
-            
-            if (!isFullscreen) {
-                enterFullscreen();
-            } else {
-                exitFullscreen();
-            }
-        }
-        
-        // Función para entrar en pantalla completa
-        function enterFullscreen() {
-            fullscreenCamera.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevenir scroll
-            
-            // Mover el video a pantalla completa
-            const videoElement = cameraView.querySelector('video');
-            if (videoElement) {
-                fullscreenCamera.appendChild(videoElement);
-                videoElement.style.width = '100%';
-                videoElement.style.height = '100%';
-                videoElement.style.objectFit = 'cover';
-            }
-            
-            isFullscreen = true;
-        }
-        
-        // Función para salir de pantalla completa
-        function exitFullscreen() {
-            fullscreenCamera.classList.add('hidden');
-            document.body.style.overflow = ''; // Restaurar scroll
-            
-            // Devolver el video a su contenedor original
-            const videoElement = fullscreenCamera.querySelector('video');
-            if (videoElement) {
-                cameraView.appendChild(videoElement);
-                videoElement.style.width = '';
-                videoElement.style.height = '';
-                videoElement.style.objectFit = '';
-            }
-            
-            fullscreenFeedback.textContent = "";
-            isFullscreen = false;
         }
         
         // Función para manejar el envío del formulario
@@ -1338,13 +1185,6 @@
         window.addEventListener('beforeunload', () => {
             if (isCameraActive && scanner) {
                 scanner.stop();
-            }
-        });
-        
-        // Manejar la tecla Escape para salir de pantalla completa
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && isFullscreen) {
-                exitFullscreen();
             }
         });
     </script>
