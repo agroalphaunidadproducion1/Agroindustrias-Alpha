@@ -3,38 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Usuarios - Sistema Agrícola</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Formulario - Escanear Códigos</title>
     <style>
         :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #45a049;
-            --admin-color: #2196F3;
-            --grower-junior-color: #FF9800;
-            --digitador-color: #9C27B0;
-            --tecnico-color: #607D8B;
-            --supervisor-color: #FF5722;
-            --invitado-color: #9E9E9E;
-            --gerente-general-color: #E91E63;
-            --gerente-produccion-color: #3F51B5;
-            --jefe-vivero-color: #009688;
-            --error-color: #f44336;
-            --light-gray: #f5f5f5;
-            --white: #ffffff;
-            --dark-gray: #000000;
-            --sidebar-bg: #2c3e50;
-            --sidebar-hover: #34495e;
-            --sidebar-active: #3498db;
-            
-            /* Nuevos colores para roles adicionales */
-            --grower-color: #FF9800;
-            --fitosanidad-color: #795548;
-            --culturales-color: #FF5722;
-            --riego-color: #00BCD4;
-            --consultor-color: #E91E63;
-            --mezclero-fitosanidad-color: #795548;
-            --usuario-color: #795548;
-            --default-role-color: #757575;
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
         }
         
         * {
@@ -45,805 +23,1294 @@
         }
         
         body {
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
             min-height: 100vh;
-            transition: margin-left 0.3s;
+            padding: 20px;
         }
         
-        /* Header con botón hamburguesa */
-        .header {
-            background-color: var(--white);
-            padding: 15px 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            flex-wrap: wrap;
         }
         
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--dark-gray);
-            padding: 5px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-            margin-right: 15px;
-        }
-        
-        .menu-toggle:hover {
-            background-color: rgba(0,0,0,0.05);
-        }
-        
-        .brand {
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .brand h1 {
-            font-size: 20px;
-            color: var(--dark-gray);
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: var(--sidebar-bg);
+        .nav-link {
+            background-color: var(--primary-color);
             color: white;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: -250px;
-            padding: 20px 0;
-            overflow-y: auto;
-            transition: left 0.3s;
-            z-index: 200;
-        }
-        
-        .sidebar.active {
-            left: 0;
-        }
-        
-        .close-menu {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            cursor: pointer;
-        }
-        
-        .logo {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid #34495e;
-            margin-bottom: 20px;
-            margin-top: 10px;
-        }
-        
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 600;
-            color: white;
-        }
-        
-        .user-info {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid #34495e;
-            margin-bottom: 20px;
-        }
-        
-        .user-info p {
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: white;
-        }
-        
-        .role-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 4px;
-        }
-        
-        /* Clases actualizadas para los badges de roles */
-        .admin-badge { background-color: var(--admin-color); color: white; }
-        .grower-badge { background-color: var(--grower-color); color: white; }
-        .grower-junior-badge { background-color: var(--grower-junior-color); color: white; }
-        .digitador-badge { background-color: var(--digitador-color); color: white; }
-        .fitosanidad-badge { background-color: var(--fitosanidad-color); color: white; }
-        .culturales-badge { background-color: var(--culturales-color); color: white; }
-        .riego-badge { background-color: var(--riego-color); color: white; }
-        .supervisor-badge { background-color: var(--supervisor-color); color: white; }
-        .invitado-badge { background-color: var(--invitado-color); color: white; }
-        .gerente-general-badge { background-color: var(--gerente-general-color); color: white; }
-        .gerente-produccion-badge { background-color: var(--gerente-produccion-color); color: white; }
-        .jefe-vivero-badge { background-color: var(--jefe-vivero-color); color: white; }
-        .consultor-badge { background-color: var(--consultor-color); color: white; }
-        .mezclero-fitosanidad-badge { background-color: var(--mezclero-fitosanidad-color); color: white; }
-        .usuario1-badge { background-color: var(--usuario-color); color: white; }
-        .usuario2-badge { background-color: var(--usuario-color); color: white; }
-        .usuario3-badge { background-color: var(--usuario-color); color: white; }
-        .usuario4-badge { background-color: var(--usuario-color); color: white; }
-        .default-badge { background-color: var(--default-role-color); color: white; }
-        
-        .nav-section {
-            margin-bottom: 25px;
-        }
-        
-        .nav-section h3 {
-            font-size: 14px;
-            text-transform: uppercase;
-            padding: 0 20px;
-            margin-bottom: 10px;
-            color: #95a5a6;
-        }
-        
-        .nav-item {
             padding: 12px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            color: white;
-            text-decoration: none;
+            gap: 8px;
         }
         
-        .nav-item:hover {
-            background-color: var(--sidebar-hover);
+        .nav-link:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        .nav-item.active {
-            background-color: var(--sidebar-active);
-        }
-        
-        .nav-item i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-        
-        /* Overlay para cerrar menú al hacer clic fuera */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 150;
-            display: none;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        /* Main Content */
-        .main-content {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: calc(100vh - 70px);
-        }
-        
-        .container {
-            background-color: var(--white);
+        .form-section {
+            background-color: white;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px;
-            margin-top: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        .breadcrumb {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-        }
-        
-        .breadcrumb a {
-            color: #3498db;
-            text-decoration: none;
-        }
-        
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 24px;
+        h2 {
+            color: var(--dark-color);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: var(--dark-gray);
-            font-size: 14px;
+            color: #444;
         }
         
-        input, select {
+        input[type="date"],
+        input[type="text"],
+        input[type="file"] {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 14px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             font-size: 16px;
-            box-sizing: border-box;
-            margin-bottom: 5px;
-            transition: border-color 0.3s;
-            color: var(--dark-gray);
+            transition: all 0.3s;
         }
         
-        input:focus, select:focus {
-            outline: none;
+        input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .scan-section {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .scan-section input {
+            flex: 1;
         }
         
         button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-scan {
             background-color: var(--primary-color);
             color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            transition: background-color 0.3s;
-            margin-top: 10px;
-            font-weight: 600;
+            white-space: nowrap;
         }
         
-        button:hover {
+        .btn-scan:hover {
             background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        button:disabled {
-            background-color: #cccccc;
+        .btn-stop {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-stop:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--success-color);
+            color: white;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 15px;
+            padding: 16px;
+        }
+        
+        .btn-primary:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary:disabled {
+            background-color: #95a5a6;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
-        .message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 4px;
-            font-size: 14px;
+        .camera-section {
+            margin-top: 25px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        #cameraView {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: 0 auto 20px;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            border: 3px solid var(--primary-color);
+        }
+        
+        .hidden {
             display: none;
-            color: var(--dark-gray);
         }
         
-        .success {
-            background-color: #e6f7ee;
-            color: #2e7d32;
-            border: 1px solid #a5d6a7;
+        .file-help {
             display: block;
+            margin-top: 8px;
+            color: #666;
+            font-size: 14px;
         }
         
-        .error {
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
-            display: block;
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .scanning-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 18px;
+            z-index: 10;
+            gap: 15px;
+        }
+        
+        .scan-line {
+            width: 80%;
+            height: 3px;
+            background-color: var(--primary-color);
+            animation: scan 2s infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(-50px); }
+            50% { transform: translateY(50px); }
+            100% { transform: translateY(-50px); }
+        }
+        
+        .scanned-codes {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .scanned-codes h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        .codes-list {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .code-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .code-item:last-child {
+            border-bottom: none;
+        }
+        
+        .contenedor-actual {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .contenedor-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .contenedor-icon {
+            font-size: 1.5rem;
+        }
+        
+        .contenedor-texto h4 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .contenedor-texto p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .btn-cambiar {
+            background-color: var(--warning-color);
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .btn-cambiar:hover {
+            background-color: #e67e22;
+        }
+        
+        @media (max-width: 768px) {
+            .scan-section {
+                flex-direction: column;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .nav-link {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            h1, h2 {
+                font-size: 1.5rem;
+            }
+            
+            .contenedor-actual {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
         }
         
         .loading {
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 3px solid rgba(255,255,255,.3);
             border-radius: 50%;
-            border-top-color: white;
+            border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-            vertical-align: middle;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .main-content {
-                padding: 15px;
-            }
+        /* Estilos para la vista previa de imágenes */
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 15px auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .image-preview-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .btn-process {
+            background-color: var(--warning-color);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .btn-process:hover {
+            background-color: #e67e22;
+        }
+        
+        .image-processing-canvas {
+            display: none;
+        }
+        
+        /* Mejoras para el escaneo */
+        .scan-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 60%;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .scan-feedback {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            z-index: 6;
+        }
+        
+        .scanner-config {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .config-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .config-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .config-option label {
+            margin-bottom: 0;
+            font-weight: normal;
         }
     </style>
 </head>
 <body>
-    <!-- Overlay para cerrar menú -->
-    <div class="overlay" id="overlay"></div>
-    
-    <!-- Header con botón hamburguesa -->
-    <div class="header">
-        <button class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="brand">
-            <h1>Agroalpha</h1>
-        </div>
-    </div>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <button class="close-menu" id="closeMenu">
-            <i class="fas fa-times"></i>
-        </button>
-        
-        <div class="logo">
-            <h1>Agroalpha</h1>
-        </div>
-        
-        <div class="user-info">
-            <p id="user-unit">Unidad de Producción 1</p>
-            <p id="user-name">Usuario</p>
-            <p id="user-role" class="role-badge">Rol</p>
-        </div>
-        
-        <div class="nav-section">
-            <h3>Navegación Principal</h3>
-            <a class="nav-item" href="dashboard.html">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-            <div class="nav-item">
-                <i class="fas fa-bell"></i>
-                <span>Notificaciones</span>
-            </div>
-        </div>
-        
-        <div class="nav-section">
-            <h3>Módulos del Sistema</h3>
-            <div id="modules-nav">
-                <div class="nav-item">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <span>Cargando módulos...</span>
+    <div class="container">
+        <header>
+            <h1>📷 Escanear Códigos de Barras</h1>
+            <nav>
+                <a href="viewer.html" class="nav-link">📋 Ver Códigos Guardados</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="form-section">
+                <h2>Nuevo Escaneo</h2>
+                
+                <!-- Sección del contenedor actual -->
+                <div id="contenedorActual" class="contenedor-actual hidden">
+                    <div class="contenedor-info">
+                        <div class="contenedor-icon">📦</div>
+                        <div class="contenedor-texto">
+                            <h4>Contenedor Actual</h4>
+                            <p id="contenedorActualTexto">CONT-001</p>
+                        </div>
+                    </div>
+                    <button type="button" id="cambiarContenedor" class="btn-cambiar">
+                        ✏️ Cambiar
+                    </button>
                 </div>
-            </div>
-        </div>
-        
-        <div class="nav-section">
-            <h3>Administración</h3>
+                
+                <div id="statusMessage"></div>
+                <form id="barcodeForm">
+                    <div class="form-group">
+                        <label for="fecha">Fecha:</label>
+                        <input type="date" id="fecha" required>
+                    </div>
 
-            <div class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Configuración</span>
-            </div>
-            <div class="nav-item">
-                <i class="fas fa-user"></i>
-                <span>Mi Perfil</span>
-            </div>
-            <div class="nav-item">
-                <i class="fas fa-question-circle"></i>
-                <span>Ayuda</span>
-            </div>
-            <div class="nav-item" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Cerrar Sesión</span>
-            </div>
-        </div>
+                    <div class="form-group" id="contenedorInputGroup">
+                        <label for="numeroContenedor">Número de Contenedor:</label>
+                        <input type="text" id="numeroContenedor" required placeholder="Ej: CONT-001">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="barcodeInput">Código de Barras:</label>
+                        <div class="scan-section">
+                            <input type="text" id="barcodeInput" required placeholder="Escanea o ingresa el código" autofocus>
+                            <button type="button" id="startCamera" class="btn-scan">
+                                📷 Activar Cámara
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="camera-section hidden" id="cameraSection">
+                        <div id="cameraView">
+                            <div class="scan-guide"></div>
+                            <div class="scanning-overlay hidden" id="scanningOverlay">
+                                <div>Enfoca el código de barras</div>
+                                <div class="scan-line"></div>
+                            </div>
+                            <div class="scan-feedback" id="scanFeedback"></div>
+                        </div>
+                        
+                        <div class="scanner-config">
+                            <h4>Configuración del Escáner</h4>
+                            <div class="config-options">
+                                <div class="config-option">
+                                    <input type="checkbox" id="enableCode128" checked>
+                                    <label for="enableCode128">Code 128</label>
+                                </div>
+                                <div class="config-option">
+                                    <input type="checkbox" id="enableEAN" checked>
+                                    <label for="enableEAN">EAN</label>
+                                </div>
+                                <div class="config-option">
+                                    <input type="checkbox" id="enableCode39" checked>
+                                    <label for="enableCode39">Code 39</label>
+                                </div>
+                                <div class="config-option">
+                                    <input type="checkbox" id="enableQR" checked>
+                                    <label for="enableQR">QR</label>
+                                </div>
+                                <div class="config-option">
+                                    <input type="checkbox" id="enableAutoFocus" checked>
+                                    <label for="enableAutoFocus">Enfoque automático</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="stopCamera" class="btn-stop">
+                            ⏹️ Detener Cámara
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fileInput">O subir desde archivo:</label>
+                        <input type="file" id="fileInput" accept=".txt,.csv,.json,.png,.jpg,.jpeg,.gif,.bmp,.webp" class="file-input">
+                        <small class="file-help">Formatos: TXT, CSV, JSON o imágenes (PNG, JPG, JPEG, GIF, BMP, WEBP)</small>
+                    </div>
+
+                    <!-- Vista previa de imagen y botón para procesar -->
+                    <div id="imagePreviewContainer" class="image-preview-container hidden">
+                        <img id="imagePreview" class="image-preview" alt="Vista previa de la imagen">
+                        <button type="button" id="processImage" class="btn-process">
+                            🔍 Procesar Código de Barras
+                        </button>
+                    </div>
+
+                    <!-- Canvas para procesamiento de imágenes -->
+                    <canvas id="imageProcessingCanvas" class="image-processing-canvas"></canvas>
+
+                    <button type="submit" class="btn-primary" id="submitBtn">Guardar Código</button>
+                </form>
+                
+                <div class="scanned-codes">
+                    <h3>Códigos Escaneados Recientemente</h3>
+                    <div class="codes-list" id="codesList">
+                        <div class="code-item">No hay códigos escaneados recientemente</div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="container">
-            <div class="breadcrumb">
-                <a href="../dashboard.html">Dashboard</a><a href="manejo-users.html">/Gestión de Usuarios</a> / Crear Usuario
-            </div>
-            
-            <h1>Crear Nuevo Usuario</h1>
-            
-            <div class="form-group">
-                <label for="username">Nombre de Usuario</label>
-                <input type="text" id="username" placeholder="Ej: jperez" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" placeholder="Mínimo 6 caracteres" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="fullname">Nombre Completo</label>
-                <input type="text" id="fullname" placeholder="Ej: Juan Pérez" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="role">Rol del Usuario</label>
-                <select id="role" required>
-                    <option value="">Seleccione un rol</option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Gerente General">Gerente General</option>
-                    <option value="Gerente de Producción">Gerente de Producción</option>
-                    <option value="Supervisor">Supervisor</option>
-                    <option value="Jefe de Vivero">Jefe de Vivero</option>
-                    <option value="Grower">Grower</option>
-                    <option value="Grower Junior">Grower Junior</option>
-                    <option value="Digitador">Digitador</option>
-                    <option value="Técnico Fitosanidad">Técnico Fitosanidad</option>
-                    <option value="Técnico Prácticas Culturales">Técnico Prácticas Culturales</option>
-                    <option value="Técnico Riego">Técnico Riego</option>
-                    <option value="Mezclero Fitosanidad">Mezclero Fitosanidad</option>
-                    <option value="Consultor">Consultor</option>
-                    <option value="Usuario1">Usuario1</option>
-                    <option value="Usuario2">Usuario2</option>
-                    <option value="Usuario3">Usuario3</option>
-                    <option value="Usuario4">Usuario4</option>
-                    <option value="Invitado">Invitado</option>
-                </select>
-            </div>
-            
-            <button id="createButton">
-                <span id="buttonText">Crear Usuario</span>
-            </button>
-            
-            <div id="message" class="message"></div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
-
+    <!-- QuaggaJS para escaneo de códigos de barras -->
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    
+    <!-- jsQR para escanear códigos QR en imágenes estáticas -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+            databaseURL: "https://calida-8e85b-default-rtdb.firebaseio.com/"
         };
         
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        // Referencias a Firebase
-        const usersRef = database.ref('login');
-        const activeUsersRef = database.ref('uactivos');
-        const modulesRef = database.ref('modules');
-        const accessRef = database.ref('accesos');
-        
         // Variables globales
-        let systemModules = [];
-        let roleAccess = {};
-        let userRole = '';
+        let isCameraActive = false;
+        let currentScanResult = null;
+        let scannedCodes = [];
+        let contenedorActual = null;
+        let quaggaInitialized = false;
+        let lastScanTime = 0;
+        const SCAN_COOLDOWN = 1000; // 1 segundo de espera entre escaneos
         
-        // Elementos del DOM
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const fullnameInput = document.getElementById('fullname');
-        const roleSelect = document.getElementById('role');
-        const createButton = document.getElementById('createButton');
-        const buttonText = document.getElementById('buttonText');
-        const messageDiv = document.getElementById('message');
-        const menuToggle = document.getElementById('menuToggle');
-        const closeMenu = document.getElementById('closeMenu');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
+        // Elementos DOM
+        const barcodeForm = document.getElementById('barcodeForm');
+        const fechaInput = document.getElementById('fecha');
+        const numeroContenedorInput = document.getElementById('numeroContenedor');
+        const barcodeInput = document.getElementById('barcodeInput');
+        const startCameraBtn = document.getElementById('startCamera');
+        const stopCameraBtn = document.getElementById('stopCamera');
+        const cameraSection = document.getElementById('cameraSection');
+        const cameraView = document.getElementById('cameraView');
+        const fileInput = document.getElementById('fileInput');
+        const statusMessage = document.getElementById('statusMessage');
+        const submitBtn = document.getElementById('submitBtn');
+        const scanningOverlay = document.getElementById('scanningOverlay');
+        const codesList = document.getElementById('codesList');
+        const contenedorActualElement = document.getElementById('contenedorActual');
+        const contenedorActualTexto = document.getElementById('contenedorActualTexto');
+        const cambiarContenedorBtn = document.getElementById('cambiarContenedor');
+        const contenedorInputGroup = document.getElementById('contenedorInputGroup');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const processImageBtn = document.getElementById('processImage');
+        const imageProcessingCanvas = document.getElementById('imageProcessingCanvas');
+        const scanFeedback = document.getElementById('scanFeedback');
         
-        // Funciones para el menú hamburguesa
-        function openMenu() {
-            sidebar.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+        // Configuración de escáner
+        const enableCode128 = document.getElementById('enableCode128');
+        const enableEAN = document.getElementById('enableEAN');
+        const enableCode39 = document.getElementById('enableCode39');
+        const enableQR = document.getElementById('enableQR');
+        const enableAutoFocus = document.getElementById('enableAutoFocus');
         
-        function closeSidebar() {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Event listeners para el menú
-        menuToggle.addEventListener('click', openMenu);
-        closeMenu.addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
-        
-        // Verificar sesión al cargar
-        document.addEventListener('DOMContentLoaded', function() {
-            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+        // Establecer fecha actual por defecto
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            fechaInput.value = today;
             
-            if (!userData || !userData.username) {
-                window.location.href = 'index.html';
-                return;
-            }
+            // Cargar contenedor guardado
+            cargarContenedorGuardado();
             
-            // Guardar el rol del usuario
-            userRole = userData.role;
-            
-            // Configurar eventos
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            
-            // Verificar si el usuario sigue activo en uactivos
-            activeUsersRef.child(userData.username).once('value')
-                .then(snapshot => {
-                    if (!snapshot.exists()) {
-                        logout();
-                        return;
-                    }
-                    
-                    // Mostrar información del usuario
-                    displayUserInfo(userData);
-                    
-                    // Cargar módulos para el menú
-                    loadModulesForMenu();
-                })
-                .catch(error => {
-                    console.error('Error verificando sesión activa:', error);
-                });
+            // Cargar códigos escaneados recientemente
+            loadRecentScans();
         });
         
-        // Cargar módulos para el menú
-        function loadModulesForMenu() {
-            // Cargar módulos y accesos en paralelo
-            Promise.all([
-                modulesRef.once('value'),
-                accessRef.once('value')
-            ])
-            .then(([modulesSnapshot, accessSnapshot]) => {
-                // Procesar módulos
-                if (modulesSnapshot.exists()) {
-                    const modulesData = modulesSnapshot.val();
-                    
-                    // Verificar si modulesData es un array o un objeto
-                    if (Array.isArray(modulesData)) {
-                        systemModules = modulesData;
-                    } else if (typeof modulesData === 'object' && modulesData !== null) {
-                        // Convertir objeto a array
-                        systemModules = Object.values(modulesData);
-                    } else {
-                        systemModules = [];
+        // Iniciar cámara para escanear
+        startCameraBtn.addEventListener('click', startCameraScan);
+        
+        // Detener cámara
+        stopCameraBtn.addEventListener('click', stopCameraScan);
+        
+        // Manejar envío del formulario
+        barcodeForm.addEventListener('submit', handleFormSubmit);
+        
+        // Manejar carga de archivos
+        fileInput.addEventListener('change', handleFileUpload);
+        
+        // Manejar cambio de contenedor
+        cambiarContenedorBtn.addEventListener('click', mostrarInputContenedor);
+        
+        // Manejar cambio en el input del contenedor
+        numeroContenedorInput.addEventListener('change', guardarContenedor);
+        
+        // Procesar imagen para detectar códigos de barras
+        processImageBtn.addEventListener('click', processImageForBarcodes);
+        
+        // Función para cargar el contenedor guardado
+        function cargarContenedorGuardado() {
+            const contenedorGuardado = localStorage.getItem('contenedorActual');
+            if (contenedorGuardado) {
+                contenedorActual = contenedorGuardado;
+                numeroContenedorInput.value = contenedorActual;
+                mostrarContenedorActual();
+            }
+        }
+        
+        // Función para guardar el contenedor
+        function guardarContenedor() {
+            const nuevoContenedor = numeroContenedorInput.value.trim();
+            if (nuevoContenedor) {
+                contenedorActual = nuevoContenedor;
+                localStorage.setItem('contenedorActual', contenedorActual);
+                mostrarContenedorActual();
+                showStatus(`Contenedor guardado: ${contenedorActual}`, 'success');
+            }
+        }
+        
+        // Función para mostrar el contenedor actual
+        function mostrarContenedorActual() {
+            if (contenedorActual) {
+                contenedorActualTexto.textContent = contenedorActual;
+                contenedorActualElement.classList.remove('hidden');
+                contenedorInputGroup.style.display = 'none';
+                numeroContenedorInput.value = contenedorActual;
+            }
+        }
+        
+        // Función para mostrar el input del contenedor
+        function mostrarInputContenedor() {
+            contenedorActualElement.classList.add('hidden');
+            contenedorInputGroup.style.display = 'block';
+            numeroContenedorInput.focus();
+            numeroContenedorInput.select();
+        }
+        
+        // Función para obtener los lectores activos según la configuración
+        function getActiveReaders() {
+            const readers = [];
+            
+            if (enableCode128.checked) readers.push("code_128_reader");
+            if (enableEAN.checked) {
+                readers.push("ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader");
+            }
+            if (enableCode39.checked) readers.push("code_39_reader", "code_39_vin_reader");
+            if (enableQR.checked) readers.push("qr_code_reader");
+            
+            // Asegurarse de que al menos Code 128 esté activo
+            if (readers.length === 0) readers.push("code_128_reader");
+            
+            return readers;
+        }
+        
+        // Función para iniciar el escaneo con cámara
+        function startCameraScan() {
+            if (isCameraActive) return;
+            
+            showStatus('Iniciando cámara...', 'info');
+            startCameraBtn.disabled = true;
+            startCameraBtn.innerHTML = '<span class="loading"></span> Iniciando...';
+            
+            // Verificar si el navegador soporta getUserMedia
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showStatus('Tu navegador no soporta el acceso a la cámara', 'error');
+                startCameraBtn.disabled = false;
+                startCameraBtn.innerHTML = '📷 Activar Cámara';
+                return;
+            }
+            
+            // Obtener lectores activos
+            const activeReaders = getActiveReaders();
+            
+            // Configuración optimizada para Code 128
+            const config = {
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: cameraView,
+                    constraints: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        aspectRatio: { ideal: 1.7777777778 }, // 16:9
+                        facingMode: "environment", // Usar cámara trasera en dispositivos móviles
+                        focusMode: enableAutoFocus.checked ? "continuous" : "manual"
+                    },
+                    area: { // Definir área de escaneo para mejorar precisión
+                        top: "20%",
+                        right: "10%",
+                        left: "10%",
+                        bottom: "20%"
                     }
-                } else {
-                    systemModules = [];
+                },
+                decoder: {
+                    readers: activeReaders
+                },
+                locator: {
+                    patchSize: "medium", // Tamaño medio para mejor detección
+                    halfSample: true // Mejorar rendimiento
+                },
+                locate: true,
+                numOfWorkers: Math.min(navigator.hardwareConcurrency || 2, 4), // Usar hasta 4 núcleos
+                frequency: 15, // Mayor frecuencia de escaneo
+                debug: {
+                    drawBoundingBox: false,
+                    showFrequency: false,
+                    drawScanline: true,
+                    showPattern: false
                 }
-                
-                // Procesar accesos
-                if (accessSnapshot.exists()) {
-                    roleAccess = accessSnapshot.val();
-                } else {
-                    roleAccess = {};
-                }
-                
-                // Generar elementos de navegación en el menú lateral
-                generateNavItems();
-            })
-            .catch(error => {
-                console.error('Error cargando datos de Firebase:', error);
-            });
-        }
-        
-        // Mostrar información del usuario
-        function displayUserInfo(userData) {
-            document.getElementById('user-name').textContent = userData.name || userData.username;
-            document.getElementById('user-unit').textContent = userData.unit || 'Unidad de Producción 1';
-            
-            const roleBadge = document.getElementById('user-role');
-            roleBadge.textContent = userData.role;
-            roleBadge.className = 'role-badge ' + getBadgeClass(userData.role);
-        }
-        
-        // Obtener clase CSS para el badge según el rol (actualizada)
-        function getBadgeClass(role) {
-            const roleClasses = {
-                'Administrador': 'admin-badge',
-                'Admin': 'admin-badge',
-                'Gerente General': 'gerente-general-badge',
-                'Gerente de Producción': 'gerente-produccion-badge',
-                'Supervisor': 'supervisor-badge',
-                'Jefe de Vivero': 'jefe-vivero-badge',
-                'Grower': 'grower-badge',
-                'Grower Junior': 'grower-junior-badge',
-                'Digitador': 'digitador-badge',
-                'Técnico Fitosanidad': 'fitosanidad-badge',
-                'Fitosanidad': 'fitosanidad-badge',
-                'Técnico Prácticas Culturales': 'culturales-badge',
-                'Prácticas Culturales': 'culturales-badge',
-                'Culturales': 'culturales-badge',
-                'Técnico Riego': 'riego-badge',
-                'Riego': 'riego-badge',
-                'Mezclero Fitosanidad': 'mezclero-fitosanidad-badge',
-                'Consultor': 'consultor-badge',
-                'Usuario1': 'usuario1-badge',
-                'Usuario2': 'usuario2-badge',
-                'Usuario3': 'usuario3-badge',
-                'Usuario4': 'usuario4-badge',
-                'Invitado': 'invitado-badge'
             };
-            return roleClasses[role] || 'default-badge';
-        }
-        
-        // Generar elementos de navegación en el menú lateral
-        function generateNavItems() {
-            const container = document.getElementById('modules-nav');
             
-            // Verificar si tenemos los datos necesarios
-            if (systemModules.length === 0 || Object.keys(roleAccess).length === 0) {
-                container.innerHTML = '<div class="nav-item"><span>Sin módulos disponibles</span></div>';
-                return;
+            // Si Quagga ya está inicializado, reiniciar con nueva configuración
+            if (quaggaInitialized) {
+                Quagga.stop();
             }
             
-            // Obtener los accesos para el rol del usuario
-            const userAccess = roleAccess[userRole];
-            
-            if (!userAccess) {
-                container.innerHTML = '<div class="nav-item"><span>Sin módulos disponibles</span></div>';
-                return;
-            }
-            
-            // Filtrar módulos a los que el usuario tiene acceso
-            const accessibleModules = [];
-            
-            systemModules.forEach(module => {
-                if (!module || !module.id) return;
-                
-                // Verificar acceso
-                const hasAccess = userAccess[module.id];
-                
-                if (hasAccess) {
-                    accessibleModules.push(module);
-                }
-            });
-            
-            if (accessibleModules.length === 0) {
-                container.innerHTML = '<div class="nav-item"><span>Sin módulos disponibles</span></div>';
-                return;
-            }
-            
-            // Generar elementos de navegación
-            container.innerHTML = '';
-            accessibleModules.forEach(module => {
-                const navItem = document.createElement('a');
-                navItem.className = 'nav-item';
-                navItem.href = module.link || '#';
-                
-                navItem.innerHTML = `
-                    <i class="fas ${module.icon || 'fa-cube'}"></i>
-                    <span>${module.title || 'Módulo sin nombre'}</span>
-                `;
-                
-                container.appendChild(navItem);
-            });
-        }
-        
-        // Función para mostrar mensajes
-        function showMessage(text, type) {
-            messageDiv.innerHTML = text;
-            messageDiv.className = 'message ' + type;
-            messageDiv.style.display = 'block';
-            
-            // Ocultar mensaje después de 5 segundos
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Función para limpiar el formulario
-        function resetForm() {
-            usernameInput.value = '';
-            passwordInput.value = '';
-            fullnameInput.value = '';
-            roleSelect.value = '';
-            usernameInput.focus();
-        }
-        
-        // Función para encriptar contraseña (básica)
-        function encryptPassword(password) {
-            return btoa(password); // Encriptación básica en Base64
-        }
-        
-        // Función principal para crear usuario
-        async function createUser() {
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value;
-            const fullname = fullnameInput.value.trim();
-            const role = roleSelect.value;
-            
-            // Validaciones básicas
-            if (!username || !password || !fullname || !role) {
-                showMessage('Por favor complete todos los campos', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
-                return;
-            }
-            
-            // Mostrar estado de carga
-            createButton.disabled = true;
-            buttonText.innerHTML = '<span class="loading"></span> Creando usuario...';
-            messageDiv.style.display = 'none';
-            
-            try {
-                // Verificar si el usuario ya existe
-                const snapshot = await usersRef.child(username).once('value');
-                
-                if (snapshot.exists()) {
-                    showMessage('El nombre de usuario ya existe', 'error');
-                    createButton.disabled = false;
-                    buttonText.textContent = 'Crear Usuario';
+            Quagga.init(config, function(err) {
+                if (err) {
+                    console.error("Error al inicializar Quagga:", err);
+                    showStatus('Error al iniciar la cámara: ' + err.message, 'error');
+                    startCameraBtn.disabled = false;
+                    startCameraBtn.innerHTML = '📷 Activar Cámara';
                     return;
                 }
                 
-                // Crear el objeto de usuario
-                const userData = {
-                    password: encryptPassword(password),
-                    name: fullname,
-                    role: role,
-                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                console.log("Quagga inicializado correctamente");
+                Quagga.start();
+                isCameraActive = true;
+                quaggaInitialized = true;
+                cameraSection.classList.remove('hidden');
+                scanningOverlay.classList.remove('hidden');
+                startCameraBtn.disabled = false;
+                startCameraBtn.innerHTML = '📷 Activar Cámara';
+                showStatus('Cámara activa. Enfoca un código de barras para escanear.', 'info');
+                
+                // Desplazar la vista hacia la cámara
+                cameraSection.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Detectar cuando se escanea un código
+            Quagga.onDetected(function(result) {
+                if (result && result.codeResult) {
+                    const currentTime = Date.now();
+                    
+                    // Evitar múltiples detecciones en un corto período
+                    if (currentTime - lastScanTime < SCAN_COOLDOWN) {
+                        return;
+                    }
+                    
+                    lastScanTime = currentTime;
+                    
+                    const code = result.codeResult.code;
+                    const format = result.codeResult.format;
+                    
+                    console.log("Código detectado:", code, "Formato:", format);
+                    
+                    // Validar el código según el formato
+                    if (!validateBarcode(code, format)) {
+                        scanFeedback.textContent = "Código no válido";
+                        scanFeedback.style.color = "#e74c3c";
+                        setTimeout(() => {
+                            scanFeedback.textContent = "";
+                        }, 2000);
+                        return;
+                    }
+                    
+                    // Mostrar indicador de escaneo exitoso
+                    scanningOverlay.innerHTML = `
+                        <div style="color: #2ecc71; font-weight: bold;">¡Código detectado!</div>
+                        <div>${code}</div>
+                        <div style="font-size: 14px;">Formato: ${format}</div>
+                    `;
+                    scanningOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                    
+                    // Actualizar el campo de entrada
+                    barcodeInput.value = code;
+                    currentScanResult = code;
+                    
+                    // Agregar a la lista de códigos escaneados
+                    addToScannedCodes(code);
+                    
+                    // Mostrar feedback visual
+                    scanFeedback.textContent = "✓ Código detectado";
+                    scanFeedback.style.color = "#2ecc71";
+                    
+                    // Detener la cámara después de un escaneo exitoso
+                    setTimeout(() => {
+                        stopCameraScan();
+                        showStatus('Código escaneado correctamente: ' + code, 'success');
+                    }, 1500);
+                }
+            });
+            
+            // Manejar errores de Quagga
+            Quagga.onProcessed(function(result) {
+                if (result) {
+                    const drawingCtx = Quagga.canvas.ctx.overlay;
+                    const drawingCanvas = Quagga.canvas.dom.overlay;
+                    
+                    if (result.boxes) {
+                        drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                        result.boxes.filter(function(box) {
+                            return box !== result.box;
+                        }).forEach(function(box) {
+                            Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+                        });
+                    }
+                    
+                    if (result.box) {
+                        Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+                    }
+                    
+                    if (result.codeResult && result.codeResult.code) {
+                        Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+                    }
+                }
+            });
+        }
+        
+        // Función para validar códigos de barras según su formato
+        function validateBarcode(code, format) {
+            // Validación básica para Code 128
+            if (format === "code_128") {
+                // Code 128 puede contener cualquier carácter ASCII
+                // Validar longitud mínima y máxima
+                if (code.length < 2 || code.length > 80) {
+                    return false;
+                }
+                
+                // Validar que no contenga caracteres no imprimibles (excepto los caracteres de control de Code 128)
+                // En la práctica, Code 128 puede codificar todos los caracteres ASCII
+                return true;
+            }
+            
+            // Para otros formatos, aceptar por ahora
+            return true;
+        }
+        
+        // Función para detener el escaneo con cámara
+        function stopCameraScan() {
+            if (!isCameraActive) return;
+            
+            Quagga.stop();
+            isCameraActive = false;
+            cameraSection.classList.add('hidden');
+            scanningOverlay.classList.add('hidden');
+            scanningOverlay.innerHTML = `
+                <div>Enfoca el código de barras</div>
+                <div class="scan-line"></div>
+            `;
+            scanningOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            scanFeedback.textContent = "";
+            
+            showStatus('Cámara desactivada', 'info');
+        }
+        
+        // Función para manejar el envío del formulario
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Validar campos
+            if (!fechaInput.value || !numeroContenedorInput.value || !barcodeInput.value) {
+                showStatus('Por favor, completa todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            // Guardar el contenedor si ha cambiado
+            if (numeroContenedorInput.value !== contenedorActual) {
+                guardarContenedor();
+            }
+            
+            // Deshabilitar botón para evitar múltiples envíos
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span> Guardando...';
+            
+            // Preparar datos para guardar
+            const scanData = {
+                fecha: fechaInput.value,
+                numeroContenedor: numeroContenedorInput.value,
+                codigoBarras: barcodeInput.value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Guardar en Firebase
+            saveToFirebase(scanData);
+        }
+        
+        // Función para guardar datos en Firebase
+        function saveToFirebase(data) {
+            const newScanRef = database.ref('scans').push();
+            
+            newScanRef.set(data)
+                .then(() => {
+                    showStatus('Código guardado correctamente', 'success');
+                    
+                    // Limpiar solo el campo de código de barras
+                    barcodeInput.value = '';
+                    currentScanResult = null;
+                    
+                    // Restablecer botón
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Guardar Código';
+                    
+                    // Actualizar lista de códigos recientes
+                    addToScannedCodes(data.codigoBarras);
+                    
+                    // Enfocar campo de código de barras para siguiente escaneo
+                    barcodeInput.focus();
+                })
+                .catch((error) => {
+                    console.error("Error al guardar en Firebase:", error);
+                    showStatus('Error al guardar: ' + error.message, 'error');
+                    
+                    // Restablecer botón
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Guardar Código';
+                });
+        }
+        
+        // Función para manejar la carga de archivos
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                try {
+                    const content = event.target.result;
+                    
+                    // Verificar si es un archivo de imagen
+                    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'];
+                    const isImage = imageExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+                    
+                    if (isImage) {
+                        // Mostrar vista previa de la imagen
+                        imagePreview.src = content;
+                        imagePreviewContainer.classList.remove('hidden');
+                        showStatus('Imagen cargada. Haz clic en "Procesar Código de Barras" para escanear.', 'info');
+                    } else {
+                        // Procesar archivos de texto
+                        imagePreviewContainer.classList.add('hidden');
+                        let codes = [];
+                        
+                        // Determinar el tipo de archivo y procesarlo
+                        if (file.name.endsWith('.txt')) {
+                            codes = content.split('\n')
+                                .map(line => line.trim())
+                                .filter(line => line.length > 0);
+                        } else if (file.name.endsWith('.csv')) {
+                            codes = content.split('\n')
+                                .map(line => {
+                                    const parts = line.split(',');
+                                    return parts.length > 0 ? parts[0].trim() : '';
+                                })
+                                .filter(line => line.length > 0);
+                        } else if (file.name.endsWith('.json')) {
+                            const jsonData = JSON.parse(content);
+                            // Asumimos que es un array de códigos o un objeto con una propiedad codes
+                            if (Array.isArray(jsonData)) {
+                                codes = jsonData;
+                            } else if (jsonData.codes && Array.isArray(jsonData.codes)) {
+                                codes = jsonData.codes;
+                            }
+                        }
+                        
+                        if (codes.length > 0) {
+                            // Tomar el primer código para el formulario actual
+                            barcodeInput.value = codes[0];
+                            showStatus(`Se cargaron ${codes.length} códigos. El primero se ha insertado.`, 'success');
+                            
+                            // Agregar todos los códigos a la lista
+                            codes.forEach(code => addToScannedCodes(code));
+                        } else {
+                            showStatus('No se encontraron códigos en el archivo', 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error al procesar archivo:", error);
+                    showStatus('Error al procesar el archivo: ' + error.message, 'error');
+                }
+            };
+            
+            reader.readAsDataURL(file); // Usar readAsDataURL para imágenes
+        }
+        
+        // Función para procesar imagen y detectar códigos de barras
+        function processImageForBarcodes() {
+            if (!imagePreview.src) {
+                showStatus('No hay imagen para procesar', 'error');
+                return;
+            }
+            
+            showStatus('Procesando imagen...', 'info');
+            processImageBtn.disabled = true;
+            processImageBtn.innerHTML = '<span class="loading"></span> Procesando...';
+            
+            // Crear un canvas para procesar la imagen
+            const canvas = imageProcessingCanvas;
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                // Configurar el canvas con las dimensiones de la imagen
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // Dibujar la imagen en el canvas
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                
+                // Intentar detectar códigos QR primero
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (qrCode) {
+                    // Código QR detectado
+                    const code = qrCode.data;
+                    barcodeInput.value = code;
+                    currentScanResult = code;
+                    addToScannedCodes(code);
+                    showStatus('Código QR detectado: ' + code, 'success');
+                    processImageBtn.disabled = false;
+                    processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                    return;
+                }
+                
+                // Si no se detecta código QR, intentar con Quagga para códigos de barras
+                // Obtener lectores activos
+                const activeReaders = getActiveReaders();
+                
+                // Configuración para procesamiento de imagen estática
+                const config = {
+                    decoder: {
+                        readers: activeReaders
+                    },
+                    locate: true,
+                    src: canvas.toDataURL()
                 };
                 
-                // Guardar en la base de datos
-                await usersRef.child(username).set(userData);
-                
-                // Mostrar mensaje de éxito
-                showMessage(
-                    `Usuario <strong>${username}</strong> creado exitosamente como <span class="role-badge ${getBadgeClass(role)}">${role}</span>`, 
-                    'success'
-                );
-                
-                // Reiniciar formulario
-                resetForm();
-                
-            } catch (error) {
-                console.error('Error al crear usuario:', error);
-                showMessage('Error al crear usuario: ' + error.message, 'error');
-            } finally {
-                createButton.disabled = false;
-                buttonText.textContent = 'Crear Usuario';
+                // Usar Quagga para decodificar la imagen
+                Quagga.decodeSingle(config, function(result) {
+                    processImageBtn.disabled = false;
+                    processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                    
+                    if (result && result.codeResult) {
+                        const code = result.codeResult.code;
+                        const format = result.codeResult.format;
+                        
+                        if (validateBarcode(code, format)) {
+                            barcodeInput.value = code;
+                            currentScanResult = code;
+                            addToScannedCodes(code);
+                            showStatus('Código de barras detectado: ' + code, 'success');
+                        } else {
+                            showStatus('Código detectado pero no válido: ' + code, 'error');
+                        }
+                    } else {
+                        // Si Quagga no funciona, intentar con un enfoque alternativo
+                        tryAlternativeBarcodeDetection(canvas, ctx);
+                    }
+                });
+            };
+            
+            img.onerror = function() {
+                processImageBtn.disabled = false;
+                processImageBtn.innerHTML = '🔍 Procesar Código de Barras';
+                showStatus('Error al cargar la imagen para procesamiento', 'error');
+            };
+            
+            img.src = imagePreview.src;
+        }
+        
+        // Función alternativa para detectar códigos de barras
+        function tryAlternativeBarcodeDetection(canvas, ctx) {
+            // Intentar con diferentes configuraciones de procesamiento de imagen
+            // 1. Convertir a escala de grises
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const grayscaleData = convertToGrayscale(imageData);
+            
+            // 2. Aplicar contraste
+            const contrastedData = applyContrast(grayscaleData, 1.5);
+            
+            // 3. Volver a dibujar en el canvas
+            ctx.putImageData(contrastedData, 0, 0);
+            
+            // 4. Intentar nuevamente con Quagga
+            const activeReaders = getActiveReaders();
+            const config = {
+                decoder: {
+                    readers: activeReaders
+                },
+                locate: true,
+                src: canvas.toDataURL()
+            };
+            
+            Quagga.decodeSingle(config, function(result) {
+                if (result && result.codeResult) {
+                    const code = result.codeResult.code;
+                    const format = result.codeResult.format;
+                    
+                    if (validateBarcode(code, format)) {
+                        barcodeInput.value = code;
+                        currentScanResult = code;
+                        addToScannedCodes(code);
+                        showStatus('Código de barras detectado: ' + code, 'success');
+                    } else {
+                        showStatus('Código detectado pero no válido: ' + code, 'error');
+                    }
+                } else {
+                    showStatus('No se pudo detectar ningún código de barras en la imagen', 'error');
+                    console.log("No se detectaron códigos en la imagen procesada");
+                }
+            });
+        }
+        
+        // Función para convertir imagen a escala de grises
+        function convertToGrayscale(imageData) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = avg;     // rojo
+                data[i + 1] = avg; // verde
+                data[i + 2] = avg; // azul
+            }
+            return imageData;
+        }
+        
+        // Función para aplicar contraste a la imagen
+        function applyContrast(imageData, contrast) {
+            const data = imageData.data;
+            const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+            
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = factor * (data[i] - 128) + 128;     // rojo
+                data[i + 1] = factor * (data[i + 1] - 128) + 128; // verde
+                data[i + 2] = factor * (data[i + 2] - 128) + 128; // azul
+            }
+            return imageData;
+        }
+        
+        // Función para mostrar mensajes de estado
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message';
+            
+            switch (type) {
+                case 'success':
+                    statusMessage.classList.add('status-success');
+                    break;
+                case 'error':
+                    statusMessage.classList.add('status-error');
+                    break;
+                case 'info':
+                    statusMessage.classList.add('status-info');
+                    break;
+            }
+            
+            // Auto-ocultar mensajes de éxito después de 5 segundos
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.textContent = '';
+                    statusMessage.className = 'status-message';
+                }, 5000);
             }
         }
         
-        // Event Listeners
-        createButton.addEventListener('click', createUser);
+        // Función para agregar códigos a la lista de escaneados recientemente
+        function addToScannedCodes(code) {
+            // Evitar duplicados
+            if (!scannedCodes.includes(code)) {
+                scannedCodes.unshift(code);
+                
+                // Mantener solo los últimos 10 códigos
+                if (scannedCodes.length > 10) {
+                    scannedCodes.pop();
+                }
+                
+                updateScannedCodesList();
+            }
+        }
         
-        // Permitir enviar con Enter
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                createUser();
+        // Función para actualizar la lista de códigos escaneados
+        function updateScannedCodesList() {
+            if (scannedCodes.length === 0) {
+                codesList.innerHTML = '<div class="code-item">No hay códigos escaneados recientemente</div>';
+                return;
+            }
+            
+            codesList.innerHTML = scannedCodes.map(code => 
+                `<div class="code-item">
+                    <span>${code}</span>
+                    <button onclick="useScannedCode('${code}')" class="btn-scan" style="padding: 5px 10px; font-size: 14px;">Usar</button>
+                </div>`
+            ).join('');
+        }
+        
+        // Función para usar un código escaneado previamente
+        function useScannedCode(code) {
+            barcodeInput.value = code;
+            showStatus(`Código "${code}" cargado en el formulario`, 'info');
+            barcodeInput.focus();
+        }
+        
+        // Función para cargar escaneos recientes desde Firebase
+        function loadRecentScans() {
+            database.ref('scans').limitToLast(5).once('value')
+                .then(snapshot => {
+                    const scans = [];
+                    snapshot.forEach(childSnapshot => {
+                        const scan = childSnapshot.val();
+                        scans.push(scan.codigoBarras);
+                    });
+                    
+                    // Agregar a la lista de códigos escaneados
+                    scans.reverse().forEach(scan => addToScannedCodes(scan));
+                })
+                .catch(error => {
+                    console.error("Error al cargar escaneos recientes:", error);
+                });
+        }
+        
+        // Limpiar recursos cuando se cierre la página
+        window.addEventListener('beforeunload', () => {
+            if (isCameraActive) {
+                Quagga.stop();
             }
         });
-        
-        // Cerrar sesión
-        function logout() {
-            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
-            
-            if (userData?.username) {
-                // Eliminar de usuarios activos
-                activeUsersRef.child(userData.username).remove()
-                    .then(() => {
-                        sessionStorage.removeItem('currentUser');
-                        window.location.href = 'index.html';
-                    })
-                    .catch(error => {
-                        console.error('Error al cerrar sesión:', error);
-                        sessionStorage.removeItem('currentUser');
-                        window.location.href = 'index.html';
-                    });
-            } else {
-                sessionStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
-            }
-        }
     </script>
-    <script src="../footer.js"></script>
 </body>
-
 </html>
