@@ -21,7 +21,7 @@ class FooterManager {
         return `
             <div class="footer-container">
                 <div class="footer-content">
-                    <p>Sistema Agroalpha © ${new Date().getFullYear()} | Versión 1.2.0</p>
+                    <p>Sistema Agroalpha © ${new Date().getFullYear()} | Versión 1.2.1</p>
                     <p>Unidad de Producción 1 - <a href="soporte.html" class="footer-link">Ayuda Técnica</a></p>
                 </div>
             </div>
