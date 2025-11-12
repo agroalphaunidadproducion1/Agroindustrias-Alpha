@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Monitoreo de Plagas</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --admin-color: #2196F3;
+            --grower-junior-color: #FF9800;
+            --digitador-color: #9C27B0;
+            --tecnico-color: #607D8B;
+            --supervisor-color: #FF5722;
+            --invitado-color: #9E9E9E;
+            --gerente-general-color: #E91E63;
+            --gerente-produccion-color: #3F51B5;
+            --jefe-vivero-color: #009688;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --dark-gray: #000000;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --sidebar-active: #3498db;
+            
+            /* Nuevos colores para roles adicionales */
+            --grower-color: #FF9800;
+            --fitosanidad-color: #795548;
+            --culturales-color: #FF5722;
+            --riego-color: #00BCD4;
+            --consultor-color: #E91E63;
+            --mezclero-fitosanidad-color: #795548;
+            --usuario-color: #795548;
+            --default-role-color: #757575;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Espacio para el header */
+        .header-space {
+            height: 70px;
+        }
+
+        /* Main content que se ajusta al espacio disponible */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+            transition: border-color 0.3s;
+            color: var(--dark-gray);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+            color: var(--dark-gray);
+        }
+
+        .success {
+            background-color: #e6f7ee;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            display: block;
+        }
+
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Espacio para el footer */
+        .footer-space {
+            height: 70px;
+        }
+
+        /* Estilos para selección múltiple */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .selection-item {
+            padding: 8px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+            font-size: 12px;
+        }
+
+        .selection-item:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f8f0;
+        }
+
+        .selection-item.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .selection-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .selection-controls button {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            margin-top: 0;
+        }
+
+        .counter-input {
+            display: flex;
+            align-items: center;
+        }
+
+        .counter-input input {
+            text-align: center;
+            margin: 0;
+        }
+
+        .counter-btn {
+            background-color: #e0e0e0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .counter-btn:hover {
+            background-color: #d0d0d0;
+        }
+
+        .counter-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .counter-btn:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+
+        .counter-input-container {
+            display: flex;
+        }
+
+        .counter-input-container input {
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+        }
+
+        .selected-items {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+
+        .selected-items h4 {
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        .selected-items-list {
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .container {
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            .selection-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Espacio reservado para el header -->
+    <div class="header-space"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="#">Inicio</a> > <a href="#">Monitoreo</a> > Ingreso de Puntos de Plaga
+            </div>
+            
+            <h1>Ingreso de Puntos de Plaga</h1>
+            
+            <form id="plagueForm">
+                <div class="form-group">
+                    <label for="invernadero">Invernadero:</label>
+                    <select id="invernadero" required>
+                        <option value="">Seleccione un invernadero</option>
+                        <option value="9">Invernadero 9</option>
+                        <option value="10">Invernadero 10</option>
+                        <option value="11">Invernadero 11</option>
+                        <option value="12">Invernadero 12</option>
+                        <option value="13">Invernadero 13</option>
+                        <option value="14">Invernadero 14</option>
+                        <option value="15">Invernadero 15</option>
+                        <option value="16">Invernadero 16</option>
+                        <option value="33">Invernadero 33</option>
+                        <option value="35">Invernadero 35</option>
+                        <option value="37">Invernadero 37</option>
+                        <option value="39">Invernadero 39</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Ubicaciones (Capillas):</label>
+                    <div class="selection-controls">
+                        <button type="button" id="selectAllUbicaciones">Seleccionar Todo</button>
+                        <button type="button" id="clearUbicaciones">Limpiar</button>
+                    </div>
+                    <div class="selection-grid" id="ubicacionesGrid">
+                        <!-- Las ubicaciones se generarán dinámicamente -->
+                    </div>
+                    <div class="selected-items">
+                        <h4>Ubicaciones seleccionadas:</h4>
+                        <div class="selected-items-list" id="selectedUbicacionesList"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="plaga">Plaga:</label>
+                    <select id="plaga" required>
+                        <option value="">Seleccione una plaga</option>
+                        <option value="acaro-blanco">Ácaro Blanco</option>
+                        <option value="mosca-blanca">Mosca Blanca</option>
+                        <option value="acaro-rojo">Ácaro Rojo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Camas:</label>
+                    <div class="selection-controls">
+                        <button type="button" id="selectAllCamas">Seleccionar Todo</button>
+                        <button type="button" id="clearCamas">Limpiar</button>
+                    </div>
+                    <div class="selection-grid" id="camasGrid">
+                        <!-- Las camas se generarán dinámicamente -->
+                    </div>
+                    <div class="selected-items">
+                        <h4>Camas seleccionadas:</h4>
+                        <div class="selected-items-list" id="selectedCamasList"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Módulos:</label>
+                    <div class="selection-controls">
+                        <button type="button" id="selectAllModulos">Seleccionar Todo</button>
+                        <button type="button" id="clearModulos">Limpiar</button>
+                    </div>
+                    <div class="selection-grid" id="modulosGrid">
+                        <!-- Los módulos se generarán dinámicamente -->
+                    </div>
+                    <div class="selected-items">
+                        <h4>Módulos seleccionados:</h4>
+                        <div class="selected-items-list" id="selectedModulosList"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cantidad">Cantidad de individuos:</label>
+                    <div class="counter-input-container">
+                        <button type="button" class="counter-btn" id="decreaseBtn">-</button>
+                        <input type="number" id="cantidad" min="0" value="0" required>
+                        <button type="button" class="counter-btn" id="increaseBtn">+</button>
+                    </div>
+                </div>
+                
+                <button type="submit" id="submitBtn">
+                    <span class="loading" id="loadingIcon" style="display: none;"></span>
+                    Registrar Puntos de Plaga
+                </button>
+            </form>
+            
+            <div class="message" id="message"></div>
+        </div>
+    </main>
+
+    <!-- Espacio reservado para el footer -->
+    <div class="footer-space"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <!-- Scripts de componentes externos -->
+    <script src="/header-component.js"></script>
+    <script src="/sidebar-component.js"></script>
+    <script src="../footer.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // DOM elements
+        const invernaderoSelect = document.getElementById('invernadero');
+        const plagaSelect = document.getElementById('plaga');
+        const cantidadInput = document.getElementById('cantidad');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+        const loadingIcon = document.getElementById('loadingIcon');
+        const decreaseBtn = document.getElementById('decreaseBtn');
+        const increaseBtn = document.getElementById('increaseBtn');
+
+        // Arrays para almacenar selecciones
+        let selectedUbicaciones = [];
+        let selectedCamas = [];
+        let selectedModulos = [];
+
+        // Generate location grid (1-18 Norte y 1-18 Sur)
+        function generateLocationGrid() {
+            const grid = document.getElementById('ubicacionesGrid');
+            let html = '';
+            
+            // Ubicaciones del lado norte (1-18)
+            for (let i = 1; i <= 18; i++) {
+                html += `<div class="selection-item" data-value="norte-${i}">${i} Norte</div>`;
+            }
+            
+            // Ubicaciones del lado sur (1-18)
+            for (let i = 1; i <= 18; i++) {
+                html += `<div class="selection-item" data-value="sur-${i}">${i} Sur</div>`;
+            }
+            
+            grid.innerHTML = html;
+            
+            // Agregar event listeners a los items
+            grid.querySelectorAll('.selection-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.getAttribute('data-value');
+                    toggleSelection(item, value, selectedUbicaciones, 'selectedUbicacionesList');
+                });
+            });
+        }
+        
+        // Generate bed grid (1-8)
+        function generateBedGrid() {
+            const grid = document.getElementById('camasGrid');
+            let html = '';
+            
+            for (let i = 1; i <= 8; i++) {
+                html += `<div class="selection-item" data-value="${i}">Cama ${i}</div>`;
+            }
+            
+            grid.innerHTML = html;
+            
+            // Agregar event listeners a los items
+            grid.querySelectorAll('.selection-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.getAttribute('data-value');
+                    toggleSelection(item, value, selectedCamas, 'selectedCamasList');
+                });
+            });
+        }
+        
+        // Generate module grid (1-10)
+        function generateModuleGrid() {
+            const grid = document.getElementById('modulosGrid');
+            let html = '';
+            
+            for (let i = 1; i <= 10; i++) {
+                html += `<div class="selection-item" data-value="${i}">Mód ${i}</div>`;
+            }
+            
+            grid.innerHTML = html;
+            
+            // Agregar event listeners a los items
+            grid.querySelectorAll('.selection-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.getAttribute('data-value');
+                    toggleSelection(item, value, selectedModulos, 'selectedModulosList');
+                });
+            });
+        }
+
+        // Función para alternar selección
+        function toggleSelection(element, value, selectionArray, listId) {
+            const index = selectionArray.indexOf(value);
+            
+            if (index === -1) {
+                // Agregar a la selección
+                selectionArray.push(value);
+                element.classList.add('selected');
+            } else {
+                // Remover de la selección
+                selectionArray.splice(index, 1);
+                element.classList.remove('selected');
+            }
+            
+            updateSelectedList(selectionArray, listId);
+        }
+
+        // Actualizar lista de elementos seleccionados
+        function updateSelectedList(selectionArray, listId) {
+            const listElement = document.getElementById(listId);
+            if (selectionArray.length === 0) {
+                listElement.innerHTML = '<em>Ninguno seleccionado</em>';
+            } else {
+                listElement.innerHTML = selectionArray.join(', ');
+            }
+        }
+
+        // Funciones para seleccionar/limpiar todo
+        function setupSelectionControls() {
+            // Ubicaciones
+            document.getElementById('selectAllUbicaciones').addEventListener('click', () => {
+                selectedUbicaciones = [];
+                document.querySelectorAll('#ubicacionesGrid .selection-item').forEach(item => {
+                    const value = item.getAttribute('data-value');
+                    selectedUbicaciones.push(value);
+                    item.classList.add('selected');
+                });
+                updateSelectedList(selectedUbicaciones, 'selectedUbicacionesList');
+            });
+
+            document.getElementById('clearUbicaciones').addEventListener('click', () => {
+                selectedUbicaciones = [];
+                document.querySelectorAll('#ubicacionesGrid .selection-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                updateSelectedList(selectedUbicaciones, 'selectedUbicacionesList');
+            });
+
+            // Camas
+            document.getElementById('selectAllCamas').addEventListener('click', () => {
+                selectedCamas = [];
+                document.querySelectorAll('#camasGrid .selection-item').forEach(item => {
+                    const value = item.getAttribute('data-value');
+                    selectedCamas.push(value);
+                    item.classList.add('selected');
+                });
+                updateSelectedList(selectedCamas, 'selectedCamasList');
+            });
+
+            document.getElementById('clearCamas').addEventListener('click', () => {
+                selectedCamas = [];
+                document.querySelectorAll('#camasGrid .selection-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                updateSelectedList(selectedCamas, 'selectedCamasList');
+            });
+
+            // Módulos
+            document.getElementById('selectAllModulos').addEventListener('click', () => {
+                selectedModulos = [];
+                document.querySelectorAll('#modulosGrid .selection-item').forEach(item => {
+                    const value = item.getAttribute('data-value');
+                    selectedModulos.push(value);
+                    item.classList.add('selected');
+                });
+                updateSelectedList(selectedModulos, 'selectedModulosList');
+            });
+
+            document.getElementById('clearModulos').addEventListener('click', () => {
+                selectedModulos = [];
+                document.querySelectorAll('#modulosGrid .selection-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                updateSelectedList(selectedModulos, 'selectedModulosList');
+            });
+        }
+        
+        // Initialize grids
+        generateLocationGrid();
+        generateBedGrid();
+        generateModuleGrid();
+        setupSelectionControls();
+        
+        // Counter buttons functionality
+        decreaseBtn.addEventListener('click', () => {
+            let currentValue = parseInt(cantidadInput.value);
+            if (currentValue > 0) {
+                cantidadInput.value = currentValue - 1;
+            }
+        });
+        
+        increaseBtn.addEventListener('click', () => {
+            let currentValue = parseInt(cantidadInput.value);
+            cantidadInput.value = currentValue + 1;
+        });
+        
+        // Form submission
+        document.getElementById('plagueForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validar selecciones
+            if (selectedUbicaciones.length === 0 || selectedCamas.length === 0 || selectedModulos.length === 0) {
+                messageDiv.textContent = 'Por favor, seleccione al menos una ubicación, una cama y un módulo.';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            loadingIcon.style.display = 'inline-block';
+            messageDiv.style.display = 'none';
+            
+            // Get form values
+            const baseData = {
+                invernadero: invernaderoSelect.value,
+                plaga: plagaSelect.value,
+                cantidad: parseInt(cantidadInput.value),
+                fecha: new Date().toISOString(),
+                usuario: 'Técnico',
+                timestamp: Date.now()
+            };
+            
+            // Validar que todos los campos estén llenos
+            if (!baseData.invernadero || !baseData.plaga) {
+                messageDiv.textContent = 'Por favor, complete todos los campos obligatorios.';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                loadingIcon.style.display = 'none';
+                return;
+            }
+
+            console.log('Datos base:', baseData);
+            console.log('Ubicaciones seleccionadas:', selectedUbicaciones);
+            console.log('Camas seleccionadas:', selectedCamas);
+            console.log('Módulos seleccionados:', selectedModulos);
+            
+            try {
+                let totalRegistros = 0;
+                let registrosExitosos = 0;
+                
+                // Calcular total de registros a crear
+                totalRegistros = selectedUbicaciones.length * selectedCamas.length * selectedModulos.length;
+                
+                console.log(`Creando ${totalRegistros} registros...`);
+                
+                // Crear registros para todas las combinaciones
+                for (const ubicacion of selectedUbicaciones) {
+                    for (const cama of selectedCamas) {
+                        for (const modulo of selectedModulos) {
+                            const formData = {
+                                ...baseData,
+                                ubicacion: ubicacion,
+                                cama: cama,
+                                modulo: modulo
+                            };
+                            
+                            // Guardar en Firebase
+                            const newPlaguePointRef = database.ref('plague-points').push();
+                            await newPlaguePointRef.set(formData);
+                            registrosExitosos++;
+                            
+                            console.log(`✅ Registro ${registrosExitosos}/${totalRegistros}:`, {
+                                ubicacion: formData.ubicacion,
+                                cama: formData.cama,
+                                modulo: formData.modulo
+                            });
+                        }
+                    }
+                }
+                
+                // Show success message
+                messageDiv.textContent = `Se crearon ${registrosExitosos} registros exitosamente en Firebase.`;
+                messageDiv.className = 'message success';
+                messageDiv.style.display = 'block';
+                
+                // Reset form (pero mantener selecciones)
+                cantidadInput.value = 0;
+                
+                console.log('✅ Proceso completado:');
+                console.log(`📊 Total de registros creados: ${registrosExitosos}`);
+                console.log('📍 Ubicaciones:', selectedUbicaciones.length);
+                console.log('🛏️ Camas:', selectedCamas.length);
+                console.log('🔢 Módulos:', selectedModulos.length);
+                
+            } catch (error) {
+                console.error('❌ Error al guardar en Firebase:', error);
+                
+                // Show error message
+                messageDiv.textContent = 'Error al registrar los puntos de plaga: ' + error.message;
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+            } finally {
+                // Reset loading state
+                submitBtn.disabled = false;
+                loadingIcon.style.display = 'none';
+            }
+        });
+
+        // Función para verificar conexión con Firebase
+        function testFirebaseConnection() {
+            const testRef = database.ref('connection-test');
+            testRef.set({
+                test: true,
+                timestamp: Date.now()
+            }).then(() => {
+                console.log('✅ Conexión con Firebase establecida correctamente');
+            }).catch((error) => {
+                console.error('❌ Error de conexión con Firebase:', error);
+            });
+        }
+
+        // Probar conexión al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            testFirebaseConnection();
+            console.log('🔍 Para verificar los datos:');
+            console.log('1. Abre la consola del navegador (F12)');
+            console.log('2. Ve a Firebase Console: https://console.firebase.google.com/');
+            console.log('3. Revisa la base de datos en tiempo real');
+            console.log('4. Busca la colección "plague-points"');
+        });
+    </script>
+</body>
+</html>
