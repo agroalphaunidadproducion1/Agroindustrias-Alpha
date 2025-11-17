@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manejo de Resistencias en Agroquímicos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --admin-color: #2196F3;
+            --grower-junior-color: #FF9800;
+            --digitador-color: #9C27B0;
+            --tecnico-color: #607D8B;
+            --supervisor-color: #FF5722;
+            --invitado-color: #9E9E9E;
+            --gerente-general-color: #E91E63;
+            --gerente-produccion-color: #3F51B5;
+            --jefe-vivero-color: #009688;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --dark-gray: #000000;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --sidebar-active: #3498db;
+            
+            /* Colores para niveles de severidad */
+            --bajo-color: #4CAF50;
+            --medio-color: #FF9800;
+            --alto-color: #f44336;
+            
+            /* Colores para estados */
+            --activo-color: #4CAF50;
+            --liberado-color: #9E9E9E;
+            
+            /* Colores específicos para reportes */
+            --light-bg: #f1f8e9;
+            --table-header: #c8e6c9;
+            --light-border: #a5d6a7;
+            --row-hover: #f1f8e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+        }
+        
+        .card-header {
+            border-radius: 8px 8px 0 0 !important;
+            font-weight: 600;
+            color: white;
+            padding: 15px 20px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--invitado-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .controls-container {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .filtros-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filtro-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filtro-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+
+        tr:hover {
+            background-color: var(--row-hover);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-style: italic;
+            color: var(--primary-color);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .modal-small {
+            max-width: 400px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--light-border);
+            padding-bottom: 5px;
+        }
+
+        .modal-list {
+            list-style-type: none;
+        }
+
+        .modal-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .modal-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        .descarga-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .descarga-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .descarga-btn:hover {
+            background-color: #e8f5e9;
+        }
+
+        .descarga-icono {
+            font-size: 20px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .btn-leyenda {
+            background-color: var(--admin-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-leyenda:hover {
+            background-color: #1976d2;
+        }
+
+        .btn-descarga {
+            background-color: var(--digitador-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-descarga:hover {
+            background-color: #7b1fa2;
+        }
+
+        .btn-epa {
+            background-color: var(--gerente-produccion-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-epa:hover {
+            background-color: #303f9f;
+            color: white;
+        }
+
+        .banda-color {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+
+        /* Estilos para enlaces EPA */
+        .epa-link {
+            color: var(--admin-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .epa-link:hover {
+            color: #1976d2;
+            text-decoration: underline;
+        }
+
+        .epa-link::after {
+            content: "↗";
+            font-size: 0.9em;
+        }
+
+        .no-link {
+            color: #666;
+        }
+
+        /* Estilos específicos para la página de inicio */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .feature-card h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: var(--dark-gray);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-list {
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-list li {
+            color: #555;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .feature-btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .feature-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+        }
+
+        .intro-text {
+            text-align: center;
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .filtros-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filtro-group {
+                min-width: 100%;
+            }
+            
+            .header-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            button {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+            
+            th, td {
+                padding: 8px 5px;
+                font-size: 12px;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Inicio</a> > Manejo de Resistencias
+            </div>
+            
+            <h1><i class="fas fa-shield-alt me-2"></i>Manejo de Resistencias en Agroquímicos</h1>
+
+            <p class="intro-text">
+                Herramientas especializadas para la prevención y manejo de resistencias en plagas y enfermedades. 
+                Navegue por nuestros sistemas de clasificación para implementar estrategias efectivas de rotación 
+                y manejo anti-resistencia.
+            </p>
+
+            <div class="cards-container">
+                <!-- Tarjeta Insecticidas -->
+                <div class="feature-card" onclick="location.href='irac-insecticidas.html'">
+                    <div class="feature-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h2>Buscador de Insecticidas</h2>
+                    <p>Clasificación IRAC - Manejo de resistencia en insectos</p>
+                    
+                    <ul class="feature-list">
+                        <li>Base de datos completa de ingredientes activos</li>
+                        <li>Clasificación por grupos de modo de acción</li>
+                        <li>Recomendaciones para rotación efectiva</li>
+                        <li>Información sobre funciones fisiológicas</li>
+                        <li>Búsqueda inteligente con sugerencias</li>
+                    </ul>
+                    
+                    <a href="irac-insecticidas.html" class="feature-btn">Abrir Buscador IRAC</a>
+                </div>
+                
+                <!-- Tarjeta Fungicidas -->
+                <div class="feature-card" onclick="location.href='frac-fungicidas.html'">
+                    <div class="feature-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h2>Buscador de Fungicidas</h2>
+                    <p>Clasificación FRAC - Manejo de resistencia en hongos</p>
+                    
+                    <ul class="feature-list">
+                        <li>Base de datos según clasificación FRAC</li>
+                        <li>Información sobre sitios de acción</li>
+                        <li>Evaluación de riesgo de resistencia</li>
+                        <li>Estrategias de manejo anti-resistencia</li>
+                        <li>Búsqueda avanzada por múltiples criterios</li>
+                    </ul>
+                    
+                    <a href="frac-fungicidas.html" class="feature-btn">Abrir Buscador FRAC</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Efectos de hover mejorados
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+            
+            // Click en cualquier parte de la tarjeta
+            card.addEventListener('click', function() {
+                const link = this.querySelector('a');
+                if (link) {
+                    window.location.href = link.href;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Sistema Agroalpha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/components.css">
+    <link rel="stylesheet" href="/css/users-accesos.css">
+    <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+    <!-- Header Component -->
+    <header-component></header-component>
+    
+    <!-- Sidebar Component -->
+    <sidebar-component></sidebar-component>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / Gestión de Usuarios
+            </div>
+            
+            <h1>Gestión de Usuarios</h1>
+            
+            <!-- NUEVOS BOTONES -->
+            <div class="dashboard-section">
+                <h2 class="section-title">Opciones de Gestión</h2>
+                <div class="cards-container">
+                    <!-- Botón de Crear Usuario -->
+                    <div class="card" onclick="navigateTo('crear-usuario.html')">
+                        <div class="card-icon"><i class="fas fa-user-plus"></i></div>
+                        <h3>Crear Usuario</h3>
+                    </div>
+                    
+                    <!-- Botón de Ver Usuarios -->
+                    <div class="card" onclick="navigateTo('ver-users.html')">
+                        <div class="card-icon"><i class="fas fa-users"></i></div>
+                        <h3>Ver Usuarios</h3>
+                    </div>
+                    
+                    <!-- Botón de Roles y Permisos -->
+                    <div class="card" onclick="navigateTo('roles-permisos.html')">
+                        <div class="card-icon"><i class="fas fa-user-shield"></i></div>
+                        <h3>Roles y Permisos</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+
+    <!-- Componentes -->
+    <script src="/header-component.js"></script>
+    <script src="/sidebar-component.js"></script>
+    <script src="/js/users-accesos.js"></script>
+    <script src="../footer.js"></script>
+</body>
+</html>

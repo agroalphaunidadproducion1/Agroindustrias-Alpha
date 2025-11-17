@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Puntos de Plaga</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --admin-color: #2196F3;
+            --grower-junior-color: #FF9800;
+            --digitador-color: #9C27B0;
+            --tecnico-color: #607D8B;
+            --supervisor-color: #FF5722;
+            --invitado-color: #9E9E9E;
+            --gerente-general-color: #E91E63;
+            --gerente-produccion-color: #3F51B5;
+            --jefe-vivero-color: #009688;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --dark-gray: #000000;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --sidebar-active: #3498db;
+            
+            /* Colores para niveles de severidad */
+            --bajo-color: #4CAF50;
+            --medio-color: #FF9800;
+            --alto-color: #f44336;
+            
+            /* Colores para estados */
+            --activo-color: #4CAF50;
+            --liberado-color: #9E9E9E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-space {
+            height: 70px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .severity-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .severity-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 100px;
+        }
+
+        .severity-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .severity-btn.bajo {
+            background-color: var(--bajo-color);
+            color: white;
+        }
+
+        .severity-btn.medio {
+            background-color: var(--medio-color);
+            color: white;
+        }
+
+        .severity-btn.alto {
+            background-color: var(--alto-color);
+            color: white;
+        }
+
+        .severity-btn.todas {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .state-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .state-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .state-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .state-btn.activo {
+            border-color: var(--activo-color);
+            color: var(--activo-color);
+        }
+
+        .state-btn.activo.active {
+            background-color: var(--activo-color);
+            color: white;
+        }
+
+        .state-btn.liberado {
+            border-color: var(--liberado-color);
+            color: var(--liberado-color);
+        }
+
+        .state-btn.liberado.active {
+            background-color: var(--liberado-color);
+            color: white;
+        }
+
+        .state-btn.todos {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .state-btn.todos.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .points-table-container {
+            overflow-x: auto;
+            margin-bottom: 25px;
+        }
+
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .points-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .points-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .points-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .points-table tr.liberado {
+            background-color: #f5f5f5;
+            color: #999;
+        }
+
+        .points-table tr.liberado:hover {
+            background-color: #eeeeee;
+        }
+
+        .state-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .state-badge.activo {
+            background-color: var(--activo-color);
+        }
+
+        .state-badge.liberado {
+            background-color: var(--liberado-color);
+        }
+
+        .severity-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .severity-badge.bajo {
+            background-color: var(--bajo-color);
+        }
+
+        .severity-badge.medio {
+            background-color: var(--medio-color);
+        }
+
+        .severity-badge.alto {
+            background-color: var(--alto-color);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .action-btn.liberar {
+            background-color: var(--medio-color);
+            color: white;
+        }
+
+        .action-btn.liberar:hover {
+            background-color: #e68900;
+        }
+
+        .action-btn.liberar:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .action-btn.reactivar {
+            background-color: var(--bajo-color);
+            color: white;
+        }
+
+        .action-btn.reactivar:hover {
+            background-color: #388E3C;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(76, 175, 80, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer-space {
+            height: 70px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .severity-filters,
+            .state-filters {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .severity-btn,
+            .state-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .points-table {
+                font-size: 12px;
+            }
+            
+            .points-table th,
+            .points-table td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Espacio reservado para el header -->
+    <div class="header-space"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="#">Inicio</a> > <a href="#">Monitoreo</a> > Gestión de Puntos de Plaga
+            </div>
+            
+            <h1>Gestión de Puntos de Plaga</h1>
+            
+            <!-- Controles de filtro -->
+            <div class="controls">
+                <div class="filter-group">
+                    <label for="invernaderoFilter">Invernadero:</label>
+                    <select id="invernaderoFilter">
+                        <option value="todos">Todos los invernaderos</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="plagaFilter">Plaga:</label>
+                    <select id="plagaFilter">
+                        <option value="todas">Todas las plagas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filtros por severidad -->
+            <div class="severity-filters">
+                <button class="severity-btn todas active" data-severidad="todas">Todas</button>
+                <button class="severity-btn bajo" data-severidad="bajo">Bajo (0-10)</button>
+                <button class="severity-btn medio" data-severidad="medio">Medio (11-20)</button>
+                <button class="severity-btn alto" data-severidad="alto">Alto (21+)</button>
+            </div>
+
+            <!-- Filtros por estado -->
+            <div class="state-filters">
+                <button class="state-btn todos active" data-estado="todos">Todos</button>
+                <button class="state-btn activo" data-estado="activo">Activos</button>
+                <button class="state-btn liberado" data-estado="liberado">Liberados</button>
+            </div>
+
+            <!-- Tabla de puntos -->
+            <div class="points-table-container">
+                <table class="points-table">
+                    <thead>
+                        <tr>
+                            <th>Invernadero</th>
+                            <th>Ubicación</th>
+                            <th>Cama</th>
+                            <th>Módulo</th>
+                            <th>Plaga</th>
+                            <th>Cantidad</th>
+                            <th>Severidad</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pointsTableBody">
+                        <tr>
+                            <td colspan="10" class="loading">
+                                <div class="spinner"></div>
+                                <p>Cargando datos de plagas desde Firebase...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Espacio reservado para el footer -->
+    <div class="footer-space"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // DOM elements
+        const pointsTableBody = document.getElementById('pointsTableBody');
+        const severityBtns = document.querySelectorAll('.severity-btn');
+        const stateBtns = document.querySelectorAll('.state-btn');
+        const invernaderoFilter = document.getElementById('invernaderoFilter');
+        const plagaFilter = document.getElementById('plagaFilter');
+
+        // Determinar nivel de severidad
+        function getSeverityLevel(cantidad) {
+            if (cantidad <= 10) return 'bajo';
+            if (cantidad <= 20) return 'medio';
+            return 'alto';
+        }
+
+        // Get plaga name
+        function getPlagaName(plaga) {
+            const names = {
+                'acaro-blanco': 'Ácaro Blanco',
+                'mosca-blanca': 'Mosca Blanca',
+                'acaro-rojo': 'Ácaro Rojo'
+            };
+            return names[plaga] || plaga;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        // Get estado por defecto si no existe
+        function getEstado(point) {
+            return point.estado || 'activo';
+        }
+
+        // Filter data
+        function filterData(data) {
+            const selectedSeverity = document.querySelector('.severity-btn.active').dataset.severidad;
+            const selectedState = document.querySelector('.state-btn.active').dataset.estado;
+            const selectedInvernadero = invernaderoFilter.value;
+            const selectedPlaga = plagaFilter.value;
+
+            const filteredData = [];
+
+            Object.keys(data).forEach(key => {
+                const point = data[key];
+                const severity = getSeverityLevel(point.cantidad);
+                const estado = getEstado(point);
+
+                // Aplicar filtros
+                if (selectedSeverity !== 'todas' && severity !== selectedSeverity) return;
+                if (selectedState !== 'todos' && estado !== selectedState) return;
+                if (selectedInvernadero !== 'todos' && point.invernadero !== selectedInvernadero) return;
+                if (selectedPlaga !== 'todas' && point.plaga !== selectedPlaga) return;
+
+                filteredData.push({
+                    key: key,
+                    ...point,
+                    severity: severity,
+                    estado: estado
+                });
+            });
+
+            return filteredData;
+        }
+
+        // Render points table
+        function renderPointsTable(data) {
+            const filteredData = filterData(data);
+
+            if (filteredData.length === 0) {
+                pointsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="no-data">
+                            <h3>No se encontraron puntos de plaga</h3>
+                            <p>No hay registros que coincidan con los filtros seleccionados</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            filteredData.forEach(item => {
+                const point = item;
+                const estado = getEstado(point);
+                const severity = getSeverityLevel(point.cantidad);
+                
+                html += `
+                    <tr class="${estado}">
+                        <td>Invernadero ${point.invernadero}</td>
+                        <td>${point.ubicacion}</td>
+                        <td>Cama ${point.cama}</td>
+                        <td>Módulo ${point.modulo}</td>
+                        <td>${getPlagaName(point.plaga)}</td>
+                        <td>${point.cantidad}</td>
+                        <td><span class="severity-badge ${severity}">${severity}</span></td>
+                        <td><span class="state-badge ${estado}">${estado}</span></td>
+                        <td>${formatDate(point.fecha)}</td>
+                        <td>
+                            ${estado === 'activo' ? 
+                                `<button class="action-btn liberar" onclick="liberarPunto('${item.key}')">
+                                    Liberar
+                                </button>` :
+                                `<button class="action-btn reactivar" onclick="reactivarPunto('${item.key}')">
+                                    Reactivar
+                                </button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            });
+
+            pointsTableBody.innerHTML = html;
+        }
+
+        // Liberar punto
+        async function liberarPunto(pointKey) {
+            if (!confirm('¿Está seguro de que desea liberar este punto de plaga?')) {
+                return;
+            }
+
+            try {
+                await database.ref(`plague-points/${pointKey}`).update({
+                    estado: 'liberado',
+                    fechaLiberacion: new Date().toISOString(),
+                    usuarioLiberacion: 'Técnico'
+                });
+                
+                console.log('Punto liberado exitosamente:', pointKey);
+                loadDataFromFirebase(); // Recargar datos
+                
+            } catch (error) {
+                console.error('Error al liberar punto:', error);
+                alert('Error al liberar el punto: ' + error.message);
+            }
+        }
+
+        // Reactivar punto
+        async function reactivarPunto(pointKey) {
+            if (!confirm('¿Está seguro de que desea reactivar este punto de plaga?')) {
+                return;
+            }
+
+            try {
+                await database.ref(`plague-points/${pointKey}`).update({
+                    estado: 'activo',
+                    fechaLiberacion: null,
+                    usuarioLiberacion: null
+                });
+                
+                console.log('Punto reactivado exitosamente:', pointKey);
+                loadDataFromFirebase(); // Recargar datos
+                
+            } catch (error) {
+                console.error('Error al reactivar punto:', error);
+                alert('Error al reactivar el punto: ' + error.message);
+            }
+        }
+
+        // Update filter options
+        function updateFilterOptions(data) {
+            // Invernaderos
+            const invernaderos = new Set();
+            // Plagas
+            const plagas = new Set();
+
+            Object.values(data).forEach(point => {
+                invernaderos.add(point.invernadero);
+                plagas.add(point.plaga);
+            });
+
+            // Actualizar filtro de invernaderos
+            let invernaderoOptions = '<option value="todos">Todos los invernaderos</option>';
+            Array.from(invernaderos).sort().forEach(inv => {
+                invernaderoOptions += `<option value="${inv}">Invernadero ${inv}</option>`;
+            });
+            invernaderoFilter.innerHTML = invernaderoOptions;
+
+            // Actualizar filtro de plagas
+            let plagaOptions = '<option value="todas">Todas las plagas</option>';
+            Array.from(plagas).sort().forEach(plaga => {
+                plagaOptions += `<option value="${plaga}">${getPlagaName(plaga)}</option>`;
+            });
+            plagaFilter.innerHTML = plagaOptions;
+        }
+
+        // Load data from Firebase
+        function loadDataFromFirebase() {
+            pointsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="loading">
+                        <div class="spinner"></div>
+                        <p>Cargando datos de plagas desde Firebase...</p>
+                    </td>
+                </tr>
+            `;
+
+            const plaguePointsRef = database.ref('plague-points');
+            
+            plaguePointsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data) {
+                    console.log('Datos cargados desde Firebase:', data);
+                    window.plagueData = data;
+                    updateFilterOptions(data);
+                    renderPointsTable(data);
+                } else {
+                    pointsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="10" class="no-data">
+                                <h3>No se encontraron datos</h3>
+                                <p>No hay registros de puntos de plaga en la base de datos.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }, (error) => {
+                console.error('Error loading data:', error);
+                pointsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="no-data">
+                            <h3>Error al cargar datos</h3>
+                            <p>No se pudieron cargar los datos desde Firebase</p>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Initialize
+        function init() {
+            // Event listeners for severity filters
+            severityBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    severityBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    if (window.plagueData) renderPointsTable(window.plagueData);
+                });
+            });
+
+            // Event listeners for state filters
+            stateBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    stateBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    if (window.plagueData) renderPointsTable(window.plagueData);
+                });
+            });
+
+            // Event listeners for dropdown filters
+            invernaderoFilter.addEventListener('change', () => {
+                if (window.plagueData) renderPointsTable(window.plagueData);
+            });
+
+            plagaFilter.addEventListener('change', () => {
+                if (window.plagueData) renderPointsTable(window.plagueData);
+            });
+
+            // Load data from Firebase
+            loadDataFromFirebase();
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>

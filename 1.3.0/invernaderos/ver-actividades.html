@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Actividades - Agro Alpha</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --admin-color: #2196F3;
+            --grower-junior-color: #FF9800;
+            --digitador-color: #9C27B0;
+            --tecnico-color: #607D8B;
+            --supervisor-color: #FF5722;
+            --invitado-color: #9E9E9E;
+            --gerente-general-color: #E91E63;
+            --gerente-produccion-color: #3F51B5;
+            --jefe-vivero-color: #009688;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --dark-gray: #000000;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --sidebar-active: #3498db;
+            
+            /* Colores para niveles de severidad */
+            --bajo-color: #4CAF50;
+            --medio-color: #FF9800;
+            --alto-color: #f44336;
+            
+            /* Colores para estados */
+            --activo-color: #4CAF50;
+            --liberado-color: #9E9E9E;
+            
+            /* Colores específicos para reportes */
+            --light-bg: #f1f8e9;
+            --table-header: #c8e6c9;
+            --light-border: #a5d6a7;
+            --row-hover: #f1f8e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+        }
+        
+        .card-header {
+            border-radius: 8px 8px 0 0 !important;
+            font-weight: 600;
+            color: white;
+            padding: 15px 20px;
+            background-color: var(--primary-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--invitado-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+
+        tr:hover {
+            background-color: var(--row-hover);
+        }
+
+        .info-hover {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .info-hover .tooltip-info {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .info-hover:hover .tooltip-info {
+            display: block;
+        }
+        
+        .cultivo-icon {
+            color: var(--primary-color);
+        }
+        
+        .rendimiento-cell {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .section-title {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .completed {
+            background-color: rgba(76, 175, 80, 0.2) !important;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .completed::after {
+            content: "✓";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+            color: var(--primary-color);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .btn-leyenda {
+            background-color: var(--admin-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-leyenda:hover {
+            background-color: #1976d2;
+        }
+
+        .btn-descarga {
+            background-color: var(--digitador-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-descarga:hover {
+            background-color: #7b1fa2;
+        }
+
+        .btn-epa {
+            background-color: var(--gerente-produccion-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-epa:hover {
+            background-color: #303f9f;
+            color: white;
+        }
+
+        .btn-info {
+            background-color: var(--admin-color);
+            border: none;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #1976d2;
+        }
+
+        /* Estilos para el menú hamburguesa */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 5px 10px;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        .offcanvas {
+            background-color: var(--light-bg);
+        }
+        
+        .offcanvas-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .offcanvas-title {
+            font-weight: 600;
+        }
+        
+        .btn-close {
+            background-color: white;
+        }
+        
+        /* Estilos para el interruptor */
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+        }
+        
+        /* Estilos para cuando el interruptor está activo */
+        .hide-completed .completed {
+            background-color: transparent !important;
+            color: #ccc !important;
+        }
+        
+        .hide-completed .completed::after {
+            display: none;
+        }
+        
+        .hide-completed .completed .info-hover {
+            color: #ccc;
+        }
+
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-small {
+            max-width: 400px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--dark-gray);
+            text-decoration: none;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .modal-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .modal-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .modal-list li:before {
+            content: "•";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+        }
+
+        .descarga-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .descarga-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .descarga-btn:hover {
+            background-color: var(--light-gray);
+            border-color: var(--primary-color);
+        }
+
+        .descarga-icono {
+            font-size: 24px;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            button {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+            
+            th, td {
+                padding: 8px 5px;
+                font-size: 12px;
+            }
+            
+            .info-hover .tooltip-info {
+                white-space: normal;
+                width: 150px;
+            }
+            
+            .completed::after {
+                font-size: 8px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-buttons {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menú de navegación -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-seedling me-2"></i>Agro Alpha
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+                        <i class="fas fa-cogs me-2"></i>Configuración
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="hideCompletedSwitch" checked>
+                                <label class="form-check-label" for="hideCompletedSwitch">
+                                    Ocultar actividades completadas
+                                </label>
+                            </div>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <div class="alert alert-info p-2">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Cuando está activo, las actividades completadas se muestran en 0 y sin color.
+                                </small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Inicio</a> > <a href="actividades.html">Actividades</a> > Reporte
+            </div>
+            
+            <h1><i class="fas fa-chart-bar me-2"></i>Reporte de Actividades</h1>
+
+            <div class="header-buttons">
+                <a href="registro-actividades.html" class="btn btn-primary">
+                    <i class="fas fa-clipboard-list me-2"></i>Registro de Actividades
+                </a>
+                <button class="btn btn-leyenda" id="btnLeyenda">
+                    <i class="fas fa-info-circle me-2"></i>Leyenda
+                </button>
+                <button class="btn btn-descarga" id="btnDescarga">
+                    <i class="fas fa-download me-2"></i>Descargar
+                </button>
+            </div>
+
+            <!-- Sección de Tomate -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="mb-4 section-title"><i class="fas fa-apple-alt me-2 cultivo-icon"></i>Tomate actividades</h2>
+                    
+                    <!-- Tabla de invernaderos de tomate -->
+                    <div class="card mb-4">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Bajado</th>
+                                            <th>Deshoje</th>
+                                            <th>Desbrote</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaResumenTomate">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rendimientos de Tomate -->
+                <div class="col-12 mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Rendimientos de Tomate</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Bajado</th>
+                                            <th>Deshoje</th>
+                                            <th>Desbrote</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaRendimientosTomate">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Chile/Mini -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="mb-4 section-title"><i class="fas fa-pepper-hot me-2 cultivo-icon"></i>Chile actividades</h2>
+                    
+                    <!-- Tabla de invernaderos de chile -->
+                    <div class="card mb-4">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Poda</th>
+                                            <th>Amarrado</th>
+                                            <th>Raleo</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaResumenChile">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rendimientos de Chile -->
+                <div class="col-12 mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Rendimientos de Chile</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Poda</th>
+                                            <th>Amarrado</th>
+                                            <th>Raleo</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaRendimientosChile">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Leyenda -->
+    <div id="modalLeyenda" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close">&times;</span>
+            <h3 class="mb-3">Leyenda del Reporte</h3>
+            <div class="modal-section">
+                <h4>Colores y símbolos</h4>
+                <ul class="modal-list">
+                    <li><span class="completed" style="padding: 2px 5px;">Celda</span> - Actividad completada</li>
+                    <li><strong>✓</strong> - Marca de completado</li>
+                    <li><strong>Números en verde</strong> - Rendimientos registrados</li>
+                </ul>
+            </div>
+            <div class="modal-section">
+                <h4>Información de tablas</h4>
+                <ul class="modal-list">
+                    <li><strong>Tabla de actividades</strong> - Muestra el progreso actual de cada actividad</li>
+                    <li><strong>Tabla de rendimientos</strong> - Muestra los últimos rendimientos registrados</li>
+                    <li><strong>Pase el cursor</strong> sobre los números para ver información adicional</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Descarga -->
+    <div id="modalDescarga" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close">&times;</span>
+            <h3 class="mb-3">Descargar Reporte</h3>
+            <div class="descarga-opciones">
+                <div class="descarga-btn" data-formato="pdf">
+                    <div class="descarga-icono">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1">PDF</h5>
+                        <p class="mb-0">Formato optimizado para impresión</p>
+                    </div>
+                </div>
+                <div class="descarga-btn" data-formato="excel">
+                    <div class="descarga-icono">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1">Excel</h5>
+                        <p class="mb-0">Formato para análisis de datos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Configuración de Firebase con tu URL
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Definir invernaderos por cultivo (agregado vivero al tomate)
+        const invernaderosPorCultivo = {
+            chile: ['9', '10', '11', '12', '33', '35', '37', '39'],
+            tomate: ['13', '14', '15', '16', 'vivero'] // Vivero agregado después del 16
+        };
+
+        // Definir actividades por cultivo (con cosecha al final)
+        const actividadesPorCultivo = {
+            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'],
+            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha']
+        };
+
+        // Definir metas de camas por invernadero (agregada meta para vivero: 64 camas)
+        const metasCamas = {
+            '9': 274,
+            '10': 270,
+            '11': 274,
+            '12': 274,
+            '13': 274,
+            '14': 274,
+            '15': 274,
+            '16': 274,
+            '33': 276,
+            '35': 276,
+            '37': 284,
+            '39': 284,
+            'vivero': 64  // Nueva meta para el vivero
+        };
+
+        // Variables globales
+        let actividadesData = [];
+        let hideCompleted = true; // Por defecto, ocultar actividades completadas
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar el interruptor
+            const hideCompletedSwitch = document.getElementById('hideCompletedSwitch');
+            hideCompletedSwitch.checked = hideCompleted;
+            
+            // Aplicar estado inicial
+            toggleCompletedVisibility();
+            
+            // Escuchar cambios en el interruptor
+            hideCompletedSwitch.addEventListener('change', function() {
+                hideCompleted = this.checked;
+                toggleCompletedVisibility();
+            });
+            
+            // Configurar modales
+            configurarModales();
+            
+            // Cargar datos de Firebase
+            cargarDatosActividades();
+        });
+
+        // Función para alternar la visibilidad de actividades completadas
+        function toggleCompletedVisibility() {
+            if (hideCompleted) {
+                document.body.classList.add('hide-completed');
+            } else {
+                document.body.classList.remove('hide-completed');
+            }
+            
+            // Si ya tenemos datos, actualizar las tablas
+            if (actividadesData.length > 0) {
+                procesarDatos();
+            }
+        }
+
+        // Configurar modales
+        function configurarModales() {
+            // Modal de leyenda
+            const modalLeyenda = document.getElementById('modalLeyenda');
+            const btnLeyenda = document.getElementById('btnLeyenda');
+            const spanLeyenda = modalLeyenda.querySelector('.close');
+            
+            btnLeyenda.onclick = function() {
+                modalLeyenda.style.display = "block";
+            }
+            
+            spanLeyenda.onclick = function() {
+                modalLeyenda.style.display = "none";
+            }
+            
+            // Modal de descarga
+            const modalDescarga = document.getElementById('modalDescarga');
+            const btnDescarga = document.getElementById('btnDescarga');
+            const spanDescarga = modalDescarga.querySelector('.close');
+            
+            btnDescarga.onclick = function() {
+                modalDescarga.style.display = "block";
+            }
+            
+            spanDescarga.onclick = function() {
+                modalDescarga.style.display = "none";
+            }
+            
+            // Cerrar modales al hacer clic fuera
+            window.onclick = function(event) {
+                if (event.target == modalLeyenda) {
+                    modalLeyenda.style.display = "none";
+                }
+                if (event.target == modalDescarga) {
+                    modalDescarga.style.display = "none";
+                }
+            }
+            
+            // Configurar botones de descarga
+            document.querySelectorAll('.descarga-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const formato = this.getAttribute('data-formato');
+                    descargarReporte(formato);
+                });
+            });
+        }
+
+        // Descargar reporte
+        function descargarReporte(formato) {
+            alert(`Función de descarga en formato ${formato.toUpperCase()} activada. En una implementación real, esto generaría el archivo correspondiente.`);
+            document.getElementById('modalDescarga').style.display = "none";
+        }
+
+        // Cargar datos de actividades desde Firebase
+        function cargarDatosActividades() {
+            const actividadesRef = database.ref('unidad_produccion_1/actividades');
+            
+            actividadesRef.on('value', (snapshot) => {
+                actividadesData = [];
+                snapshot.forEach(childSnapshot => {
+                    actividadesData.push(childSnapshot.val());
+                });
+                
+                // Procesar y mostrar datos
+                procesarDatos();
+            }, (error) => {
+                console.error("Error al cargar datos de Firebase:", error);
+                mostrarMensajeError("No se pudieron cargar los datos. Verifique la conexión.");
+            });
+        }
+
+        // Procesar datos y actualizar la interfaz
+        function procesarDatos() {
+            // Mostrar tablas resumen
+            mostrarTablaResumen('tomate', 'tablaResumenTomate');
+            mostrarTablaResumen('chile', 'tablaResumenChile');
+            
+            // Mostrar últimos rendimientos
+            mostrarTablaRendimientos('tomate', 'tablaRendimientosTomate');
+            mostrarTablaRendimientos('chile', 'tablaRendimientosChile');
+        }
+
+        // Mostrar tabla resumen por tipo de cultivo
+        function mostrarTablaResumen(tipoCultivo, contenedorId) {
+            const contenedor = document.getElementById(contenedorId);
+            if (!contenedor) {
+                console.error(`Contenedor ${contenedorId} no encontrado`);
+                return;
+            }
+            
+            contenedor.innerHTML = '';
+            
+            const invernaderos = invernaderosPorCultivo[tipoCultivo];
+            const actividades = actividadesPorCultivo[tipoCultivo];
+            
+            invernaderos.forEach(invernadero => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero (abreviado)
+                const celdaInvernadero = document.createElement('td');
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('fw-bold');
+                fila.appendChild(celdaInvernadero);
+                
+                // Celdas para cada actividad
+                actividades.forEach(actividad => {
+                    const celda = document.createElement('td');
+                    
+                    // Filtrar datos para esta actividad e invernadero
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && item.actividad === actividad
+                    );
+                    
+                    if (datosActividad.length > 0) {
+                        // Calcular total de camas para esta actividad
+                        const totalCamas = datosActividad.reduce((sum, item) => sum + (item.camas || 0), 0);
+                        const metaCamas = metasCamas[invernadero] || 0;
+                        
+                        if (actividad === 'Cosecha') {
+                            // Para cosecha, mostrar el total de camas de la última cosecha
+                            const ultimaCosecha = datosActividad[datosActividad.length - 1];
+                            const camasCosecha = ultimaCosecha.camas || 0;
+                            
+                            // Verificar si se completó una vuelta (múltiplo de la meta)
+                            if (camasCosecha >= metaCamas) {
+                                celda.classList.add('completed');
+                            }
+                            
+                            // Si hideCompleted está activo y está completado, mostrar 0
+                            if (hideCompleted && camasCosecha >= metaCamas) {
+                                celda.textContent = '0';
+                            } else {
+                                celda.textContent = camasCosecha;
+                            }
+                        } else {
+                            const vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
+                            const camasVueltaActual = totalCamas % metaCamas;
+                            
+                            // Mostrar el número de camas (si completó vuelta, mostrar la meta en lugar del total)
+                            let camasAMostrar = camasVueltaActual;
+                            let esCompletado = false;
+                            
+                            if (camasVueltaActual === 0 && totalCamas > 0) {
+                                // Cuando se completa una vuelta, mostrar la meta (no el total acumulado)
+                                camasAMostrar = metaCamas;
+                                celda.classList.add('completed');
+                                esCompletado = true;
+                            }
+                            
+                            // Si hideCompleted está activo y está completado, mostrar 0
+                            if (hideCompleted && esCompletado) {
+                                celda.innerHTML = `
+                                    <div class="info-hover">
+                                        0
+                                        <div class="tooltip-info">
+                                            Vuelta ${vueltaActual}<br>
+                                            Progreso: 100%<br>
+                                            Meta: ${metaCamas} camas<br>
+                                            <small>Completado</small>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                celda.innerHTML = `
+                                    <div class="info-hover">
+                                        ${camasAMostrar}
+                                        <div class="tooltip-info">
+                                            Vuelta ${vueltaActual}<br>
+                                            Progreso: ${Math.min(100, (totalCamas / metaCamas) * 100).toFixed(1)}%<br>
+                                            Meta: ${metaCamas} camas
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    } else {
+                        celda.innerHTML = '<span class="text-muted">-</span>';
+                    }
+                    
+                    fila.appendChild(celda);
+                });
+                
+                contenedor.appendChild(fila);
+            });
+        }
+
+        // Mostrar tabla de rendimientos por tipo de cultivo
+        function mostrarTablaRendimientos(tipoCultivo, contenedorId) {
+            const contenedor = document.getElementById(contenedorId);
+            if (!contenedor) {
+                console.error(`Contenedor ${contenedorId} no encontrado`);
+                return;
+            }
+            
+            contenedor.innerHTML = '';
+            
+            const invernaderos = invernaderosPorCultivo[tipoCultivo];
+            const actividades = actividadesPorCultivo[tipoCultivo];
+            
+            invernaderos.forEach(invernadero => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero (abreviado)
+                const celdaInvernadero = document.createElement('td');
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('fw-bold');
+                fila.appendChild(celdaInvernadero);
+                
+                // Celdas para cada actividad
+                actividades.forEach(actividad => {
+                    const celda = document.createElement('td');
+                    
+                    // Filtrar datos para esta actividad e invernadero con rendimiento
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && 
+                        item.actividad === actividad &&
+                        item.rendimiento > 0
+                    );
+                    
+                    if (datosActividad.length > 0) {
+                        // Obtener el último registro con rendimiento
+                        const ultimoRegistro = datosActividad[datosActividad.length - 1];
+                        celda.innerHTML = `<span class="rendimiento-cell">${ultimoRegistro.rendimiento}</span>`;
+                    } else {
+                        celda.innerHTML = '<span class="text-muted">-</span>';
+                    }
+                    
+                    fila.appendChild(celda);
+                });
+                
+                contenedor.appendChild(fila);
+            });
+        }
+
+        // Función para mostrar mensajes de error
+        function mostrarMensajeError(mensaje) {
+            // Crear un elemento de alerta de Bootstrap
+            const alerta = document.createElement('div');
+            alerta.className = 'alert alert-danger alert-dismissible fade show';
+            alerta.innerHTML = `
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Insertar al principio del contenedor
+            const container = document.querySelector('.container');
+            container.insertBefore(alerta, container.firstChild);
+        }
+    </script>
+</body>
+</html>

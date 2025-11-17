@@ -1,0 +1,4189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Modos de Acción - IRAC</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --admin-color: #2196F3;
+            --grower-junior-color: #FF9800;
+            --digitador-color: #9C27B0;
+            --tecnico-color: #607D8B;
+            --supervisor-color: #FF5722;
+            --invitado-color: #9E9E9E;
+            --gerente-general-color: #E91E63;
+            --gerente-produccion-color: #3F51B5;
+            --jefe-vivero-color: #009688;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --dark-gray: #000000;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --sidebar-active: #3498db;
+            
+            /* Colores para niveles de severidad */
+            --bajo-color: #4CAF50;
+            --medio-color: #FF9800;
+            --alto-color: #f44336;
+            
+            /* Colores para estados */
+            --activo-color: #4CAF50;
+            --liberado-color: #9E9E9E;
+            
+            /* Colores específicos para reportes */
+            --light-bg: #f1f8e9;
+            --table-header: #c8e6c9;
+            --light-border: #a5d6a7;
+            --row-hover: #f1f8e9;
+            
+            /* Colores para categorías de modos de acción */
+            --nervous-system: #e3f2fd;
+            --nervous-system-dark: #1565c0;
+            --growth-development: #f3e5f5;
+            --growth-development-dark: #7b1fa2;
+            --respiration: #ffebee;
+            --respiration-dark: #c62828;
+            --digestive-system: #fff3e0;
+            --digestive-system-dark: #ef6c00;
+            --unknown-action: #f5f5f5;
+            --unknown-action-dark: #616161;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .card {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+        }
+        
+        .card-header {
+            border-radius: 8px 8px 0 0 !important;
+            font-weight: 600;
+            color: white;
+            padding: 15px 20px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--invitado-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .controls-container {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .filtros-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filtro-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filtro-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+
+        tr:hover {
+            background-color: var(--row-hover);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-style: italic;
+            color: var(--primary-color);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .modal-small {
+            max-width: 400px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--light-border);
+            padding-bottom: 5px;
+        }
+
+        .modal-list {
+            list-style-type: none;
+        }
+
+        .modal-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .modal-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        .descarga-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .descarga-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .descarga-btn:hover {
+            background-color: #e8f5e9;
+        }
+
+        .descarga-icono {
+            font-size: 20px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .btn-leyenda {
+            background-color: var(--admin-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-leyenda:hover {
+            background-color: #1976d2;
+        }
+
+        .btn-descarga {
+            background-color: var(--digitador-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .btn-descarga:hover {
+            background-color: #7b1fa2;
+        }
+
+        .btn-epa {
+            background-color: var(--gerente-produccion-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-epa:hover {
+            background-color: #303f9f;
+            color: white;
+        }
+
+        .banda-color {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+
+        /* Estilos para enlaces EPA */
+        .epa-link {
+            color: var(--admin-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .epa-link:hover {
+            color: #1976d2;
+            text-decoration: underline;
+        }
+
+        .epa-link::after {
+            content: "↗";
+            font-size: 0.9em;
+        }
+
+        .no-link {
+            color: #666;
+        }
+
+        /* Estilos específicos para el buscador de ingredientes activos */
+        .search-section {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #ingredient-search {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .suggestions {
+            position: relative;
+        }
+
+        #suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .suggestion-item:hover {
+            background-color: var(--light-gray);
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .active-ingredient {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .ingredient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .ingredient-name {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .moa-badge {
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .ingredient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .recommendations {
+            margin-top: 2rem;
+        }
+
+        .recommendations h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--light-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recommendation-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .rec-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .rec-moa {
+            color: var(--secondary-color);
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+        }
+
+        .rec-details {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--dark-gray);
+        }
+
+        /* Estilos para el modal de información IRAC */
+        .action-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .action-section h3 {
+            margin-bottom: 1rem;
+            color: var(--dark-gray);
+        }
+
+        .mode-list {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mode-of-action {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0.2rem;
+        }
+
+        .nervous-system-section {
+            background-color: var(--nervous-system);
+            border-left: 4px solid var(--nervous-system-dark);
+        }
+
+        .nervous-system-mode {
+            background-color: var(--nervous-system-dark);
+            color: white;
+        }
+
+        .growth-development-section {
+            background-color: var(--growth-development);
+            border-left: 4px solid var(--growth-development-dark);
+        }
+
+        .growth-development-mode {
+            background-color: var(--growth-development-dark);
+            color: white;
+        }
+
+        .respiration-section {
+            background-color: var(--respiration);
+            border-left: 4px solid var(--respiration-dark);
+        }
+
+        .respiration-mode {
+            background-color: var(--respiration-dark);
+            color: white;
+        }
+
+        .digestive-system-section {
+            background-color: var(--digestive-system);
+            border-left: 4px solid var(--digestive-system-dark);
+        }
+
+        .digestive-system-mode {
+            background-color: var(--digestive-system-dark);
+            color: white;
+        }
+
+        .unknown-action-section {
+            background-color: var(--unknown-action);
+            border-left: 4px solid var(--unknown-action-dark);
+        }
+
+        .unknown-action-mode {
+            background-color: var(--unknown-action-dark);
+            color: white;
+        }
+
+        .modal-note {
+            background-color: #fffde7;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #fbc02d;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .filtros-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filtro-group {
+                min-width: 100%;
+            }
+            
+            .header-buttons {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            button {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+            
+            th, td {
+                padding: 8px 5px;
+                font-size: 12px;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .ingredient-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .recommendation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Inicio</a> > <a href="insecticidas.html">Insecticidas</a> > Buscador IRAC
+            </div>
+            
+            <h1><i class="fas fa-search me-2"></i>Buscador de Modos de Acción - IRAC</h1>
+
+            <div class="header-buttons">
+                <button class="btn-leyenda" onclick="mostrarLeyenda()">
+                    <i class="fas fa-book me-1"></i> Leyenda de Funciones Fisiológicas
+                </button>
+            </div>
+
+            <section class="search-section">
+                <h2>Buscar Ingrediente Activo</h2>
+                <div class="search-box">
+                    <div class="suggestions" style="flex: 1;">
+                        <input type="text" id="ingredient-search" placeholder="Ej: Imidacloprid, Clorpirifos, Metomilo...">
+                        <div id="suggestions-list"></div>
+                    </div>
+                    <button class="btn-primary" id="search-btn">Buscar</button>
+                </div>
+            </section>
+            
+            <section class="results-section" id="results-section">
+                <div class="active-ingredient" id="active-ingredient">
+                    <!-- Información del ingrediente activo seleccionado -->
+                </div>
+                
+                <div class="recommendations">
+                    <h3>Ingredientes con Modos de Acción Diferentes</h3>
+                    <div class="recommendation-grid" id="recommendation-grid">
+                        <!-- Recomendaciones se cargarán aquí -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal de Leyenda IRAC -->
+    <div id="modalLeyenda" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarLeyenda()">&times;</span>
+            <h2>Funciones Fisiológicas de Insecticidas</h2>
+            
+            <div class="action-section nervous-system-section">
+                <h3>Acción sobre el sistema nervioso o muscular</h3>
+                <p>La mayoría de los insecticidas actúan sobre el sistema nervioso o muscular. Generalmente suelen ser de acción rápida.</p>
+                <p><strong>Grupos que actúan en el sistema nervioso:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 1: Inhibidores de acetilcolinesterasa (AChE)</li>
+                    <li>Grupo 2: Antagonistas del receptor de GABA</li>
+                    <li>Grupo 3: Moduladores de canales de sodio</li>
+                    <li>Grupo 4: Moduladores de receptores nicotínicos de acetilcolina (nAChR)</li>
+                    <li>Grupo 5: Moduladores de receptores de glutamato</li>
+                    <li>Grupo 6: Activadores de canales de cloro</li>
+                    <li>Grupo 9: Moduladores de receptores de octopamina</li>
+                    <li>Grupo 14: Inhibidores de la biosíntesis de lípidos</li>
+                    <li>Grupo 19: Moduladores de canales de calcio</li>
+                    <li>Grupo 22: Inhibidores de canales de voltaje de calcio</li>
+                    <li>Grupo 28: Moduladores de canales de iones Ryanodina</li>
+                    <li>Grupo 29: Compuestos con efecto desconocido o no clasificado</li>
+                    <li>Grupo 30: Inhibidores de la síntesis de acetilcolina</li>
+                    <li>Grupo 32: Inhibidores de la captación de GABA</li>
+                    <li>Grupo 33: Inhibidores de la captación de octopamina</li>
+                    <li>Grupo 35: Moduladores de canales de cloro activados por glutamato</li>
+                    <li>Grupo 36: Inhibidores de la síntesis de glutamato</li>
+                    <li>Grupo 37: Moduladores de canales de potasio</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action nervous-system-mode">Sistema Nervioso</span> y fondo celeste pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section growth-development-section">
+                <h3>Acción sobre el crecimiento y desarrollo</h3>
+                <p>El desarrollo de los insectos está controlado por el equilibrio de two hormonas principales: la hormona juvenil y la ecdisona. Los reguladores del crecimiento de los insectos actúan imitando una de estas hormonas o perturbando directamente la formación/deposición de la cutícula o la biosíntesis de lípidos.</p>
+                <p>Los insecticidas que actúan sobre los distintos objetivos de este sistema, son generalmente de acción lenta a moderadamente lenta.</p>
+                <p><strong>Grupos que actúan en el crecimiento y desarrollo:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 7: Análogos de la hormona juvenil (JH)</li>
+                    <li>Grupo 10: Inhibidores de la biosíntesis de quitina</li>
+                    <li>Grupo 15: Inhibidores de la biosíntesis de quitina (tipo 1)</li>
+                    <li>Grupo 16: Inhibidores de la síntesis de lípidos</li>
+                    <li>Grupo 17: Inhibidores de la biosíntesis de quitina (tipo 2)</li>
+                    <li>Grupo 18: Ecdisona agonistas/disruptores de la muda</li>
+                    <li>Grupo 23: Inhibidores de la síntesis de ATP mitocondrial</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span> y fondo lila pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section respiration-section">
+                <h3>Acción sobre la respiración</h3>
+                <p>La respiración mitocondrial produce ATP, la molécula que da energía a todos los procesos celulares vitales. En las mitocondrias, una cadena de transporte de electrones almacena la energía generada por la oxidación en forma de un gradiente de protones, lo que genera la síntesis de ATP.</p>
+                <p>Varios insecticidas son conocidos por interferir en la respiración mitocondrial mediante la inhibición del transporte de electrones y/o la fosforilación oxidativa. Los insecticidas que actúan sobre los distintos puntos de este sistema son generalmente de acción rápida a moderadamente rápida.</p>
+                <p><strong>Grupos que actúan en la respiración:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 12: Inhibidores del transporte de electrones mitocondrial</li>
+                    <li>Grupo 13: Desacopladores de la fosforilación oxidativa</li>
+                    <li>Grupo 20: Inhibidores del transporte de electrones mitocondrial (Complexo I)</li>
+                    <li>Grupo 21: Inhibidores del transporte de electrones mitocondrial (Complexo III)</li>
+                    <li>Grupo 24: Inhibidores del transporte de electrones mitocondrial (Complexo IV)</li>
+                    <li>Grupo 25: Desacopladores de la fosforilación oxidativa</li>
+                    <li>Grupo 34: Inhibidores de la síntesis de ATP</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action respiration-mode">Respiración</span> y fondo rojo claro pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section digestive-system-section">
+                <h3>Acción sobre el sistema digestivo</h3>
+                <p>Toxinas microbianas específicas de lepidópteros (aplicadas mediante pulverización o expresadas en variedades de cultivos transgénicos) y baculovirus.</p>
+                <p><strong>Grupos que actúan en el sistema digestivo:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 11: Toxinas microbianas disruptoras de la membrana</li>
+                    <li>Grupo 31: Toxinas de Bacillus thuringiensis (Bt) y otros bioinsecticidas</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action digestive-system-mode">Sistema Digestivo</span> y fondo naranja claro pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section unknown-action-section">
+                <h3>Modo de acción desconocido o incierto</h3>
+                <p>Varios insecticidas que afectan a funciones o puntos de acción de un modo menos conocido, o actúan inespecíficamente sobre varios puntos.</p>
+                <p><strong>Grupos con modo de acción desconocido o incierto:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 8: Compuestos varios (modo de acción no clasificado)</li>
+                    <li>Grupo UN: Compuestos de modo de acción desconocido</li>
+                    <li>Grupo UNE: Compuestos de modo de acción desconocido (efectos en enzimas)</li>
+                    <li>Grupo UNF: Compuestos de modo de acción desconocido (efectos en funciones)</li>
+                    <li>Grupo UNM: Compuestos de modo de acción desconocido (efectos múltiples)</li>
+                    <li>Grupo ONU: Compuestos con modo de acción no determinado</li>
+                    <li>Grupo UNP: Compuestos de modo de acción desconocido (efectos fisiológicos)</li>
+                    <li>Grupo UNU: Compuestos de modo de acción desconocido (efectos diversos)</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action unknown-action-mode">Modo Desconocido</span> y fondo gris claro pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="modal-note">
+                <p><strong>Nota importante:</strong> El esquema de color empleado asocia modos de acción con categorías generales basadas en las funciones fisiológicas afectadas, como una ayuda para la comprensión de la sintomatología, la rapidez de acción y otras propiedades de los insecticidas, y no para cualquier propósito de manejo de la resistencia.</p>
+                <p><strong>Las rotaciones para el manejo de la resistencia deben basarse únicamente en los grupos numerados de modo de acción.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de ingredientes activos con estructura corregida
+        const ingredientsDatabase = [
+            // Grupo 1A - Carbamatos (Sistema Nervioso)
+            {
+                name: "Alanycarb",
+                moaCode: "1A",
+                moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Carbamatos",
+                family: "Carbamatos",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos en diversos cultivos"
+            },
+            {
+                name: "Aldicarb",
+                moaCode: "1A",
+                moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Carbamatos",
+                family: "Carbamatos",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos y nematodos en diversos cultivos"
+            },
+            {
+                name: "Metomilo",
+                moaCode: "1A",
+                moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Carbamatos",
+                family: "Carbamatos",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Amplio espectro contra insectos en múltiples cultivos"
+            },
+            {
+                name: "Carbaril",
+                moaCode: "1A",
+                moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Carbamatos",
+                family: "Carbamatos",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos en frutales y hortalizas"
+            },
+            
+            // Grupo 1B - Organofosforados (Sistema Nervioso)
+            {
+                name: "Clorpirifos",
+                moaCode: "1B",
+                moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Organofosforados",
+                family: "Organofosforados",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos masticadores y chupadores en múltiples cultivos"
+            },
+            {
+                name: "Malatión",
+                moaCode: "1B",
+                moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+                moaDescription: "Inhibidores de la acetilcolinesterasa",
+                chemicalGroup: "Organofosforados",
+                family: "Organofosforados",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos en agricultura y salud pública"
+            },
+            
+            // Grupo 4 - Neonicotinoides (Sistema Nervioso)
+            {
+                name: "Imidacloprid",
+                moaCode: "4A",
+                moaGroup: "Moduladores de receptores nicotínicos de acetilcolina (nAChR)",
+                moaDescription: "Agonistas de receptores de acetilcolina",
+                chemicalGroup: "Neonicotinoides",
+                family: "Neonicotinoides",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos chupadores como pulgones, moscas blancas, trips"
+            },
+            {
+                name: "Tiametoxam",
+                moaCode: "4A",
+                moaGroup: "Moduladores de receptores nicotínicos de acetilcolina (nAChR)",
+                moaDescription: "Agonistas de receptores de acetilcolina",
+                chemicalGroup: "Neonicotinoides",
+                family: "Neonicotinoides",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos chupadores en múltiples cultivos"
+            },
+            
+            // Grupo 3 - Piretroides (Sistema Nervioso)
+            {
+                name: "Lambda-cihalotrina",
+                moaCode: "3A",
+                moaGroup: "Moduladores de canales de sodio",
+                moaDescription: "Moduladores de canales de sodio",
+                chemicalGroup: "Piretroides",
+                family: "Piretroides",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Amplio espectro contra insectos masticadores y chupadores"
+            },
+            {
+                name: "Deltametrina",
+                moaCode: "3A",
+                moaGroup: "Moduladores de canales de sodio",
+                moaDescription: "Moduladores de canales de sodio",
+                chemicalGroup: "Piretroides",
+                family: "Piretroides",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de insectos en cultivos y salud pública"
+            },
+            
+            // Grupo 6 - Avermectinas (Sistema Nervioso)
+            {
+                name: "Abamectina",
+                moaCode: "6",
+                moaGroup: "Activadores de canales de cloro",
+                moaDescription: "Activadores de canales de cloro",
+                chemicalGroup: "Avermectinas",
+                family: "Avermectinas",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de ácaros y minadores de hojas"
+            },
+            
+            // Grupo 15 - Benzoylureas (Crecimiento y Desarrollo)
+            {
+                name: "Diflubenzuron",
+                moaCode: "15",
+                moaGroup: "Inhibidores de la biosíntesis de quitina",
+                moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+                chemicalGroup: "Benzoylureas",
+                family: "Benzoylureas",
+                physiologicalFunction: "Crecimiento y Desarrollo",
+                commonUses: "Control de insectos en estado larval en frutales y forestales"
+            },
+            {
+                name: "Lufenuron",
+                moaCode: "15",
+                moaGroup: "Inhibidores de la biosíntesis de quitina",
+                moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+                chemicalGroup: "Benzoylureas",
+                family: "Benzoylureas",
+                physiologicalFunction: "Crecimiento y Desarrollo",
+                commonUses: "Control de insectos en estado larval"
+            },
+            
+            // Grupo 5 - Spinosinas (Sistema Nervioso)
+            {
+                name: "Spinosad",
+                moaCode: "5",
+                moaGroup: "Activadores de receptores de nicotina",
+                moaDescription: "Activadores de receptores de nicotina",
+                chemicalGroup: "Spinosinas",
+                family: "Spinosinas",
+                physiologicalFunction: "Sistema Nervioso",
+                commonUses: "Control de trips, minadores y lepidópteros"
+            },
+            
+            // Grupo 12 - Inhibidores de la respiración
+            {
+                name: "Diafentiurón",
+                moaCode: "12B",
+                moaGroup: "Inhibidores del transporte de electrones",
+                moaDescription: "Inhibidores del complejo mitocondrial II",
+                chemicalGroup: "Tioureas",
+                family: "Tioureas",
+                physiologicalFunction: "Respiración",
+                commonUses: "Control de ácaros y moscas blancas"
+            },
+            
+            // Grupo 11 - Sistema Digestivo
+            {
+                name: "Bacillus thuringiensis",
+                moaCode: "11A",
+                moaGroup: "Toxinas microbianas disruptoras de la membrana",
+                moaDescription: "Toxinas que dañan el tracto digestivo",
+                chemicalGroup: "Toxinas microbianas",
+                family: "Bacillus thuringiensis",
+                physiologicalFunction: "Sistema Digestivo",
+                commonUses: "Control específico de lepidópteros"
+            },
+            // Agregar estos ingredientes a la base de datos existente (ingredientsDatabase array)
+
+// Grupo 1A - Carbamatos (Sistema Nervioso) - Los que faltan
+{
+    name: "Etiopencarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Pirimicarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control específico de áfidos en múltiples cultivos"
+},
+{
+    name: "Bendiccarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y salud pública"
+},
+{
+    name: "Benfuracarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo y foliares"
+},
+{
+    name: "Butocarboxim",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores"
+},
+{
+    name: "Butoxicarboxim",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Carbofurano",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos y nematodos en múltiples cultivos"
+},
+{
+    name: "Carbosulfán",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo y foliares"
+},
+{
+    name: "Fenobucarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en arroz y otros cultivos"
+},
+{
+    name: "Formetanato",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos en frutales"
+},
+{
+    name: "Furaticcarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Isoprocarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en arroz y otros cultivos"
+},
+{
+    name: "Meticcarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Metolcarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en múltiples cultivos"
+},
+{
+    name: "Oxamilo",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de nematodos e insectos del suelo"
+},
+{
+    name: "Proproxur",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y agricultura"
+},
+{
+    name: "Tiodicarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de lepidópteros en diversos cultivos"
+},
+{
+    name: "Tiofanox",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo y foliares"
+},
+{
+    name: "Triazamate",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control específico de áfidos"
+},
+{
+    name: "Trimetacarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "XMC",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en múltiples cultivos"
+},
+{
+    name: "Xilcarb",
+    moaCode: "1A",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Carbamatos",
+    family: "Carbamatos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+// Agregar estos ingredientes a la base de datos existente (ingredientsDatabase array)
+// Grupo 1B - Organofosforados (Sistema Nervioso)
+
+{
+    name: "Acefato",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores y masticadores"
+},
+{
+    name: "Azamethiphos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y salud pública"
+},
+{
+    name: "Azinfos-etilo",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en frutales y cultivos extensivos"
+},
+{
+    name: "Azinfos-metilo",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Cadusafos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de nematodos e insectos del suelo"
+},
+{
+    name: "Clorfenvinfos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo y salud pública"
+},
+{
+    name: "Clormefos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Clorpirifos-metilo",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en granos almacenados y cultivos"
+},
+{
+    name: "Coumaphos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de garrapatas y parásitos en animales"
+},
+{
+    name: "Cianofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en arroz y otros cultivos"
+},
+{
+    name: "Demetón-S-metilo",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de áfidos y otros insectos chupadores"
+},
+{
+    name: "Diazinón",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo y foliares"
+},
+{
+    name: "Díclorvos/DDVP",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y agricultura"
+},
+{
+    name: "Dicrotofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en múltiples cultivos"
+},
+{
+    name: "Dimetoato",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de áfidos y otros insectos chupadores"
+},
+{
+    name: "Disulfotón",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control sistémico de insectos del suelo"
+},
+{
+    name: "EPN",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en cultivos agrícolas"
+},
+{
+    name: "Etión",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos en frutales"
+},
+{
+    name: "Ethoprophos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de nematodos e insectos del suelo"
+},
+{
+    name: "Famphur",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de parásitos en animales"
+},
+{
+    name: "Fenamifos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de nematodos en diversos cultivos"
+},
+{
+    name: "Fenitrotión",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en arroz y otros cultivos"
+},
+{
+    name: "Fenthion",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y agricultura"
+},
+{
+    name: "Fostiazato",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de nematodos en cultivos hortícolas"
+},
+{
+    name: "Heptenophos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Isofenfos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo en cultivos extensivos"
+},
+{
+    name: "Isoxatión",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Mecarbam",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en frutales y hortalizas"
+},
+{
+    name: "Metamidofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos y ácaros en múltiples cultivos"
+},
+{
+    name: "Metidatión",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en cítricos y frutales"
+},
+{
+    name: "Mevinphos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos de acción rápida"
+},
+{
+    name: "Monocrotofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en múltiples cultivos"
+},
+{
+    name: "Naled",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y agricultura"
+},
+{
+    name: "Ometoato",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control sistémico de insectos chupadores"
+},
+{
+    name: "Oxidemetón-metilo",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de áfidos y otros insectos chupadores"
+},
+{
+    name: "Paratión",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos de amplio espectro"
+},
+{
+    name: "Paratión-metilo",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Fentoato",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en cultivos agrícolas"
+},
+{
+    name: "Fosalón",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Forato",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo en múltiples cultivos"
+},
+{
+    name: "Fosmet",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en frutales, especialmente manzanas"
+},
+{
+    name: "Fosfamidón",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en diversos cultivos"
+},
+{
+    name: "Phoxim",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y agricultura"
+},
+{
+    name: "Profenofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en algodón y otros cultivos"
+},
+{
+    name: "Propetamphos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y agricultura"
+},
+{
+    name: "Prothiofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Pyraclofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en arroz y otros cultivos"
+},
+{
+    name: "Piridafención",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos en frutales"
+},
+{
+    name: "Quinalfos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Sulfotep",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en invernaderos y cultivos"
+},
+{
+    name: "Tebupirimfos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo en maíz y otros cultivos"
+},
+{
+    name: "Temefos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de larvas de mosquitos en salud pública"
+},
+{
+    name: "Terbufos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo en cultivos extensivos"
+},
+{
+    name: "Tetraclorvinfos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y animales"
+},
+{
+    name: "Triclorfon",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y salud pública"
+},
+{
+    name: "Triazofos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en frutales y cultivos extensivos"
+},
+{
+    name: "Vamidotión",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en frutales"
+},
+{
+    name: "Pirimifos-metilo",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en granos almacenados"
+},
+{
+    name: "Imicyafos",
+    moaCode: "1B",
+    moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)",
+    moaDescription: "Inhibidores de la acetilcolinesterasa",
+    chemicalGroup: "Organofosforados",
+    family: "Organofosforados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de nematodos en diversos cultivos"
+},
+// Agregar estos ingredientes a la base de datos existente (ingredientsDatabase array)
+// Grupo 2 - Bloqueadores de canales de cloro activados por GABA (Sistema Nervioso)
+
+// Subgrupo 2A - Organoclorados de ciclodieno
+{
+    name: "Clordano",
+    moaCode: "2A",
+    moaGroup: "Bloqueadores de canales de cloro activados por GABA",
+    moaDescription: "Antagonistas del receptor GABA",
+    chemicalGroup: "Organoclorados",
+    family: "Ciclodienos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de termitas y insectos del suelo"
+},
+{
+    name: "Endosulfán",
+    moaCode: "2A",
+    moaGroup: "Bloqueadores de canales de cloro activados por GABA",
+    moaDescription: "Antagonistas del receptor GABA",
+    chemicalGroup: "Organoclorados",
+    family: "Ciclodienos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en algodón, café y otros cultivos"
+},
+
+// Subgrupo 2B - Fenilpirazoles (Fiprones)
+{
+    name: "Fipronil",
+    moaCode: "2B",
+    moaGroup: "Bloqueadores de canales de cloro activados por GABA",
+    moaDescription: "Antagonistas del receptor GABA",
+    chemicalGroup: "Fenilpirazoles",
+    family: "Fiprones",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y salud pública"
+},
+{
+    name: "Etirol",
+    moaCode: "2B",
+    moaGroup: "Bloqueadores de canales de cloro activados por GABA",
+    moaDescription: "Antagonistas del receptor GABA",
+    chemicalGroup: "Fenilpirazoles",
+    family: "Fiprones",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+// Agregar estos ingredientes a la base de datos existente (ingredientsDatabase array)
+// Grupo 3 - Moduladores de canales de sodio (Sistema Nervioso)
+
+// Subgrupo 3A - Piretroides y Piretrinas
+{
+    name: "Acinatrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y salud pública"
+},
+{
+    name: "Alethrin",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos voladores en espacios interiores"
+},
+{
+    name: "d-cis-trans Alethrin",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública"
+},
+{
+    name: "d-trans Alethrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos domésticos"
+},
+{
+    name: "Bifentrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de termitas y insectos del suelo"
+},
+{
+    name: "Bioaletrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en espacios cerrados"
+},
+{
+    name: "Bioaletrina S-ciclopentenilo",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos domésticos"
+},
+{
+    name: "Bioresmetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos voladores"
+},
+{
+    name: "Cicloprotrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura"
+},
+{
+    name: "Ciflutrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en cultivos y animales"
+},
+{
+    name: "beta-ciflutrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Cihalotrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos de amplio espectro"
+},
+{
+    name: "lambda-Cihalotrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos masticadores y chupadores"
+},
+{
+    name: "gamma-cihalotrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en múltiples cultivos"
+},
+{
+    name: "Cipermetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y salud pública"
+},
+{
+    name: "alfa-cipermetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de cantales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos de acción rápida"
+},
+{
+    name: "beta-cipermetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "theta-cipermetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura"
+},
+{
+    name: "zeta-cipermetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en cultivos extensivos"
+},
+{
+    name: "Cifenotrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y jardinería"
+},
+{
+    name: "Deltametrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en cultivos y salud pública"
+},
+{
+    name: "Empentrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos domésticos"
+},
+{
+    name: "Esfenvalerato",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en frutales y hortalizas"
+},
+{
+    name: "Etofenprox",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en arroz y otros cultivos"
+},
+{
+    name: "Fenpropatrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos en frutales"
+},
+{
+    name: "Fenvalerato",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en múltiples cultivos"
+},
+{
+    name: "Flucitrinato",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos en frutales"
+},
+{
+    name: "Flumetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de garrapatas en animales"
+},
+{
+    name: "tau-Fluvalinato",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros en apicultura y agricultura"
+},
+{
+    name: "Kadethrin",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos voladores"
+},
+{
+    name: "Piretrinas",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretrinas",
+    family: "Piretrinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos domésticos y en espacios cerrados"
+},
+{
+    name: "Halfenprox",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Fenotrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública y agricultura"
+},
+{
+    name: "Prallethrin",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de mosquitos y insectos voladores"
+},
+{
+    name: "Resmetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en espacios urbanos"
+},
+{
+    name: "Silafluorén",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura"
+},
+{
+    name: "Teflutrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos del suelo"
+},
+{
+    name: "Tetrametrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos domésticos"
+},
+{
+    name: "Tralometrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en cultivos extensivos"
+},
+{
+    name: "Transflutrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en espacios cerrados"
+},
+{
+    name: "Permetrina",
+    moaCode: "3A",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Piretroides",
+    family: "Piretroides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en agricultura y salud pública"
+},
+
+// Subgrupo 3B - DDT y Metoxicloro
+{
+    name: "DDT",
+    moaCode: "3B",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Organoclorados",
+    family: "DDT",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en salud pública (uso restringido)"
+},
+{
+    name: "Metoxicloro",
+    moaCode: "3B",
+    moaGroup: "Moduladores de canales de sodio",
+    moaDescription: "Moduladores de canales de sodio",
+    chemicalGroup: "Organoclorados",
+    family: "DDT",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en frutales y hortalizas"
+},
+// Agregar estos ingredientes a la base de datos existente (ingredientsDatabase array)
+// Grupo 4 - Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR) - Sistema Nervioso
+
+// Subgrupo 4A - Neonicotinoides
+{
+    name: "Acetamiprid",
+    moaCode: "4A",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Neonicotinoides",
+    family: "Neonicotinoides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores como pulgones, moscas blancas y trips"
+},
+{
+    name: "Clotianidina",
+    moaCode: "4A",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Neonicotinoides",
+    family: "Neonicotinoides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control sistémico de insectos chupadores en múltiples cultivos"
+},
+{
+    name: "Dinotefuran",
+    moaCode: "4A",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Neonicotinoides",
+    family: "Neonicotinoides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores con alta movilidad en la planta"
+},
+{
+    name: "Nitenpyram",
+    moaCode: "4A",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Neonicotinoides",
+    family: "Neonicotinoides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control rápido de insectos chupadores, especialmente en mascotas"
+},
+{
+    name: "Tiacloprid",
+    moaCode: "4A",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Neonicotinoides",
+    family: "Neonicotinoides",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en frutales y hortalizas"
+},
+
+// Subgrupo 4B - Nicotina
+{
+    name: "Nicotina",
+    moaCode: "4B",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Alcaloides",
+    family: "Nicotina",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos de cuerpo blando en agricultura orgánica"
+},
+
+// Subgrupo 4C - Sulfoximinas
+{
+    name: "Sulfoxaflor",
+    moaCode: "4C",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Sulfoximinas",
+    family: "Sulfoximinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores resistentes a neonicotinoides"
+},
+
+// Subgrupo 4D - Butenólidos
+{
+    name: "Flupiradifurona",
+    moaCode: "4D",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Butenólidos",
+    family: "Butenólidos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores con actividad sistémica"
+},
+
+// Subgrupo 4E - Mesoiónica
+{
+    name: "Triflumezopirim",
+    moaCode: "4E",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Mesoiónicos",
+    family: "Mesoiónicos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en cultivos extensivos"
+},
+{
+    name: "Dícloromezotiaz",
+    moaCode: "4E",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Mesoiónicos",
+    family: "Mesoiónicos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en diversos cultivos"
+},
+{
+    name: "Fenmezoditiaz",
+    moaCode: "4E",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Mesoiónicos",
+    family: "Mesoiónicos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores con amplio espectro"
+},
+
+// Subgrupo 4F - Piridilidenos
+{
+    name: "Flupirimina",
+    moaCode: "4F",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Piridilidenos",
+    family: "Piridilidenos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en frutales y hortalizas"
+},
+{
+    name: "Dicloromezotiaz",
+    moaCode: "4E",
+    moaGroup: "Moduladores competitivos del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Agonistas de receptores nicotínicos",
+    chemicalGroup: "Mesoiónicos",
+    family: "Mesoiónicos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores en diversos cultivos"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 5 - Moduladores alostéricos del receptor nicotínico de acetilcolina (nAChR) - Sitio I
+{
+    name: "Espinetoram",
+    moaCode: "5",
+    moaGroup: "Moduladores alostéricos del receptor nicotínico de acetilcolina (nAChR) - Sitio I",
+    moaDescription: "Moduladores alostéricos de receptores nicotínicos",
+    chemicalGroup: "Espinosinas",
+    family: "Espinosinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de trips, minadores y lepidópteros en frutales y hortalizas"
+},
+
+// Grupo 6 - Moduladores alostéricos del canal de cloruro activado por glutamato (GluCl)
+{
+    name: "Lepimectina",
+    moaCode: "6",
+    moaGroup: "Moduladores alostéricos del canal de cloruro activado por glutamato (GluCl)",
+    moaDescription: "Activadores de canales de cloruro",
+    chemicalGroup: "Avermectinas",
+    family: "Avermectinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos en diversos cultivos"
+},
+{
+    name: "Benzoato de emamectina",
+    moaCode: "6",
+    moaGroup: "Moduladores alostéricos del canal de cloruro activado por glutamato (GluCl)",
+    moaDescription: "Activadores de canales de cloruro",
+    chemicalGroup: "Avermectinas",
+    family: "Avermectinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de lepidópteros en cultivos hortícolas y frutales"
+},
+{
+    name: "Milbemectina",
+    moaCode: "6",
+    moaGroup: "Moduladores alostéricos del canal de cloruro activado por glutamato (GluCl)",
+    moaDescription: "Activadores de canales de cloruro",
+    chemicalGroup: "Milbemicinas",
+    family: "Milbemicinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros en frutales y cultivos ornamentales"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 7A - Análogos de hormonas juveniles
+{
+    name: "Hidropreno",
+    moaCode: "7A",
+    moaGroup: "Moduladores de los receptores hormonales juveniles",
+    moaDescription: "Análogos de la hormona juvenil",
+    chemicalGroup: "Análogos de JH",
+    family: "Análogos de hormonas juveniles",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos en estado larval, interrumpe el desarrollo"
+},
+{
+    name: "Kinoprene",
+    moaCode: "7A",
+    moaGroup: "Moduladores de los receptores hormonales juveniles",
+    moaDescription: "Análogos de la hormona juvenil",
+    chemicalGroup: "Análogos de JH",
+    family: "Análogos de hormonas juveniles",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos chupadores como áfidos y moscas blancas"
+},
+{
+    name: "Metopreno",
+    moaCode: "7A",
+    moaGroup: "Moduladores de los receptores hormonales juveniles",
+    moaDescription: "Análogos de la hormona juvenil",
+    chemicalGroup: "Análogos de JH",
+    family: "Análogos de hormonas juveniles",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de mosquitos, moscas y otros insectos en desarrollo"
+},
+
+// Grupo 7B - Fenoxicarb
+{
+    name: "Fenoxicarb",
+    moaCode: "7B",
+    moaGroup: "Moduladores de los receptores hormonales juveniles",
+    moaDescription: "Moduladores de receptores de hormona juvenil",
+    chemicalGroup: "Carbamatos",
+    family: "Fenoxicarb",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos chupadores y lepidópteros"
+},
+
+// Grupo 7C - Piriproxifeno
+{
+    name: "Piriproxifeno",
+    moaCode: "7C",
+    moaGroup: "Moduladores de los receptores hormonales juveniles",
+    moaDescription: "Moduladores de receptores de hormona juvenil",
+    chemicalGroup: "Piridinas",
+    family: "Piriproxifeno",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de moscas blancas, áfidos y otros insectos chupadores"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 8A - Haluros de alquilo
+{
+    name: "Bromuro de metilo",
+    moaCode: "8A",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Haluros de alquilo",
+    family: "Haluros de alquilo",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Fumigante de suelo para control de plagas y enfermedades (uso restringido)"
+},
+{
+    name: "1,3-dicloropropeno",
+    moaCode: "8A",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Haluros de alquilo",
+    family: "Haluros de alquilo",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Fumigante de suelo para control de nematodos"
+},
+
+// Grupo 8B - Cloropicrina
+{
+    name: "Cloropicrina",
+    moaCode: "8B",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Organoclorados",
+    family: "Cloropicrina",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Fumigante de suelo y desinfectante"
+},
+
+// Grupo 8C - Fluoruros
+{
+    name: "Criolita",
+    moaCode: "8C",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Fluoruros",
+    family: "Fluoruros",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos masticadores en frutales y hortalizas"
+},
+{
+    name: "Fluoruro de sulfurilo",
+    moaCode: "8C",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Fluoruros",
+    family: "Fluoruros",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Fumigante para control de plagas en granos almacenados"
+},
+
+// Grupo 8D - Boratos
+{
+    name: "Bórax",
+    moaCode: "8D",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Boratos",
+    family: "Boratos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de cucarachas, hormigas y otros insectos rastreros"
+},
+{
+    name: "Octaborato disódico",
+    moaCode: "8D",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Boratos",
+    family: "Boratos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Protector de madera contra termitas y hongos"
+},
+{
+    name: "Metaborato de sodio",
+    moaCode: "8D",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Boratos",
+    family: "Boratos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos en diversos usos"
+},
+{
+    name: "Ácido bórico",
+    moaCode: "8D",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Boratos",
+    family: "Boratos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de cucarachas, hormigas y otros insectos domésticos"
+},
+{
+    name: "Borato de sodio",
+    moaCode: "8D",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Boratos",
+    family: "Boratos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos en múltiples aplicaciones"
+},
+
+// Grupo 8E - Emético tártaro
+{
+    name: "Emético tártaro",
+    moaCode: "8E",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Compuestos inorgánicos",
+    family: "Emético tártaro",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Uso como repelente y emético en aplicaciones específicas"
+},
+
+// Grupo 8F - Generadores de isotiocianato de metilo
+{
+    name: "Dazomet",
+    moaCode: "8F",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Tiadiazinas",
+    family: "Generadores de isotiocianato",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Fumigante de suelo para control de nematodos, hongos y malezas"
+},
+{
+    name: "Metam",
+    moaCode: "8F",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Ditiocarbamatos",
+    family: "Generadores de isotiocianato",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Fumigante de suelo para control de plagas y enfermedades"
+},
+{
+    name: "Isotiocianato de metilo",
+    moaCode: "8F",
+    moaGroup: "Inhibidores diversos no específicos (multisitio)",
+    moaDescription: "Compuestos varios de modo de acción no clasificado",
+    chemicalGroup: "Isotiocianatos",
+    family: "Generadores de isotiocianato",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Fumigante natural producido por plantas brassicáceas"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 9 - Moduladores de canal TRPV de órgano cordotonal
+{
+    name: "Pimetrozina",
+    moaCode: "9B",
+    moaGroup: "Moduladores de canal TRPV de órgano cordotonal",
+    moaDescription: "Moduladores de canales TRPV",
+    chemicalGroup: "Piridina azumetina derivados",
+    family: "Piridina azumetina derivados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control específico de áfidos en múltiples cultivos"
+},
+{
+    name: "Pirifluquinazón",
+    moaCode: "9B",
+    moaGroup: "Moduladores de canal TRPV de órgano cordotonal",
+    moaDescription: "Moduladores de canales TRPV",
+    chemicalGroup: "Piridina azumetina derivados",
+    family: "Piridina azumetina derivados",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de moscas blancas, trips y otros insectos chupadores"
+},
+{
+    name: "Afidopiropen",
+    moaCode: "9D",
+    moaGroup: "Moduladores de canal TRPV de órgano cordotonal",
+    moaDescription: "Moduladores de canales TRPV",
+    chemicalGroup: "Piropenos",
+    family: "Piropenos",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control específico de áfidos en frutales y hortalizas"
+},
+
+// Grupo 10 - Inhibidores del crecimiento de ácaros que afectan a CHS1
+{
+    name: "Clofentezina",
+    moaCode: "10A",
+    moaGroup: "Inhibidores del crecimiento de ácaros que afectan a CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina",
+    chemicalGroup: "Tetrazinas",
+    family: "Clofentezina",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de ácaros en frutales y cultivos ornamentales"
+},
+{
+    name: "Diflovidazina",
+    moaCode: "10A",
+    moaGroup: "Inhibidores del crecimiento de ácaros que afectan a CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina",
+    chemicalGroup: "Tetrazinas",
+    family: "Diflovidazina",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de ácaros en diversos cultivos"
+},
+{
+    name: "Hexitiazox",
+    moaCode: "10A",
+    moaGroup: "Inhibidores del crecimiento de ácaros que afectan a CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina",
+    chemicalGroup: "Tiazolidinonas",
+    family: "Hexitiazox",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de ácaros en frutales y hortalizas"
+},
+{
+    name: "Etoxazol",
+    moaCode: "10B",
+    moaGroup: "Inhibidores del crecimiento de ácaros que afectan a CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina",
+    chemicalGroup: "Oxazolidinas",
+    family: "Etoxazol",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de ácaros en frutales, cítricos y ornamentales"
+},
+
+// Grupo 11 - Disruptores microbianos de las membranas del intestino medio de los insectos
+{
+    name: "B.t. var. israelensis",
+    moaCode: "11A",
+    moaGroup: "Disruptores microbianos de las membranas del intestino medio de los insectos",
+    moaDescription: "Toxinas microbianas disruptoras de la membrana",
+    chemicalGroup: "Toxinas microbianas",
+    family: "Bacillus thuringiensis",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control específico de mosquitos y dípteros"
+},
+{
+    name: "B.t. var. kurstaki",
+    moaCode: "11A",
+    moaGroup: "Disruptores microbianos de las membranas del intestino medio de los insectos",
+    moaDescription: "Toxinas microbianas disruptoras de la membrana",
+    chemicalGroup: "Toxinas microbianas",
+    family: "Bacillus thuringiensis",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control de lepidópteros en múltiples cultivos"
+},
+{
+    name: "B.t. var. aizawai",
+    moaCode: "11A",
+    moaGroup: "Disruptores microbianos de las membranas del intestino medio de los insectos",
+    moaDescription: "Toxinas microbianas disruptoras de la membrana",
+    chemicalGroup: "Toxinas microbianas",
+    family: "Bacillus thuringiensis",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control de lepidópteros, especialmente en cultivos hortícolas"
+},
+{
+    name: "B.t. var. tenebrionensis",
+    moaCode: "11A",
+    moaGroup: "Disruptores microbianos de las membranas del intestino medio de los insectos",
+    moaDescription: "Toxinas microbianas disruptoras de la membrana",
+    chemicalGroup: "Toxinas microbianas",
+    family: "Bacillus thuringiensis",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control de coleópteros como el escarabajo de la patata"
+},
+{
+    name: "Bacilo sphaericus",
+    moaCode: "11B",
+    moaGroup: "Disruptores microbianos de las membranas del intestino medio de los insectos",
+    moaDescription: "Toxinas microbianas disruptoras de la membrana",
+    chemicalGroup: "Toxinas microbianas",
+    family: "Bacilo sphaericus",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control específico de larvas de mosquitos"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 12 - Inhibidores de la ATP sintasa mitocondrial
+{
+    name: "Azocidotina",
+    moaCode: "12B",
+    moaGroup: "Inhibidores de la ATP sintasa mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones",
+    chemicalGroup: "Organoestánnicos",
+    family: "Acaricidas organoestánnicos",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales y cultivos ornamentales"
+},
+{
+    name: "Cinevatina",
+    moaCode: "12B",
+    moaGroup: "Inhibidores de la ATP sintasa mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones",
+    chemicalGroup: "Organoestánnicos",
+    family: "Acaricidas organoestánnicos",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en diversos cultivos"
+},
+{
+    name: "Óxido de fenbutatina",
+    moaCode: "12B",
+    moaGroup: "Inhibidores de la ATP sintasa mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones",
+    chemicalGroup: "Organoestánnicos",
+    family: "Acaricidas organoestánnicos",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en cítricos y frutales"
+},
+{
+    name: "Propargatita",
+    moaCode: "12C",
+    moaGroup: "Inhibidores de la ATP sintasa mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones",
+    chemicalGroup: "Sulfonatos",
+    family: "Propargatita",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en múltiples cultivos"
+},
+{
+    name: "Tetradifón",
+    moaCode: "12D",
+    moaGroup: "Inhibidores de la ATP sintasa mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones",
+    chemicalGroup: "Sulfonas",
+    family: "Tetradifón",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales y cultivos protegidos"
+},
+
+// Grupo 13 - Desacopladores de la fosforilación oxidativa
+{
+    name: "Clorfenapir",
+    moaCode: "13",
+    moaGroup: "Desacopladores de la fosforilación oxidativa a través de la interrupción del gradiente de protones",
+    moaDescription: "Desacopladores de la fosforilación oxidativa",
+    chemicalGroup: "Pirroles",
+    family: "Pirroles",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros e insectos chupadores en múltiples cultivos"
+},
+{
+    name: "DNOC",
+    moaCode: "13",
+    moaGroup: "Desacopladores de la fosforilación oxidativa a través de la interrupción del gradiente de protones",
+    moaDescription: "Desacopladores de la fosforilación oxidativa",
+    chemicalGroup: "Dinitrofenoles",
+    family: "Dinitrofenoles",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de insectos y como herbicida (uso restringido)"
+},
+{
+    name: "Sulfuramida",
+    moaCode: "13",
+    moaGroup: "Desacopladores de la fosforilación oxidativa a través de la interrupción del gradiente de protones",
+    moaDescription: "Desacopladores de la fosforilación oxidativa",
+    chemicalGroup: "Sulfonamidas",
+    family: "Sulfuramida",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de insectos en aplicaciones específicas"
+},
+
+// Grupo 14 - Bloqueadores de los canales del receptor nicotínico de acetilcolina (nAChR)
+{
+    name: "Bensultap",
+    moaCode: "14",
+    moaGroup: "Bloqueadores de los canales del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Análogos de la nereistoxina",
+    chemicalGroup: "Sultams",
+    family: "Análogos de la nereistoxina",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de lepidópteros y otros insectos en arroz y hortalizas"
+},
+{
+    name: "Tiociclam",
+    moaCode: "14",
+    moaGroup: "Bloqueadores de los canales del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Análogos de la nereistoxina",
+    chemicalGroup: "Tiosulfamatos",
+    family: "Análogos de la nereistoxina",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Clorhidrato de Cartap",
+    moaCode: "14",
+    moaGroup: "Bloqueadores de los canales del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Análogos de la nereistoxina",
+    chemicalGroup: "Nereistoxina análogos",
+    family: "Análogos de la nereistoxina",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de lepidópteros en arroz, frutales y hortalizas"
+},
+{
+    name: "Tiosultap-sodio",
+    moaCode: "14",
+    moaGroup: "Bloqueadores de los canales del receptor nicotínico de acetilcolina (nAChR)",
+    moaDescription: "Análogos de la nereistoxina",
+    chemicalGroup: "Sultams",
+    family: "Análogos de la nereistoxina",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en arroz y otros cultivos"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 15 - Inhibidores de la biosíntesis de quitina que afectan al CHS1 (Benzoylureas)
+{
+    name: "Bistrifiurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos en estado larval en múltiples cultivos"
+},
+{
+    name: "Flufenoxurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de ácaros e insectos en frutales y ornamentales"
+},
+{
+    name: "Noviflumurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de termitas y otros insectos xilófagos"
+},
+{
+    name: "Clorfluazurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de lepidópteros en algodón y hortalizas"
+},
+{
+    name: "Hexaflumurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de termitas y otros insectos en madera"
+},
+{
+    name: "Teflubenzurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos en estado larval en frutales y hortalizas"
+},
+{
+    name: "Flucicloxurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de ácaros en frutales y ornamentales"
+},
+{
+    name: "Novaluron",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos chupadores y masticadores en múltiples cultivos"
+},
+{
+    name: "Triflumurón",
+    moaCode: "15",
+    moaGroup: "Inhibidores de la biosíntesis de quitina que afectan al CHS1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 0",
+    chemicalGroup: "Benzoylureas",
+    family: "Benzoylureas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos en estado larval en frutales y forestales"
+},
+
+// Grupo 16 - Inhibidores de la biosíntesis de quitina tipo 1
+{
+    name: "Buprofezina",
+    moaCode: "16",
+    moaGroup: "Inhibidores de la biosíntesis de quitina tipo 1",
+    moaDescription: "Inhibidores de la biosíntesis de quitina, tipo 1",
+    chemicalGroup: "Tiadiazinas",
+    family: "Buprofezina",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de moscas blancas, saltahojas y otros insectos chupadores"
+},
+
+// Grupo 17 - Disruptor de muda, díptero
+{
+    name: "Cironiazina",
+    moaCode: "17",
+    moaGroup: "Disruptor de muda, díptero",
+    moaDescription: "Disruptor de muda para dípteros",
+    chemicalGroup: "Triazinas",
+    family: "Cironiazina",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control específico de moscas y mosquitos en estado larval"
+},
+
+// Grupo 18 - Agonistas del receptor de ecdisona
+{
+    name: "Crofenozida",
+    moaCode: "18",
+    moaGroup: "Agonistas del receptor de ecdisona",
+    moaDescription: "Ecdisona agonistas/disruptores de la muda",
+    chemicalGroup: "Diacilhidrazinas",
+    family: "Diacilhidrazinas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de lepidópteros en frutales y hortalizas"
+},
+{
+    name: "Metoxifenozida",
+    moaCode: "18",
+    moaGroup: "Agonistas del receptor de ecdisona",
+    moaDescription: "Ecdisona agonistas/disruptores de la muda",
+    chemicalGroup: "Diacilhidrazinas",
+    family: "Diacilhidrazinas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de lepidópteros en múltiples cultivos"
+},
+{
+    name: "Halofenozida",
+    moaCode: "18",
+    moaGroup: "Agonistas del receptor de ecdisona",
+    moaDescription: "Ecdisona agonistas/disruptores de la muda",
+    chemicalGroup: "Diacilhidrazinas",
+    family: "Diacilhidrazinas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de insectos del suelo y lepidópteros"
+},
+{
+    name: "Tebufenozida",
+    moaCode: "18",
+    moaGroup: "Agonistas del receptor de ecdisona",
+    moaDescription: "Ecdisona agonistas/disruptores de la muda",
+    chemicalGroup: "Diacilhidrazinas",
+    family: "Diacilhidrazinas",
+    physiologicalFunction: "Crecimiento y Desarrollo",
+    commonUses: "Control de lepidópteros en frutales, forestales y hortalizas"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 19 - Agonistas de los receptores de octopamina
+{
+    name: "Amitraz",
+    moaCode: "19",
+    moaGroup: "Agonistas de los receptores de octopamina",
+    moaDescription: "Moduladores de receptores de octopamina",
+    chemicalGroup: "Formamidinas",
+    family: "Amitraz",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos en frutales, cítricos y animales"
+},
+
+// Grupo 20 - Inhibidores del transporte de electrones del complejo III mitocondrial – Sitio Qo
+{
+    name: "Hidrametilnona",
+    moaCode: "20A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo III mitocondrial – Sitio Qo",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo III)",
+    chemicalGroup: "Hidrazonas",
+    family: "Hidrametilnona",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de hormigas, cucarachas y otros insectos rastreros"
+},
+{
+    name: "Acequinocilo",
+    moaCode: "20B",
+    moaGroup: "Inhibidores del transporte de electrones del complejo III mitocondrial – Sitio Qo",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo III)",
+    chemicalGroup: "Naftoquinonas",
+    family: "Acequinocilo",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales, ornamentales y cultivos protegidos"
+},
+{
+    name: "Fluacripirim",
+    moaCode: "20C",
+    moaGroup: "Inhibidores del transporte de electrones del complejo III mitocondrial – Sitio Qo",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo III)",
+    chemicalGroup: "Pirimidinas",
+    family: "Fluacripirim",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en múltiples cultivos"
+},
+{
+    name: "Bifenazato",
+    moaCode: "20D",
+    moaGroup: "Inhibidores del transporte de electrones del complejo III mitocondrial – Sitio Qo",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo III)",
+    chemicalGroup: "Carbazatos",
+    family: "Bifenazato",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales, ornamentales y cultivos protegidos"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 21 - Inhibidores del transporte de electrones del complejo I mitocondrial
+{
+    name: "Fenazaguina",
+    moaCode: "21A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo I mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo I)",
+    chemicalGroup: "Quinazolinas",
+    family: "METI",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales y cultivos protegidos"
+},
+{
+    name: "Pirimidifen",
+    moaCode: "21A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo I mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo I)",
+    chemicalGroup: "Pirimidinas",
+    family: "METI",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en múltiples cultivos"
+},
+{
+    name: "Tebufenpyrad",
+    moaCode: "21A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo I mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo I)",
+    chemicalGroup: "Pirazoles",
+    family: "METI",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales, ornamentales y hortalizas"
+},
+{
+    name: "Fenpiroximato",
+    moaCode: "21A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo I mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo I)",
+    chemicalGroup: "Pirazoles",
+    family: "METI",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales y cultivos protegidos"
+},
+{
+    name: "Piridaben",
+    moaCode: "21A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo I mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo I)",
+    chemicalGroup: "Piridazinonas",
+    family: "METI",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros e insectos en múltiples cultivos"
+},
+{
+    name: "Tolfenpyrad",
+    moaCode: "21A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo I mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo I)",
+    chemicalGroup: "Pirazoles",
+    family: "METI",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de insectos y ácaros en hortalizas y frutales"
+},
+{
+    name: "Rotenona",
+    moaCode: "21B",
+    moaGroup: "Inhibidores del transporte de electrones del complejo I mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo I)",
+    chemicalGroup: "Rotenoides",
+    family: "Rotenona",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de insectos en agricultura orgánica"
+},
+
+// Grupo 22 - Bloqueadores de los canales de sodio dependientes de la tensión
+{
+    name: "Indoxacarb",
+    moaCode: "22A",
+    moaGroup: "Bloqueadores de los canales de sodio dependientes de la tensión",
+    moaDescription: "Bloqueadores de canales de sodio",
+    chemicalGroup: "Oxadiazinas",
+    family: "Oxadiazinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de lepidópteros en múltiples cultivos"
+},
+{
+    name: "Metaflumizona",
+    moaCode: "22B",
+    moaGroup: "Bloqueadores de los canales de sodio dependientes de la tensión",
+    moaDescription: "Bloqueadores de canales de sodio",
+    chemicalGroup: "Semicarbazonas",
+    family: "Semicarbazonas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos masticadores en frutales y hortalizas"
+},
+
+// Grupo 23 - Inhibidores de la acetil CoA carboxilasa
+{
+    name: "Espirodiclofeno",
+    moaCode: "23",
+    moaGroup: "Inhibidores de la acetil CoA carboxilasa",
+    moaDescription: "Inhibidores de la biosíntesis de lípidos",
+    chemicalGroup: "Derivados del ácido tetrónico",
+    family: "Derivados del ácido tetrónico y tetrámico",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros en cítricos, frutales y ornamentales"
+},
+{
+    name: "Espiropidión",
+    moaCode: "23",
+    moaGroup: "Inhibidores de la acetil CoA carboxilasa",
+    moaDescription: "Inhibidores de la biosíntesis de lípidos",
+    chemicalGroup: "Derivados del ácido tetrónico",
+    family: "Derivados del ácido tetrónico y tetrámico",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros e insectos chupadores en múltiples cultivos"
+},
+{
+    name: "Spidoxamat",
+    moaCode: "23",
+    moaGroup: "Inhibidores de la acetil CoA carboxilasa",
+    moaDescription: "Inhibidores de la biosíntesis de lípidos",
+    chemicalGroup: "Derivados del ácido tetrónico",
+    family: "Derivados del ácido tetrónico y tetrámico",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de ácaros en diversos cultivos"
+},
+{
+    name: "Espiromesifen",
+    moaCode: "23",
+    moaGroup: "Inhibidores de la acetil CoA carboxilasa",
+    moaDescription: "Inhibidores de la biosíntesis de lípidos",
+    chemicalGroup: "Derivados del ácido tetrónico",
+    family: "Derivados del ácido tetrónico y tetrámico",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de moscas blancas y ácaros en múltiples cultivos"
+},
+{
+    name: "Espirotetramat",
+    moaCode: "23",
+    moaGroup: "Inhibidores de la acetil CoA carboxilasa",
+    moaDescription: "Inhibidores de la biosíntesis de lípidos",
+    chemicalGroup: "Derivados del ácido tetrónico",
+    family: "Derivados del ácido tetrónico y tetrámico",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control sistémico de insectos chupadores en frutales y hortalizas"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 24 - Inhibidores del transporte de electrones del complejo IV mitocondrial
+{
+    name: "Fosfuro de aluminio",
+    moaCode: "24A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo IV mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo IV)",
+    chemicalGroup: "Fosfuros",
+    family: "Fosfuros",
+    physiologicalFunction: "Respiración",
+    commonUses: "Fumigante para control de plagas en granos almacenados"
+},
+{
+    name: "Fosfina",
+    moaCode: "24A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo IV mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo IV)",
+    chemicalGroup: "Fosfuros",
+    family: "Fosfuros",
+    physiologicalFunction: "Respiración",
+    commonUses: "Fumigante para control de insectos en granos y productos almacenados"
+},
+{
+    name: "Fosfuro de calcio",
+    moaCode: "24A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo IV mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo IV)",
+    chemicalGroup: "Fosfuros",
+    family: "Fosfuros",
+    physiologicalFunction: "Respiración",
+    commonUses: "Fumigante para control de plagas en agricultura"
+},
+{
+    name: "Fosfuro de zinc",
+    moaCode: "24A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo IV mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo IV)",
+    chemicalGroup: "Fosfuros",
+    family: "Fosfuros",
+    physiologicalFunction: "Respiración",
+    commonUses: "Fumigante para control de roedores e insectos"
+},
+{
+    name: "Cianuro de calcio",
+    moaCode: "24B",
+    moaGroup: "Inhibidores del transporte de electrones del complejo IV mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo IV)",
+    chemicalGroup: "Cianuros",
+    family: "Cianuros",
+    physiologicalFunction: "Respiración",
+    commonUses: "Fumigante para control de plagas (uso restringido)"
+},
+{
+    name: "Cianuro de potasio",
+    moaCode: "24B",
+    moaGroup: "Inhibidores del transporte de electrones del complejo IV mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo IV)",
+    chemicalGroup: "Cianuros",
+    family: "Cianuros",
+    physiologicalFunction: "Respiración",
+    commonUses: "Fumigante para control de plagas (uso muy restringido)"
+},
+{
+    name: "Cianuro de sodio",
+    moaCode: "24B",
+    moaGroup: "Inhibidores del transporte de electrones del complejo IV mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo IV)",
+    chemicalGroup: "Cianuros",
+    family: "Cianuros",
+    physiologicalFunction: "Respiración",
+    commonUses: "Fumigante para control de plagas (uso restringido)"
+},
+
+// Grupo 25 - Inhibidores del transporte de electrones del complejo II mitocondrial
+{
+    name: "Cyenopyrafen",
+    moaCode: "25A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo II mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo II)",
+    chemicalGroup: "Derivados de beta-cetonitrilo",
+    family: "Derivados de beta-cetonitrilo",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales y cultivos protegidos"
+},
+{
+    name: "Cyflumetofen",
+    moaCode: "25A",
+    moaGroup: "Inhibidores del transporte de electrones del complejo II mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo II)",
+    chemicalGroup: "Derivados de beta-cetonitrilo",
+    family: "Derivados de beta-cetonitrilo",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en múltiples cultivos"
+},
+{
+    name: "Piflubumida",
+    moaCode: "25B",
+    moaGroup: "Inhibidores del transporte de electrones del complejo II mitocondrial",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo II)",
+    chemicalGroup: "Carboxanilidas",
+    family: "Carboxanilidas",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros en frutales y ornamentales"
+},
+
+// Grupo 28 - Moduladores del receptor de rianodina
+{
+    name: "Clorantraniliprol",
+    moaCode: "28",
+    moaGroup: "Moduladores del receptor de rianodina",
+    moaDescription: "Moduladores de canales de iones Ryanodina",
+    chemicalGroup: "Diamidas",
+    family: "Diamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de lepidópteros en múltiples cultivos"
+},
+{
+    name: "Cicianiliprol",
+    moaCode: "28",
+    moaGroup: "Moduladores del receptor de rianodina",
+    moaDescription: "Moduladores de canales de iones Ryanodina",
+    chemicalGroup: "Diamidas",
+    family: "Diamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores y masticadores"
+},
+{
+    name: "Tetraniliprol",
+    moaCode: "28",
+    moaGroup: "Moduladores del receptor de rianodina",
+    moaDescription: "Moduladores de canales de iones Ryanodina",
+    chemicalGroup: "Diamidas",
+    family: "Diamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en múltiples cultivos"
+},
+{
+    name: "Ciantraniliprol",
+    moaCode: "28",
+    moaGroup: "Moduladores del receptor de rianodina",
+    moaDescription: "Moduladores de canales de iones Ryanodina",
+    chemicalGroup: "Diamidas",
+    family: "Diamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores y masticadores en frutales y hortalizas"
+},
+{
+    name: "Flubendiamida",
+    moaCode: "28",
+    moaGroup: "Moduladores del receptor de rianodina",
+    moaDescription: "Moduladores de canales de iones Ryanodina",
+    chemicalGroup: "Diamidas",
+    family: "Diamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de lepidópteros en múltiples cultivos"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 29 - Inhibidores de la nicotinamidasa del órgano cordotonal
+{
+    name: "Flonicamid",
+    moaCode: "29",
+    moaGroup: "Inhibidores de la nicotinamidasa del órgano cordotonal",
+    moaDescription: "Inhibidores de la síntesis de acetilcolina",
+    chemicalGroup: "Piridincarboxamidas",
+    family: "Flonicamid",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores como áfidos, moscas blancas y trips"
+},
+
+// Grupo 30 - Moduladores alostéricos de canal de cloruro activados por GABA
+{
+    name: "Broflanilida",
+    moaCode: "30",
+    moaGroup: "Moduladores alostéricos de canal de cloruro activados por GABA",
+    moaDescription: "Moduladores de canales de cloruro activados por glutamato",
+    chemicalGroup: "Metadiamidas",
+    family: "Metadiamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos masticadores y chupadores en múltiples cultivos"
+},
+{
+    name: "Fluxametanida",
+    moaCode: "30",
+    moaGroup: "Moduladores alostéricos de canal de cloruro activados por GABA",
+    moaDescription: "Moduladores de canales de cloruro activados por glutamato",
+    chemicalGroup: "Metadiamidas",
+    family: "Metadiamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Ciproflanilida",
+    moaCode: "30",
+    moaGroup: "Moduladores alostéricos de canal de cloruro activados por GABA",
+    moaDescription: "Moduladores de canales de cloruro activados por glutamato",
+    chemicalGroup: "Isoxazolinas",
+    family: "Isoxazolinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos con amplio espectro"
+},
+{
+    name: "Isocioloseram",
+    moaCode: "30",
+    moaGroup: "Moduladores alostéricos de canal de cloruro activados por GABA",
+    moaDescription: "Moduladores de canales de cloruro activados por glutamato",
+    chemicalGroup: "Isoxazolinas",
+    family: "Isoxazolinas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos en múltiples cultivos"
+},
+
+// Grupo 31 - Baculovirus
+{
+    name: "Cydia pomonella GV",
+    moaCode: "31",
+    moaGroup: "Baculovirus",
+    moaDescription: "Virus específicos que infectan y matan insectos",
+    chemicalGroup: "Granulovirus",
+    family: "Baculovirus",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control específico del gusano de la manzana (Cydia pomonella)"
+},
+{
+    name: "Anticarsia gemmatalis MNPV",
+    moaCode: "31",
+    moaGroup: "Baculovirus",
+    moaDescription: "Virus específicos que infectan y matan insectos",
+    chemicalGroup: "Nucleopoliedrovirus múltiple",
+    family: "Baculovirus",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control específico del gusano de la soja (Anticarsia gemmatalis)"
+},
+{
+    name: "Thaumatotibia leucotreta GV",
+    moaCode: "31",
+    moaGroup: "Baculovirus",
+    moaDescription: "Virus específicos que infectan y matan insectos",
+    chemicalGroup: "Granulovirus",
+    family: "Baculovirus",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control específico del gusano del naranjo (Thaumatotibia leucotreta)"
+},
+{
+    name: "Helicoverpa armigera NPV",
+    moaCode: "31",
+    moaGroup: "Baculovirus",
+    moaDescription: "Virus específicos que infectan y matan insectos",
+    chemicalGroup: "Nucleopoliedrovirus",
+    family: "Baculovirus",
+    physiologicalFunction: "Sistema Digestivo",
+    commonUses: "Control específico del gusano del algodón (Helicoverpa armigera)"
+},
+
+// Grupo 32 - Moduladores alostéricos del receptor nicotínico de acetilcolina (nAChR) - Sitio II
+{
+    name: "Péptido GS-omega/kappa HXTX-Hv1a",
+    moaCode: "32",
+    moaGroup: "Moduladores alostéricos del receptor nicotínico de acetilcolina (nAChR) - Sitio II",
+    moaDescription: "Moduladores alostéricos de receptores nicotínicos",
+    chemicalGroup: "Péptidos",
+    family: "Péptidos de araña",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos mediante toxina peptídica derivada de araña"
+},
+// Agregar estos ingredientes al array ingredientsDatabase
+
+// Grupo 33 - Moduladores de los canales de potasio activados por calcio (KCa2)
+{
+    name: "Acynonapyr",
+    moaCode: "33",
+    moaGroup: "Moduladores de los canales de potasio activados por calcio (KCa2)",
+    moaDescription: "Moduladores de canales de potasio",
+    chemicalGroup: "Pirroles",
+    family: "Acynonapyr",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores y masticadores en múltiples cultivos"
+},
+
+// Grupo 34 - Inhibidores del transporte de electrones del complejo III mitocondrial – Sitio Qi
+{
+    name: "Flometoquina",
+    moaCode: "34",
+    moaGroup: "Inhibidores del transporte de electrones del complejo III mitocondrial – Sitio Qi",
+    moaDescription: "Inhibidores del transporte de electrones mitocondrial (Complejo III)",
+    chemicalGroup: "Quinolinas",
+    family: "Flometoquina",
+    physiologicalFunction: "Respiración",
+    commonUses: "Control de ácaros e insectos en diversos cultivos"
+},
+
+// Grupo 35 - Supresores de diana mediados por interferencia de ARN
+{
+    name: "Ledprona",
+    moaCode: "35",
+    moaGroup: "Supresores de diana mediados por interferencia de ARN",
+    moaDescription: "Inhibidores de la síntesis de proteínas específicas",
+    chemicalGroup: "ARN de interferencia",
+    family: "ARNi",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control específico del gusano de la raíz del maíz (Diabrotica virgifera)"
+},
+
+// Grupo 36 - Moduladores de órganos cordotonales: sitio objetivo indefinido
+{
+    name: "Dimpropyridaz",
+    moaCode: "36",
+    moaGroup: "Moduladores de órganos cordotonales: sitio objetivo indefinido",
+    moaDescription: "Moduladores de órganos sensoriales de insectos",
+    chemicalGroup: "Piridazina pirazolecarboxamidas",
+    family: "Piridazina pirazolecarboxamidas",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores como áfidos y moscas blancas"
+},
+// Agregar este ingrediente al array ingredientsDatabase
+
+// Grupo 37 - Inhibidor del transportador vesicular de acetilcolina (VAChT)
+{
+    name: "Oxazosulfilo",
+    moaCode: "37",
+    moaGroup: "Inhibidor del transportador vesicular de acetilcolina (VAChT)",
+    moaDescription: "Inhibidores de la síntesis de glutamato",
+    chemicalGroup: "Oxazinas",
+    family: "Oxazosulfilo",
+    physiologicalFunction: "Sistema Nervioso",
+    commonUses: "Control de insectos chupadores y masticadores en múltiples cultivos"
+},
+// Agregar estos ingredientes al array ingredientsDatabase - Compuestos de MOA desconocidos o inciertos
+
+{
+    name: "Azadiractina",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Limonoides",
+    family: "Azadiractina",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos en agricultura orgánica, extraído del árbol de neem"
+},
+{
+    name: "Benzoximate",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Benzoatos",
+    family: "Benzoximate",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de ácaros en frutales y cítricos"
+},
+{
+    name: "Benzpirimoxan",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Pirimidinas",
+    family: "Benzpirimoxan",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos chupadores en diversos cultivos"
+},
+{
+    name: "Bromopropilato",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Propionatos",
+    family: "Bromopropilato",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de ácaros en frutales y cultivos protegidos"
+},
+{
+    name: "Chinometionat",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Ditionocarbamatos",
+    family: "Chinometionat",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de ácaros en múltiples cultivos"
+},
+{
+    name: "Dicofol",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Organoclorados",
+    family: "Dicofol",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de ácaros en frutales, cítricos y cultivos extensivos"
+},
+{
+    name: "Azufre de cal",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Inorgánicos",
+    family: "Azufre de cal",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de ácaros, hongos e insectos en agricultura orgánica"
+},
+{
+    name: "Mancozeb",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Ditiocarbamatos",
+    family: "Mancozeb",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Principalmente fungicida, con cierta actividad acaricida"
+},
+// Agregar estos ingredientes al array ingredientsDatabase - Compuestos adicionales de MOA desconocidos o inciertos
+
+{
+    name: "Piridalilo",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Piridinas",
+    family: "Piridalilo",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos en diversos cultivos"
+},
+{
+    name: "Azufre",
+    moaCode: "UN",
+    moaGroup: "Compuestos de modo de acción desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido",
+    chemicalGroup: "Inorgánicos",
+    family: "Azufre",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de ácaros, hongos e insectos en agricultura orgánica"
+},
+{
+    name: "Burkholderia spp",
+    moaCode: "UNB",
+    moaGroup: "Agentes bacterianos (no Bt) de MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en funciones)",
+    chemicalGroup: "Bacterias",
+    family: "Burkholderia",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control biológico de insectos y nematodos"
+},
+{
+    name: "Wolbachia pipientis (Zap)",
+    moaCode: "UNB",
+    moaGroup: "Agentes bacterianos (no Bt) de MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en funciones)",
+    chemicalGroup: "Bacterias",
+    family: "Wolbachia",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de mosquitos mediante incompatibilidad citoplásmica"
+},
+{
+    name: "Chenopodium ambrosioides extracto",
+    moaCode: "UNE",
+    moaGroup: "Esencia botánica que incluye aceites sintéticos, extractos y aceites sin refinar con MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en enzimas)",
+    chemicalGroup: "Extractos botánicos",
+    family: "Chenopodium",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos en agricultura orgánica"
+},
+{
+    name: "Monoésteres de ácidos grasos con glicerol o propanodiol",
+    moaCode: "UNE",
+    moaGroup: "Esencia botánica que incluye aceites sintéticos, extractos y aceites sin refinar con MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en enzimas)",
+    chemicalGroup: "Jabones insecticidas",
+    family: "Jabones potásicos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos de cuerpo blando en agricultura ecológica"
+},
+{
+    name: "Ácido nonanoico",
+    moaCode: "UNE",
+    moaGroup: "Esencia botánica que incluye aceites sintéticos, extractos y aceites sin refinar con MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en enzimas)",
+    chemicalGroup: "Ácidos grasos",
+    family: "Ácidos grasos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos y malezas en agricultura orgánica"
+},
+{
+    name: "Extracto de Sabadilla",
+    moaCode: "UNE",
+    moaGroup: "Esencia botánica que incluye aceites sintéticos, extractos y aceites sin refinar con MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en enzimas)",
+    chemicalGroup: "Alcaloides",
+    family: "Sabadilla",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos chupadores en agricultura orgánica"
+},
+{
+    name: "Extracto de Clitoria ternatea",
+    moaCode: "UNE",
+    moaGroup: "Esencia botánica que incluye aceites sintéticos, extractos y aceites sin refinar con MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en enzimas)",
+    chemicalGroup: "Extractos botánicos",
+    family: "Clitoria",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos en agricultura ecológica"
+},
+{
+    name: "Aceite de neem",
+    moaCode: "UNE",
+    moaGroup: "Esencia botánica que incluye aceites sintéticos, extractos y aceites sin refinar con MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos en enzimas)",
+    chemicalGroup: "Aceites vegetales",
+    family: "Neem",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos en agricultura orgánica, extraído del árbol de neem"
+},
+{
+    name: "Beauveria bassiana",
+    moaCode: "UNF",
+    moaGroup: "Agentes fúngicos de MOA desconocidos o inciertos",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos fisiológicos)",
+    chemicalGroup: "Hongos entomopatógenos",
+    family: "Beauveria",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control biológico de múltiples insectos plaga"
+},
+{
+    name: "Metarhizium bruneum cepa F52",
+    moaCode: "UNF",
+    moaGroup: "Agentes fúngicos de MOA desconocidos o inciertos",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos fisiológicos)",
+    chemicalGroup: "Hongos entomopatógenos",
+    family: "Metarhizium",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control biológico de insectos del suelo y foliares"
+},
+{
+    name: "Paecilomyces fumosoroseus Cepa 97",
+    moaCode: "UNF",
+    moaGroup: "Agentes fúngicos de MOA desconocidos o inciertos",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos fisiológicos)",
+    chemicalGroup: "Hongos entomopatógenos",
+    family: "Paecilomyces",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control biológico de moscas blancas y otros insectos"
+},
+{
+    name: "Akanthomyces muscarius Ve6",
+    moaCode: "UNF",
+    moaGroup: "Agentes fúngicos de MOA desconocidos o inciertos",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos fisiológicos)",
+    chemicalGroup: "Hongos entomopatógenos",
+    family: "Akanthomyces",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control biológico de áfidos y otros insectos chupadores"
+},
+// Agregar estos ingredientes al array ingredientsDatabase - Últimos compuestos de MOA desconocidos o inciertos
+
+{
+    name: "Tierra de diatomeas",
+    moaCode: "UNM",
+    moaGroup: "Disruptores mecánicos y físicos no específicos",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos múltiples)",
+    chemicalGroup: "Minerales",
+    family: "Diatomeas",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control físico de insectos mediante desecación, usado en agricultura orgánica"
+},
+{
+    name: "Aceite mineral",
+    moaCode: "UNM",
+    moaGroup: "Disruptores mecánicos y físicos no específicos",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos múltiples)",
+    chemicalGroup: "Aceites",
+    family: "Aceites minerales",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos y ácaros mediante asfixia, usado en frutales y ornamentales"
+},
+{
+    name: "Polidimetilsiloxano (PDMS)",
+    moaCode: "UNM",
+    moaGroup: "Disruptores mecánicos y físicos no específicos",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos múltiples)",
+    chemicalGroup: "Siliconas",
+    family: "Siliconas",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control físico de insectos mediante recubrimiento y asfixia"
+},
+{
+    name: "Péptidos diversos",
+    moaCode: "UNP",
+    moaGroup: "Péptidos de MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos fisiológicos)",
+    chemicalGroup: "Péptidos",
+    family: "Péptidos diversos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control de insectos mediante péptidos con mecanismo no completamente elucidado"
+},
+{
+    name: "Virus entomopatógenos diversos",
+    moaCode: "UNU",
+    moaGroup: "Agentes virales (no baculovirus) de MOA desconocido o incierto",
+    moaDescription: "Compuestos de modo de acción desconocido (efectos diversos)",
+    chemicalGroup: "Virus",
+    family: "Virus entomopatógenos",
+    physiologicalFunction: "Modo Desconocido",
+    commonUses: "Control biológico de insectos mediante infección viral específica"
+}
+      
+        ];
+
+        // Mapeo de funciones fisiológicas a colores
+        const functionColors = {
+            "Sistema Nervioso": {
+                background: "var(--nervous-system-dark)",
+                text: "white"
+            },
+            "Crecimiento y Desarrollo": {
+                background: "var(--growth-development-dark)",
+                text: "white"
+            },
+            "Respiración": {
+                background: "var(--respiration-dark)",
+                text: "white"
+            },
+            "Sistema Digestivo": {
+                background: "var(--digestive-system-dark)",
+                text: "white"
+            },
+            "Modo Desconocido": {
+                background: "var(--unknown-action-dark)",
+                text: "white"
+            }
+        };
+
+        // Elementos del DOM
+        const searchInput = document.getElementById('ingredient-search');
+        const searchBtn = document.getElementById('search-btn');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const resultsSection = document.getElementById('results-section');
+        const activeIngredientDiv = document.getElementById('active-ingredient');
+        const recommendationGrid = document.getElementById('recommendation-grid');
+        const modalLeyenda = document.getElementById('modalLeyenda');
+
+        // Variables globales
+        let currentRecommendations = [];
+        let currentIngredient = null;
+
+        // Función para mostrar el modal de leyenda
+        function mostrarLeyenda() {
+            modalLeyenda.style.display = "block";
+        }
+
+        // Función para cerrar el modal de leyenda
+        function cerrarLeyenda() {
+            modalLeyenda.style.display = "none";
+        }
+
+        // Cerrar el modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            if (event.target == modalLeyenda) {
+                cerrarLeyenda();
+            }
+        }
+
+        // Mostrar sugerencias al escribir
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            suggestionsList.innerHTML = '';
+            
+            if (query.length < 2) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+            
+            const matches = ingredientsDatabase.filter(ingredient => 
+                ingredient.name.toLowerCase().includes(query)
+            );
+            
+            if (matches.length > 0) {
+                matches.forEach(ingredient => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = ingredient.name;
+                    div.addEventListener('click', function() {
+                        searchInput.value = ingredient.name;
+                        suggestionsList.style.display = 'none';
+                        searchIngredient(ingredient.name);
+                    });
+                    suggestionsList.appendChild(div);
+                });
+                suggestionsList.style.display = 'block';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        });
+
+        // Ocultar sugerencias al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+                suggestionsList.style.display = 'none';
+            }
+        });
+
+        // Buscar al hacer clic en el botón
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchIngredient(query);
+            }
+        });
+
+        // Permitir búsqueda con Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    searchIngredient(query);
+                }
+            }
+        });
+
+        // Buscar ingrediente y mostrar resultados
+        function searchIngredient(query) {
+            const ingredient = ingredientsDatabase.find(ing => 
+                ing.name.toLowerCase() === query.toLowerCase()
+            );
+            
+            if (!ingredient) {
+                alert('Ingrediente no encontrado. Intente con otro nombre.');
+                return;
+            }
+            
+            currentIngredient = ingredient;
+            
+            // Mostrar información del ingrediente activo
+            displayActiveIngredient(ingredient);
+            
+            // Obtener recomendaciones
+            currentRecommendations = getRecommendations(ingredient);
+            
+            // Mostrar recomendaciones
+            displayRecommendations(currentRecommendations);
+            
+            // Mostrar sección de resultados
+            resultsSection.style.display = 'block';
+            
+            // Desplazarse a los resultados
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Mostrar información del ingrediente activo
+        function displayActiveIngredient(ingredient) {
+            const colorStyle = functionColors[ingredient.physiologicalFunction] || functionColors["Modo Desconocido"];
+            
+            activeIngredientDiv.innerHTML = `
+                <div class="ingredient-header">
+                    <h2 class="ingredient-name">${ingredient.name}</h2>
+                    <span class="moa-badge" style="background-color: ${colorStyle.background}">Grupo ${ingredient.moaCode} - ${ingredient.moaGroup}</span>
+                </div>
+                <div class="ingredient-details">
+                    <div>
+                        <div class="detail-item">
+                            <span class="detail-label">Función Fisiológica:</span> ${ingredient.physiologicalFunction}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Familia:</span> ${ingredient.family}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="detail-item">
+                            <span class="detail-label">Grupo Químico:</span> ${ingredient.chemicalGroup}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Usos Comunes:</span> ${ingredient.commonUses}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Obtener recomendaciones (excluyendo misma función fisiológica)
+        function getRecommendations(activeIngredient) {
+            return ingredientsDatabase.filter(ingredient => 
+                ingredient.name !== activeIngredient.name && 
+                ingredient.physiologicalFunction !== activeIngredient.physiologicalFunction
+            );
+        }
+
+        // Mostrar recomendaciones
+        function displayRecommendations(recommendations) {
+            if (recommendations.length === 0) {
+                recommendationGrid.innerHTML = `
+                    <div class="no-results">
+                        <p>No se encontraron ingredientes con modos de acción diferentes.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            recommendationGrid.innerHTML = '';
+            
+            recommendations.forEach(ingredient => {
+                const colorStyle = functionColors[ingredient.physiologicalFunction] || functionColors["Modo Desconocido"];
+                
+                const card = document.createElement('div');
+                card.className = 'recommendation-card';
+                card.innerHTML = `
+                    <div class="rec-name">${ingredient.name}</div>
+                    <div class="rec-moa">
+                        Grupo: 
+                        <span class="moa-badge" style="background-color: ${colorStyle.background}">
+                            ${ingredient.moaCode} - ${ingredient.moaGroup}
+                        </span>
+                    </div>
+                    <div class="rec-details">
+                        <p><strong>Función Fisiológica:</strong> ${ingredient.physiologicalFunction}</p>
+                        <p><strong>Familia:</strong> ${ingredient.family}</p>
+                        <p><strong>Grupo Químico:</strong> ${ingredient.chemicalGroup}</p>
+                        <p><strong>Usos Comunes:</strong> ${ingredient.commonUses}</p>
+                    </div>
+                `;
+                recommendationGrid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
