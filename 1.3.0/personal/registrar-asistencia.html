@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../components.css">
     <style>
         :root {
             --primary-color: #4CAF50;
@@ -323,14 +324,16 @@
     </style>
 </head>
 <body>
-    <!-- Espacio reservado para el header -->
-    <div class="header-space"></div>
+
+    <!-- Componentes -->
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
 
     <!-- Contenido principal -->
     <main class="main-content">
         <div class="container">
             <div class="breadcrumb">
-                <a href="#">Inicio</a> > <a href="#">Asistencias</a> > Registro Diario
+                <a href="dashboard.html">Inicio</a> >Registro Diario de Asistencia
             </div>
             
             <h1>Sistema de Asistencia</h1>
@@ -1221,5 +1224,9 @@
                 });
         }
     </script>
+      <!-- Scripts -->
+    <script src="../header-component.js"></script>
+    <script src="../sidebar-component.js"></script>
+    <script src="../footer.js"></script>
 </body>
 </html>
