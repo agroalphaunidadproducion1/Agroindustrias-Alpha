@@ -49,15 +49,15 @@
 
         .main-content {
             flex: 1;
-            padding: 20px;
+            padding: 15px;
             min-height: calc(100vh - 140px);
         }
 
         .container {
             background-color: var(--white);
-            padding: 30px;
+            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 1400px;
             margin: 0 auto;
@@ -76,14 +76,14 @@
 
         h1 {
             color: var(--primary-color);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .card {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
             border-radius: 8px;
             border: none;
         }
@@ -93,23 +93,26 @@
             font-weight: 600;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 15px 20px;
+            padding: 12px 15px;
+            font-size: 0.95rem;
         }
 
         .section-title {
             color: var(--primary-color);
             border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 18px;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
         }
 
+        /* Botones principales más pequeños */
         .btn-primary {
             background-color: var(--primary-color);
             border: none;
-            padding: 10px 20px;
+            padding: 6px 12px;
             font-weight: 600;
             border-radius: 4px;
+            font-size: 0.85rem;
         }
         
         .btn-primary:hover {
@@ -119,39 +122,43 @@
         .btn-success {
             background-color: var(--primary-color);
             border: none;
-            padding: 10px 20px;
+            padding: 6px 12px;
             font-weight: 600;
             border-radius: 4px;
+            font-size: 0.85rem;
         }
 
         .btn-danger {
             background-color: var(--error-color);
             border: none;
-            padding: 10px 20px;
+            padding: 6px 12px;
             font-weight: 600;
             border-radius: 4px;
+            font-size: 0.85rem;
         }
 
         .btn-info {
             background-color: var(--admin-color);
             border: none;
-            padding: 10px 20px;
+            padding: 6px 12px;
             font-weight: 600;
             border-radius: 4px;
+            font-size: 0.85rem;
         }
 
         .btn-warning {
             background-color: var(--grower-junior-color);
             border: none;
-            padding: 10px 20px;
+            padding: 6px 12px;
             font-weight: 600;
             border-radius: 4px;
+            font-size: 0.85rem;
         }
 
         .btn-action {
-            padding: 5px 8px;
-            font-size: 0.8rem;
-            margin: 2px;
+            padding: 4px 6px;
+            font-size: 0.75rem;
+            margin: 1px;
         }
 
         .points-table {
@@ -160,22 +167,23 @@
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            font-size: 0.85rem;
         }
 
         .points-table th {
             background-color: var(--primary-color);
             color: white;
-            padding: 12px 15px;
+            padding: 10px 8px;
             text-align: left;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 0.8rem;
         }
 
         .points-table td {
-            padding: 12px 15px;
+            padding: 10px 8px;
             border-bottom: 1px solid #eee;
-            font-size: 14px;
+            font-size: 0.8rem;
         }
 
         .points-table tr:hover {
@@ -183,18 +191,18 @@
         }
 
         .current-date {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: bold;
             color: var(--primary-color);
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .current-area {
             background-color: #e8f5e9;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
             border-left: 4px solid var(--primary-color);
         }
         
@@ -214,7 +222,7 @@
             background: white;
             border: 1px solid #ddd;
             border-radius: 0 0 4px 4px;
-            max-height: 200px;
+            max-height: 150px;
             overflow-y: auto;
             z-index: 1000;
             display: none;
@@ -222,9 +230,10 @@
         }
         
         .suggestion-item {
-            padding: 10px;
+            padding: 8px;
             cursor: pointer;
             border-bottom: 1px solid #eee;
+            font-size: 0.85rem;
         }
         
         .suggestion-item:hover {
@@ -234,20 +243,11 @@
         .caporal-badge {
             background-color: var(--grower-junior-color);
             color: #000;
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            margin-left: 8px;
-        }
-        
-        .stats-card {
-            transition: transform 0.3s ease;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-5px);
+            margin-left: 5px;
         }
 
         .modal-content {
@@ -260,30 +260,33 @@
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border-radius: 8px 8px 0 0;
+            padding: 12px 15px;
         }
 
         .no-data {
             text-align: center;
-            padding: 40px;
+            padding: 30px;
             color: #666;
             font-style: italic;
+            font-size: 0.9rem;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 30px;
             color: #666;
+            font-size: 0.9rem;
         }
 
         .spinner {
             display: inline-block;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             border: 3px solid rgba(76, 175, 80, 0.3);
             border-radius: 50%;
             border-top-color: var(--primary-color);
             animation: spin 1s ease-in-out infinite;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         @keyframes spin {
@@ -294,32 +297,272 @@
             height: 70px;
         }
 
+        /* Estilos específicos para móviles */
         @media (max-width: 768px) {
+            .main-content {
+                padding: 10px;
+            }
+            
             .container {
-                padding: 20px;
+                padding: 15px;
             }
             
-            .btn {
-                width: 100%;
-                margin-bottom: 10px;
+            h1 {
+                font-size: 20px;
+                margin-bottom: 15px;
             }
             
-            .table-responsive {
+            .card-header {
+                padding: 10px 12px;
                 font-size: 0.9rem;
             }
             
-            .points-table th, .points-table td {
-                padding: 8px 5px;
+            .current-area {
+                padding: 12px;
+            }
+            
+            .section-title {
+                font-size: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .btn {
+                font-size: 0.8rem;
+                padding: 5px 10px;
             }
             
             .btn-action {
-                padding: 4px 6px;
+                padding: 3px 5px;
                 font-size: 0.7rem;
             }
             
-            .stats-card {
-                margin-bottom: 15px;
+            .points-table th, 
+            .points-table td {
+                padding: 8px 5px;
+                font-size: 0.75rem;
             }
+            
+            .current-date {
+                font-size: 0.9rem;
+            }
+            
+            /* Mejorar visualización de botones de asistencia en móviles */
+            .attendance-btn {
+                padding: 4px 6px !important;
+                font-size: 0.7rem !important;
+            }
+            
+            .attendance-btn i {
+                margin-right: 2px !important;
+            }
+            
+            /* Ocultar texto en botones pequeños y mostrar solo iconos */
+            .btn-action span {
+                display: none;
+            }
+            
+            /* Ajustar tabla para móviles */
+            .table-responsive {
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+            
+            .card-header {
+                font-size: 0.85rem;
+            }
+            
+            .btn {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+            
+            .btn-group .btn {
+                padding: 4px 6px;
+            }
+            
+            .points-table th, 
+            .points-table td {
+                padding: 6px 4px;
+                font-size: 0.7rem;
+            }
+            
+            /* Ocultar columnas menos importantes en móviles muy pequeños */
+            .points-table td:nth-child(3), /* Ocultar puesto */
+            .points-table th:nth-child(3) {
+                display: none;
+            }
+            
+            /* Ajustar botones de acción */
+            .btn-action {
+                padding: 2px 4px;
+                margin: 0 1px;
+            }
+            
+            /* Mejorar visualización de áreas */
+            .current-area .row > div {
+                margin-bottom: 10px;
+            }
+            
+            /* Ajustar modal para móviles */
+            .modal-dialog {
+                margin: 10px;
+            }
+            
+            .modal-content {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .points-table td:nth-child(2), /* Ocultar código en móviles muy pequeños */
+            .points-table th:nth-child(2) {
+                display: none;
+            }
+            
+            .btn-action {
+                display: block;
+                width: 100%;
+                margin-bottom: 2px;
+            }
+            
+            .attendance-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+            
+            .attendance-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Mejoras para tablets */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .points-table {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Utilidades para mejorar la experiencia móvil */
+        .mobile-optimized {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        .btn-mobile {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-control-mobile {
+            font-size: 16px; /* Previene zoom en iOS */
+        }
+
+        /* Estilos específicos para los botones de acción principales */
+        .action-buttons-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .action-buttons-container .btn {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons-container {
+                justify-content: center;
+                margin-top: 10px;
+            }
+            
+            .action-buttons-container .btn {
+                flex: 1;
+                max-width: 180px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .action-buttons-container {
+                flex-direction: row;
+                gap: 6px;
+            }
+            
+            .action-buttons-container .btn {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+            }
+        }
+
+        /* Estilos para el tutorial */
+        .tutorial-step {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .tutorial-step.active {
+            display: block;
+        }
+
+        .tutorial-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .tutorial-progress {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin: 0 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background-color: var(--primary-color);
+        }
+
+        .tutorial-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .tutorial-skip {
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .tutorial-skip:hover {
+            color: var(--error-color);
         }
     </style>
 </head>
@@ -333,31 +576,31 @@
     <main class="main-content">
         <div class="container">
             <div class="breadcrumb">
-                <a href="dashboard.html">Inicio</a> >Registro Diario de Asistencia
+                <a href="dashboard.html">Inicio</a> > Registro Diario de Asistencia
             </div>
             
             <h1>Sistema de Asistencia</h1>
             <div class="current-date" id="current-date"></div>
 
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Registro de Asistencia Diaria</h5>
                         </div>
                         <div class="card-body">
                             <!-- Selección de área actual -->
-                            <div class="current-area mb-4">
+                            <div class="current-area mb-3">
                                 <h5 class="section-title"><i class="fas fa-map-marker-alt me-2"></i>Área de Trabajo</h5>
                                 <div class="row align-items-center">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-12 mb-2 mb-md-0">
                                         <label class="form-label"><strong>Seleccione el invernadero/área:</strong></label>
-                                        <select class="form-select" id="current-area-select">
+                                        <select class="form-select form-control-mobile" id="current-area-select">
                                             <option value="">Seleccione un área...</option>
                                             <!-- Opciones se cargarán dinámicamente -->
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-12">
                                         <div id="current-area-display">
                                             <strong>Área seleccionada:</strong> <span id="current-area-name" class="fw-bold text-primary">Ninguna</span>
                                         </div>
@@ -366,14 +609,14 @@
                             </div>
 
                             <!-- Selección de fecha -->
-                            <div class="current-area mb-4">
+                            <div class="current-area mb-3">
                                 <h5 class="section-title"><i class="fas fa-calendar-alt me-2"></i>Fecha de Asistencia</h5>
                                 <div class="row align-items-center">
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-12 mb-2 mb-md-0">
                                         <label class="form-label"><strong>Seleccione la fecha:</strong></label>
-                                        <input type="date" class="form-control" id="attendance-date" value="">
+                                        <input type="date" class="form-control form-control-mobile" id="attendance-date" value="">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 col-12">
                                         <div id="selected-date-display">
                                             <strong>Fecha seleccionada:</strong> <span id="selected-date-name" class="fw-bold text-primary"></span>
                                         </div>
@@ -381,33 +624,35 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-4">
-                                <div class="col-md-6">
+                            <div class="row mb-3 align-items-center">
+                                <div class="col-md-6 col-12 mb-2 mb-md-0">
                                     <div class="search-container">
-                                        <div class="input-group mb-3">
+                                        <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                            <input type="text" id="search-employee" class="form-control" placeholder="Buscar personal por nombre o código...">
+                                            <input type="text" id="search-employee" class="form-control form-control-mobile" placeholder="Buscar personal...">
                                         </div>
                                         <div class="suggestions-container" id="search-suggestions"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 text-end">
-                                    <button class="btn btn-success me-2" id="mark-all-present">
-                                        <i class="fas fa-check-circle me-2"></i>Marcar Todos Presentes
-                                    </button>
-                                    <button class="btn btn-primary" id="save-attendance">
-                                        <i class="fas fa-save me-2"></i>Guardar Asistencia
-                                    </button>
+                                <div class="col-md-6 col-12">
+                                    <div class="action-buttons-container">
+                                        <button class="btn btn-success btn-mobile mobile-optimized" id="mark-all-present">
+                                            <i class="fas fa-check-circle me-1"></i>Marcar Todos
+                                        </button>
+                                        <button class="btn btn-primary btn-mobile mobile-optimized" id="save-attendance">
+                                            <i class="fas fa-save me-1"></i>Guardar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="points-table-container">
+                            <div class="table-responsive">
                                 <table class="points-table">
                                     <thead>
                                         <tr>
                                             <th>Nombre</th>
-                                            <th>Código</th>
-                                            <th>Puesto</th>
+                                            <th class="d-none d-sm-table-cell">Código</th>
+                                            <th class="d-none d-md-table-cell">Puesto</th>
                                             <th class="text-center">Asistencia</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
@@ -423,63 +668,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Resumen de Asistencia</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-md-4 mb-3">
-                                    <div class="card stats-card">
-                                        <div class="card-body">
-                                            <h6>Total Empleados</h6>
-                                            <h3 id="total-employees">0</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card stats-card">
-                                        <div class="card-body">
-                                            <h6>Presentes</h6>
-                                            <h3 id="present-count">0</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card stats-card">
-                                        <div class="card-body">
-                                            <h6>Ausentes</h6>
-                                            <h3 id="absent-count">0</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Instrucciones</h5>
-                        </div>
-                        <div class="card-body">
-                            <ol>
-                                <li>Seleccione el área donde está tomando asistencia</li>
-                                <li>Seleccione la fecha para la cual está registrando asistencia</li>
-                                <li>Se mostrará automáticamente el personal de esa área</li>
-                                <li>Busque empleados por nombre o código si es necesario</li>
-                                <li>Seleccione "Presente" o "Ausente" para cada empleado</li>
-                                <li>Use el botón "+" para agregar personal de otras áreas</li>
-                                <li>Haga clic en "Guardar Asistencia" para guardar los registros</li>
-                                <li>Cada invernadero/área guarda su asistencia por separado</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
@@ -488,7 +676,7 @@
 
     <!-- Modal para mover empleado -->
     <div class="modal fade" id="moveEmployeeModal" tabindex="-1" aria-labelledby="moveEmployeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="moveEmployeeModalLabel">Mover Empleado</h5>
@@ -508,15 +696,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="newAreaSelect" class="form-label">Seleccionar nuevo invernadero/área:</label>
-                        <select class="form-select" id="newAreaSelect">
+                        <select class="form-select form-control-mobile" id="newAreaSelect">
                             <option value="">Seleccione un área...</option>
                             <!-- Opciones se cargarán dinámicamente -->
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="confirmMove">Mover Empleado</button>
+                    <button type="button" class="btn btn-secondary btn-mobile" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary btn-mobile mobile-optimized" id="confirmMove">Mover Empleado</button>
                 </div>
             </div>
         </div>
@@ -524,7 +712,7 @@
 
     <!-- Modal para eliminar empleado -->
     <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteEmployeeModalLabel">Eliminar Empleado</h5>
@@ -537,8 +725,101 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar Empleado</button>
+                    <button type="button" class="btn btn-secondary btn-mobile" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger btn-mobile mobile-optimized" id="confirmDelete">Eliminar Empleado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Tutorial -->
+    <div class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tutorialModalLabel">Tutorial - Sistema de Asistencia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Paso 1: Selección de área -->
+                    <div class="tutorial-step active" id="step1">
+                        <div class="tutorial-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h4>Paso 1: Selecciona el Área</h4>
+                        <p>Elige el invernadero o área donde estás tomando asistencia. Cada área guarda su asistencia por separado.</p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Ejemplo: Invernadero 9, Fitosanidad, Riego, etc.
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Selección de fecha -->
+                    <div class="tutorial-step" id="step2">
+                        <div class="tutorial-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h4>Paso 2: Elige la Fecha</h4>
+                        <p>Selecciona la fecha para la cual estás registrando la asistencia. Por defecto se usa la fecha actual.</p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Puedes registrar asistencia para días anteriores si es necesario.
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Búsqueda y registro -->
+                    <div class="tutorial-step" id="step3">
+                        <div class="tutorial-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>Paso 3: Registra la Asistencia</h4>
+                        <p>Se mostrarán automáticamente los empleados de esa área. Usa los botones "Presente" o "Ausente" para cada uno.</p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Puedes buscar empleados por nombre o código si necesitas agregar personal de otras áreas.
+                        </div>
+                    </div>
+
+                    <!-- Paso 4: Acciones adicionales -->
+                    <div class="tutorial-step" id="step4">
+                        <div class="tutorial-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h4>Paso 4: Acciones Adicionales</h4>
+                        <p>Usa los botones de acción para:</p>
+                        <ul class="text-start">
+                            <li><i class="fas fa-exchange-alt text-primary me-2"></i> Mover empleados entre áreas</li>
+                            <li><i class="fas fa-plus text-info me-2"></i> Agregar empleados de otras áreas temporalmente</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Marcar a todos como presentes rápidamente</li>
+                        </ul>
+                    </div>
+
+                    <!-- Paso 5: Guardar -->
+                    <div class="tutorial-step" id="step5">
+                        <div class="tutorial-icon">
+                            <i class="fas fa-save"></i>
+                        </div>
+                        <h4>Paso 5: Guarda los Cambios</h4>
+                        <p>No olvides hacer clic en "Guardar" para registrar toda la asistencia en el sistema.</p>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Si no guardas, se perderán todos los cambios realizados.
+                        </div>
+                    </div>
+
+                    <!-- Indicadores de progreso -->
+                    <div class="tutorial-progress">
+                        <div class="progress-dot active" data-step="1"></div>
+                        <div class="progress-dot" data-step="2"></div>
+                        <div class="progress-dot" data-step="3"></div>
+                        <div class="progress-dot" data-step="4"></div>
+                        <div class="progress-dot" data-step="5"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link tutorial-skip" id="skipTutorial">Omitir Tutorial</button>
+                    <button type="button" class="btn btn-secondary" id="prevStep" style="display: none;">Anterior</button>
+                    <button type="button" class="btn btn-primary" id="nextStep">Siguiente</button>
                 </div>
             </div>
         </div>
@@ -579,33 +860,108 @@
         let selectedDate = '';
         let dateId = '';
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Inicializando aplicación...');
+        // Variables para el tutorial
+        let currentTutorialStep = 1;
+        const totalTutorialSteps = 5;
+
+        // Función para formatear fecha correctamente
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            // Ajustar para evitar problemas de zona horaria
+            const adjustedDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
             
-            // Establecer fecha actual como predeterminada
-            const today = new Date();
-            dateId = today.toISOString().split('T')[0];
-            selectedDate = dateId;
-            
-            // Formatear fecha para mostrar
-            const formattedDate = today.toLocaleDateString('es-ES', { 
+            return adjustedDate.toLocaleDateString('es-ES', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
                 day: 'numeric' 
             });
-            document.getElementById('current-date').textContent = formattedDate;
+        }
+
+        // Función para obtener la fecha actual en formato YYYY-MM-DD
+        function getCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Función para verificar si es la primera vez
+        function isFirstTime() {
+            return localStorage.getItem('attendanceTutorialSeen') !== 'true';
+        }
+
+        // Función para marcar tutorial como visto
+        function markTutorialAsSeen() {
+            localStorage.setItem('attendanceTutorialSeen', 'true');
+        }
+
+        // Función para mostrar el tutorial
+        function showTutorial() {
+            const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
+            tutorialModal.show();
+        }
+
+        // Función para actualizar el tutorial
+        function updateTutorial() {
+            // Ocultar todos los pasos
+            document.querySelectorAll('.tutorial-step').forEach(step => {
+                step.classList.remove('active');
+            });
             
-            // Configurar selector de fecha
+            // Mostrar paso actual
+            document.getElementById(`step${currentTutorialStep}`).classList.add('active');
+            
+            // Actualizar indicadores de progreso
+            document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+                if (index + 1 <= currentTutorialStep) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            
+            // Actualizar botones
+            document.getElementById('prevStep').style.display = currentTutorialStep === 1 ? 'none' : 'block';
+            document.getElementById('nextStep').textContent = currentTutorialStep === totalTutorialSteps ? 'Comenzar' : 'Siguiente';
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Inicializando aplicación...');
+            
+            // Establecer fecha actual como predeterminada
+            dateId = getCurrentDate();
+            selectedDate = dateId;
+            
+            // Configurar elementos de fecha
             const dateInput = document.getElementById('attendance-date');
             dateInput.value = dateId;
-            updateSelectedDateDisplay(dateId);
+            
+            // Actualizar displays de fecha
+            updateDateDisplays();
             
             // Cargar empleados y configurar eventos
             loadEmployees();
             setupEventListeners();
+            
+            // Mostrar tutorial si es la primera vez
+            if (isFirstTime()) {
+                setTimeout(() => {
+                    showTutorial();
+                }, 1000);
+            }
         });
+
+        // Actualizar todos los displays de fecha
+        function updateDateDisplays() {
+            // Fecha actual
+            document.getElementById('current-date').textContent = formatDate(dateId);
+            
+            // Fecha seleccionada
+            document.getElementById('selected-date-name').textContent = formatDate(dateId);
+        }
 
         // Configurar event listeners
         function setupEventListeners() {
@@ -622,7 +978,7 @@
             document.getElementById('attendance-date').addEventListener('change', function() {
                 selectedDate = this.value;
                 dateId = selectedDate;
-                updateSelectedDateDisplay(selectedDate);
+                updateDateDisplays();
                 console.log('Fecha seleccionada:', dateId);
                 
                 // Recargar asistencia si hay un área seleccionada
@@ -656,18 +1012,29 @@
             // Event listeners para modales
             document.getElementById('confirmMove').addEventListener('click', moveEmployee);
             document.getElementById('confirmDelete').addEventListener('click', deleteEmployee);
-        }
 
-        // Actualizar la visualización de la fecha seleccionada
-        function updateSelectedDateDisplay(dateString) {
-            const date = new Date(dateString);
-            const formattedDate = date.toLocaleDateString('es-ES', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            // Event listeners para el tutorial
+            document.getElementById('nextStep').addEventListener('click', function() {
+                if (currentTutorialStep < totalTutorialSteps) {
+                    currentTutorialStep++;
+                    updateTutorial();
+                } else {
+                    markTutorialAsSeen();
+                    bootstrap.Modal.getInstance(document.getElementById('tutorialModal')).hide();
+                }
             });
-            document.getElementById('selected-date-name').textContent = formattedDate;
+
+            document.getElementById('prevStep').addEventListener('click', function() {
+                if (currentTutorialStep > 1) {
+                    currentTutorialStep--;
+                    updateTutorial();
+                }
+            });
+
+            document.getElementById('skipTutorial').addEventListener('click', function() {
+                markTutorialAsSeen();
+                bootstrap.Modal.getInstance(document.getElementById('tutorialModal')).hide();
+            });
         }
 
         // Cargar empleados desde Firebase
@@ -835,7 +1202,6 @@
             
             // Actualizar la lista de asistencia
             renderAttendanceList();
-            updateCounters();
         }
 
         // Mostrar sugerencias de búsqueda
@@ -942,34 +1308,36 @@
                         ${employee.nombre || 'Sin nombre'}
                         ${isCaporal ? '<span class="caporal-badge">Caporal</span>' : ''}
                     </td>
-                    <td>${employee.codigo || 'Sin código'}</td>
-                    <td>${employee.puesto || 'Sin puesto'}</td>
+                    <td class="d-none d-sm-table-cell">${employee.codigo || 'Sin código'}</td>
+                    <td class="d-none d-md-table-cell">${employee.puesto || 'Sin puesto'}</td>
                     <td class="text-center">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-sm ${isPresent ? 'btn-success' : 'btn-outline-success'} attendance-btn present-btn" data-employee-id="${employee.id}" data-status="true">
-                                <i class="fas fa-check"></i> Presente
+                        <div class="btn-group attendance-buttons" role="group">
+                            <button type="button" class="btn btn-sm ${isPresent ? 'btn-success' : 'btn-outline-success'} attendance-btn present-btn mobile-optimized" data-employee-id="${employee.id}" data-status="true">
+                                <i class="fas fa-check"></i> <span class="d-none d-sm-inline">Presente</span>
                             </button>
-                            <button type="button" class="btn btn-sm ${!isPresent ? 'btn-danger' : 'btn-outline-danger'} attendance-btn absent-btn" data-employee-id="${employee.id}" data-status="false">
-                                <i class="fas fa-times"></i> Ausente
+                            <button type="button" class="btn btn-sm ${!isPresent ? 'btn-danger' : 'btn-outline-danger'} attendance-btn absent-btn mobile-optimized" data-employee-id="${employee.id}" data-status="false">
+                                <i class="fas fa-times"></i> <span class="d-none d-sm-inline">Ausente</span>
                             </button>
                         </div>
                     </td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-primary btn-action move-employee-btn" data-employee-id="${employee.id}">
-                            <i class="fas fa-exchange-alt"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger btn-action delete-employee-btn" data-employee-id="${employee.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        ${employee.temporal ? 
-                            `<button class="btn btn-sm btn-warning btn-action remove-temporal-btn" data-employee-id="${employee.id}">
-                                <i class="fas fa-times"></i>
-                            </button>` : 
-                            (employee.invernaderos && employee.invernaderos.includes(currentArea) ? '' :
-                            `<button class="btn btn-sm btn-info btn-action add-temporal-btn" data-employee-id="${employee.id}">
-                                <i class="fas fa-plus"></i>
-                            </button>`)
-                        }
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-primary btn-action move-employee-btn mobile-optimized" data-employee-id="${employee.id}" title="Mover empleado">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-action delete-employee-btn mobile-optimized" data-employee-id="${employee.id}" title="Eliminar empleado">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            ${employee.temporal ? 
+                                `<button class="btn btn-sm btn-warning btn-action remove-temporal-btn mobile-optimized" data-employee-id="${employee.id}" title="Quitar temporal">
+                                    <i class="fas fa-times"></i>
+                                </button>` : 
+                                (employee.invernaderos && employee.invernaderos.includes(currentArea) ? '' :
+                                `<button class="btn btn-sm btn-info btn-action add-temporal-btn mobile-optimized" data-employee-id="${employee.id}" title="Agregar temporal">
+                                    <i class="fas fa-plus"></i>
+                                </button>`)
+                            }
+                        </div>
                     </td>
                 `;
                 
@@ -978,9 +1346,6 @@
             
             // Añadir event listeners
             setupAttendanceEventListeners();
-            
-            // Actualizar contadores
-            updateCounters();
         }
 
         // Configurar event listeners para la tabla de asistencia
@@ -993,7 +1358,6 @@
                     
                     savedAttendance[employeeId] = status;
                     updateAttendanceUI(employeeId, status);
-                    updateCounters();
                 });
             });
             
@@ -1178,18 +1542,6 @@
                 savedAttendance[employee.id] = true;
                 updateAttendanceUI(employee.id, true);
             });
-            updateCounters();
-        }
-
-        // Actualizar contadores
-        function updateCounters() {
-            const total = filteredEmployees.length;
-            const present = Object.values(savedAttendance).filter(status => status === true).length;
-            const absent = total - present;
-            
-            document.getElementById('total-employees').textContent = total;
-            document.getElementById('present-count').textContent = present;
-            document.getElementById('absent-count').textContent = absent;
         }
 
         // Guardar asistencia en Firebase
@@ -1227,6 +1579,6 @@
       <!-- Scripts -->
     <script src="../header-component.js"></script>
     <script src="../sidebar-component.js"></script>
-    <script src="../footer.js"></script>
+    <script src="..footer.js"></script>
 </body>
 </html>
