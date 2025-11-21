@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Contenido principal mejorado */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Contenedor de tarjetas más compacto */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        /* Tarjetas más pequeñas y compactas */
+        .card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-light);
+        }
+
+        .card-icon {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        .card h3 {
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            margin-top: 40px;
+            transition: all 0.3s ease;
+        }
+
+        /* Estados de carga y error */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .loading i {
+            margin-right: 10px;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 25px;
+            color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        /* Clase utilitaria */
+        .hidden {
+            display: none;
+        }
+
+        /* Estilos responsivos mejorados */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+                gap: 10px;
+            }
+            
+            .card {
+                padding: 10px;
+                min-height: 100px;
+            }
+            
+            .card-icon {
+                font-size: 1.4rem;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+                gap: 8px;
+            }
+            
+            .card {
+                padding: 8px;
+                min-height: 95px;
+            }
+            
+            .card-icon {
+                font-size: 1.3rem;
+            }
+            
+            .card h3 {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            }
+            
+            .card {
+                min-height: 90px;
+            }
+            
+            .card-icon {
+                font-size: 1.2rem;
+            }
+            
+            .card h3 {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <!-- Componentes -->
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+    
+    <!-- Contenido principal mejorado -->
+    <div class="main-content" id="mainContent">
+        <div class="dashboard-section">
+            <div class="modules-container" id="modulesContainer">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando módulos de registro...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        
+        // Referencias específicas para módulos de registro
+        const registrosModulesRef = database.ref('modulos_registros');
+        const registrosAccessRef = database.ref('accesos_registros');
+
+        // Variables globales
+        let systemModules = [];
+        let roleAccess = {};
+        let userRole = '';
+        let currentUser = null;
+
+        // Sistema de temas
+        const themes = ['light', 'dark', 'blue', 'orange', 'purple'];
+        let currentThemeIndex = 0;
+
+        // Cargar tema guardado
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme) {
+                currentThemeIndex = themes.indexOf(savedTheme);
+                if (currentThemeIndex === -1) currentThemeIndex = 0;
+                document.body.setAttribute('data-theme', themes[currentThemeIndex]);
+            }
+        }
+
+        // Verificar sesión al cargar
+        document.addEventListener('DOMContentLoaded', async function() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Guardar el rol del usuario
+            currentUser = userData;
+            userRole = userData.role;
+            
+            console.log('Usuario actual:', userData);
+            
+            // Cargar tema guardado
+            loadSavedTheme();
+            
+            // Configurar eventos de logout
+            document.addEventListener('logout', logout);
+            
+            // Verificar si el usuario sigue activo en uactivos
+            activeUsersRef.child(userData.username).once('value')
+                .then(snapshot => {
+                    if (!snapshot.exists()) {
+                        logout();
+                        return;
+                    }
+                    
+                    // Cargar datos de Firebase para los módulos de registro
+                    loadRegistrosData();
+                })
+                .catch(error => {
+                    console.error('Error verificando sesión activa:', error);
+                    showError('Error de conexión. Intente recargar la página.');
+                    
+                    // Intentar cargar datos aunque falle la verificación
+                    loadRegistrosData();
+                });
+        });
+
+        // Cargar datos de registro desde Firebase
+        function loadRegistrosData() {
+            console.log('Cargando datos de registros desde Firebase...');
+            
+            // Cargar módulos y accesos de registro en paralelo
+            Promise.all([
+                registrosModulesRef.once('value'),
+                registrosAccessRef.once('value')
+            ])
+            .then(([modulesSnapshot, accessSnapshot]) => {
+                console.log('Datos de registros cargados de Firebase:', {
+                    modules: modulesSnapshot.exists(),
+                    access: accessSnapshot.exists()
+                });
+                
+                // Procesar módulos de registro
+                if (modulesSnapshot.exists()) {
+                    const modulesData = modulesSnapshot.val();
+                    console.log('Datos de módulos de registro:', modulesData);
+                    
+                    // Verificar si modulesData es un array o un objeto
+                    if (Array.isArray(modulesData)) {
+                        systemModules = modulesData;
+                    } else if (typeof modulesData === 'object' && modulesData !== null) {
+                        // Convertir objeto a array
+                        systemModules = Object.values(modulesData);
+                    } else {
+                        systemModules = [];
+                    }
+                    
+                    console.log('Módulos de registro procesados:', systemModules);
+                } else {
+                    console.error('No se encontraron módulos de registro en Firebase');
+                    // Cargar módulos predeterminados de registro
+                    loadDefaultRegistrosModules();
+                }
+                
+                // Procesar accesos de registro
+                if (accessSnapshot.exists()) {
+                    roleAccess = accessSnapshot.val();
+                    console.log('Accesos de registro cargados:', roleAccess);
+                } else {
+                    console.error('No se encontraron accesos de registro en Firebase');
+                    // Cargar accesos predeterminados
+                    loadDefaultRegistrosAccess();
+                }
+                
+                // Generar las tarjetas con los permisos del usuario
+                generateFeatureCards();
+            })
+            .catch(error => {
+                console.error('Error cargando datos de registro:', error);
+                showError('Error al cargar los módulos de registro. Intente recargar la página.');
+            });
+        }
+
+        // Cargar módulos predeterminados de registro
+        function loadDefaultRegistrosModules() {
+            systemModules = [
+                { 
+                    id: 'quimicos', 
+                    icon: 'fa-flask', 
+                    title: 'Químicos', 
+                    description: 'Registro de productos químicos', 
+                    link: 'ingresoquimicos.html' 
+                },
+                { 
+                    id: 'aplicaciones', 
+                    icon: 'fa-spray-can', 
+                    title: 'Aplicaciones Químicos', 
+                    description: 'Registro de aplicaciones de químicos', 
+                    link: 'ingresoaplicaciones.html' 
+                },
+                { 
+                    id: 'asistencia', 
+                    icon: 'fa-user-check', 
+                    title: 'Asistencia', 
+                    description: 'Registro de asistencia del personal', 
+                    link: 'registrarasistencia.html' 
+                },
+                { 
+                    id: 'actividades', 
+                    icon: 'fa-clipboard-list', 
+                    title: 'Actividades', 
+                    description: 'Registro de actividades realizadas', 
+                    link: 'registroactividades.html' 
+                },
+                { 
+                    id: 'cosecha', 
+                    icon: 'fa-apple-whole', 
+                    title: 'Cosecha', 
+                    description: 'Registro de cosechas', 
+                    link: 'Registrocosecha.html' 
+                },
+                { 
+                    id: 'proyecciones', 
+                    icon: 'fa-chart-line', 
+                    title: 'Proyecciones', 
+                    description: 'Proyecciones de producción', 
+                    link: 'proyecciones.html' 
+                },
+                { 
+                    id: 'personal', 
+                    icon: 'fa-user-plus', 
+                    title: 'Agregar Personal', 
+                    description: 'Registro de nuevo personal', 
+                    link: 'registropersonal.html' 
+                },
+                { 
+                    id: 'beneficios', 
+                    icon: 'fa-bug', 
+                    title: 'Benéficos', 
+                    description: 'Registro de organismos benéficos', 
+                    link: 'ingresodanobeneficos.html' 
+                }
+            ];
+            
+            // Guardar los módulos predeterminados en Firebase
+            registrosModulesRef.set(systemModules)
+                .then(() => {
+                    console.log('Módulos predeterminados de registro guardados en Firebase');
+                })
+                .catch(error => {
+                    console.error('Error guardando módulos predeterminados:', error);
+                });
+        }
+
+        // Cargar accesos predeterminados para registros
+        function loadDefaultRegistrosAccess() {
+            // Inicializar accesos para todos los roles
+            const allRoles = [
+                'Administrador', 'Gerente General', 'Gerente de Producción', 
+                'Supervisor', 'Jefe de Vivero', 'Grower Junior', 'Digitador', 
+                'Técnico Fitosanidad', 'Técnico Prácticas Culturales', 
+                'Técnico Riego', 'Invitado'
+            ];
+            
+            // Inicializar estructura vacía
+            roleAccess = {};
+            
+            allRoles.forEach(role => {
+                roleAccess[role] = {};
+                systemModules.forEach(module => {
+                    // Por defecto, solo el administrador tiene acceso a todo
+                    roleAccess[role][module.id] = (role === 'Administrador');
+                });
+            });
+            
+            // Ajustes específicos para otros roles
+            roleAccess['Gerente General'] = {
+                'quimicos': true, 'aplicaciones': true, 'asistencia': true, 
+                'actividades': true, 'cosecha': true, 'proyecciones': true,
+                'personal': true, 'beneficios': true
+            };
+            
+            roleAccess['Gerente de Producción'] = {
+                'quimicos': true, 'aplicaciones': true, 'asistencia': true, 
+                'actividades': true, 'cosecha': true, 'proyecciones': true,
+                'personal': true, 'beneficios': true
+            };
+            
+            roleAccess['Supervisor'] = {
+                'asistencia': true, 'actividades': true
+            };
+            
+            roleAccess['Jefe de Vivero'] = {
+                'asistencia': true, 'actividades': true
+            };
+            
+            roleAccess['Grower Junior'] = {
+                'quimicos': true, 'aplicaciones': true, 'asistencia': true, 
+                'actividades': true, 'cosecha': true, 'beneficios': true
+            };
+            
+            roleAccess['Digitador'] = {
+                'cosecha': true, 'proyecciones': true
+            };
+            
+            roleAccess['Técnico Fitosanidad'] = {
+                'quimicos': true, 'aplicaciones': true, 'asistencia': true, 
+                'beneficios': true
+            };
+            
+            roleAccess['Técnico Prácticas Culturales'] = {
+                'asistencia': true, 'actividades': true
+            };
+            
+            roleAccess['Técnico Riego'] = {
+                'asistencia': true
+            };
+            
+            roleAccess['Invitado'] = {
+                // Sin acceso por defecto
+            };
+            
+            // Guardar los accesos predeterminados en Firebase
+            registrosAccessRef.set(roleAccess)
+                .then(() => {
+                    console.log('Accesos predeterminados de registro guardados en Firebase');
+                })
+                .catch(error => {
+                    console.error('Error guardando accesos predeterminados:', error);
+                });
+        }
+
+        // Verificar si el usuario tiene acceso a un módulo
+        function hasAccessToModule(module) {
+            if (!module || !module.id) return false;
+            
+            // Obtener los accesos para el rol del usuario
+            const userAccess = roleAccess[userRole];
+            if (!userAccess) return false;
+            
+            console.log(`Verificando acceso para módulo: ${module.id}`, {
+                userRole: userRole,
+                userAccess: userAccess,
+                moduleId: module.id,
+                hasDirectAccess: userAccess[module.id]
+            });
+            
+            // Verificar acceso directo
+            if (userAccess[module.id]) return true;
+            
+            return false;
+        }
+
+        // Generar tarjetas de características según los permisos del rol
+        function generateFeatureCards() {
+            const container = document.getElementById('modulesContainer');
+            
+            // Verificar si tenemos los datos necesarios
+            if (systemModules.length === 0) {
+                container.innerHTML = '<div class="error-message">No hay módulos de registro configurados en el sistema.</div>';
+                return;
+            }
+            
+            if (Object.keys(roleAccess).length === 0) {
+                container.innerHTML = '<div class="error-message">No hay permisos de registro configurados en el sistema.</div>';
+                return;
+            }
+            
+            console.log('Generando tarjetas de registro para rol:', userRole);
+            console.log('Módulos de registro disponibles:', systemModules);
+            console.log('Accesos de registro para este rol:', roleAccess[userRole]);
+            
+            // Obtener los accesos para el rol del usuario
+            const userAccess = roleAccess[userRole];
+            
+            if (!userAccess) {
+                container.innerHTML = `<div class="error-message">No se encontraron permisos de registro para el rol "${userRole}".</div>`;
+                return;
+            }
+            
+            // Filtrar módulos a los que el usuario tiene acceso
+            const accessibleModules = systemModules.filter(module => hasAccessToModule(module));
+            
+            console.log('Módulos de registro accesibles:', accessibleModules);
+            
+            if (accessibleModules.length === 0) {
+                container.innerHTML = `
+                    <div class="error-message">
+                        No tiene acceso a ningún módulo de registro. Contacte al administrador.
+                    </div>
+                `;
+                return;
+            }
+            
+            // Crear contenedor de tarjetas
+            const cardsContainer = document.createElement('div');
+            cardsContainer.className = 'cards-container';
+            
+            // Generar tarjetas para todos los módulos accesibles
+            accessibleModules.forEach(module => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = function() {
+                    if (module.link && module.link !== '#') {
+                        window.location.href = module.link;
+                    } else {
+                        console.warn('Módulo de registro sin enlace:', module);
+                    }
+                };
+                
+                card.innerHTML = `
+                    <div class="card-icon"><i class="fas ${module.icon || 'fa-cube'}"></i></div>
+                    <h3>${module.title || 'Módulo sin nombre'}</h3>
+                `;
+                
+                cardsContainer.appendChild(card);
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(cardsContainer);
+        }
+
+        // Mostrar mensaje de error
+        function showError(message) {
+            const container = document.getElementById('modulesContainer');
+            container.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        // Cerrar sesión
+        function logout() {
+            if (currentUser?.username) {
+                // Eliminar de usuarios activos
+                activeUsersRef.child(currentUser.username).remove()
+                    .then(() => {
+                        sessionStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => {
+                        console.error('Error al cerrar sesión:', error);
+                        sessionStorage.removeItem('currentUser');
+                        window.location.href = 'index.html';
+                    });
+            } else {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
