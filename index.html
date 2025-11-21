@@ -25,19 +25,31 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        body {
-            font-family: 'Roboto', sans-serif;
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
             background-color: var(--light-gray);
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             min-height: 100vh;
             background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
         }
         
         /* Pantalla de inicio para móviles */
@@ -84,7 +96,6 @@
             max-width: 450px;
             text-align: center;
             animation: fadeIn 0.8s ease-out;
-            margin: 20px;
             backdrop-filter: blur(5px);
         }
         
@@ -292,22 +303,44 @@
             padding: 5px;
         }
         
-        .footer {
-            margin-top: 30px;
-            color: var(--text-light);
+        /* Estilos para el footer */
+        footer {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 15px 0;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            flex-shrink: 0;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-content {
+            color: #757575;
             font-size: 12px;
             line-height: 1.5;
         }
-        
-        .footer a {
-            color: var(--primary-color);
+
+        .footer-content p {
+            margin: 5px 0;
+        }
+
+        .footer-link {
+            color: #4CAF50;
             text-decoration: none;
             transition: color 0.3s;
             cursor: pointer;
         }
-        
-        .footer a:hover {
-            color: var(--primary-dark);
+
+        .footer-link:hover {
+            color: #388E3C;
             text-decoration: underline;
         }
         
@@ -417,7 +450,6 @@
         @media (max-width: 768px) {
             .login-container {
                 padding: 30px;
-                margin: 15px;
                 width: calc(100% - 30px);
             }
             
@@ -445,6 +477,14 @@
             
             .modal-content {
                 padding: 20px;
+            }
+            
+            .footer-content {
+                font-size: 11px;
+            }
+            
+            .footer-container {
+                padding: 0 15px;
             }
         }
         
@@ -482,6 +522,14 @@
                 margin: 10px;
                 width: calc(100% - 20px);
             }
+            
+            .footer-content {
+                font-size: 10px;
+            }
+            
+            footer {
+                padding: 10px 0;
+            }
         }
         
         /* Detección de móvil */
@@ -513,45 +561,45 @@
         <div class="loading-text">Verificando sesión...</div>
     </div>
     
-    <!-- Formulario de Login -->
-    <div id="loginFormContainer" class="login-container hidden">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK6pM2j_2yXjRnGm8nKJQ064y-EOLqYOnnJA&s" alt="Logo Agroalpha" class="logo">
-        <h1>Iniciar Sesión</h1>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" required autocomplete="username" autocapitalize="off">
-            </div>
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <!-- Formulario de Login -->
+        <div id="loginFormContainer" class="login-container hidden">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK6pM2j_2yXjRnGm8nKJQ064y-EOLqYOnnJA&s" alt="Logo Agroalpha" class="logo">
+            <h1>Iniciar Sesión</h1>
             
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <div class="password-container">
-                    <input type="password" id="password" required autocomplete="current-password">
-                    <span class="toggle-password" id="togglePassword">👁️</span>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" required autocomplete="username" autocapitalize="off">
                 </div>
-            </div>
-            
-            <div class="remember-forgot">
-                <div class="remember-me">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Recordarme</label>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="password-container">
+                        <input type="password" id="password" required autocomplete="current-password">
+                        <span class="toggle-password" id="togglePassword">👁️</span>
+                    </div>
                 </div>
-                <a class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
-            </div>
-            
-            <button type="submit" id="loginButton">
-                <span id="buttonText">Ingresar</span>
-            </button>
-            
-            <div id="errorMessage" class="error-message"></div>
-        </form>
-        
-        <div class="footer">
-            <p>Sistema Agroalpha © 2025 | Versión 2.1</p>
-            <p>Unidad de Producción 1 - <a id="helpLink">Ayuda Técnica</a></p>
+                
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Recordarme</label>
+                    </div>
+                    <a class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
+                </div>
+                
+                <button type="submit" id="loginButton">
+                    <span id="buttonText">Ingresar</span>
+                </button>
+                
+                <div id="errorMessage" class="error-message"></div>
+            </form>
         </div>
     </div>
+
+
 
     <!-- Modal para recuperación de contraseña -->
     <div id="passwordModal" class="modal">
@@ -654,8 +702,8 @@
                 document.getElementById('passwordModal').style.display = 'flex';
             });
             
-            // Manejar clic en ayuda - MODIFICADO
-            document.getElementById('helpLink').addEventListener('click', function(e) {
+            // Manejar clic en ayuda técnica del footer
+            document.querySelector('.footer-link').addEventListener('click', function(e) {
                 e.preventDefault();
                 document.getElementById('helpModal').style.display = 'flex';
             });
@@ -847,5 +895,6 @@
                 });
         }
     </script>
+    <script src="footer.js"></script>
 </body>
 </html>
