@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Actividades - Agro Alpha</title>
+    <title>Reporte de Actividades - Agro Alpha</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="components.css">
     <style>
         :root {
@@ -107,6 +108,7 @@
             font-weight: 600;
             color: white;
             padding: 15px 20px;
+            background-color: var(--primary-color);
         }
 
         .btn-primary {
@@ -138,48 +140,6 @@
             font-weight: 600;
             border-radius: 4px;
             color: white;
-        }
-
-        .controls-container {
-            background-color: var(--white);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .filtros-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .filtro-group {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .filtro-label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--dark-gray);
-            font-size: 14px;
-        }
-
-        input, select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        select:focus, input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
         }
 
         .table-container {
@@ -222,113 +182,60 @@
             background-color: var(--row-hover);
         }
 
-        .loading {
-            text-align: center;
-            padding: 30px;
-            font-style: italic;
-            color: var(--primary-color);
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 30px;
-            color: #666;
-            font-style: italic;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 600px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .modal-small {
-            max-width: 400px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+        .info-hover {
+            position: relative;
             cursor: pointer;
         }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+        
+        .info-hover .tooltip-info {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-
-        .modal-section {
-            margin-bottom: 20px;
+        
+        .info-hover:hover .tooltip-info {
+            display: block;
         }
-
-        .modal-section h3 {
+        
+        .cultivo-icon {
             color: var(--primary-color);
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--light-border);
-            padding-bottom: 5px;
         }
-
-        .modal-list {
-            list-style-type: none;
+        
+        .rendimiento-cell {
+            font-weight: bold;
+            color: var(--primary-color);
         }
-
-        .modal-list li {
-            margin-bottom: 8px;
-            padding-left: 20px;
+        
+        .section-title {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .completed {
+            background-color: rgba(76, 175, 80, 0.2) !important;
+            font-weight: bold;
             position: relative;
         }
-
-        .modal-list li:before {
-            content: "•";
+        
+        .completed::after {
+            content: "✓";
             position: absolute;
-            left: 0;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
             color: var(--primary-color);
-        }
-
-        .descarga-opciones {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .descarga-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .descarga-btn:hover {
-            background-color: #e8f5e9;
-        }
-
-        .descarga-icono {
-            font-size: 20px;
         }
 
         .header-buttons {
@@ -382,145 +289,6 @@
             color: white;
         }
 
-        .banda-color {
-            display: inline-block;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            margin: 0 auto;
-            border: 1px solid #ddd;
-        }
-
-        /* Estilos para enlaces EPA */
-        .epa-link {
-            color: var(--admin-color);
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .epa-link:hover {
-            color: #1976d2;
-            text-decoration: underline;
-        }
-
-        .epa-link::after {
-            content: "↗";
-            font-size: 0.9em;
-        }
-
-        .no-link {
-            color: #666;
-        }
-
-        /* Estilos específicos para el registro de actividades */
-        .activity-form {
-            background-color: var(--white);
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .required-field::after {
-            content: " *";
-            color: #dc3545;
-        }
-        
-        .camas-input, .rendimiento-input {
-            max-width: 150px;
-        }
-        
-        .user-preferences {
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .preferences-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .actividad-item {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #dee2e6;
-            position: relative;
-        }
-        
-        .actividad-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .actividad-info {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 10px;
-            padding: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-        }
-        
-        .vuelta-badge {
-            font-size: 0.85rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .progress {
-            height: 10px;
-            margin-top: 8px;
-        }
-        
-        .input-group-sm {
-            max-width: 300px;
-        }
-        
-        .dropdown-toggle::after {
-            display: none;
-        }
-        
-        .actividad-menu {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        
-        .actividad-menu .btn {
-            padding: 4px 8px;
-            font-size: 0.8rem;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-        
-        .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-        
-        .alert-info {
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
-            color: #0c5460;
-        }
-
         .btn-info {
             background-color: var(--admin-color);
             border: none;
@@ -531,19 +299,174 @@
             background-color: #1976d2;
         }
 
+        /* Estilos para el menú hamburguesa */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 5px 10px;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        .offcanvas {
+            background-color: var(--light-bg);
+        }
+        
+        .offcanvas-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .offcanvas-title {
+            font-weight: 600;
+        }
+        
+        .btn-close {
+            background-color: white;
+        }
+        
+        /* Estilos para el interruptor */
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+        }
+        
+        /* Estilos para cuando el interruptor está activo */
+        .hide-completed .completed {
+            background-color: transparent !important;
+            color: #ccc !important;
+        }
+        
+        .hide-completed .completed::after {
+            display: none;
+        }
+        
+        .hide-completed .completed .info-hover {
+            color: #ccc;
+        }
+
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-small {
+            max-width: 400px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--dark-gray);
+            text-decoration: none;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .modal-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .modal-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .modal-list li:before {
+            content: "•";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+        }
+
+        .descarga-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .descarga-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .descarga-btn:hover {
+            background-color: var(--light-gray);
+            border-color: var(--primary-color);
+        }
+
+        .descarga-icono {
+            font-size: 24px;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
-            }
-            
-            .filtros-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .filtro-group {
-                min-width: 100%;
             }
             
             .header-buttons {
@@ -562,36 +485,19 @@
                 font-size: 12px;
             }
             
-            .camas-input, .rendimiento-input {
-                max-width: 100%;
+            .info-hover .tooltip-info {
+                white-space: normal;
+                width: 150px;
             }
             
-            .input-group-sm {
-                max-width: 100%;
-            }
-            
-            .actividad-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-                padding: 15px;
+            .completed::after {
+                font-size: 8px;
             }
         }
 
         @media (max-width: 576px) {
             .header-buttons {
                 flex-wrap: wrap;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-                padding: 15px;
             }
         }
     </style>
@@ -600,86 +506,237 @@
     <header-component></header-component>
     <sidebar-component></sidebar-component>
 
+
+    <!-- Menú de navegación -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-seedling me-2"></i>Agro Alpha
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+                        <i class="fas fa-cogs me-2"></i>Configuración
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="hideCompletedSwitch" checked>
+                                <label class="form-check-label" for="hideCompletedSwitch">
+                                    Ocultar actividades completadas
+                                </label>
+                            </div>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <div class="alert alert-info p-2">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Cuando está activo, las actividades completadas se muestran en 0 y sin color.
+                                </small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <!-- Contenido principal -->
     <main class="main-content">
         <div class="container">
             <div class="breadcrumb">
-                <a href="index.html">Inicio</a> > <a href="actividades.html">Actividades</a> > Registro
+                <a href="index.html">Inicio</a> > <a href="actividades.html">Actividades</a> > Reporte
             </div>
             
-            <h1><i class="fas fa-clipboard-list me-2"></i>Registro de Actividades</h1>
+            <h1><i class="fas fa-chart-bar me-2"></i>Reporte de Actividades</h1>
 
-            <div class="activity-form">
-                <div id="alertMessage" class="alert alert-dismissible fade show d-none" role="alert">
-                    <span id="alertText"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+            <div class="header-buttons">
+                <a href="registro-actividades.html" class="btn btn-primary">
+                    <i class="fas fa-clipboard-list me-2"></i>Registro de Actividades
+                </a>
+                <button class="btn btn-leyenda" id="btnLeyenda">
+                    <i class="fas fa-info-circle me-2"></i>Leyenda
+                </button>
+                <button class="btn btn-descarga" id="btnDescarga">
+                    <i class="fas fa-download me-2"></i>Descargar
+                </button>
+            </div>
 
-                <!-- Preferencias de usuario -->
-                <div class="user-preferences mb-4">
-                    <div class="preferences-header">
-                        <h5 class="mb-0"><i class="fas fa-user-cog me-2"></i>Mis preferencias</h5>
-                        <button type="button" id="btnCambiarPreferencias" class="btn btn-info btn-sm">
-                            <i class="fas fa-edit me-1"></i>Cambiar
-                        </button>
-                    </div>
-                    <div id="preferenciasUsuario">
-                        <p class="mb-1"><strong>Cultivo:</strong> <span id="prefCultivo">No seleccionado</span></p>
-                        <p class="mb-0"><strong>Invernadero:</strong> <span id="prefInvernadero">No seleccionado</span></p>
-                    </div>
-                    <div id="formPreferencias" class="mt-3 d-none">
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <label for="prefCultivoSelect" class="form-label required-field">Cultivo</label>
-                                <select class="form-select" id="prefCultivoSelect">
-                                    <option value="">Seleccione un cultivo</option>
-                                    <option value="chile">Chile</option>
-                                    <option value="tomate">Tomate</option>
-                                </select>
+            <!-- Sección de Tomate -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="mb-4 section-title"><i class="fas fa-apple-alt me-2 cultivo-icon"></i>Tomate actividades</h2>
+                    
+                    <!-- Tabla de invernaderos de tomate -->
+                    <div class="card mb-4">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Bajado</th>
+                                            <th>Deshoje</th>
+                                            <th>Desbrote</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaResumenTomate">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="col-md-6 mb-2">
-                                <label for="prefInvernaderoSelect" class="form-label required-field">Invernadero</label>
-                                <select class="form-select" id="prefInvernaderoSelect" disabled>
-                                    <option value="">Primero seleccione un cultivo</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <button type="button" id="btnGuardarPreferencias" class="btn btn-success btn-sm me-2">
-                                <i class="fas fa-save me-1"></i>Guardar
-                            </button>
-                            <button type="button" id="btnCancelarPreferencias" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-times me-1"></i>Cancelar
-                            </button>
                         </div>
                     </div>
                 </div>
-
-                <form id="activityForm">
-                    <div class="mb-3">
-                        <label for="fecha" class="form-label required-field">Fecha</label>
-                        <input type="date" class="form-control" id="fecha" required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="form-label required-field">Actividades realizadas</label>
-                        <div id="actividadesContainer">
-                            <!-- Las actividades se generarán dinámicamente aquí -->
-                            <div class="text-center text-muted py-3">
-                                <i class="fas fa-info-circle me-2"></i>Configure sus preferencias para ver las actividades disponibles
+                
+                <!-- Rendimientos de Tomate -->
+                <div class="col-12 mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Rendimientos de Tomate</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Bajado</th>
+                                            <th>Deshoje</th>
+                                            <th>Desbrote</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaRendimientosTomate">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Sección de Chile/Mini -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="mb-4 section-title"><i class="fas fa-pepper-hot me-2 cultivo-icon"></i>Chile actividades</h2>
                     
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg" id="submitButton">
-                            <i class="fas fa-paper-plane me-2"></i>Enviar Actividades
-                        </button>
+                    <!-- Tabla de invernaderos de chile -->
+                    <div class="card mb-4">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Poda</th>
+                                            <th>Amarrado</th>
+                                            <th>Raleo</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaResumenChile">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </form>
+                </div>
+                
+                <!-- Rendimientos de Chile -->
+                <div class="col-12 mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Rendimientos de Chile</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Inv</th>
+                                            <th>Enguie</th>
+                                            <th>Poda</th>
+                                            <th>Amarrado</th>
+                                            <th>Raleo</th>
+                                            <th>Cosecha</th> <!-- Cosecha movida al final -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaRendimientosChile">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
+
+    <!-- Modal de Leyenda -->
+    <div id="modalLeyenda" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close">&times;</span>
+            <h3 class="mb-3">Leyenda del Reporte</h3>
+            <div class="modal-section">
+                <h4>Colores y símbolos</h4>
+                <ul class="modal-list">
+                    <li><span class="completed" style="padding: 2px 5px;">Celda</span> - Actividad completada</li>
+                    <li><strong>✓</strong> - Marca de completado</li>
+                    <li><strong>Números en verde</strong> - Rendimientos registrados</li>
+                </ul>
+            </div>
+            <div class="modal-section">
+                <h4>Información de tablas</h4>
+                <ul class="modal-list">
+                    <li><strong>Tabla de actividades</strong> - Muestra el progreso actual de cada actividad</li>
+                    <li><strong>Tabla de rendimientos</strong> - Muestra los últimos rendimientos registrados</li>
+                    <li><strong>Pase el cursor</strong> sobre los números para ver información adicional</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Descarga -->
+    <div id="modalDescarga" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close">&times;</span>
+            <h3 class="mb-3">Descargar Reporte</h3>
+            <div class="descarga-opciones">
+                <div class="descarga-btn" data-formato="pdf">
+                    <div class="descarga-icono">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1">PDF</h5>
+                        <p class="mb-0">Formato optimizado para impresión</p>
+                    </div>
+                </div>
+                <div class="descarga-btn" data-formato="excel">
+                    <div class="descarga-icono">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1">Excel</h5>
+                        <p class="mb-0">Formato para análisis de datos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -702,19 +759,19 @@
         // Definir invernaderos por cultivo (agregado vivero al tomate)
         const invernaderosPorCultivo = {
             chile: ['9', '10', '11', '12', '33', '35', '37', '39'],
-            tomate: ['13', '14', '15', '16', 'vivero']
+            tomate: ['13', '14', '15', '16', 'vivero'] // Vivero agregado después del 16
         };
 
-        // Definir actividades por cultivo (Cosecha primero en ambos)
+        // Definir actividades por cultivo (con cosecha al final)
         const actividadesPorCultivo = {
-            chile: ['Cosecha', 'Enguie', 'Poda', 'Amarrado', 'Raleo'],
-            tomate: ['Cosecha', 'Enguie', 'Bajado', 'Deshoje', 'Desbrote']
+            chile: ['Enguie', 'Poda', 'Amarrado', 'Raleo', 'Cosecha'],
+            tomate: ['Enguie', 'Bajado', 'Deshoje', 'Desbrote', 'Cosecha']
         };
 
-        // Definir metas de camas por invernadero (MODIFICADO: invernadero 10 de 270 a 272)
+        // Definir metas de camas por invernadero (agregada meta para vivero: 64 camas)
         const metasCamas = {
             '9': 274,
-            '10': 272,  // MODIFICADO: Cambiado de 270 a 272
+            '10': 270,
             '11': 274,
             '12': 274,
             '13': 274,
@@ -725,477 +782,296 @@
             '35': 276,
             '37': 284,
             '39': 284,
-            'vivero': 64
+            'vivero': 64  // Nueva meta para el vivero
         };
 
-        // Preferencias de usuario
-        let preferenciasUsuario = {
-            cultivo: null,
-            invernadero: null
-        };
-
-        // Control para evitar envíos duplicados
-        let isSubmitting = false;
+        // Variables globales
+        let actividadesData = [];
+        let hideCompleted = true; // Por defecto, ocultar actividades completadas
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            // Establecer fecha actual por defecto
-            const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
-            document.getElementById('fecha').value = formattedDate;
+            // Configurar el interruptor
+            const hideCompletedSwitch = document.getElementById('hideCompletedSwitch');
+            hideCompletedSwitch.checked = hideCompleted;
             
-            // Cargar preferencias del usuario
-            cargarPreferenciasUsuario();
+            // Aplicar estado inicial
+            toggleCompletedVisibility();
             
-            // Configurar event listeners
-            document.getElementById('btnCambiarPreferencias').addEventListener('click', mostrarFormularioPreferencias);
-            document.getElementById('btnGuardarPreferencias').addEventListener('click', guardarPreferencias);
-            document.getElementById('btnCancelarPreferencias').addEventListener('click', cancelarCambioPreferencias);
-            document.getElementById('prefCultivoSelect').addEventListener('change', actualizarInvernaderosPreferencias);
-            document.getElementById('activityForm').addEventListener('submit', guardarActividades);
+            // Escuchar cambios en el interruptor
+            hideCompletedSwitch.addEventListener('change', function() {
+                hideCompleted = this.checked;
+                toggleCompletedVisibility();
+            });
+            
+            // Configurar modales
+            configurarModales();
+            
+            // Cargar datos de Firebase
+            cargarDatosActividades();
         });
 
-        // Cargar preferencias del usuario desde localStorage
-        function cargarPreferenciasUsuario() {
-            const preferenciasGuardadas = localStorage.getItem('preferenciasUsuarioAgroalpha');
-            
-            if (preferenciasGuardadas) {
-                preferenciasUsuario = JSON.parse(preferenciasGuardadas);
-                actualizarVistaPreferencias();
-                
-                // Si hay preferencias, generar las actividades
-                if (preferenciasUsuario.cultivo) {
-                    generarActividades();
-                }
+        // Función para alternar la visibilidad de actividades completadas
+        function toggleCompletedVisibility() {
+            if (hideCompleted) {
+                document.body.classList.add('hide-completed');
             } else {
-                // Si no hay preferencias, mostrar el formulario
-                mostrarFormularioPreferencias();
+                document.body.classList.remove('hide-completed');
+            }
+            
+            // Si ya tenemos datos, actualizar las tablas
+            if (actividadesData.length > 0) {
+                procesarDatos();
             }
         }
 
-        // Actualizar la vista de preferencias
-        function actualizarVistaPreferencias() {
-            document.getElementById('prefCultivo').textContent = preferenciasUsuario.cultivo ? 
-                (preferenciasUsuario.cultivo === 'chile' ? 'Chile' : 'Tomate') : 'No seleccionado';
-                
-            document.getElementById('prefInvernadero').textContent = preferenciasUsuario.invernadero ? 
-                (preferenciasUsuario.invernadero === 'vivero' ? 'Vivero' : `Invernadero ${preferenciasUsuario.invernadero}`) : 'No seleccionado';
-        }
-
-        // Mostrar formulario de preferencias
-        function mostrarFormularioPreferencias() {
-            document.getElementById('preferenciasUsuario').classList.add('d-none');
-            document.getElementById('formPreferencias').classList.remove('d-none');
+        // Configurar modales
+        function configurarModales() {
+            // Modal de leyenda
+            const modalLeyenda = document.getElementById('modalLeyenda');
+            const btnLeyenda = document.getElementById('btnLeyenda');
+            const spanLeyenda = modalLeyenda.querySelector('.close');
             
-            // Establecer valores actuales en el formulario
-            if (preferenciasUsuario.cultivo) {
-                document.getElementById('prefCultivoSelect').value = preferenciasUsuario.cultivo;
-                actualizarInvernaderosPreferencias();
-                
-                if (preferenciasUsuario.invernadero) {
-                    setTimeout(() => {
-                        document.getElementById('prefInvernaderoSelect').value = preferenciasUsuario.invernadero;
-                    }, 100);
+            btnLeyenda.onclick = function() {
+                modalLeyenda.style.display = "block";
+            }
+            
+            spanLeyenda.onclick = function() {
+                modalLeyenda.style.display = "none";
+            }
+            
+            // Modal de descarga
+            const modalDescarga = document.getElementById('modalDescarga');
+            const btnDescarga = document.getElementById('btnDescarga');
+            const spanDescarga = modalDescarga.querySelector('.close');
+            
+            btnDescarga.onclick = function() {
+                modalDescarga.style.display = "block";
+            }
+            
+            spanDescarga.onclick = function() {
+                modalDescarga.style.display = "none";
+            }
+            
+            // Cerrar modales al hacer clic fuera
+            window.onclick = function(event) {
+                if (event.target == modalLeyenda) {
+                    modalLeyenda.style.display = "none";
+                }
+                if (event.target == modalDescarga) {
+                    modalDescarga.style.display = "none";
                 }
             }
-        }
-
-        // Actualizar invernaderos en el formulario de preferencias
-        function actualizarInvernaderosPreferencias() {
-            const cultivo = document.getElementById('prefCultivoSelect').value;
-            const invernaderoSelect = document.getElementById('prefInvernaderoSelect');
             
-            invernaderoSelect.innerHTML = '';
-            if (cultivo) {
-                invernaderoSelect.disabled = false;
-                invernaderoSelect.innerHTML = '<option value="">Seleccione un invernadero</option>';
-                
-                invernaderosPorCultivo[cultivo].forEach(inv => {
-                    const option = document.createElement('option');
-                    option.value = inv;
-                    option.textContent = inv === 'vivero' ? 'Vivero' : `Invernadero ${inv}`;
-                    invernaderoSelect.appendChild(option);
-                });
-            } else {
-                invernaderoSelect.disabled = true;
-                invernaderoSelect.innerHTML = '<option value="">Primero seleccione un cultivo</option>';
-            }
-        }
-
-        // Guardar preferencias del usuario
-        function guardarPreferencias() {
-            const cultivo = document.getElementById('prefCultivoSelect').value;
-            const invernadero = document.getElementById('prefInvernaderoSelect').value;
-            
-            if (!cultivo || !invernadero) {
-                showAlert('Por favor seleccione un cultivo y un invernadero', 'danger');
-                return;
-            }
-            
-            preferenciasUsuario = {
-                cultivo: cultivo,
-                invernadero: invernadero
-            };
-            
-            // Guardar en localStorage
-            localStorage.setItem('preferenciasUsuarioAgroalpha', JSON.stringify(preferenciasUsuario));
-            
-            // Actualizar la vista
-            actualizarVistaPreferencias();
-            document.getElementById('preferenciasUsuario').classList.remove('d-none');
-            document.getElementById('formPreferencias').classList.add('d-none');
-            
-            // Generar las actividades correspondientes
-            generarActividades();
-            
-            showAlert('Preferencias guardadas correctamente', 'success');
-        }
-
-        // Cancelar cambio de preferencias
-        function cancelarCambioPreferencias() {
-            document.getElementById('preferenciasUsuario').classList.remove('d-none');
-            document.getElementById('formPreferencias').classList.add('d-none');
-        }
-
-        // Generar actividades según el cultivo seleccionado
-        function generarActividades() {
-            const container = document.getElementById('actividadesContainer');
-            container.innerHTML = '';
-            
-            if (!preferenciasUsuario.cultivo) return;
-            
-            const actividades = actividadesPorCultivo[preferenciasUsuario.cultivo];
-            const metaCamas = metasCamas[preferenciasUsuario.invernadero] || 0;
-            
-            actividades.forEach(actividad => {
-                const actividadDiv = document.createElement('div');
-                actividadDiv.className = 'actividad-item';
-                actividadDiv.innerHTML = `
-                    <div class="actividad-menu dropdown">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item culminar-vuelta-btn" href="#" data-actividad="${actividad}"><i class="fas fa-flag-checkered me-2"></i>Culminar vuelta</a></li>
-                        </ul>
-                    </div>
-                    <div class="actividad-header">
-                        <label class="form-check-label fw-bold">${actividad}</label>
-                        <span class="vuelta-badge" id="vuelta-badge-${actividad}">Vuelta: Cargando...</span>
-                    </div>
-                    <div class="actividad-info" id="info-${actividad}">
-                        <div>Meta: ${metaCamas} camas | Progreso: Cargando...</div>
-                        <div class="progress">
-                            <div id="progress-${actividad}" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="camas-${actividad}" class="form-label">Nº de camas</label>
-                            <input type="number" class="form-control camas-input" id="camas-${actividad}" 
-                                min="0" placeholder="0 si no se realizó" data-actividad="${actividad}">
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <label for="rendimiento-${actividad}" class="form-label">Rendimiento</label>
-                            <input type="number" class="form-control rendimiento-input" id="rendimiento-${actividad}" 
-                                min="0" step="0.01" placeholder="0 si no aplica" data-actividad="${actividad}">
-                        </div>
-                    </div>
-                `;
-                
-                container.appendChild(actividadDiv);
-                
-                // Cargar información de vueltas para esta actividad
-                cargarInfoVueltas(actividad, metaCamas);
-            });
-            
-            // Agregar event listeners para los botones de culminar vuelta
-            document.querySelectorAll('.culminar-vuelta-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const actividad = this.getAttribute('data-actividad');
-                    culminarVuelta(actividad);
+            // Configurar botones de descarga
+            document.querySelectorAll('.descarga-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const formato = this.getAttribute('data-formato');
+                    descargarReporte(formato);
                 });
             });
         }
 
-        // Cargar información de vueltas desde Firebase
-        function cargarInfoVueltas(actividad, metaCamas) {
-            const invernadero = preferenciasUsuario.invernadero;
-            
-            if (!invernadero) return;
-            
-            // Referencia a las actividades en Firebase
+        // Descargar reporte
+        function descargarReporte(formato) {
+            alert(`Función de descarga en formato ${formato.toUpperCase()} activada. En una implementación real, esto generaría el archivo correspondiente.`);
+            document.getElementById('modalDescarga').style.display = "none";
+        }
+
+        // Cargar datos de actividades desde Firebase
+        function cargarDatosActividades() {
             const actividadesRef = database.ref('unidad_produccion_1/actividades');
             
-            // Consultar actividades para este invernadero y actividad específica
-            actividadesRef.orderByChild('invernadero').equalTo(invernadero).once('value')
-                .then(snapshot => {
-                    let totalCamas = 0;
-                    let vueltaActual = 1;
-                    let conteoCosecha = 0;
+            actividadesRef.on('value', (snapshot) => {
+                actividadesData = [];
+                snapshot.forEach(childSnapshot => {
+                    actividadesData.push(childSnapshot.val());
+                });
+                
+                // Procesar y mostrar datos
+                procesarDatos();
+            }, (error) => {
+                console.error("Error al cargar datos de Firebase:", error);
+                mostrarMensajeError("No se pudieron cargar los datos. Verifique la conexión.");
+            });
+        }
+
+        // Procesar datos y actualizar la interfaz
+        function procesarDatos() {
+            // Mostrar tablas resumen
+            mostrarTablaResumen('tomate', 'tablaResumenTomate');
+            mostrarTablaResumen('chile', 'tablaResumenChile');
+            
+            // Mostrar últimos rendimientos
+            mostrarTablaRendimientos('tomate', 'tablaRendimientosTomate');
+            mostrarTablaRendimientos('chile', 'tablaRendimientosChile');
+        }
+
+        // Mostrar tabla resumen por tipo de cultivo
+        function mostrarTablaResumen(tipoCultivo, contenedorId) {
+            const contenedor = document.getElementById(contenedorId);
+            if (!contenedor) {
+                console.error(`Contenedor ${contenedorId} no encontrado`);
+                return;
+            }
+            
+            contenedor.innerHTML = '';
+            
+            const invernaderos = invernaderosPorCultivo[tipoCultivo];
+            const actividades = actividadesPorCultivo[tipoCultivo];
+            
+            invernaderos.forEach(invernadero => {
+                const fila = document.createElement('tr');
+                
+                // Celda de invernadero (abreviado)
+                const celdaInvernadero = document.createElement('td');
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('fw-bold');
+                fila.appendChild(celdaInvernadero);
+                
+                // Celdas para cada actividad
+                actividades.forEach(actividad => {
+                    const celda = document.createElement('td');
                     
-                    snapshot.forEach(childSnapshot => {
-                        const actividadData = childSnapshot.val();
+                    // Filtrar datos para esta actividad e invernadero
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && item.actividad === actividad
+                    );
+                    
+                    if (datosActividad.length > 0) {
+                        // Calcular total de camas para esta actividad
+                        const totalCamas = datosActividad.reduce((sum, item) => sum + (item.camas || 0), 0);
+                        const metaCamas = metasCamas[invernadero] || 0;
                         
-                        if (actividadData.actividad === actividad) {
-                            if (actividad === 'Cosecha') {
-                                // Para cosecha, solo contamos el número de registros
-                                conteoCosecha++;
+                        if (actividad === 'Cosecha') {
+                            // Para cosecha, mostrar el total de camas de la última cosecha
+                            const ultimaCosecha = datosActividad[datosActividad.length - 1];
+                            const camasCosecha = ultimaCosecha.camas || 0;
+                            
+                            // Verificar si se completó una vuelta (múltiplo de la meta)
+                            if (camasCosecha >= metaCamas) {
+                                celda.classList.add('completed');
+                            }
+                            
+                            // Si hideCompleted está activo y está completado, mostrar 0
+                            if (hideCompleted && camasCosecha >= metaCamas) {
+                                celda.textContent = '0';
                             } else {
-                                // Para otras actividades, sumamos camas
-                                totalCamas += actividadData.camas || 0;
+                                celda.textContent = camasCosecha;
+                            }
+                        } else {
+                            const vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
+                            const camasVueltaActual = totalCamas % metaCamas;
+                            
+                            // Mostrar el número de camas (si completó vuelta, mostrar la meta en lugar del total)
+                            let camasAMostrar = camasVueltaActual;
+                            let esCompletado = false;
+                            
+                            if (camasVueltaActual === 0 && totalCamas > 0) {
+                                // Cuando se completa una vuelta, mostrar la meta (no el total acumulado)
+                                camasAMostrar = metaCamas;
+                                celda.classList.add('completed');
+                                esCompletado = true;
+                            }
+                            
+                            // Si hideCompleted está activo y está completado, mostrar 0
+                            if (hideCompleted && esCompletado) {
+                                celda.innerHTML = `
+                                    <div class="info-hover">
+                                        0
+                                        <div class="tooltip-info">
+                                            Vuelta ${vueltaActual}<br>
+                                            Progreso: 100%<br>
+                                            Meta: ${metaCamas} camas<br>
+                                            <small>Completado</small>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                celda.innerHTML = `
+                                    <div class="info-hover">
+                                        ${camasAMostrar}
+                                        <div class="tooltip-info">
+                                            Vuelta ${vueltaActual}<br>
+                                            Progreso: ${Math.min(100, (totalCamas / metaCamas) * 100).toFixed(1)}%<br>
+                                            Meta: ${metaCamas} camas
+                                        </div>
+                                    </div>
+                                `;
                             }
                         }
-                    });
-                    
-                    // Calcular vuelta actual basada en la meta
-                    if (actividad !== 'Cosecha' && metaCamas > 0) {
-                        vueltaActual = Math.floor(totalCamas / metaCamas) + 1;
-                    }
-                    
-                    // Calcular camas en la vuelta actual
-                    const camasEnVueltaActual = totalCamas % metaCamas;
-                    const porcentajeProgreso = metaCamas > 0 ? (camasEnVueltaActual / metaCamas) * 100 : 0;
-                    
-                    // Actualizar la interfaz
-                    const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
-                    const infoElement = document.getElementById(`info-${actividad}`);
-                    const progressElement = document.getElementById(`progress-${actividad}`);
-                    
-                    if (actividad === 'Cosecha') {
-                        badgeElement.textContent = `Cosecha #${conteoCosecha + 1}`;
-                        infoElement.innerHTML = `<div>Número de cosecha: ${conteoCosecha + 1}</div>`;
-                        progressElement.style.width = '0%';
                     } else {
-                        badgeElement.textContent = `Vuelta: ${vueltaActual}`;
-                        infoElement.innerHTML = `
-                            <div>Meta: ${metaCamas} camas | Progreso: ${camasEnVueltaActual}/${metaCamas} camas</div>
-                            <div class="progress">
-                                <div id="progress-${actividad}" class="progress-bar" role="progressbar" style="width: ${porcentajeProgreso}%" aria-valuenow="${camasEnVueltaActual}" aria-valuemin="0" aria-valuemax="${metaCamas}"></div>
-                            </div>
-                        `;
-                        progressElement.style.width = `${porcentajeProgreso}%`;
+                        celda.innerHTML = '<span class="text-muted">-</span>';
                     }
                     
-                    // Guardar los valores calculados para usar al guardar
-                    badgeElement.setAttribute('data-total-camas', totalCamas);
-                    if (actividad === 'Cosecha') {
-                        badgeElement.setAttribute('data-conteo-cosecha', conteoCosecha);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al cargar información de vueltas:', error);
-                    const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
-                    badgeElement.textContent = 'Error al cargar';
+                    fila.appendChild(celda);
                 });
+                
+                contenedor.appendChild(fila);
+            });
         }
 
-        // Culminar vuelta para una actividad específica
-        function culminarVuelta(actividad) {
-            if (actividad === 'Cosecha') {
-                showAlert('La función "Culminar vuelta" no está disponible para la actividad Cosecha', 'info');
+        // Mostrar tabla de rendimientos por tipo de cultivo
+        function mostrarTablaRendimientos(tipoCultivo, contenedorId) {
+            const contenedor = document.getElementById(contenedorId);
+            if (!contenedor) {
+                console.error(`Contenedor ${contenedorId} no encontrado`);
                 return;
             }
             
-            const invernadero = preferenciasUsuario.invernadero;
-            const metaCamas = metasCamas[invernadero] || 0;
+            contenedor.innerHTML = '';
             
-            if (metaCamas === 0) {
-                showAlert('No se puede culminar vuelta: meta de camas no definida', 'danger');
-                return;
-            }
+            const invernaderos = invernaderosPorCultivo[tipoCultivo];
+            const actividades = actividadesPorCultivo[tipoCultivo];
             
-            const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
-            const totalCamasAnterior = parseInt(badgeElement.getAttribute('data-total-camas') || 0);
-            const camasEnVueltaActual = totalCamasAnterior % metaCamas;
-            
-            if (camasEnVueltaActual === 0) {
-                showAlert('Esta vuelta ya está completa', 'info');
-                return;
-            }
-            
-            const camasFaltantes = metaCamas - camasEnVueltaActual;
-            
-            if (confirm(`¿Desea culminar la vuelta actual? Se registrarán automáticamente ${camasFaltantes} camas para completar la vuelta.`)) {
-                const fecha = document.getElementById('fecha').value;
+            invernaderos.forEach(invernadero => {
+                const fila = document.createElement('tr');
                 
-                const actividadData = {
-                    fecha: fecha,
-                    cultivo: preferenciasUsuario.cultivo,
-                    invernadero: invernadero,
-                    actividad: actividad,
-                    camas: camasFaltantes,
-                    rendimiento: 0,
-                    timestamp: new Date().toISOString(),
-                    vueltaCompletada: true
-                };
+                // Celda de invernadero (abreviado)
+                const celdaInvernadero = document.createElement('td');
+                celdaInvernadero.textContent = invernadero === 'vivero' ? 'Viv' : invernadero;
+                celdaInvernadero.classList.add('fw-bold');
+                fila.appendChild(celdaInvernadero);
                 
-                // Calcular vuelta anterior y nueva
-                const totalCamasNuevo = totalCamasAnterior + camasFaltantes;
-                const vueltaAnterior = Math.floor(totalCamasAnterior / metaCamas) + 1;
-                const vueltaNueva = Math.floor(totalCamasNuevo / metaCamas) + 1;
-                
-                actividadData.vuelta = vueltaAnterior; // Se guarda como la vuelta que se completó
-                actividadData.camasAcumuladas = totalCamasNuevo;
-                
-                // Guardar en Firebase
-                const activitiesRef = database.ref('unidad_produccion_1/actividades');
-                
-                activitiesRef.push().set(actividadData)
-                    .then(() => {
-                        showAlert(`Vuelta ${vueltaAnterior} de ${actividad} completada. Se registraron ${camasFaltantes} camas automáticamente.`, 'success');
-                        
-                        // Actualizar información de vueltas
-                        cargarInfoVueltas(actividad, metaCamas);
-                    })
-                    .catch((error) => {
-                        console.error('Error al culminar vuelta:', error);
-                        showAlert('Error al culminar vuelta: ' + error.message, 'danger');
-                    });
-            }
-        }
-
-        // Guardar todas las actividades en Firebase
-        function guardarActividades(e) {
-            e.preventDefault();
-            
-            // Prevenir envíos duplicados
-            if (isSubmitting) {
-                showAlert('Estamos procesando tu envío. Por favor espera...', 'info');
-                return false;
-            }
-            
-            const fecha = document.getElementById('fecha').value;
-            
-            if (!preferenciasUsuario.cultivo || !preferenciasUsuario.invernadero) {
-                showAlert('Por favor configure sus preferencias primero', 'danger');
-                return;
-            }
-            
-            // Obtener actividades con datos
-            const actividadesParaGuardar = [];
-            const actividades = actividadesPorCultivo[preferenciasUsuario.cultivo];
-            const metaCamas = metasCamas[preferenciasUsuario.invernadero] || 0;
-            
-            actividades.forEach(actividad => {
-                const camasInput = document.getElementById(`camas-${actividad}`);
-                const rendimientoInput = document.getElementById(`rendimiento-${actividad}`);
-                const badgeElement = document.getElementById(`vuelta-badge-${actividad}`);
-                
-                const camas = camasInput.value ? parseInt(camasInput.value) : 0;
-                const rendimiento = rendimientoInput.value ? parseFloat(rendimientoInput.value) : 0;
-                
-                // Solo guardar si hay al menos un valor
-                if (camas > 0 || rendimiento > 0) {
-                    const actividadData = {
-                        fecha: fecha,
-                        cultivo: preferenciasUsuario.cultivo,
-                        invernadero: preferenciasUsuario.invernadero,
-                        actividad: actividad,
-                        camas: camas,
-                        rendimiento: rendimiento,
-                        timestamp: new Date().toISOString()
-                    };
+                // Celdas para cada actividad
+                actividades.forEach(actividad => {
+                    const celda = document.createElement('td');
                     
-                    // Para cosecha, guardar el número de cosecha
-                    if (actividad === 'Cosecha') {
-                        // Obtener el número de cosecha del badge (ya incluye el +1)
-                        const numeroCosecha = parseInt(badgeElement.textContent.split('#')[1]);
-                        actividadData.numeroCosecha = numeroCosecha;
+                    // Filtrar datos para esta actividad e invernadero con rendimiento
+                    const datosActividad = actividadesData.filter(item => 
+                        item.invernadero === invernadero && 
+                        item.actividad === actividad &&
+                        item.rendimiento > 0
+                    );
+                    
+                    if (datosActividad.length > 0) {
+                        // Obtener el último registro con rendimiento
+                        const ultimoRegistro = datosActividad[datosActividad.length - 1];
+                        celda.innerHTML = `<span class="rendimiento-cell">${ultimoRegistro.rendimiento}</span>`;
                     } else {
-                        // Para otras actividades, calcular y guardar la vuelta
-                        const totalCamasAnterior = parseInt(badgeElement.getAttribute('data-total-camas') || 0);
-                        const totalCamasNuevo = totalCamasAnterior + camas;
-                        
-                        // Calcular vuelta anterior y nueva
-                        const vueltaAnterior = Math.floor(totalCamasAnterior / metaCamas) + 1;
-                        const vueltaNueva = Math.floor(totalCamasNuevo / metaCamas) + 1;
-                        
-                        actividadData.vuelta = vueltaNueva;
-                        actividadData.camasAcumuladas = totalCamasNuevo;
+                        celda.innerHTML = '<span class="text-muted">-</span>';
                     }
                     
-                    actividadesParaGuardar.push(actividadData);
-                }
-            });
-            
-            if (actividadesParaGuardar.length === 0) {
-                showAlert('No hay actividades para guardar. Ingrese al menos un valor en alguna actividad.', 'danger');
-                return;
-            }
-            
-            // Deshabilitar botón para evitar envíos duplicados
-            isSubmitting = true;
-            const submitButton = document.getElementById('submitButton');
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
-            
-            // Guardar en Firebase
-            const activitiesRef = database.ref('unidad_produccion_1/actividades');
-            
-            // Crear un array de promesas para guardar todas las actividades
-            const promises = actividadesParaGuardar.map(actividad => {
-                return activitiesRef.push().set(actividad);
-            });
-            
-            // Ejecutar todas las promesas
-            Promise.all(promises)
-                .then(() => {
-                    showAlert(`${actividadesParaGuardar.length} actividades guardadas correctamente`, 'success');
-                    
-                    // Limpiar campos
-                    actividades.forEach(actividad => {
-                        document.getElementById(`camas-${actividad}`).value = '';
-                        document.getElementById(`rendimiento-${actividad}`).value = '';
-                    });
-                    
-                    // Actualizar información de vueltas
-                    actividades.forEach(actividad => {
-                        cargarInfoVueltas(actividad, metaCamas);
-                    });
-                    
-                    // Restablecer el estado del formulario
-                    isSubmitting = false;
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar Actividades';
-                })
-                .catch((error) => {
-                    console.error('Error al guardar las actividades:', error);
-                    showAlert('Error al guardar las actividades: ' + error.message, 'danger');
-                    
-                    // Restablecer el estado del formulario en caso de error
-                    isSubmitting = false;
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar Actividades';
+                    fila.appendChild(celda);
                 });
+                
+                contenedor.appendChild(fila);
+            });
         }
 
-        // Mostrar alerta
-        function showAlert(message, type) {
-            const alertElement = document.getElementById('alertMessage');
-            const alertText = document.getElementById('alertText');
+        // Función para mostrar mensajes de error
+        function mostrarMensajeError(mensaje) {
+            // Crear un elemento de alerta de Bootstrap
+            const alerta = document.createElement('div');
+            alerta.className = 'alert alert-danger alert-dismissible fade show';
+            alerta.innerHTML = `
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
             
-            alertText.textContent = message;
-            alertElement.classList.remove('alert-success', 'alert-danger', 'alert-info', 'd-none');
-            
-            if (type === 'success') {
-                alertElement.classList.add('alert-success');
-            } else if (type === 'danger') {
-                alertElement.classList.add('alert-danger');
-            } else {
-                alertElement.classList.add('alert-info');
-            }
-            
-            alertElement.classList.remove('d-none');
-            
-            // Ocultar automáticamente después de 5 segundos
-            setTimeout(() => {
-                alertElement.classList.add('d-none');
-            }, 5000);
-            
-            // Desplazar hacia arriba para ver el mensaje
-            alertElement.scrollIntoView({ behavior: 'smooth' });
+            // Insertar al principio del contenedor
+            const container = document.querySelector('.container');
+            container.insertBefore(alerta, container.firstChild);
         }
     </script>
     <script src="header-component.js"></script>
