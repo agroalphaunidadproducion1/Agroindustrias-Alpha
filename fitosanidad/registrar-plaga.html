@@ -240,51 +240,6 @@
             margin-top: 0;
         }
 
-        .counter-input {
-            display: flex;
-            align-items: center;
-        }
-
-        .counter-input input {
-            text-align: center;
-            margin: 0;
-        }
-
-        .counter-btn {
-            background-color: #e0e0e0;
-            border: none;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .counter-btn:hover {
-            background-color: #d0d0d0;
-        }
-
-        .counter-btn:first-child {
-            border-radius: 4px 0 0 4px;
-        }
-
-        .counter-btn:last-child {
-            border-radius: 0 4px 4px 0;
-        }
-
-        .counter-input-container {
-            display: flex;
-        }
-
-        .counter-input-container input {
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-        }
-
         .selected-items {
             margin-top: 10px;
             padding: 10px;
@@ -304,6 +259,87 @@
             overflow-y: auto;
         }
 
+        /* Estilos para el checkbox de seleccionar todo */
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .select-all-checkbox {
+            width: 18px;
+            height: 18px;
+        }
+
+        .select-all-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Estilos para los botones de nivel */
+        .level-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .level-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+        .level-btn:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f8f0;
+        }
+
+        .level-btn.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .level-btn.bajo {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .level-btn.bajo.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .level-btn.medio {
+            border-color: #FF9800;
+            color: #FF9800;
+        }
+
+        .level-btn.medio.selected {
+            background-color: #FF9800;
+            color: white;
+        }
+
+        .level-btn.alto {
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .level-btn.alto.selected {
+            background-color: #f44336;
+            color: white;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-content {
@@ -317,6 +353,10 @@
 
             .selection-grid {
                 grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+
+            .level-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -355,11 +395,11 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Ubicaciones (Capillas):</label>
-                    <div class="selection-controls">
-                        <button type="button" id="selectAllUbicaciones">Seleccionar Todo</button>
-                        <button type="button" id="clearUbicaciones">Limpiar</button>
+                    <div class="select-all-container">
+                        <input type="checkbox" id="selectAllUbicacionesCheckbox" class="select-all-checkbox">
+                        <label for="selectAllUbicacionesCheckbox" class="select-all-label">Seleccionar Todas las Ubicaciones</label>
                     </div>
+                    <label>Ubicaciones (Capillas):</label>
                     <div class="selection-grid" id="ubicacionesGrid">
                         <!-- Las ubicaciones se generarán dinámicamente -->
                     </div>
@@ -370,21 +410,11 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="plaga">Plaga:</label>
-                    <select id="plaga" required>
-                        <option value="">Seleccione una plaga</option>
-                        <option value="acaro-blanco">Ácaro Blanco</option>
-                        <option value="mosca-blanca">Mosca Blanca</option>
-                        <option value="acaro-rojo">Ácaro Rojo</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Camas:</label>
-                    <div class="selection-controls">
-                        <button type="button" id="selectAllCamas">Seleccionar Todo</button>
-                        <button type="button" id="clearCamas">Limpiar</button>
+                    <div class="select-all-container">
+                        <input type="checkbox" id="selectAllCamasCheckbox" class="select-all-checkbox">
+                        <label for="selectAllCamasCheckbox" class="select-all-label">Seleccionar Todas las Camas</label>
                     </div>
+                    <label>Camas:</label>
                     <div class="selection-grid" id="camasGrid">
                         <!-- Las camas se generarán dinámicamente -->
                     </div>
@@ -395,11 +425,11 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Módulos:</label>
-                    <div class="selection-controls">
-                        <button type="button" id="selectAllModulos">Seleccionar Todo</button>
-                        <button type="button" id="clearModulos">Limpiar</button>
+                    <div class="select-all-container">
+                        <input type="checkbox" id="selectAllModulosCheckbox" class="select-all-checkbox">
+                        <label for="selectAllModulosCheckbox" class="select-all-label">Seleccionar Todos los Módulos</label>
                     </div>
+                    <label>Módulos:</label>
                     <div class="selection-grid" id="modulosGrid">
                         <!-- Los módulos se generarán dinámicamente -->
                     </div>
@@ -409,13 +439,30 @@
                     </div>
                 </div>
                 
+                <!-- PLAGA MOVIDA AQUÍ - DEBAJO DE MÓDULOS -->
                 <div class="form-group">
-                    <label for="cantidad">Cantidad de individuos:</label>
-                    <div class="counter-input-container">
-                        <button type="button" class="counter-btn" id="decreaseBtn">-</button>
-                        <input type="number" id="cantidad" min="0" value="0" required>
-                        <button type="button" class="counter-btn" id="increaseBtn">+</button>
+                    <label for="plaga">Plaga:</label>
+                    <select id="plaga" required>
+                        <option value="">Seleccione una plaga</option>
+                        <option value="acaro-blanco">Ácaro Blanco</option>
+                        <option value="acaro-rojo">Ácaro Rojo</option>
+                        <option value="cochinilla">Cochinilla</option>
+                        <option value="chinche">Chinche</option>
+                        <option value="pulgon">Pulgón</option>
+                        <option value="gusano">Gusano</option>
+                        <option value="mosca-blanca">Mosca Blanca</option>
+                    </select>
+                </div>
+                
+                <!-- REEMPLAZO DE CANTIDAD POR NIVEL -->
+                <div class="form-group">
+                    <label>Nivel de Infestación:</label>
+                    <div class="level-buttons">
+                        <div class="level-btn bajo selected" data-level="bajo">Bajo</div>
+                        <div class="level-btn medio" data-level="medio">Medio</div>
+                        <div class="level-btn alto" data-level="alto">Alto</div>
                     </div>
+                    <input type="hidden" id="nivel" value="bajo" required>
                 </div>
                 
                 <button type="submit" id="submitBtn">
@@ -453,17 +500,16 @@
         // DOM elements
         const invernaderoSelect = document.getElementById('invernadero');
         const plagaSelect = document.getElementById('plaga');
-        const cantidadInput = document.getElementById('cantidad');
+        const nivelInput = document.getElementById('nivel');
         const submitBtn = document.getElementById('submitBtn');
         const messageDiv = document.getElementById('message');
         const loadingIcon = document.getElementById('loadingIcon');
-        const decreaseBtn = document.getElementById('decreaseBtn');
-        const increaseBtn = document.getElementById('increaseBtn');
 
         // Arrays para almacenar selecciones
         let selectedUbicaciones = [];
         let selectedCamas = [];
         let selectedModulos = [];
+        let selectedNivel = 'bajo'; // Valor por defecto
 
         // Generate location grid (1-18 Norte y 1-18 Sur)
         function generateLocationGrid() {
@@ -487,6 +533,7 @@
                 item.addEventListener('click', () => {
                     const value = item.getAttribute('data-value');
                     toggleSelection(item, value, selectedUbicaciones, 'selectedUbicacionesList');
+                    updateSelectAllCheckbox('ubicaciones');
                 });
             });
         }
@@ -507,6 +554,7 @@
                 item.addEventListener('click', () => {
                     const value = item.getAttribute('data-value');
                     toggleSelection(item, value, selectedCamas, 'selectedCamasList');
+                    updateSelectAllCheckbox('camas');
                 });
             });
         }
@@ -527,6 +575,7 @@
                 item.addEventListener('click', () => {
                     const value = item.getAttribute('data-value');
                     toggleSelection(item, value, selectedModulos, 'selectedModulosList');
+                    updateSelectAllCheckbox('modulos');
                 });
             });
         }
@@ -558,84 +607,161 @@
             }
         }
 
-        // Funciones para seleccionar/limpiar todo
-        function setupSelectionControls() {
+        // Función para actualizar el estado del checkbox "Seleccionar Todo"
+        function updateSelectAllCheckbox(type) {
+            let checkbox, totalItems, selectedItems;
+            
+            switch(type) {
+                case 'ubicaciones':
+                    checkbox = document.getElementById('selectAllUbicacionesCheckbox');
+                    totalItems = 36; // 18 norte + 18 sur
+                    selectedItems = selectedUbicaciones.length;
+                    break;
+                case 'camas':
+                    checkbox = document.getElementById('selectAllCamasCheckbox');
+                    totalItems = 8;
+                    selectedItems = selectedCamas.length;
+                    break;
+                case 'modulos':
+                    checkbox = document.getElementById('selectAllModulosCheckbox');
+                    totalItems = 10;
+                    selectedItems = selectedModulos.length;
+                    break;
+            }
+            
+            if (selectedItems === totalItems) {
+                checkbox.checked = true;
+                checkbox.indeterminate = false;
+            } else if (selectedItems > 0) {
+                checkbox.checked = false;
+                checkbox.indeterminate = true;
+            } else {
+                checkbox.checked = false;
+                checkbox.indeterminate = false;
+            }
+        }
+
+        // Función para manejar la selección de nivel
+        function setupLevelSelection() {
+            const levelButtons = document.querySelectorAll('.level-btn');
+            
+            levelButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remover selección de todos los botones
+                    levelButtons.forEach(b => b.classList.remove('selected'));
+                    
+                    // Agregar selección al botón clickeado
+                    btn.classList.add('selected');
+                    
+                    // Actualizar valor del nivel
+                    selectedNivel = btn.getAttribute('data-level');
+                    nivelInput.value = selectedNivel;
+                });
+            });
+        }
+
+        // Función para configurar los checkboxes de "Seleccionar Todo"
+        function setupSelectAllCheckboxes() {
             // Ubicaciones
-            document.getElementById('selectAllUbicaciones').addEventListener('click', () => {
+            document.getElementById('selectAllUbicacionesCheckbox').addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
                 selectedUbicaciones = [];
+                
                 document.querySelectorAll('#ubicacionesGrid .selection-item').forEach(item => {
                     const value = item.getAttribute('data-value');
-                    selectedUbicaciones.push(value);
-                    item.classList.add('selected');
+                    if (isChecked) {
+                        selectedUbicaciones.push(value);
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
                 });
+                
                 updateSelectedList(selectedUbicaciones, 'selectedUbicacionesList');
-            });
-
-            document.getElementById('clearUbicaciones').addEventListener('click', () => {
-                selectedUbicaciones = [];
-                document.querySelectorAll('#ubicacionesGrid .selection-item').forEach(item => {
-                    item.classList.remove('selected');
-                });
-                updateSelectedList(selectedUbicaciones, 'selectedUbicacionesList');
+                updateSelectAllCheckbox('ubicaciones');
             });
 
             // Camas
-            document.getElementById('selectAllCamas').addEventListener('click', () => {
+            document.getElementById('selectAllCamasCheckbox').addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
                 selectedCamas = [];
+                
                 document.querySelectorAll('#camasGrid .selection-item').forEach(item => {
                     const value = item.getAttribute('data-value');
-                    selectedCamas.push(value);
-                    item.classList.add('selected');
+                    if (isChecked) {
+                        selectedCamas.push(value);
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
                 });
+                
                 updateSelectedList(selectedCamas, 'selectedCamasList');
-            });
-
-            document.getElementById('clearCamas').addEventListener('click', () => {
-                selectedCamas = [];
-                document.querySelectorAll('#camasGrid .selection-item').forEach(item => {
-                    item.classList.remove('selected');
-                });
-                updateSelectedList(selectedCamas, 'selectedCamasList');
+                updateSelectAllCheckbox('camas');
             });
 
             // Módulos
-            document.getElementById('selectAllModulos').addEventListener('click', () => {
+            document.getElementById('selectAllModulosCheckbox').addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
                 selectedModulos = [];
+                
                 document.querySelectorAll('#modulosGrid .selection-item').forEach(item => {
                     const value = item.getAttribute('data-value');
-                    selectedModulos.push(value);
-                    item.classList.add('selected');
+                    if (isChecked) {
+                        selectedModulos.push(value);
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
                 });
+                
                 updateSelectedList(selectedModulos, 'selectedModulosList');
-            });
-
-            document.getElementById('clearModulos').addEventListener('click', () => {
-                selectedModulos = [];
-                document.querySelectorAll('#modulosGrid .selection-item').forEach(item => {
-                    item.classList.remove('selected');
-                });
-                updateSelectedList(selectedModulos, 'selectedModulosList');
+                updateSelectAllCheckbox('modulos');
             });
         }
-        
-        // Initialize grids
+
+        // Función para reiniciar el formulario
+        function resetForm() {
+            // Limpiar selecciones
+            selectedUbicaciones = [];
+            selectedCamas = [];
+            selectedModulos = [];
+            selectedNivel = 'bajo';
+            
+            // Limpiar elementos seleccionados visualmente
+            document.querySelectorAll('.selection-item.selected').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Resetear nivel a "Bajo"
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector('.level-btn.bajo').classList.add('selected');
+            nivelInput.value = 'bajo';
+            
+            // Resetear checkboxes
+            document.querySelectorAll('.select-all-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+                checkbox.indeterminate = false;
+            });
+            
+            // Actualizar listas
+            updateSelectedList(selectedUbicaciones, 'selectedUbicacionesList');
+            updateSelectedList(selectedCamas, 'selectedCamasList');
+            updateSelectedList(selectedModulos, 'selectedModulosList');
+            
+            // Resetear otros campos
+            invernaderoSelect.value = '';
+            plagaSelect.value = '';
+        }
+
+        // Initialize grids and controls
         generateLocationGrid();
         generateBedGrid();
         generateModuleGrid();
-        setupSelectionControls();
-        
-        // Counter buttons functionality
-        decreaseBtn.addEventListener('click', () => {
-            let currentValue = parseInt(cantidadInput.value);
-            if (currentValue > 0) {
-                cantidadInput.value = currentValue - 1;
-            }
-        });
-        
-        increaseBtn.addEventListener('click', () => {
-            let currentValue = parseInt(cantidadInput.value);
-            cantidadInput.value = currentValue + 1;
-        });
+        setupSelectAllCheckboxes();
+        setupLevelSelection();
         
         // Form submission
         document.getElementById('plagueForm').addEventListener('submit', async (e) => {
@@ -658,7 +784,7 @@
             const baseData = {
                 invernadero: invernaderoSelect.value,
                 plaga: plagaSelect.value,
-                cantidad: parseInt(cantidadInput.value),
+                nivel: selectedNivel,
                 fecha: new Date().toISOString(),
                 usuario: 'Técnico',
                 timestamp: Date.now()
@@ -678,6 +804,7 @@
             console.log('Ubicaciones seleccionadas:', selectedUbicaciones);
             console.log('Camas seleccionadas:', selectedCamas);
             console.log('Módulos seleccionados:', selectedModulos);
+            console.log('Nivel seleccionado:', selectedNivel);
             
             try {
                 let totalRegistros = 0;
@@ -707,7 +834,8 @@
                             console.log(`✅ Registro ${registrosExitosos}/${totalRegistros}:`, {
                                 ubicacion: formData.ubicacion,
                                 cama: formData.cama,
-                                modulo: formData.modulo
+                                modulo: formData.modulo,
+                                nivel: formData.nivel
                             });
                         }
                     }
@@ -718,14 +846,16 @@
                 messageDiv.className = 'message success';
                 messageDiv.style.display = 'block';
                 
-                // Reset form (pero mantener selecciones)
-                cantidadInput.value = 0;
+                // REINICIAR FORMULARIO después de guardar exitosamente
+                resetForm();
                 
                 console.log('✅ Proceso completado:');
                 console.log(`📊 Total de registros creados: ${registrosExitosos}`);
                 console.log('📍 Ubicaciones:', selectedUbicaciones.length);
                 console.log('🛏️ Camas:', selectedCamas.length);
                 console.log('🔢 Módulos:', selectedModulos.length);
+                console.log('📈 Nivel:', selectedNivel);
+                console.log('🔄 Formulario reiniciado');
                 
             } catch (error) {
                 console.error('❌ Error al guardar en Firebase:', error);
