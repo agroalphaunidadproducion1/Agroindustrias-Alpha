@@ -54,6 +54,8 @@
             flex: 1;
             padding: 20px;
             min-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
@@ -64,6 +66,9 @@
             width: 100%;
             max-width: 1800px;
             margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .breadcrumb {
@@ -159,176 +164,122 @@
             display: flex;
             gap: 10px;
             margin-bottom: 30px;
-            min-height: 800px;
+            flex: 1;
+            min-height: 400px;
+            max-height: 70vh;
         }
 
         .capillas-izquierda {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         .capillas-derecha {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
         }
 
         .pasillo-central {
-            width: 40px;
+            width: 30px;
             background: #5d4037;
             display: flex;
             justify-content: center;
             align-items: center;
             color: #d7ccc8;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.9rem;
             writing-mode: vertical-lr;
             text-orientation: mixed;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
             border-left: 2px dashed #8d6e63;
             border-right: 2px dashed #8d6e63;
+            margin: 0 5px;
         }
 
+        /* Capillas más angostas - REDUCIDAS EN UN 20% */
         .capilla {
-            flex: 1;
             background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .capilla-header {
-            text-align: center;
-            font-weight: bold;
-            font-size: 12px;
-            color: #495057;
-            padding: 4px;
-            background: #e9ecef;
+            border: 1px solid #e9ecef;
             border-radius: 4px;
-            margin-bottom: 4px;
-        }
-
-        .camas-container {
             display: flex;
-            flex-direction: column;
-            gap: 3px;
-            flex: 1;
-        }
-
-        .cama {
-            flex: 1;
-            background: #ffffff;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 3px;
-            display: flex;
-            gap: 2px;
-        }
-
-        /* Para el lado izquierdo, los módulos empiezan desde la derecha (cerca del pasillo) */
-        .capillas-izquierda .cama {
-            flex-direction: row-reverse;
-        }
-
-        /* Para el lado derecho, los módulos empiezan desde la izquierda (cerca del pasillo) */
-        .capillas-derecha .cama {
-            flex-direction: row;
-        }
-
-        .modulo {
-            flex: 1;
-            background: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 2px;
-            cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            min-height: 12px;
+            cursor: pointer;
+            flex: 1;
+            min-height: 28px; /* Reducido de 35px a 28px (20%) */
+            font-weight: bold;
+            font-size: 10px; /* Reducido de 11px a 10px */
+            color: #495057;
+            text-align: center;
+            overflow: hidden;
         }
 
-        .modulo:hover {
-            transform: scale(1.1);
+        .capilla-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            z-index: 2;
+            position: relative;
+            padding: 1px; /* Reducido de 2px a 1px */
+        }
+
+        .capilla:hover {
+            transform: scale(1.02);
             z-index: 10;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .modulo:hover::after {
+        .capilla:hover::after {
             content: attr(data-info);
             position: absolute;
-            top: -80px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            margin-left: 10px;
             background: rgba(0,0,0,0.9);
             color: white;
             padding: 8px 10px;
-            border-radius: 4px;
-            font-size: 12px;
+            border-radius: 6px;
+            font-size: 11px;
             white-space: pre-line;
             z-index: 1000;
             pointer-events: none;
             text-align: center;
             line-height: 1.4;
-            min-width: 150px;
+            min-width: 180px;
         }
 
-        .modulo.mosca-blanca {
+        /* Para el lado derecho, el tooltip aparece a la izquierda */
+        .capillas-derecha .capilla:hover::after {
+            left: auto;
+            right: 100%;
+            margin-left: 0;
+            margin-right: 10px;
+        }
+
+        /* Segmentos de plagas dentro de las capillas */
+        .plaga-segment {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            transition: all 0.3s ease;
+        }
+
+        .plaga-segment.mosca-blanca {
             background-color: var(--mosca-blanca-color);
-            border-color: #FBC02D;
         }
 
-        .modulo.acaro-rojo {
+        .plaga-segment.acaro-rojo {
             background-color: var(--acaro-rojo-color);
-            border-color: #D32F2F;
         }
 
-        .modulo.acaro-blanco {
+        .plaga-segment.acaro-blanco {
             background-color: var(--acaro-blanco-color);
-            border-color: #757575;
-        }
-
-        .modulo.con-plaga {
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .stat-card {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .stat-card h3 {
-            font-size: 14px;
-            margin-bottom: 10px;
-            color: #666;
-        }
-
-        .stat-card .number {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
         }
 
         .loading {
@@ -363,18 +314,37 @@
             height: 70px;
         }
 
+        /* Alertas */
+        .alert-indicator {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+            z-index: 3;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .greenhouse-container {
                 flex-direction: column;
                 min-height: auto;
+                max-height: none;
             }
             
             .pasillo-central {
                 width: 100%;
-                height: 40px;
+                height: 30px;
                 writing-mode: horizontal-tb;
-                margin: 10px 0;
+                margin: 8px 0;
             }
             
             .capillas-izquierda,
@@ -384,14 +354,26 @@
             }
             
             .capilla {
-                min-width: 200px;
-                min-height: 150px;
+                min-width: 70px;
+                min-height: 40px; /* Ajustado para móvil */
+                flex: 0 1 calc(16.666% - 8px);
             }
 
-            /* En móvil, mantener dirección normal */
-            .capillas-izquierda .cama,
-            .capillas-derecha .cama {
-                flex-direction: row;
+            /* En móvil, tooltips arriba */
+            .capilla:hover::after {
+                top: -100px;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                margin: 0;
+            }
+            
+            .capillas-derecha .capilla:hover::after {
+                top: -100px;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                margin: 0;
             }
         }
 
@@ -406,7 +388,9 @@
             }
             
             .capilla {
-                min-width: 100%;
+                flex: 0 1 calc(33.333% - 8px);
+                min-height: 35px; /* Ajustado para móvil */
+                font-size: 9px; /* Reducido para móvil */
             }
         }
     </style>
@@ -470,8 +454,8 @@
                     <span>Ácaro Blanco</span>
                 </div>
                 <div class="legend-item">
-                    <div style="width: 14px; height: 14px; border: 2px solid #4CAF50; background: transparent; animation: pulse 2s infinite;"></div>
-                    <span>Módulo con plaga</span>
+                    <div style="width: 8px; height: 8px; background: #ff0000; border-radius: 50%; animation: blink 1s infinite;"></div>
+                    <span>Alerta (>3 puntos)</span>
                 </div>
             </div>
 
@@ -479,27 +463,7 @@
             <div id="invernaderoMap" class="invernadero-map">
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Cargando mapa del invernadero...</p>
-                </div>
-            </div>
-
-            <!-- Estadísticas -->
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>Total de Módulos Afectados</h3>
-                    <div class="number" id="totalModulos">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Mosca Blanca</h3>
-                    <div class="number" id="totalMosca">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Ácaro Rojo</h3>
-                    <div class="number" id="totalAcaroRojo">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Ácaro Blanco</h3>
-                    <div class="number" id="totalAcaroBlanco">0</div>
+                    <p>Cargando datos desde Firebase...</p>
                 </div>
             </div>
         </div>
@@ -511,11 +475,6 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
-    <!-- Scripts de componentes externos -->
-    <script src="/header-component.js"></script>
-    <script src="/sidebar-component.js"></script>
-    <script src="../footer.js"></script>
 
     <script>
         // Firebase configuration
@@ -531,12 +490,9 @@
         const invernaderoSelect = document.getElementById('invernadero');
         const plagaSelect = document.getElementById('plaga');
         const invernaderoMap = document.getElementById('invernaderoMap');
-        const totalModulos = document.getElementById('totalModulos');
-        const totalMosca = document.getElementById('totalMosca');
-        const totalAcaroRojo = document.getElementById('totalAcaroRojo');
-        const totalAcaroBlanco = document.getElementById('totalAcaroBlanco');
 
-        // Datos de ejemplo (serán reemplazados por Firebase)
+        // Variables para control de alertas
+        let alertasMostradas = new Set();
         let plagueData = {};
 
         // Función para obtener el estado (por defecto "activo" si no existe)
@@ -569,7 +525,9 @@
             `;
             
             invernaderoMap.innerHTML = html;
-            updateStatistics(filteredData, selectedPlaga);
+            
+            // Verificar y mostrar alertas
+            checkAndShowAlerts(filteredData);
         }
 
         // Generar todas las capillas de un lado
@@ -587,105 +545,146 @@
         // Generar una capilla individual
         function generateCapilla(lado, numero, data, plagaFiltro) {
             const nombreCapilla = lado === 'norte' ? `${numero} NORTE` : `${numero} SUR`;
+            const ubicacion = `${lado}-${numero}`;
             
-            return `
-                <div class="capilla">
-                    <div class="capilla-header">${nombreCapilla}</div>
-                    <div class="camas-container">
-                        ${generateCamas(lado, numero, data, plagaFiltro)}
-                    </div>
-                </div>
-            `;
-        }
-
-        // Generar las 8 camas para una capilla
-        function generateCamas(lado, capilla, data, plagaFiltro) {
-            let html = '';
-            
-            // 8 camas por capilla
-            for (let cama = 1; cama <= 8; cama++) {
-                html += `
-                    <div class="cama">
-                        ${generateModulos(lado, capilla, cama, data, plagaFiltro)}
-                    </div>
-                `;
-            }
-            
-            return html;
-        }
-
-        // Generar los 10 módulos para una cama
-        function generateModulos(lado, capilla, cama, data, plagaFiltro) {
-            let html = '';
-            const ubicacion = `${lado}-${capilla}`;
-            
-            // 10 módulos por cama - IMPORTANTE: Los módulos se generan en orden normal
-            // La dirección se controla con CSS (flex-direction)
-            for (let modulo = 1; modulo <= 10; modulo++) {
-                const moduloData = findPlagueData(data, ubicacion, cama, modulo);
-                html += generateModulo(lado, capilla, cama, modulo, moduloData, plagaFiltro);
-            }
-            
-            return html;
-        }
-
-        // Generar un módulo individual
-        function generateModulo(lado, capilla, cama, modulo, moduloData, plagaFiltro) {
-            let clase = 'modulo';
-            let info = `Módulo ${modulo}`;
-            let showModule = true;
-            
-            if (moduloData) {
-                // Verificar si coincide con el filtro de plaga
-                if (plagaFiltro !== 'todas' && moduloData.plaga !== plagaFiltro) {
-                    showModule = false;
-                } else {
-                    clase += ` ${moduloData.plaga} con-plaga`;
-                    const nombreUbicacion = lado === 'norte' ? `${capilla} NORTE` : `${capilla} SUR`;
-                    info = `${getPlagaName(moduloData.plaga)}\nCantidad: ${moduloData.cantidad}\nFecha: ${formatDate(moduloData.fecha)}\nUbicación: ${nombreUbicacion} - C${cama} - M${modulo}\nEstado: ${getEstado(moduloData).toUpperCase()}`;
-                }
-            }
-            
-            if (!showModule) {
-                return `<div class="modulo" style="opacity: 0.3; cursor: default;"></div>`;
-            }
-            
-            return `<div class="${clase}" data-info="${info}"></div>`;
-        }
-
-        // Buscar datos de plaga para una ubicación específica
-        function findPlagueData(data, ubicacion, cama, modulo) {
-            return data.find(point => 
-                point.ubicacion === ubicacion && 
-                parseInt(point.cama) === cama && 
-                parseInt(point.modulo) === modulo &&
-                getEstado(point) === 'activo'  // Solo puntos activos
+            // Verificar si hay plagas en esta capilla
+            const capillaData = data.filter(point => 
+                point.ubicacion === ubicacion
             );
+            
+            // Determinar si la capilla debe mostrarse
+            let showCapilla = true;
+            let capillaInfo = `Capilla ${nombreCapilla}`;
+            let tieneAlerta = false;
+            
+            if (capillaData.length > 0) {
+                // Si hay datos de plagas en esta capilla
+                const plagasEnCapilla = getPlagasEnCapilla(capillaData);
+                
+                // Si hay un filtro específico, verificar si coincide
+                if (plagaFiltro !== 'todas' && !plagasEnCapilla.includes(plagaFiltro)) {
+                    showCapilla = false;
+                } else {
+                    // Construir información detallada para el tooltip
+                    capillaInfo = `Capilla ${nombreCapilla}\n\n`;
+                    
+                    // Agrupar por tipo de plaga
+                    const plagasAgrupadas = groupByPlaga(capillaData);
+                    let totalPuntos = 0;
+                    
+                    for (const [plaga, puntos] of Object.entries(plagasAgrupadas)) {
+                        capillaInfo += `${getPlagaName(plaga)}: ${puntos.length} puntos\n`;
+                        totalPuntos += puntos.length;
+                        
+                        // Verificar si hay alerta (más de 3 puntos de una plaga)
+                        if (puntos.length > 3) {
+                            tieneAlerta = true;
+                            const alertaKey = `${ubicacion}-${plaga}`;
+                            if (!alertasMostradas.has(alertaKey)) {
+                                alertasMostradas.add(alertaKey);
+                            }
+                        }
+                    }
+                    
+                    capillaInfo += `\nTotal: ${totalPuntos} puntos`;
+                    capillaInfo += `\nHaga clic para ver detalles`;
+                }
+            }
+            
+            if (!showCapilla) {
+                return `<div class="capilla" style="opacity: 0.3; cursor: default;">
+                    <div class="capilla-content">${nombreCapilla}</div>
+                </div>`;
+            }
+            
+            // Generar segmentos de plagas
+            const segmentosHTML = generatePlagaSegments(capillaData);
+            const alertaHTML = tieneAlerta ? '<div class="alert-indicator"></div>' : '';
+            
+            return `<div class="capilla" data-info="${capillaInfo}" onclick="showCapillaDetails('${lado}', ${numero})">
+                ${segmentosHTML}
+                <div class="capilla-content">${nombreCapilla}</div>
+                ${alertaHTML}
+            </div>`;
         }
 
-        // Actualizar estadísticas - SOLO PUNTOS ACTIVOS
-        function updateStatistics(data, plagaFiltro) {
-            let total = 0;
-            let mosca = 0;
-            let acaroRojo = 0;
-            let acaroBlanco = 0;
+        // Generar segmentos de plagas dentro de la capilla
+        function generatePlagaSegments(capillaData) {
+            if (capillaData.length === 0) return '';
             
+            const totalPuntos = capillaData.length;
+            const plagasAgrupadas = groupByPlaga(capillaData);
+            let segmentosHTML = '';
+            let leftPosition = 0;
+            
+            for (const [plaga, puntos] of Object.entries(plagasAgrupadas)) {
+                const porcentaje = (puntos.length / totalPuntos) * 100;
+                segmentosHTML += `<div class="plaga-segment ${plaga}" style="left: ${leftPosition}%; width: ${porcentaje}%;"></div>`;
+                leftPosition += porcentaje;
+            }
+            
+            return segmentosHTML;
+        }
+
+        // Verificar y mostrar alertas
+        function checkAndShowAlerts(data) {
+            const plagasAgrupadasPorCapilla = {};
+            
+            // Agrupar datos por capilla y por plaga
             data.forEach(point => {
-                // Solo contar puntos activos
-                if (getEstado(point) === 'activo') {
-                    if (plagaFiltro === 'todas' || point.plaga === plagaFiltro) {
-                        total++;
-                        if (point.plaga === 'mosca-blanca') mosca++;
-                        else if (point.plaga === 'acaro-rojo') acaroRojo++;
-                        else if (point.plaga === 'acaro-blanco') acaroBlanco++;
-                    }
+                if (!plagasAgrupadasPorCapilla[point.ubicacion]) {
+                    plagasAgrupadasPorCapilla[point.ubicacion] = {};
                 }
+                if (!plagasAgrupadasPorCapilla[point.ubicacion][point.plaga]) {
+                    plagasAgrupadasPorCapilla[point.ubicacion][point.plaga] = 0;
+                }
+                plagasAgrupadasPorCapilla[point.ubicacion][point.plaga]++;
             });
             
-            totalModulos.textContent = total;
-            totalMosca.textContent = mosca;
-            totalAcaroRojo.textContent = acaroRojo;
-            totalAcaroBlanco.textContent = acaroBlanco;
+            // Verificar alertas
+            for (const [ubicacion, plagas] of Object.entries(plagasAgrupadasPorCapilla)) {
+                for (const [plaga, cantidad] of Object.entries(plagas)) {
+                    if (cantidad > 3) {
+                        const alertaKey = `${ubicacion}-${plaga}`;
+                        if (!alertasMostradas.has(alertaKey)) {
+                            mostrarAlerta(ubicacion, plaga, cantidad);
+                            alertasMostradas.add(alertaKey);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Mostrar alerta
+        function mostrarAlerta(ubicacion, plaga, cantidad) {
+            const [lado, numero] = ubicacion.split('-');
+            const nombreCapilla = lado === 'norte' ? `${numero} NORTE` : `${numero} SUR`;
+            const nombrePlaga = getPlagaName(plaga);
+            
+            setTimeout(() => {
+                alert(`🚨 ALERTA - Capilla ${nombreCapilla}\n\nSe detectaron ${cantidad} puntos de ${nombrePlaga}\n\nSe recomienda revisión inmediata.`);
+            }, 1000);
+        }
+
+        // Obtener las plagas presentes en una capilla
+        function getPlagasEnCapilla(capillaData) {
+            const plagas = new Set();
+            capillaData.forEach(point => {
+                plagas.add(point.plaga);
+            });
+            return Array.from(plagas);
+        }
+
+        // Agrupar datos por tipo de plaga
+        function groupByPlaga(capillaData) {
+            const grouped = {};
+            capillaData.forEach(point => {
+                if (!grouped[point.plaga]) {
+                    grouped[point.plaga] = [];
+                }
+                grouped[point.plaga].push(point);
+            });
+            return grouped;
         }
 
         // Helper functions
@@ -698,9 +697,43 @@
             return names[plaga] || plaga;
         }
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-ES');
+        // Función para mostrar detalles de una capilla
+        function showCapillaDetails(lado, numero) {
+            const ubicacion = `${lado}-${numero}`;
+            const nombreCapilla = lado === 'norte' ? `${numero} NORTE` : `${numero} SUR`;
+            const selectedInvernadero = invernaderoSelect.value;
+            const capillaData = (plagueData[selectedInvernadero] || []).filter(point => 
+                point.ubicacion === ubicacion && getEstado(point) === 'activo'
+            );
+            
+            if (capillaData.length === 0) {
+                alert(`Capilla ${nombreCapilla}\n\nNo hay plagas registradas en esta capilla.`);
+                return;
+            }
+            
+            let detalles = `Detalles de la Capilla ${nombreCapilla}\n\n`;
+            const plagasAgrupadas = groupByPlaga(capillaData);
+            
+            for (const [plaga, puntos] of Object.entries(plagasAgrupadas)) {
+                detalles += `${getPlagaName(plaga)}: ${puntos.length} puntos\n`;
+            }
+            
+            detalles += `\nTotal: ${capillaData.length} puntos`;
+            
+            // Verificar si hay alertas para esta capilla
+            let tieneAlerta = false;
+            for (const [plaga, puntos] of Object.entries(plagasAgrupadas)) {
+                if (puntos.length > 3) {
+                    tieneAlerta = true;
+                    break;
+                }
+            }
+            
+            if (tieneAlerta) {
+                detalles += `\n\n⚠️  ESTA CAPILLA TIENE ALERTAS ACTIVAS`;
+            }
+            
+            alert(detalles);
         }
 
         // Cargar datos desde Firebase
@@ -712,20 +745,25 @@
                 const organizedData = {};
 
                 if (data) {
+                    console.log("Datos recibidos de Firebase:", data);
+                    
                     // Organizar datos por invernadero
                     Object.keys(data).forEach(key => {
                         const point = data[key];
                         if (point && point.invernadero) {
-                            if (!organizedData[point.invernadero]) {
-                                organizedData[point.invernadero] = [];
+                            const invernadero = point.invernadero.toString();
+                            if (!organizedData[invernadero]) {
+                                organizedData[invernadero] = [];
                             }
-                            organizedData[point.invernadero].push(point);
+                            organizedData[invernadero].push(point);
                         }
                     });
 
                     plagueData = organizedData;
+                    console.log("Datos organizados:", plagueData);
                     generateInvernaderoMap();
                 } else {
+                    console.log("No hay datos en Firebase");
                     invernaderoMap.innerHTML = `
                         <div class="no-data">
                             <h3>No hay datos disponibles</h3>
@@ -747,10 +785,14 @@
         // Inicializar
         function init() {
             // Event listeners
-            invernaderoSelect.addEventListener('change', generateInvernaderoMap);
+            invernaderoSelect.addEventListener('change', function() {
+                alertasMostradas.clear();
+                generateInvernaderoMap();
+            });
+            
             plagaSelect.addEventListener('change', generateInvernaderoMap);
             
-            // Cargar datos iniciales
+            // Cargar datos iniciales desde Firebase
             loadDataFromFirebase();
         }
 
