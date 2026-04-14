@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Ver Usuarios - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 100%;
+            max-width: 350px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        tr:hover {
+            background: var(--bg-primary);
+            transition: background 0.2s;
+        }
+
+        /* Badges roles - clickeables */
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-badge:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Selector de rol inline (aparece al hacer clic) */
+        .role-select-inline {
+            padding: 4px 8px;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .role-select-inline:focus {
+            border-color: var(--primary-light);
+        }
+
+        .admin-badge { background-color: #2196F3; color: white; }
+        .grower-badge { background-color: #FF9800; color: white; }
+        .grower-junior-badge { background-color: #FF9800; color: white; }
+        .digitador-badge { background-color: #9C27B0; color: white; }
+        .fitosanidad-badge { background-color: #795548; color: white; }
+        .culturales-badge { background-color: #FF5722; color: white; }
+        .riego-badge { background-color: #00BCD4; color: white; }
+        .supervisor-badge { background-color: #673AB7; color: white; }
+        .invitado-badge { background-color: #9E9E9E; color: white; }
+        .gerente-general-badge { background-color: #E91E63; color: white; }
+        .gerente-produccion-badge { background-color: #3F51B5; color: white; }
+        .jefe-vivero-badge { background-color: #009688; color: white; }
+        .consultor-badge { background-color: #E91E63; color: white; }
+        .mezclero-fitosanidad-badge { background-color: #795548; color: white; }
+        .usuario1-badge, .usuario2-badge, .usuario3-badge, .usuario4-badge { background-color: #795548; color: white; }
+        .default-badge { background-color: #757575; color: white; }
+
+        /* Botón eliminar */
+        .btn-delete {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Modal de confirmación */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal-confirm {
+            background: #dc3545;
+            color: white;
+        }
+
+        .modal-cancel {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Estados */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary-color);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(76, 175, 80, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 4px solid #28a745;
+            display: block;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+            display: block;
+        }
+
+        .empty-row {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        /* Indicador de carga en rol */
+        .role-updating {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 15px; }
+            .dashboard-section { padding: 20px; }
+            h1 { font-size: 1.5rem; }
+            th, td { padding: 10px 12px; font-size: 0.8rem; }
+        }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <div class="main-content">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / 
+                <a href="manejo-users.html">Gestión de Usuarios</a> / 
+                <span>Ver Usuarios</span>
+            </div>
+            
+            <h1><i class="fas fa-users"></i> Usuarios Registrados</h1>
+            
+            <div class="action-buttons">
+                <a href="crear-usuario.html" class="action-button">
+                    <i class="fas fa-user-plus"></i> Crear Usuario
+                </a>
+                <a href="manejo-users.html" class="action-button">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar por usuario, nombre o rol...">
+            </div>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="table-wrapper">
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Rol (clic para cambiar)</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">
+                                <span class="loading-spinner"></span> Cargando usuarios...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 15px;"></i>
+            <h3>Eliminar Usuario</h3>
+            <p id="deleteModalMessage">¿Estás seguro de que deseas eliminar este usuario?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-cancel" id="cancelDeleteBtn">Cancelar</button>
+                <button class="modal-btn modal-confirm" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer-component></footer-component>
+
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        const firebaseConfig = { databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const usersRef = database.ref('login');
+        const activeUsersRef = database.ref('uactivos');
+        
+        let currentUser = null;
+        let allUsers = [];
+        let userToDelete = null;
+        
+        // Lista de roles disponibles
+        const rolesList = [
+            'Administrador', 'Gerente General', 'Gerente de Producción', 'Supervisor',
+            'Jefe de Vivero', 'Grower', 'Grower Junior', 'Digitador', 'Técnico Fitosanidad',
+            'Técnico Prácticas Culturales', 'Técnico Riego', 'Mezclero Fitosanidad',
+            'Consultor', 'Usuario1', 'Usuario2', 'Usuario3', 'Usuario4', 'Invitado'
+        ];
+        
+        // Tema
+        const themes = ['light', 'dark', 'blue', 'orange', 'purple'];
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && themes.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+        
+        function getBadgeClass(role) {
+            const classes = {
+                'Administrador': 'admin-badge', 'Admin': 'admin-badge',
+                'Gerente General': 'gerente-general-badge', 'Gerente de Producción': 'gerente-produccion-badge',
+                'Supervisor': 'supervisor-badge', 'Jefe de Vivero': 'jefe-vivero-badge',
+                'Grower': 'grower-badge', 'Grower Junior': 'grower-junior-badge',
+                'Digitador': 'digitador-badge', 'Técnico Fitosanidad': 'fitosanidad-badge',
+                'Fitosanidad': 'fitosanidad-badge', 'Técnico Prácticas Culturales': 'culturales-badge',
+                'Prácticas Culturales': 'culturales-badge', 'Culturales': 'culturales-badge',
+                'Técnico Riego': 'riego-badge', 'Riego': 'riego-badge',
+                'Mezclero Fitosanidad': 'mezclero-fitosanidad-badge', 'Consultor': 'consultor-badge',
+                'Invitado': 'invitado-badge'
+            };
+            return classes[role] || 'default-badge';
+        }
+        
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'No disponible';
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('es-CL') + ' ' + date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showMessage(text, type) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${text}`;
+            msgDiv.className = `message ${type}`;
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Cambiar rol de usuario
+        async function changeUserRole(username, newRole) {
+            if (!username || !newRole) return false;
+            
+            try {
+                await usersRef.child(username).update({ role: newRole });
+                showMessage(`Rol de ${username} actualizado a ${newRole}`, 'success');
+                
+                // Actualizar lista local
+                const userIndex = allUsers.findIndex(u => u.username === username);
+                if (userIndex !== -1) {
+                    allUsers[userIndex].role = newRole;
+                    // Refrescar la vista manteniendo el filtro actual
+                    const searchTerm = document.getElementById('searchInput')?.value || '';
+                    filterUsers(searchTerm);
+                }
+                return true;
+            } catch (error) {
+                console.error('Error al actualizar rol:', error);
+                showMessage(`Error al actualizar rol: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Eliminar usuario
+        async function deleteUser(username) {
+            if (!username) return false;
+            
+            try {
+                if (currentUser && currentUser.username === username) {
+                    showMessage('No puedes eliminar tu propio usuario', 'error');
+                    return false;
+                }
+                
+                await usersRef.child(username).remove();
+                await activeUsersRef.child(username).remove();
+                
+                showMessage(`Usuario ${username} eliminado correctamente`, 'success');
+                
+                allUsers = allUsers.filter(u => u.username !== username);
+                const searchTerm = document.getElementById('searchInput')?.value || '';
+                filterUsers(searchTerm);
+                return true;
+            } catch (error) {
+                console.error('Error al eliminar usuario:', error);
+                showMessage(`Error al eliminar usuario: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Crear el selector inline para cambiar rol
+        function createRoleSelector(currentRole, username) {
+            const select = document.createElement('select');
+            select.className = 'role-select-inline';
+            
+            rolesList.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role;
+                option.textContent = role;
+                if (role === currentRole) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+            
+            // Guardar el rol original para poder revertir si hay error
+            select.setAttribute('data-original-role', currentRole);
+            select.setAttribute('data-username', username);
+            
+            select.addEventListener('change', async (e) => {
+                e.stopPropagation();
+                const newRole = select.value;
+                const originalRole = select.getAttribute('data-original-role');
+                
+                if (newRole === originalRole) return;
+                
+                // Mostrar estado de carga en el select
+                select.disabled = true;
+                select.style.opacity = '0.7';
+                
+                const success = await changeUserRole(username, newRole);
+                
+                if (success) {
+                    select.setAttribute('data-original-role', newRole);
+                    // Reemplazar el select por un badge (salir del modo edición)
+                    finishRoleEdit(select.parentElement, username, newRole);
+                } else {
+                    // Revertir el select al valor original
+                    select.value = originalRole;
+                    select.disabled = false;
+                    select.style.opacity = '1';
+                }
+            });
+            
+            // Permitir salir del modo edición si se pierde el foco
+            select.addEventListener('blur', (e) => {
+                // Pequeño delay para permitir que el change se ejecute primero
+                setTimeout(() => {
+                    if (select.parentElement && !select.disabled) {
+                        const currentVal = select.value;
+                        finishRoleEdit(select.parentElement, username, currentVal);
+                    }
+                }, 200);
+            });
+            
+            return select;
+        }
+        
+        // Finalizar edición: reemplazar selector por badge
+        function finishRoleEdit(container, username, newRole) {
+            const badge = document.createElement('span');
+            badge.className = `role-badge ${getBadgeClass(newRole)}`;
+            badge.textContent = newRole;
+            badge.setAttribute('data-role', newRole);
+            badge.setAttribute('data-username', username);
+            badge.style.cursor = 'pointer';
+            
+            // Agregar evento de clic para volver a editar
+            badge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                startRoleEdit(badge, username, newRole);
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(badge);
+        }
+        
+        // Iniciar edición: reemplazar badge por selector
+        function startRoleEdit(badgeElement, username, currentRole) {
+            const container = badgeElement.parentElement;
+            const selector = createRoleSelector(currentRole, username);
+            container.innerHTML = '';
+            container.appendChild(selector);
+            selector.focus();
+        }
+        
+        // Renderizar tabla
+        function displayUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-row"><i class="fas fa-inbox" style="font-size: 2rem; opacity: 0.5;"></i><br>No se encontraron usuarios</td></tr>`;
+                return;
+            }
+            
+            let html = '';
+            users.forEach(user => {
+                const isCurrentUser = currentUser && currentUser.username === user.username;
+                const roleBadgeClass = getBadgeClass(user.role);
+                
+                html += `
+                    <tr data-username="${escapeHtml(user.username)}">
+                        <td><strong>${escapeHtml(user.username)}</strong>${isCurrentUser ? ' <span style="font-size:0.7rem; color:var(--primary-color);">(tú)</span>' : ''}</td>
+                        <td>${escapeHtml(user.name || 'No especificado')}</td>
+                        <td class="role-cell">
+                            <span class="role-badge ${roleBadgeClass}" data-role="${escapeHtml(user.role)}" data-username="${escapeHtml(user.username)}" style="cursor: pointer;">
+                                ${escapeHtml(user.role)}
+                            </span>
+                        </td>
+                        <td>${formatTimestamp(user.createdAt)}</td>
+                        <td class="action-cell">
+                            <button class="btn-delete" data-username="${escapeHtml(user.username)}" data-name="${escapeHtml(user.name || user.username)}" title="Eliminar usuario">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            
+            // Agregar event listeners a los badges de rol (clic para editar)
+            document.querySelectorAll('.role-cell .role-badge').forEach(badge => {
+                badge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const username = badge.getAttribute('data-username');
+                    const currentRole = badge.getAttribute('data-role');
+                    startRoleEdit(badge, username, currentRole);
+                });
+            });
+            
+            // Agregar event listeners a los botones de eliminar
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const username = btn.getAttribute('data-username');
+                    const name = btn.getAttribute('data-name');
+                    userToDelete = username;
+                    const modalMsg = document.getElementById('deleteModalMessage');
+                    modalMsg.innerHTML = `¿Estás seguro de que deseas eliminar al usuario <strong>${escapeHtml(name || username)}</strong>?<br>Esta acción no se puede deshacer.`;
+                    document.getElementById('deleteModal').classList.add('active');
+                });
+            });
+        }
+        
+        function filterUsers(searchTerm) {
+            if (!searchTerm || searchTerm.trim() === '') {
+                displayUsers(allUsers);
+                return;
+            }
+            const term = searchTerm.toLowerCase().trim();
+            const filtered = allUsers.filter(user => 
+                (user.username && user.username.toLowerCase().includes(term)) ||
+                (user.name && user.name.toLowerCase().includes(term)) ||
+                (user.role && user.role.toLowerCase().includes(term))
+            );
+            displayUsers(filtered);
+        }
+        
+        function loadUsers() {
+            usersRef.on('value', (snapshot) => {
+                const usersData = snapshot.val();
+                const usersList = [];
+                if (usersData) {
+                    for (const username in usersData) {
+                        if (usersData.hasOwnProperty(username)) {
+                            usersList.push({
+                                username: username,
+                                ...usersData[username]
+                            });
+                        }
+                    }
+                }
+                usersList.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                allUsers = usersList;
+                filterUsers(document.getElementById('searchInput')?.value || '');
+            }, (error) => {
+                console.error('Error al cargar usuarios:', error);
+                showMessage('Error al cargar usuarios', 'error');
+            });
+        }
+        
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentUser = userData;
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try { await activeUsersRef.child(currentUser.username).remove(); } catch(e) {}
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => cerrarSesion());
+            window.addEventListener('message', (event) => { if (event.data === 'logout') cerrarSesion(); });
+        }
+        
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                let debounceTimer;
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => filterUsers(e.target.value), 300);
+                });
+            }
+        }
+        
+        function setupModal() {
+            const modal = document.getElementById('deleteModal');
+            const cancelBtn = document.getElementById('cancelDeleteBtn');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            
+            cancelBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                userToDelete = null;
+            });
+            
+            confirmBtn.addEventListener('click', async () => {
+                if (userToDelete) {
+                    await deleteUser(userToDelete);
+                    modal.classList.remove('active');
+                    userToDelete = null;
+                } else {
+                    modal.classList.remove('active');
+                }
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    userToDelete = null;
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            
+            setupLogoutListener();
+            loadUsers();
+            setupSearch();
+            setupModal();
+            
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+    </script>
+</body>
+</html>

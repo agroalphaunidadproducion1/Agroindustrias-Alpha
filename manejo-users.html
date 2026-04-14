@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Gestión de Usuarios - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales (mismos que dashboard) -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Contenido principal (coincide con dashboard) */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        /* Sección estilo dashboard */
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-align: center;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        /* Grid de tarjetas de gestión (mismo estilo que módulos) */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-radius: 12px;
+            padding: 20px 12px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-light);
+        }
+
+        .card:active {
+            transform: translateY(0);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        .card h3 {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 8px 0 4px;
+            line-height: 1.3;
+        }
+
+        .card p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Estados de carga y error */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .loading i {
+            margin-right: 10px;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 25px;
+            color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* Responsive (alineado con dashboard) */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .card {
+                padding: 16px 10px;
+                min-height: 110px;
+            }
+            
+            .card-icon {
+                font-size: 1.7rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 10px;
+            }
+            
+            .card {
+                padding: 14px 8px;
+                min-height: 100px;
+            }
+            
+            .card-icon {
+                font-size: 1.5rem;
+            }
+            
+            .card h3 {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <!-- COMPONENTES GLOBALES: header y sidebar (idénticos al dashboard) -->
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <!-- Contenido principal (Gestión de Usuarios) -->
+    <div class="main-content" id="mainContent">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / Gestión de Usuarios
+            </div>
+            
+            <h1>
+                <i class="fas fa-users-gear"></i> 
+                Gestión de Usuarios
+            </h1>
+            
+            <div class="cards-container" id="userManagementCards">
+                <!-- Tarjetas generadas dinámicamente para mantener coherencia -->
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando opciones...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer global (mismo componente que dashboard) -->
+    <footer-component></footer-component>
+
+    <!-- Scripts de componentes (mismos archivos usados en dashboard) -->
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        // Configuración de Firebase (idéntica a dashboard)
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        const usersRef = database.ref('login');
+        
+        let currentUser = null;
+        
+        // Sistema de temas (compatible con dashboard)
+        const themes = ['light', 'dark', 'blue', 'orange', 'purple'];
+        let currentThemeIndex = 0;
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme) {
+                currentThemeIndex = themes.indexOf(savedTheme);
+                if (currentThemeIndex === -1) currentThemeIndex = 0;
+                document.body.setAttribute('data-theme', themes[currentThemeIndex]);
+            }
+        }
+        
+        // Verificar sesión y mostrar información
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            
+            currentUser = userData;
+            
+            // Verificar activo en Firebase
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                // Si hay error de red, asumimos que la sesión es válida pero mostramos advertencia
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try {
+                    await activeUsersRef.child(currentUser.username).remove();
+                } catch(e) { console.error(e); }
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        // Generar tarjetas de gestión de usuarios (mismo estilo que módulos dashboard)
+        function generarTarjetasGestion() {
+            const container = document.getElementById('userManagementCards');
+            if (!container) return;
+            
+            // Tarjetas con diseño coherente a las del dashboard
+            const opciones = [
+                { 
+                    icono: 'fa-user-plus', 
+                    titulo: 'Crear Usuario', 
+                    descripcion: 'Registrar nuevo colaborador',
+                    link: 'crear-usuario.html',
+                    color: 'var(--primary-color)'
+                },
+                { 
+                    icono: 'fa-users-viewfinder', 
+                    titulo: 'Ver Usuarios', 
+                    descripcion: 'Lista y gestión de cuentas',
+                    link: 'ver-users.html'
+                },
+                { 
+                    icono: 'fa-lock-keyhole', 
+                    titulo: 'Roles y Permisos', 
+                    descripcion: 'Configurar accesos',
+                    link: 'roles-permisos.html'
+                }
+            ];
+            
+            container.innerHTML = '';
+            
+            opciones.forEach(op => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => {
+                    window.location.href = op.link;
+                };
+                
+                card.innerHTML = `
+                    <div class="card-icon"><i class="fas ${op.icono}"></i></div>
+                    <h3>${op.titulo}</h3>
+                    <p>${op.descripcion}</p>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Evento para escuchar cierre de sesión desde el sidebar/header
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => {
+                cerrarSesion();
+            });
+            
+            // También capturar evento personalizado de sidebar si existe
+            window.addEventListener('message', (event) => {
+                if (event.data === 'logout') {
+                    cerrarSesion();
+                }
+            });
+        }
+        
+        // Inicialización completa
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            
+            generarTarjetasGestion();
+            setupLogoutListener();
+            
+            // Opcional: actualizar tema dinámico si cambia desde header (por consistencia)
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+        
+        // Exponer función para posibles redirecciones desde componentes
+        window.navigateTo = function(page) {
+            window.location.href = page;
+        };
+    </script>
+</body>
+</html>
