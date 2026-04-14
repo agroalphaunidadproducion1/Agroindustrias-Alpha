@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Reportes de Asistencia - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales (mismos que dashboard) -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        /* Sección estilo dashboard */
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-align: center;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        /* Estilos específicos */
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .date-filter {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-select, .form-control {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border: none;
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-view-mode {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 40px;
+            transition: all 0.2s;
+        }
+
+        .btn-view-mode.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn-view-mode:hover {
+            transform: translateY(-2px);
+        }
+
+        .table {
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+            border: none;
+        }
+
+        .table td {
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+            border-color: var(--border-color);
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: var(--bg-tertiary);
+        }
+
+        .table-hover > tbody > tr:hover > * {
+            background-color: rgba(var(--primary-rgb), 0.1);
+        }
+
+        .inv-header {
+            font-weight: 700;
+            background: var(--bg-tertiary);
+        }
+
+        .day-column {
+            font-weight: 600;
+            min-width: 70px;
+        }
+
+        .percentage-cell, .count-cell {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .percentage-cell:hover, .count-cell:hover {
+            transform: scale(1.05);
+            font-weight: bold;
+        }
+
+        .high-percentage {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .medium-percentage {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .low-percentage {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .no-attendance {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .total-row {
+            background: var(--bg-tertiary);
+            font-weight: bold;
+        }
+
+        .combined-average {
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15), rgba(var(--primary-rgb), 0.05));
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .summary-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+            height: 100%;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-card h6 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .summary-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .high-percentage-text {
+            color: #28a745;
+        }
+
+        .medium-percentage-text {
+            color: #ffc107;
+        }
+
+        .low-percentage-text {
+            color: #dc3545;
+        }
+
+        /* Tooltip */
+        .count-tooltip {
+            position: fixed;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            z-index: 2000;
+            pointer-events: none;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .table th, .table td {
+                padding: 6px;
+                font-size: 0.75rem;
+            }
+            
+            .day-column {
+                min-width: 50px;
+            }
+            
+            .summary-card h2 {
+                font-size: 1.5rem;
+            }
+            
+            .btn-view-mode {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <!-- COMPONENTES GLOBALES: header y sidebar -->
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <!-- Contenido principal -->
+    <div class="main-content" id="mainContent">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / <a href="asistencia.html">Asistencia</a> / Reportes
+            </div>
+            
+            <h1>
+                <i class="fas fa-chart-bar"></i> 
+                Reportes de Asistencia Semanal
+            </h1>
+
+            <!-- Selector de semana -->
+            <div class="date-filter">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label"><strong><i class="fas fa-calendar-week me-2"></i>Seleccione la semana:</strong></label>
+                        <select class="form-select" id="semana-select">
+                            <option value="">Cargando semanas...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><strong><i class="fas fa-calendar-alt me-2"></i>Rango de fechas:</strong></label>
+                        <div id="rango-fechas" class="form-control" style="background: var(--bg-primary); height: 42px; display: flex; align-items: center;">
+                            Cargando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de modo de visualización -->
+            <div class="d-flex justify-content-end mb-4">
+                <div class="btn-group" role="group">
+                    <button type="button" id="btn-porcentajes" class="btn btn-view-mode active">
+                        <i class="fas fa-percentage me-1"></i> Porcentajes
+                    </button>
+                    <button type="button" id="btn-numeros" class="btn btn-view-mode">
+                        <i class="fas fa-users me-1"></i> Números
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reporte Chile -->
+            <div class="card mb-4" style="background: transparent; border: none;">
+                <div class="card-header bg-success text-white" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #2e7d32, #1b5e20) !important;">
+                    <h5 class="mb-0"><i class="fas fa-pepper-hot me-2"></i>Reporte Detallado - Chile</h5>
+                </div>
+                <div class="card-body" style="background: var(--bg-secondary); border-radius: 0 0 12px 12px; padding: 0;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead id="chile-header">
+                                <tr>
+                                    <th class="inv-header">Inv</th>
+                                </tr>
+                            </thead>
+                            <tbody id="chile-table-body">
+                                <tr><td colspan="8" class="text-center loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando datos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte Tomate -->
+            <div class="card mb-4" style="background: transparent; border: none;">
+                <div class="card-header bg-danger text-white" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #c62828, #b71c1c) !important;">
+                    <h5 class="mb-0"><i class="fas fa-apple-alt me-2"></i>Reporte Detallado - Tomate</h5>
+                </div>
+                <div class="card-body" style="background: var(--bg-secondary); border-radius: 0 0 12px 12px; padding: 0;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead id="tomate-header">
+                                <tr>
+                                    <th class="inv-header">Inv</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tomate-table-body">
+                                <tr><td colspan="8" class="text-center loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando datos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte Otras Áreas -->
+            <div class="card mb-4" style="background: transparent; border: none;">
+                <div class="card-header" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #6f42c1, #5a32a3) !important; color: white;">
+                    <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Reporte Detallado - Otras Áreas</h5>
+                </div>
+                <div class="card-body" style="background: var(--bg-secondary); border-radius: 0 0 12px 12px; padding: 0;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead id="otras-header">
+                                <tr>
+                                    <th class="inv-header">Área</th>
+                                </tr>
+                            </thead>
+                            <tbody id="otras-areas-table-body">
+                                <tr><td colspan="8" class="text-center loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando datos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen Semanal General -->
+            <div class="dashboard-section">
+                <h5 class="section-title"><i class="fas fa-chart-pie me-2"></i>Resumen Semanal General</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="summary-card">
+                            <h6><i class="fas fa-pepper-hot me-1"></i> Chile</h6>
+                            <h2 id="chile-promedio">0%</h2>
+                            <small class="text-muted">Promedio semanal</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="summary-card">
+                            <h6><i class="fas fa-apple-alt me-1"></i> Tomate</h6>
+                            <h2 id="tomate-promedio">0%</h2>
+                            <small class="text-muted">Promedio semanal</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="summary-card">
+                            <h6><i class="fas fa-tools me-1"></i> Otras Áreas</h6>
+                            <h2 id="otras-areas-promedio">0%</h2>
+                            <small class="text-muted">Promedio semanal</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tablas de resumen diario -->
+                <div class="row mt-3">
+                    <div class="col-md-4 mb-3">
+                        <div class="card" style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                            <div class="card-header" style="background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white;">
+                                <small><i class="fas fa-calendar-day me-1"></i> Resumen Diario - Chile</small>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm table-bordered mb-0">
+                                    <tbody id="chile-resumen"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card" style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                            <div class="card-header" style="background: linear-gradient(135deg, #c62828, #b71c1c); color: white;">
+                                <small><i class="fas fa-calendar-day me-1"></i> Resumen Diario - Tomate</small>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm table-bordered mb-0">
+                                    <tbody id="tomate-resumen"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card" style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                            <div class="card-header" style="background: linear-gradient(135deg, #6f42c1, #5a32a3); color: white;">
+                                <small><i class="fas fa-calendar-day me-1"></i> Resumen Diario - Otras Áreas</small>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm table-bordered mb-0">
+                                    <tbody id="otras-areas-resumen"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer-component></footer-component>
+
+    <!-- Scripts -->
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        const personalRef = database.ref('personal');
+        const attendanceRef = database.ref('asistencia');
+
+        // Definiciones
+        const chileInvernaderos = ['9', '10', '11', '12', '33', '35', '37', '39'];
+        const tomateInvernaderos = ['13', '14', '15', '16', 'Viv'];
+        const otrasAreas = ['Mantenimiento', 'Fitosanidad', 'Riego', 'Vivero', 'Áreas Verdes'];
+        
+        const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        
+        let currentUser = null;
+        let allEmployees = [];
+        let weekData = {};
+        let currentWeekDates = [];
+        let availableWeekDates = [];
+        let viewMode = 'percentage';
+        let currentWeekNumber = 0;
+
+        // Sistema de temas
+        const themes = ['light', 'dark', 'blue', 'orange', 'purple'];
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && themes.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+
+        // Verificar sesión
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentUser = userData;
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return true;
+            }
+        }
+
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try {
+                    await activeUsersRef.child(currentUser.username).remove();
+                } catch(e) { console.error(e); }
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        // Utilidades
+        function getWeekNumber(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+            const week1 = new Date(d.getFullYear(), 0, 4);
+            return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        }
+
+        function getFirstDayOfWeek(week, year) {
+            const simple = new Date(year, 0, 1 + (week - 1) * 7);
+            const dayOfWeek = simple.getDay();
+            const ISOweekStart = simple;
+            if (dayOfWeek <= 4) {
+                ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+            } else {
+                ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+            }
+            return ISOweekStart;
+        }
+
+        function formatDate(date) {
+            const d = new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function getPercentageClass(percentage) {
+            if (percentage >= 80) return 'high-percentage';
+            if (percentage >= 70) return 'medium-percentage';
+            return 'low-percentage';
+        }
+
+        // Cargar selector de semanas
+        function loadWeeksSelector() {
+            const selector = document.getElementById('semana-select');
+            selector.innerHTML = '';
+            const currentYear = new Date().getFullYear();
+            for (let week = 1; week <= 52; week++) {
+                const option = document.createElement('option');
+                option.value = week;
+                option.textContent = `Semana ${week} - ${currentYear}`;
+                selector.appendChild(option);
+            }
+            selector.addEventListener('change', function() {
+                updateWeekDates(this.value);
+                loadAttendanceData();
+            });
+        }
+
+        function updateWeekDates(weekNumber) {
+            if (!weekNumber) return;
+            const year = new Date().getFullYear();
+            const firstDay = getFirstDayOfWeek(parseInt(weekNumber), year);
+            currentWeekDates = [];
+            for (let i = 0; i < 6; i++) {
+                const date = new Date(firstDay);
+                date.setDate(firstDay.getDate() + i);
+                currentWeekDates.push(formatDate(date));
+            }
+            const lastDay = new Date(firstDay);
+            lastDay.setDate(firstDay.getDate() + 5);
+            const options = { day: '2-digit', month: '2-digit' };
+            document.getElementById('rango-fechas').textContent = 
+                `${firstDay.toLocaleDateString('es-ES', options)} al ${lastDay.toLocaleDateString('es-ES', options)} de ${year}`;
+        }
+
+        async function loadAttendanceData() {
+            weekData = {};
+            availableWeekDates = [];
+            
+            // Verificar fechas existentes
+            const checkPromises = currentWeekDates.map(date => 
+                attendanceRef.child(date).once('value').then(snapshot => snapshot.exists() ? date : null)
+            );
+            const existingDates = await Promise.all(checkPromises);
+            availableWeekDates = existingDates.filter(date => date !== null);
+            
+            if (availableWeekDates.length === 0) {
+                renderEmptyTables();
+                return;
+            }
+            
+            const loadPromises = availableWeekDates.map(date =>
+                attendanceRef.child(date).once('value').then(snapshot => {
+                    if (snapshot.exists()) weekData[date] = snapshot.val();
+                })
+            );
+            await Promise.all(loadPromises);
+            processReportData();
+        }
+
+        function renderEmptyTables() {
+            const msg = '<tr><td colspan="8" class="text-center text-secondary">No hay datos de asistencia para esta semana</td></tr>';
+            document.getElementById('chile-table-body').innerHTML = msg;
+            document.getElementById('tomate-table-body').innerHTML = msg;
+            document.getElementById('otras-areas-table-body').innerHTML = msg;
+            document.getElementById('chile-promedio').textContent = '0%';
+            document.getElementById('tomate-promedio').textContent = '0%';
+            document.getElementById('otras-areas-promedio').textContent = '0%';
+            document.getElementById('chile-resumen').innerHTML = '<tr><td colspan="2" class="text-center">Sin datos</td></tr>';
+            document.getElementById('tomate-resumen').innerHTML = '<tr><td colspan="2" class="text-center">Sin datos</td></tr>';
+            document.getElementById('otras-areas-resumen').innerHTML = '<tr><td colspan="2" class="text-center">Sin datos</td></tr>';
+        }
+
+        function processReportData() {
+            const allAreas = [...chileInvernaderos, ...tomateInvernaderos, ...otrasAreas];
+            const reportData = {};
+            
+            allAreas.forEach(area => {
+                reportData[area] = {
+                    dailyAttendance: {},
+                    dailyTotals: {},
+                    weekTotal: 0,
+                    weekMax: 0
+                };
+                currentWeekDates.forEach(date => {
+                    reportData[area].dailyAttendance[date] = 0;
+                    reportData[area].dailyTotals[date] = 0;
+                });
+            });
+            
+            availableWeekDates.forEach(date => {
+                if (weekData[date]) {
+                    Object.keys(weekData[date]).forEach(area => {
+                        let targetArea = area;
+                        if (area === 'Vivero') targetArea = 'Viv';
+                        if (area === 'Mantenimiento') targetArea = 'Mantenimiento';
+                        if (area === 'Áreas Verdes') targetArea = 'Áreas Verdes';
+                        if (area === 'Fitosanidad') targetArea = 'Fitosanidad';
+                        
+                        if (allAreas.includes(targetArea)) {
+                            const totalEmps = Object.keys(weekData[date][area]).length;
+                            reportData[targetArea].dailyTotals[date] = totalEmps;
+                            
+                            let present = 0;
+                            Object.values(weekData[date][area]).forEach(status => {
+                                if (status === true) present++;
+                            });
+                            reportData[targetArea].dailyAttendance[date] = present;
+                            reportData[targetArea].weekTotal += present;
+                            reportData[targetArea].weekMax += totalEmps;
+                        }
+                    });
+                }
+            });
+            
+            generateTables(reportData);
+            generateSummaries(reportData);
+        }
+
+        function generateTables(reportData) {
+            generateTableHeaders();
+            generateChileTable(reportData);
+            generateTomateTable(reportData);
+            generateOtrasAreasTable(reportData);
+        }
+
+        function generateTableHeaders() {
+            const headers = ['chile-header', 'tomate-header', 'otras-header'];
+            headers.forEach(headerId => {
+                const header = document.getElementById(headerId);
+                if (header) {
+                    let html = '<tr><th class="inv-header">' + (headerId === 'otras-header' ? 'Área' : 'Inv') + '</th>';
+                    currentWeekDates.forEach((date, idx) => {
+                        html += `<th class="day-column" title="${date}">${diasSemana[idx]}</th>`;
+                    });
+                    html += '<th>Promedio Total</th></tr>';
+                    header.innerHTML = html;
+                }
+            });
+        }
+
+        function generateChileTable(reportData) {
+            const tbody = document.getElementById('chile-table-body');
+            tbody.innerHTML = '';
+            
+            const dailyTotals = {};
+            currentWeekDates.forEach(date => { dailyTotals[date] = { present: 0, max: 0 }; });
+            
+            chileInvernaderos.forEach(inv => {
+                const data = reportData[inv];
+                let row = `<tr><td class="inv-header"><strong>${inv}</strong></td>`;
+                let weekPresent = 0, weekMax = 0;
+                
+                currentWeekDates.forEach(date => {
+                    const present = data?.dailyAttendance[date] || 0;
+                    const total = data?.dailyTotals[date] || 0;
+                    if (total > 0) {
+                        const percent = Math.round((present / total) * 100);
+                        const percentClass = getPercentageClass(percent);
+                        if (viewMode === 'percentage') {
+                            row += `<td class="percentage-cell ${percentClass}" data-present="${present}" data-total="${total}">${percent}%</td>`;
+                        } else {
+                            row += `<td class="count-cell" data-present="${present}" data-total="${total}">${present}</td>`;
+                        }
+                        dailyTotals[date].present += present;
+                        dailyTotals[date].max += total;
+                        weekPresent += present;
+                        weekMax += total;
+                    } else {
+                        row += `<td class="no-attendance">-</td>`;
+                    }
+                });
+                
+                if (viewMode === 'percentage') {
+                    const weekPercent = weekMax > 0 ? Math.round((weekPresent / weekMax) * 100) : 0;
+                    row += `<td class="percentage-cell ${getPercentageClass(weekPercent)}">${weekPercent}%</td>`;
+                } else {
+                    row += `<td class="count-cell">${weekPresent}</td>`;
+                }
+                row += `</tr>`;
+                tbody.innerHTML += row;
+            });
+            
+            // Fila de promedio total
+            let totalRow = `<tr class="total-row"><td class="inv-header"><strong>PROMEDIO TOTAL</strong></td>`;
+            let weekTotalPresent = 0, weekTotalMax = 0;
+            currentWeekDates.forEach(date => {
+                const present = dailyTotals[date].present;
+                const max = dailyTotals[date].max;
+                if (max > 0) {
+                    const percent = Math.round((present / max) * 100);
+                    if (viewMode === 'percentage') {
+                        totalRow += `<td class="percentage-cell combined-average ${getPercentageClass(percent)}">${percent}%</td>`;
+                    } else {
+                        const avg = chileInvernaderos.length > 0 ? Math.round(present / chileInvernaderos.length) : 0;
+                        totalRow += `<td class="count-cell combined-average">${avg}</td>`;
+                    }
+                    weekTotalPresent += present;
+                    weekTotalMax += max;
+                } else {
+                    totalRow += `<td class="no-attendance">-</td>`;
+                }
+            });
+            if (viewMode === 'percentage') {
+                const weekPercent = weekTotalMax > 0 ? Math.round((weekTotalPresent / weekTotalMax) * 100) : 0;
+                totalRow += `<td class="percentage-cell combined-average ${getPercentageClass(weekPercent)}">${weekPercent}%</td>`;
+            } else {
+                const weekAvg = chileInvernaderos.length > 0 ? Math.round(weekTotalPresent / chileInvernaderos.length) : 0;
+                totalRow += `<td class="count-cell combined-average">${weekAvg}</td>`;
+            }
+            totalRow += `</tr>`;
+            tbody.innerHTML += totalRow;
+        }
+
+        function generateTomateTable(reportData) {
+            const tbody = document.getElementById('tomate-table-body');
+            tbody.innerHTML = '';
+            
+            const dailyTotals = {};
+            currentWeekDates.forEach(date => { dailyTotals[date] = { present: 0, max: 0 }; });
+            
+            tomateInvernaderos.forEach(inv => {
+                const data = reportData[inv];
+                let row = `<tr><td class="inv-header"><strong>${inv}</strong></td>`;
+                let weekPresent = 0, weekMax = 0;
+                
+                currentWeekDates.forEach(date => {
+                    const present = data?.dailyAttendance[date] || 0;
+                    const total = data?.dailyTotals[date] || 0;
+                    if (total > 0) {
+                        const percent = Math.round((present / total) * 100);
+                        if (viewMode === 'percentage') {
+                            row += `<td class="percentage-cell ${getPercentageClass(percent)}" data-present="${present}" data-total="${total}">${percent}%</td>`;
+                        } else {
+                            row += `<td class="count-cell" data-present="${present}" data-total="${total}">${present}</td>`;
+                        }
+                        dailyTotals[date].present += present;
+                        dailyTotals[date].max += total;
+                        weekPresent += present;
+                        weekMax += total;
+                    } else {
+                        row += `<td class="no-attendance">-</td>`;
+                    }
+                });
+                
+                if (viewMode === 'percentage') {
+                    const weekPercent = weekMax > 0 ? Math.round((weekPresent / weekMax) * 100) : 0;
+                    row += `<td class="percentage-cell ${getPercentageClass(weekPercent)}">${weekPercent}%</td>`;
+                } else {
+                    row += `<td class="count-cell">${weekPresent}</td>`;
+                }
+                row += `</tr>`;
+                tbody.innerHTML += row;
+            });
+            
+            let totalRow = `<tr class="total-row"><td class="inv-header"><strong>PROMEDIO TOTAL</strong></td>`;
+            let weekTotalPresent = 0, weekTotalMax = 0;
+            currentWeekDates.forEach(date => {
+                const present = dailyTotals[date].present;
+                const max = dailyTotals[date].max;
+                if (max > 0) {
+                    const percent = Math.round((present / max) * 100);
+                    if (viewMode === 'percentage') {
+                        totalRow += `<td class="percentage-cell combined-average ${getPercentageClass(percent)}">${percent}%</td>`;
+                    } else {
+                        const avg = tomateInvernaderos.length > 0 ? Math.round(present / tomateInvernaderos.length) : 0;
+                        totalRow += `<td class="count-cell combined-average">${avg}</td>`;
+                    }
+                    weekTotalPresent += present;
+                    weekTotalMax += max;
+                } else {
+                    totalRow += `<td class="no-attendance">-</td>`;
+                }
+            });
+            if (viewMode === 'percentage') {
+                const weekPercent = weekTotalMax > 0 ? Math.round((weekTotalPresent / weekTotalMax) * 100) : 0;
+                totalRow += `<td class="percentage-cell combined-average ${getPercentageClass(weekPercent)}">${weekPercent}%</td>`;
+            } else {
+                const weekAvg = tomateInvernaderos.length > 0 ? Math.round(weekTotalPresent / tomateInvernaderos.length) : 0;
+                totalRow += `<td class="count-cell combined-average">${weekAvg}</td>`;
+            }
+            totalRow += `</tr>`;
+            tbody.innerHTML += totalRow;
+        }
+
+        function generateOtrasAreasTable(reportData) {
+            const tbody = document.getElementById('otras-areas-table-body');
+            tbody.innerHTML = '';
+            
+            const dailyTotals = {};
+            currentWeekDates.forEach(date => { dailyTotals[date] = { present: 0, max: 0 }; });
+            
+            otrasAreas.forEach(area => {
+                const data = reportData[area];
+                let row = `<tr><td class="inv-header"><strong>${area}</strong></td>`;
+                let weekPresent = 0, weekMax = 0;
+                
+                currentWeekDates.forEach(date => {
+                    const present = data?.dailyAttendance[date] || 0;
+                    const total = data?.dailyTotals[date] || 0;
+                    if (total > 0) {
+                        const percent = Math.round((present / total) * 100);
+                        if (viewMode === 'percentage') {
+                            row += `<td class="percentage-cell ${getPercentageClass(percent)}" data-present="${present}" data-total="${total}">${percent}%</td>`;
+                        } else {
+                            row += `<td class="count-cell" data-present="${present}" data-total="${total}">${present}</td>`;
+                        }
+                        dailyTotals[date].present += present;
+                        dailyTotals[date].max += total;
+                        weekPresent += present;
+                        weekMax += total;
+                    } else {
+                        row += `<td class="no-attendance">-</td>`;
+                    }
+                });
+                
+                if (viewMode === 'percentage') {
+                    const weekPercent = weekMax > 0 ? Math.round((weekPresent / weekMax) * 100) : 0;
+                    row += `<td class="percentage-cell ${getPercentageClass(weekPercent)}">${weekPercent}%</td>`;
+                } else {
+                    row += `<td class="count-cell">${weekPresent}</td>`;
+                }
+                row += `</tr>`;
+                tbody.innerHTML += row;
+            });
+            
+            let totalRow = `<tr class="total-row"><td class="inv-header"><strong>PROMEDIO TOTAL</strong></td>`;
+            let weekTotalPresent = 0, weekTotalMax = 0;
+            currentWeekDates.forEach(date => {
+                const present = dailyTotals[date].present;
+                const max = dailyTotals[date].max;
+                if (max > 0) {
+                    const percent = Math.round((present / max) * 100);
+                    if (viewMode === 'percentage') {
+                        totalRow += `<td class="percentage-cell combined-average ${getPercentageClass(percent)}">${percent}%</td>`;
+                    } else {
+                        const avg = otrasAreas.length > 0 ? Math.round(present / otrasAreas.length) : 0;
+                        totalRow += `<td class="count-cell combined-average">${avg}</td>`;
+                    }
+                    weekTotalPresent += present;
+                    weekTotalMax += max;
+                } else {
+                    totalRow += `<td class="no-attendance">-</td>`;
+                }
+            });
+            if (viewMode === 'percentage') {
+                const weekPercent = weekTotalMax > 0 ? Math.round((weekTotalPresent / weekTotalMax) * 100) : 0;
+                totalRow += `<td class="percentage-cell combined-average ${getPercentageClass(weekPercent)}">${weekPercent}%</td>`;
+            } else {
+                const weekAvg = otrasAreas.length > 0 ? Math.round(weekTotalPresent / otrasAreas.length) : 0;
+                totalRow += `<td class="count-cell combined-average">${weekAvg}</td>`;
+            }
+            totalRow += `</tr>`;
+            tbody.innerHTML += totalRow;
+        }
+
+        function generateSummaries(reportData) {
+            // Calcular promedios semanales por cultivo
+            let chileTotal = 0, chileMax = 0;
+            let tomateTotal = 0, tomateMax = 0;
+            let otrasTotal = 0, otrasMax = 0;
+            
+            chileInvernaderos.forEach(inv => {
+                const data = reportData[inv];
+                if (data) {
+                    chileTotal += data.weekTotal;
+                    chileMax += data.weekMax;
+                }
+            });
+            tomateInvernaderos.forEach(inv => {
+                const data = reportData[inv];
+                if (data) {
+                    tomateTotal += data.weekTotal;
+                    tomateMax += data.weekMax;
+                }
+            });
+            otrasAreas.forEach(area => {
+                const data = reportData[area];
+                if (data) {
+                    otrasTotal += data.weekTotal;
+                    otrasMax += data.weekMax;
+                }
+            });
+            
+            const chilePercent = chileMax > 0 ? Math.round((chileTotal / chileMax) * 100) : 0;
+            const tomatePercent = tomateMax > 0 ? Math.round((tomateTotal / tomateMax) * 100) : 0;
+            const otrasPercent = otrasMax > 0 ? Math.round((otrasTotal / otrasMax) * 100) : 0;
+            
+            document.getElementById('chile-promedio').innerHTML = viewMode === 'percentage' ? `${chilePercent}%` : `${chileTotal}`;
+            document.getElementById('tomate-promedio').innerHTML = viewMode === 'percentage' ? `${tomatePercent}%` : `${tomateTotal}`;
+            document.getElementById('otras-areas-promedio').innerHTML = viewMode === 'percentage' ? `${otrasPercent}%` : `${otrasTotal}`;
+            
+            // Resúmenes diarios
+            const chileDaily = {}, tomateDaily = {}, otrasDaily = {};
+            currentWeekDates.forEach(date => {
+                chileDaily[date] = { present: 0, total: 0 };
+                tomateDaily[date] = { present: 0, total: 0 };
+                otrasDaily[date] = { present: 0, total: 0 };
+            });
+            
+            chileInvernaderos.forEach(inv => {
+                const data = reportData[inv];
+                if (data) {
+                    currentWeekDates.forEach(date => {
+                        chileDaily[date].present += data.dailyAttendance[date] || 0;
+                        chileDaily[date].total += data.dailyTotals[date] || 0;
+                    });
+                }
+            });
+            tomateInvernaderos.forEach(inv => {
+                const data = reportData[inv];
+                if (data) {
+                    currentWeekDates.forEach(date => {
+                        tomateDaily[date].present += data.dailyAttendance[date] || 0;
+                        tomateDaily[date].total += data.dailyTotals[date] || 0;
+                    });
+                }
+            });
+            otrasAreas.forEach(area => {
+                const data = reportData[area];
+                if (data) {
+                    currentWeekDates.forEach(date => {
+                        otrasDaily[date].present += data.dailyAttendance[date] || 0;
+                        otrasDaily[date].total += data.dailyTotals[date] || 0;
+                    });
+                }
+            });
+            
+            ['chile', 'tomate', 'otras'].forEach(cultivo => {
+                const dailyData = cultivo === 'chile' ? chileDaily : (cultivo === 'tomate' ? tomateDaily : otrasDaily);
+                const tbody = document.getElementById(`${cultivo}-resumen`);
+                tbody.innerHTML = '';
+                currentWeekDates.forEach((date, idx) => {
+                    const data = dailyData[date];
+                    const dayName = diasSemana[idx];
+                    if (data.total > 0) {
+                        const percent = Math.round((data.present / data.total) * 100);
+                        if (viewMode === 'percentage') {
+                            tbody.innerHTML += `<tr><td>${dayName}</td><td class="${getPercentageClass(percent)}">${percent}%</td></tr>`;
+                        } else {
+                            tbody.innerHTML += `<tr><td>${dayName}</td><td>${data.present}</td></tr>`;
+                        }
+                    } else {
+                        tbody.innerHTML += `<tr><td>${dayName}</td><td class="no-attendance">-</td></tr>`;
+                    }
+                });
+            });
+            
+            addCellClickListeners();
+        }
+
+        function addCellClickListeners() {
+            document.querySelectorAll('.percentage-cell, .count-cell').forEach(cell => {
+                if (!cell.classList.contains('no-attendance') && cell.dataset.present) {
+                    cell.onclick = () => {
+                        let tooltip = document.querySelector('.count-tooltip');
+                        if (!tooltip) {
+                            tooltip = document.createElement('div');
+                            tooltip.className = 'count-tooltip';
+                            document.body.appendChild(tooltip);
+                        }
+                        const rect = cell.getBoundingClientRect();
+                        tooltip.textContent = `${cell.dataset.present}/${cell.dataset.total}`;
+                        tooltip.style.left = `${rect.left + rect.width / 2 - 30}px`;
+                        tooltip.style.top = `${rect.top + window.scrollY - 35}px`;
+                        tooltip.style.display = 'block';
+                        setTimeout(() => tooltip.style.display = 'none', 2000);
+                    };
+                }
+            });
+        }
+
+        function setViewMode(mode) {
+            viewMode = mode;
+            document.getElementById('btn-porcentajes').classList.toggle('active', mode === 'percentage');
+            document.getElementById('btn-numeros').classList.toggle('active', mode === 'count');
+            if (availableWeekDates.length > 0) processReportData();
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            
+            loadWeeksSelector();
+            const today = new Date();
+            currentWeekNumber = getWeekNumber(today);
+            document.getElementById('semana-select').value = currentWeekNumber;
+            updateWeekDates(currentWeekNumber);
+            
+            document.getElementById('btn-porcentajes').addEventListener('click', () => setViewMode('percentage'));
+            document.getElementById('btn-numeros').addEventListener('click', () => setViewMode('count'));
+            
+            await loadAttendanceData();
+            
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+    </script>
+</body>
+</html>

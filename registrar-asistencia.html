@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Registrar Asistencia - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales (mismos que dashboard) -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS (para componentes adicionales) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        /* Sección estilo dashboard */
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-align: center;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        /* Estilos personalizados para asistencia */
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .current-area, .current-date-box {
+            background: var(--bg-tertiary);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-select, .form-control, .input-group-text {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border: none;
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            border-radius: 40px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-success {
+            border-color: #28a745;
+            color: #28a745;
+            border-radius: 40px;
+        }
+
+        .btn-outline-success:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border: none;
+            border-radius: 40px;
+        }
+
+        .btn-outline-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+            border-radius: 40px;
+        }
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .attendance-table th, .attendance-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .attendance-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .attendance-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .present {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .absent {
+            color: #dc3545;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            margin: 2px;
+            border-radius: 8px;
+        }
+
+        .temporary-employee {
+            background-color: rgba(255, 193, 7, 0.15) !important;
+            border-left: 3px solid #ffc107;
+        }
+
+        .caporal-badge {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 8px;
+            display: inline-block;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: var(--card-shadow);
+        }
+
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Modal styles */
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border-radius: 16px 16px 0 0;
+            border-bottom: none;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .modal-footer {
+            border-top-color: var(--border-color);
+        }
+
+        /* Tarjetas de resumen */
+        .summary-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-card h6 {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .summary-card h3 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .attendance-table th, .attendance-table td {
+                padding: 8px 6px;
+                font-size: 0.85rem;
+            }
+            
+            .btn-action {
+                padding: 3px 6px;
+                font-size: 0.65rem;
+            }
+            
+            .btn-primary, .btn-success {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Toast personalizado */
+        .success-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+        }
+
+        .error-toast {
+            background: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <!-- COMPONENTES GLOBALES: header y sidebar -->
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <!-- Contenido principal -->
+    <div class="main-content" id="mainContent">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / <a href="asistencia.html">Asistencia</a> / Registrar Asistencia
+            </div>
+            
+            <h1>
+                <i class="fas fa-pen-to-square"></i> 
+                Registrar Asistencia
+            </h1>
+
+            <!-- Selección de área -->
+            <div class="current-area">
+                <h5 class="section-title"><i class="fas fa-map-marker-alt me-2"></i>Área de Trabajo</h5>
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Seleccione el invernadero/área:</strong></label>
+                        <select class="form-select" id="current-area-select">
+                            <option value="">Seleccione un área...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mt-2 mt-md-0">
+                            <strong>Área seleccionada:</strong> 
+                            <span id="current-area-name" class="fw-bold text-primary">Ninguna</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selección de fecha -->
+            <div class="current-date-box">
+                <h5 class="section-title"><i class="fas fa-calendar-alt me-2"></i>Fecha de Asistencia</h5>
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Seleccione la fecha:</strong></label>
+                        <input type="date" class="form-control" id="attendance-date" value="">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mt-2 mt-md-0">
+                            <strong>Fecha seleccionada:</strong> 
+                            <span id="selected-date-name" class="fw-bold text-primary"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de búsqueda y acciones -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="search-container">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" id="search-employee" class="form-control" placeholder="Buscar personal por nombre o código...">
+                        </div>
+                        <div class="suggestions-container" id="search-suggestions"></div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-success me-2" id="mark-all-present">
+                        <i class="fas fa-check-circle me-2"></i>Marcar Todos Presentes
+                    </button>
+                    <button class="btn btn-primary" id="save-attendance">
+                        <i class="fas fa-save me-2"></i>Guardar Asistencia
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de asistencia -->
+            <div class="table-responsive">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Código</th>
+                            <th>Puesto</th>
+                            <th class="text-center">Asistencia</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-list">
+                        <tr>
+                            <td colspan="5" class="text-center text-secondary">Seleccione un área de trabajo para mostrar el personal</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Resumen de asistencia -->
+        <div class="dashboard-section">
+            <h5 class="section-title"><i class="fas fa-chart-pie me-2"></i>Resumen de Asistencia</h5>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="summary-card">
+                        <h6><i class="fas fa-users me-1"></i> Total Empleados</h6>
+                        <h3 id="total-employees">0</h3>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-card">
+                        <h6><i class="fas fa-check-circle me-1"></i> Presentes</h6>
+                        <h3 id="present-count" style="color: #28a745;">0</h3>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="summary-card">
+                        <h6><i class="fas fa-times-circle me-1"></i> Ausentes</h6>
+                        <h3 id="absent-count" style="color: #dc3545;">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mover empleado -->
+    <div class="modal fade" id="moveEmployeeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exchange-alt me-2"></i>Mover Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro que desea mover al empleado <strong id="employeeName"></strong>?</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="restrictions-text"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Área actual:</label>
+                        <input type="text" class="form-control" id="currentAreaDisplay" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Seleccionar nuevo invernadero/área:</label>
+                        <select class="form-select" id="newAreaSelect">
+                            <option value="">Seleccione un área...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmMove">Mover Empleado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar empleado -->
+    <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-trash-alt me-2"></i>Eliminar Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Está seguro que desea eliminar al empleado <strong id="deleteEmployeeName"></strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Esta acción no se puede deshacer.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar Empleado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer-component></footer-component>
+
+    <!-- Scripts -->
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        const personalRef = database.ref('personal');
+        const attendanceRef = database.ref('asistencia');
+
+        // Variables globales
+        let currentUser = null;
+        let allEmployees = [];
+        let filteredEmployees = [];
+        let temporalEmployees = [];
+        let savedAttendance = {};
+        let currentArea = '';
+        let allAreas = [];
+        let currentEmployeeForAction = null;
+        let selectedDate = '';
+        let dateId = '';
+
+        // Sistema de temas
+        const themes = ['light', 'dark', 'blue', 'orange', 'purple'];
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && themes.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+
+        // Verificar sesión
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentUser = userData;
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                return true;
+            }
+        }
+
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try {
+                    await activeUsersRef.child(currentUser.username).remove();
+                } catch(e) { console.error(e); }
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        // Mostrar toast
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `success-toast ${tipo === 'error' ? 'error-toast' : ''}`;
+            toast.innerHTML = `<i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${mensaje}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+
+            // Configurar fecha
+            const today = new Date();
+            dateId = today.toISOString().split('T')[0];
+            selectedDate = dateId;
+            document.getElementById('attendance-date').value = dateId;
+            
+            const formattedDate = today.toLocaleDateString('es-ES', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            document.getElementById('selected-date-name').textContent = formattedDate;
+
+            await loadEmployees();
+            setupEventListeners();
+
+            // Observador de tema
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+
+        async function loadEmployees() {
+            try {
+                const snapshot = await personalRef.once('value');
+                allEmployees = [];
+                allAreas = new Set();
+                
+                snapshot.forEach((childSnapshot) => {
+                    const employee = childSnapshot.val();
+                    employee.id = childSnapshot.key;
+                    allEmployees.push(employee);
+                    
+                    if (employee.invernaderos && Array.isArray(employee.invernaderos)) {
+                        employee.invernaderos.forEach(area => allAreas.add(area));
+                    }
+                });
+                
+                loadAreaSelector();
+            } catch (error) {
+                console.error('Error cargando empleados:', error);
+                mostrarToast('Error al cargar empleados', 'error');
+            }
+        }
+
+        function loadAreaSelector() {
+            const areaSelect = document.getElementById('current-area-select');
+            areaSelect.innerHTML = '<option value="">Seleccione un área...</option>';
+            
+            const sortedAreas = Array.from(allAreas).sort();
+            sortedAreas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                if (area === 'Fitosanidad' || area === 'Riego' || area === 'Acopio' || area === 'Áreas Verdes') {
+                    option.textContent = area;
+                } else {
+                    option.textContent = 'Invernadero ' + area;
+                }
+                areaSelect.appendChild(option);
+            });
+            
+            // Cargar selector para mover
+            const moveAreaSelect = document.getElementById('newAreaSelect');
+            moveAreaSelect.innerHTML = '<option value="">Seleccione un área...</option>';
+            sortedAreas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                if (area === 'Fitosanidad' || area === 'Riego' || area === 'Acopio' || area === 'Áreas Verdes') {
+                    option.textContent = area;
+                } else {
+                    option.textContent = 'Invernadero ' + area;
+                }
+                moveAreaSelect.appendChild(option);
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('current-area-select').addEventListener('change', async function() {
+                currentArea = this.value;
+                const areaName = this.options[this.selectedIndex]?.text || 'Ninguna';
+                document.getElementById('current-area-name').textContent = areaName;
+                
+                if (currentArea) {
+                    await loadAttendanceForArea(currentArea);
+                    filterEmployeesByArea(currentArea);
+                } else {
+                    document.getElementById('attendance-list').innerHTML = '<tr><td colspan="5" class="text-center text-secondary">Seleccione un área de trabajo</td></tr>';
+                }
+            });
+
+            document.getElementById('attendance-date').addEventListener('change', function() {
+                selectedDate = this.value;
+                dateId = selectedDate;
+                const date = new Date(selectedDate);
+                const formattedDate = date.toLocaleDateString('es-ES', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                });
+                document.getElementById('selected-date-name').textContent = formattedDate;
+                
+                if (currentArea) {
+                    loadAttendanceForArea(currentArea);
+                }
+            });
+
+            document.getElementById('mark-all-present').addEventListener('click', markAllPresent);
+            document.getElementById('save-attendance').addEventListener('click', saveAttendance);
+            document.getElementById('confirmMove').addEventListener('click', moveEmployee);
+            document.getElementById('confirmDelete').addEventListener('click', deleteEmployee);
+
+            // Búsqueda
+            const searchInput = document.getElementById('search-employee');
+            searchInput.addEventListener('input', () => showSuggestions(searchInput.value));
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) hideSuggestions();
+            });
+        }
+
+        async function loadAttendanceForArea(area) {
+            try {
+                const snapshot = await attendanceRef.child(dateId).child(area).once('value');
+                savedAttendance = snapshot.val() || {};
+            } catch (error) {
+                console.error('Error cargando asistencia:', error);
+                savedAttendance = {};
+            }
+        }
+
+        function filterEmployeesByArea(area) {
+            const areaEmployees = allEmployees.filter(employee => 
+                employee.invernaderos && employee.invernaderos.includes(area)
+            );
+            filteredEmployees = [...areaEmployees, ...temporalEmployees];
+            renderAttendanceList();
+            updateCounters();
+        }
+
+        function showSuggestions(query) {
+            const container = document.getElementById('search-suggestions');
+            container.innerHTML = '';
+            
+            if (!query || !currentArea) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            const suggestions = allEmployees.filter(employee => {
+                const nombreMatch = employee.nombre?.toLowerCase().includes(query.toLowerCase());
+                const codigoMatch = employee.codigo?.toLowerCase().includes(query.toLowerCase());
+                return nombreMatch || codigoMatch;
+            }).slice(0, 5);
+            
+            if (suggestions.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            suggestions.forEach(employee => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                const mainArea = employee.invernaderos?.[0] || 'Sin área';
+                item.textContent = `${employee.nombre} (${employee.codigo}) - Invernadero ${mainArea}`;
+                item.onclick = () => {
+                    document.getElementById('search-employee').value = '';
+                    hideSuggestions();
+                    if (!employee.invernaderos?.includes(currentArea)) {
+                        if (!temporalEmployees.some(e => e.id === employee.id)) {
+                            temporalEmployees.push({ ...employee, temporal: true });
+                            filterEmployeesByArea(currentArea);
+                            mostrarToast(`${employee.nombre} agregado temporalmente`);
+                        }
+                    }
+                };
+                container.appendChild(item);
+            });
+            container.style.display = 'block';
+        }
+
+        function hideSuggestions() {
+            document.getElementById('search-suggestions').style.display = 'none';
+        }
+
+        function renderAttendanceList() {
+            const tbody = document.getElementById('attendance-list');
+            
+            if (!currentArea || filteredEmployees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-secondary">No hay empleados en esta área</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            filteredEmployees.forEach(employee => {
+                const isPresent = savedAttendance[employee.id] === true;
+                const isCaporal = employee.puesto?.toLowerCase().includes('caporal');
+                const row = document.createElement('tr');
+                if (employee.temporal) row.classList.add('temporary-employee');
+                
+                row.innerHTML = `
+                    <td>
+                        ${employee.nombre || '-'}
+                        ${isCaporal ? '<span class="caporal-badge">Caporal</span>' : ''}
+                    </td>
+                    <td>${employee.codigo || '-'}</td>
+                    <td>${employee.puesto || '-'}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm ${isPresent ? 'btn-success' : 'btn-outline-success'} attendance-btn present-btn" data-employee-id="${employee.id}" data-status="true">
+                                <i class="fas fa-check"></i> Presente
+                            </button>
+                            <button class="btn btn-sm ${!isPresent ? 'btn-danger' : 'btn-outline-danger'} attendance-btn absent-btn" data-employee-id="${employee.id}" data-status="false">
+                                <i class="fas fa-times"></i> Ausente
+                            </button>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-primary btn-action move-employee-btn" data-employee-id="${employee.id}" title="Mover empleado">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-action delete-employee-btn" data-employee-id="${employee.id}" title="Eliminar empleado">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        ${employee.temporal ? 
+                            `<button class="btn btn-sm btn-warning btn-action remove-temporal-btn" data-employee-id="${employee.id}" title="Quitar temporal">
+                                <i class="fas fa-times"></i>
+                            </button>` : ''
+                        }
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Event listeners
+            document.querySelectorAll('.attendance-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const employeeId = btn.dataset.employeeId;
+                    const status = btn.dataset.status === 'true';
+                    savedAttendance[employeeId] = status;
+                    updateAttendanceUI(employeeId, status);
+                    updateCounters();
+                };
+            });
+            
+            document.querySelectorAll('.move-employee-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const employee = allEmployees.find(e => e.id === btn.dataset.employeeId);
+                    if (employee) showMoveModal(employee);
+                };
+            });
+            
+            document.querySelectorAll('.delete-employee-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const employee = allEmployees.find(e => e.id === btn.dataset.employeeId);
+                    if (employee) showDeleteModal(employee);
+                };
+            });
+            
+            document.querySelectorAll('.remove-temporal-btn').forEach(btn => {
+                btn.onclick = () => {
+                    temporalEmployees = temporalEmployees.filter(e => e.id !== btn.dataset.employeeId);
+                    delete savedAttendance[btn.dataset.employeeId];
+                    filterEmployeesByArea(currentArea);
+                };
+            });
+        }
+
+        function updateAttendanceUI(employeeId, status) {
+            const presentBtn = document.querySelector(`.present-btn[data-employee-id="${employeeId}"]`);
+            const absentBtn = document.querySelector(`.absent-btn[data-employee-id="${employeeId}"]`);
+            if (presentBtn && absentBtn) {
+                if (status) {
+                    presentBtn.classList.remove('btn-outline-success');
+                    presentBtn.classList.add('btn-success');
+                    absentBtn.classList.remove('btn-danger');
+                    absentBtn.classList.add('btn-outline-danger');
+                } else {
+                    presentBtn.classList.remove('btn-success');
+                    presentBtn.classList.add('btn-outline-success');
+                    absentBtn.classList.remove('btn-outline-danger');
+                    absentBtn.classList.add('btn-danger');
+                }
+            }
+        }
+
+        function updateCounters() {
+            const total = filteredEmployees.length;
+            const present = Object.values(savedAttendance).filter(v => v === true).length;
+            const absent = total - present;
+            document.getElementById('total-employees').textContent = total;
+            document.getElementById('present-count').textContent = present;
+            document.getElementById('absent-count').textContent = absent;
+        }
+
+        function markAllPresent() {
+            filteredEmployees.forEach(emp => {
+                savedAttendance[emp.id] = true;
+                updateAttendanceUI(emp.id, true);
+            });
+            updateCounters();
+            mostrarToast('Todos marcados como presentes');
+        }
+
+        async function saveAttendance() {
+            if (!currentArea) {
+                mostrarToast('Seleccione un área primero', 'error');
+                return;
+            }
+            
+            try {
+                await attendanceRef.child(dateId).child(currentArea).set(savedAttendance);
+                mostrarToast(`Asistencia guardada correctamente`);
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarToast('Error al guardar', 'error');
+            }
+        }
+
+        function showMoveModal(employee) {
+            currentEmployeeForAction = employee;
+            document.getElementById('employeeName').textContent = `${employee.nombre} (${employee.codigo})`;
+            
+            const isCaporal = employee.puesto?.toLowerCase().includes('caporal');
+            document.getElementById('restrictions-text').textContent = isCaporal ? 
+                'Este empleado es Caporal y puede tener múltiples invernaderos asignados.' :
+                'Este empleado solo puede tener un invernadero asignado.';
+            
+            const currentAreas = employee.invernaderos || [];
+            document.getElementById('currentAreaDisplay').value = currentAreas.map(a => 
+                a === 'Fitosanidad' || a === 'Riego' || a === 'Acopio' || a === 'Áreas Verdes' ? a : 'Invernadero ' + a
+            ).join(', ') || 'Sin área asignada';
+            
+            document.getElementById('newAreaSelect').value = '';
+            new bootstrap.Modal(document.getElementById('moveEmployeeModal')).show();
+        }
+
+        async function moveEmployee() {
+            const newArea = document.getElementById('newAreaSelect').value;
+            if (!newArea) {
+                mostrarToast('Seleccione un área destino', 'error');
+                return;
+            }
+            
+            const isCaporal = currentEmployeeForAction.puesto?.toLowerCase().includes('caporal');
+            const currentAreas = currentEmployeeForAction.invernaderos || [];
+            let updatedAreas = isCaporal ? [...currentAreas, newArea] : [newArea];
+            updatedAreas = [...new Set(updatedAreas)];
+            
+            try {
+                await personalRef.child(currentEmployeeForAction.id).update({ invernaderos: updatedAreas });
+                
+                const index = allEmployees.findIndex(e => e.id === currentEmployeeForAction.id);
+                if (index !== -1) allEmployees[index].invernaderos = updatedAreas;
+                
+                mostrarToast(`Empleado ${isCaporal ? 'agregado a nueva área' : 'movido'} exitosamente`);
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('moveEmployeeModal'));
+                modal.hide();
+                
+                if (currentArea) filterEmployeesByArea(currentArea);
+            } catch (error) {
+                mostrarToast('Error al mover empleado', 'error');
+            }
+        }
+
+        function showDeleteModal(employee) {
+            currentEmployeeForAction = employee;
+            document.getElementById('deleteEmployeeName').textContent = `${employee.nombre} (${employee.codigo})`;
+            new bootstrap.Modal(document.getElementById('deleteEmployeeModal')).show();
+        }
+
+        async function deleteEmployee() {
+            try {
+                await personalRef.child(currentEmployeeForAction.id).remove();
+                allEmployees = allEmployees.filter(e => e.id !== currentEmployeeForAction.id);
+                temporalEmployees = temporalEmployees.filter(e => e.id !== currentEmployeeForAction.id);
+                delete savedAttendance[currentEmployeeForAction.id];
+                
+                mostrarToast('Empleado eliminado exitosamente');
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteEmployeeModal'));
+                modal.hide();
+                
+                if (currentArea) filterEmployeesByArea(currentArea);
+            } catch (error) {
+                mostrarToast('Error al eliminar empleado', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
