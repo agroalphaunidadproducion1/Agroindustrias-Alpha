@@ -2,404 +2,899 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Sitio en Mantenimiento</title>
-    <!-- Fuente moderna e internacionalmente compatible -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="icon" type="image/x-icon" href="icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #388E3C;
+            --primary-light: #C8E6C9;
+            --secondary-color: #FFC107;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --text-dark: #333333;
+            --text-light: #757575;
+        }
+        
         * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f8 100%);
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light-gray);
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            color: #1e293b;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
-
-        /* Tarjeta principal con efecto sutil */
-        .maintenance-card {
-            max-width: 680px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(0px);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.05);
-            padding: 2.5rem 2rem;
-            text-align: center;
-            transition: transform 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        /* Pequeña animación de entrada */
-        @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .maintenance-card {
-            animation: fadeSlideUp 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
-        }
-
-        /* Ícono / SVG animado suave */
-        .icon-zone {
-            margin-bottom: 1.8rem;
-        }
-
-        .gear-svg {
-            width: 80px;
-            height: 80px;
-            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.08));
-        }
-
-        @keyframes gentleRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .rotating-gear {
-            animation: gentleRotate 8s infinite linear;
-            transform-origin: center;
-        }
-
-        /* Tipografía */
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #0f2b3d, #1e4a6e);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 0.75rem;
-        }
-
-        .lead-message {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: #2c3e4e;
-            margin-bottom: 1.5rem;
-            border-left: 3px solid #3b82f6;
-            padding-left: 0.9rem;
-            display: inline-block;
-            text-align: left;
-        }
-
-        .description {
-            font-size: 1rem;
-            line-height: 1.55;
-            color: #334155;
-            margin: 1.5rem 0 1rem 0;
-            font-weight: 400;
-        }
-
-        .notice {
-            background: #f1f5f9;
-            padding: 1rem 1.2rem;
-            border-radius: 1.8rem;
-            margin: 1.8rem 0;
-            font-size: 0.9rem;
-            color: #1e293b;
-            border-left: 4px solid #f97316;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .notice-icon {
-            font-size: 1.5rem;
-        }
-
-        .notice-text {
+        
+        .main-content {
             flex: 1;
-            font-weight: 500;
-        }
-
-        .small-note {
-            font-size: 0.85rem;
-            color: #5b6e8c;
-            margin-top: 1.5rem;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 1.5rem;
-            display: inline-block;
-        }
-
-        /* Enlace sutil para contacto (sin redirigir a otra página engañosa, pero útil) */
-        .contact-link {
-            color: #3b82f6;
-            text-decoration: none;
-            font-weight: 500;
-            border-bottom: 1px dashed #94a3b8;
-            transition: color 0.2s, border-color 0.2s;
-        }
-
-        .contact-link:hover {
-            color: #1e40af;
-            border-bottom-color: #3b82f6;
-        }
-
-        /* Botón simple de recarga (no promete reapertura, solo refrescar por si acaso) */
-        .refresh-hint {
-            display: inline-flex;
+            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 0.5rem;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            padding: 0.6rem 1.2rem;
-            border-radius: 60px;
-            font-size: 0.85rem;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        /* Pantalla de inicio para móviles */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s;
+        }
+        
+        .splash-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .splash-logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        .splash-text {
+            color: white;
+            font-size: 24px;
             font-weight: 500;
-            color: #2c3e50;
+            margin-top: 20px;
+        }
+        
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.97);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            backdrop-filter: blur(5px);
+        }
+        
+        .logo {
+            width: 120px;
+            margin-bottom: 25px;
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            background-color: var(--light-gray);
+            -webkit-appearance: none;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            background-color: var(--white);
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* ESTILOS MODIFICADOS PARA LA FLECHA EN LUGAR DEL CHECKBOX */
+        .remember-me input[type="checkbox"] {
+            display: none;
+        }
+        
+        .remember-me label {
+            margin: 0;
+            color: var(--text-light);
+            font-weight: 400;
             cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 0.6rem;
-            background: #f8fafc;
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me label::before {
+            content: "→"; /* Flecha inicial */
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: var(--light-gray);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            line-height: 22px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .remember-me input[type="checkbox"]:checked + label::before {
+            content: "✓"; /* Checkmark cuando está seleccionado */
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        
+        .forgot-password:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: center;
+            min-height: 20px;
+            padding: 0 10px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            background-color: rgba(255,255,255,0.95);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 18px;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-light);
+            font-size: 20px;
+            user-select: none;
+            padding: 5px;
+        }
+        
+        /* Estilos para el footer */
+        footer {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 15px 0;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            flex-shrink: 0;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .refresh-hint:hover {
-            background: #eef2ff;
-            border-color: #3b82f6;
-            color: #1e3a8a;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        .footer-content {
+            color: #757575;
+            font-size: 12px;
+            line-height: 1.5;
         }
 
-        /* Footer minimal */
-        .footer {
-            margin-top: 2rem;
-            font-size: 0.7rem;
-            color: #7e8ba3;
+        .footer-content p {
+            margin: 5px 0;
+        }
+
+        .footer-link {
+            color: #4CAF50;
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: #388E3C;
+            text-decoration: underline;
+        }
+        
+        /* Modal para recuperación de contraseña */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideIn 0.3s;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: var(--error-color);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
             text-align: center;
         }
-
-        /* adaptación móvil */
-        @media (max-width: 500px) {
-            .maintenance-card {
-                padding: 1.8rem 1.2rem;
+        
+        .modal-text {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+        
+        .contact-info {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .contact-icon {
+            margin-right: 10px;
+            color: var(--primary-color);
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Media Queries para Responsividad */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 30px;
+                width: calc(100% - 30px);
             }
+            
             h1 {
-                font-size: 1.8rem;
+                font-size: 24px;
+                margin-bottom: 20px;
             }
-            .lead-message {
-                font-size: 1rem;
+            
+            input {
+                padding: 14px 16px;
             }
-            .description {
-                font-size: 0.95rem;
+            
+            button {
+                padding: 15px;
+            }
+            
+            .splash-logo {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .splash-text {
+                font-size: 20px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+            
+            .footer-content {
+                font-size: 11px;
+            }
+            
+            .footer-container {
+                padding: 0 15px;
             }
         }
-
-        /* accesibilidad */
-        :focus-visible {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-            border-radius: 8px;
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+                border-radius: 10px;
+            }
+            
+            .logo {
+                width: 100px;
+            }
+            
+            .remember-forgot {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .forgot-password {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+            
+            .splash-logo {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .splash-text {
+                font-size: 18px;
+            }
+            
+            .modal-content {
+                padding: 15px;
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+            
+            .footer-content {
+                font-size: 10px;
+            }
+            
+            footer {
+                padding: 10px 0;
+            }
+        }
+        
+        /* Detección de móvil */
+        @media (hover: none) and (pointer: coarse) {
+            body {
+                background-attachment: initial;
+            }
+            
+            input, button {
+                font-size: 16px !important;
+            }
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <div class="maintenance-card" role="main" aria-labelledby="maintenance-title">
-        <div class="icon-zone">
-            <svg class="gear-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Icono de engranaje en mantenimiento">
-                <g class="rotating-gear">
-                    <!-- Círculo central -->
-                    <circle cx="50" cy="50" r="18" fill="#E2E8F0" stroke="#3B82F6" stroke-width="3"/>
-                    <circle cx="50" cy="50" r="8" fill="#3B82F6"/>
-                    <!-- Dientes del engranaje -->
-                    <path d="M50 22 L50 16 M50 84 L50 78 M22 50 L16 50 M84 50 L78 50 M32.5 32.5 L28.5 28.5 M71.5 71.5 L67.5 67.5 M32.5 67.5 L28.5 71.5 M71.5 28.5 L67.5 32.5" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M58 28 L62 22 M42 72 L38 78 M72 42 L78 38 M28 58 L22 62 M68 38 L74 32 M32 68 L26 74 M38 26 L32 20 M62 74 L68 80" stroke="#3B82F6" stroke-width="3.5" stroke-linecap="round"/>
-                    <path d="M62 28 L68 24 M38 72 L32 76 M72 62 L76 68 M28 38 L24 32" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
-                </g>
-            </svg>
-        </div>
-        
-        <h1 id="maintenance-title">En mantenimiento</h1>
-        
-        <div class="lead-message">
-            ✨ Estamos mejorando la experiencia ✨
-        </div>
-        
-        <div class="description">
-            En este momento el sitio web se encuentra en trabajos de mantenimiento programado.<br>
-            Hemos cerrado el acceso temporalmente para aplicar mejoras, actualizaciones y optimizaciones.
-        </div>
-        
-        <div class="notice">
-            <span class="notice-icon">🕓</span>
-            <span class="notice-text">
-                <strong>Sin fecha estimada de reapertura</strong><br>
-                No contamos con un cronómetro ni una fecha concreta de regreso. Te agradecemos tu comprensión y paciencia.
-            </span>
-        </div>
-        
-        <div class="description">
-            Nuestro equipo está trabajando con dedicación para que todo funcione mejor que nunca.<br>
-            Mientras tanto, puedes consultar nuestros canales oficiales o escribirnos si necesitas asistencia urgente.
-        </div>
-        
-        <!-- Botón que solo refresca la página, no indica tiempo real ni promete reapertura -->
-        <button class="refresh-hint" id="refreshBtn" aria-label="Recargar página para verificar estado">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
-            Verificar nuevamente
-        </button>
-        
-        <div class="small-note">
-            ¿Necesitas información urgente? <a href="#" class="contact-link" id="contactLink">Contáctanos aquí</a>
-        </div>
-        
-        <div class="footer">
-            © 2025 · Sin fecha de reapertura · Gracias por tu paciencia
-        </div>
+    <!-- Pantalla de Splash para móviles -->
+    <div id="splashScreen" class="splash-screen">
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069172.png" alt="Agroalpha Logo" class="splash-logo">
+        <div class="splash-text">Sistema Agroalpha</div>
     </div>
     
+    <!-- Pantalla de carga -->
+    <div id="loadingScreen" class="loading-container hidden">
+        <div class="loading"></div>
+        <div class="loading-text">Verificando sesión...</div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <!-- Formulario de Login -->
+        <div id="loginFormContainer" class="login-container hidden">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK6pM2j_2yXjRnGm8nKJQ064y-EOLqYOnnJA&s" alt="Logo Agroalpha" class="logo">
+            <h1>Iniciar Sesión</h1>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" required autocomplete="username" autocapitalize="off">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="password-container">
+                        <input type="password" id="password" required autocomplete="current-password">
+                        <span class="toggle-password" id="togglePassword">👁️</span>
+                    </div>
+                </div>
+                
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Recordarme</label>
+                    </div>
+                    <a class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
+                </div>
+                
+                <button type="submit" id="loginButton">
+                    <span id="buttonText">Ingresar</span>
+                </button>
+                
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Modal para recuperación de contraseña -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 class="modal-title">Recuperar Contraseña</h2>
+            <p class="modal-text">Por favor contacte al administrador del sistema para restablecer su contraseña.</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span>Teléfono: +504 88897202</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">✉️</span>
+                    <span>Email: soporteunidad1@agroalpha.com</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">🕒</span>
+                    <span>Horario: Lunes a Viernes 8:00 - 17:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ayuda técnica -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeHelpModal">&times;</span>
+            <h2 class="modal-title">Ayuda Técnica</h2>
+            <p class="modal-text">Para asistencia técnica, contacte al departamento de sistemas:</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <span>Teléfono: +504 88897202</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">✉️</span>
+                    <span>Email: soporteunidad1@agroalpha.com</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">🕒</span>
+                    <span>Horario: Lunes a Viernes 7:00 - 16:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // NO hay cronómetros, NO hay promesas de reapertura con fechas ni temporizadores.
-        // Solo funcionalidades mínimas de interacción informativa, sin generar falsas expectativas.
+        // Configuración de Firebase (reemplaza con tus credenciales)
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "agro-productos.firebaseapp.com",
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com",
+            projectId: "agro-productos",
+            storageBucket: "agro-productos.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
         
-        // 1. Botón de "Verificar nuevamente": simplemente recarga la página.
-        //    No muestra mensaje de "tiempo restante" ni nada similar.
-        const refreshBtn = document.getElementById('refreshBtn');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', function(e) {
-                // Recarga actual para comprobar si el mantenimiento ha finalizado (acción manual del usuario)
-                window.location.reload();
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        
+        // Referencias a las tablas
+        const usersRef = database.ref('login');
+        const activeUsersRef = database.ref('uactivos');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar splash screen en móviles
+            if (isMobileDevice()) {
+                setTimeout(() => {
+                    document.getElementById('splashScreen').classList.add('hidden');
+                    checkSavedSession();
+                }, 2000); // 2 segundos para el splash screen
+            } else {
+                document.getElementById('splashScreen').classList.add('hidden');
+                checkSavedSession();
+            }
+            
+            // Configurar toggle de contraseña
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '👁️';
             });
-        }
-        
-        // 2. Enlace de contacto: muestra un modal amigable que no indica reapertura ni fecha.
-        //    Simplemente ofrece un mensaje de atención al cliente, sin engaños.
-        const contactLink = document.getElementById('contactLink');
-        
-        // Función para mostrar notificación no intrusiva (sin fecha)
-        function showContactMessage() {
-            // Creamos un div flotante que desaparece tras unos segundos, informativo sin métricas de tiempo.
-            const existingToast = document.querySelector('.custom-contact-toast');
-            if (existingToast) existingToast.remove();
             
-            const toast = document.createElement('div');
-            toast.className = 'custom-contact-toast';
-            toast.setAttribute('role', 'status');
-            toast.setAttribute('aria-live', 'polite');
-            
-            // Estilos del toast
-            toast.style.position = 'fixed';
-            toast.style.bottom = '24px';
-            toast.style.left = '50%';
-            toast.style.transform = 'translateX(-50%)';
-            toast.style.backgroundColor = '#1e293b';
-            toast.style.color = '#f1f5f9';
-            toast.style.padding = '12px 20px';
-            toast.style.borderRadius = '50px';
-            toast.style.fontSize = '0.9rem';
-            toast.style.fontWeight = '500';
-            toast.style.boxShadow = '0 12px 24px -8px rgba(0,0,0,0.2)';
-            toast.style.zIndex = '1000';
-            toast.style.backdropFilter = 'blur(4px)';
-            toast.style.border = '1px solid #475569';
-            toast.style.fontFamily = "'Inter', sans-serif";
-            toast.style.maxWidth = '85%';
-            toast.style.textAlign = 'center';
-            toast.style.pointerEvents = 'none';
-            
-            // Texto claro: sin promesas de reapertura, sin cronómetro, sin fechas.
-            toast.innerHTML = '📧 Soporte: mantenimiento@ejemplo.com · No hay fecha estimada de regreso. Gracias por escribirnos.';
-            
-            document.body.appendChild(toast);
-            
-            // Eliminar después de 5 segundos
-            setTimeout(() => {
-                if (toast && toast.parentNode) {
-                    toast.style.opacity = '0';
-                    toast.style.transition = 'opacity 0.3s ease';
-                    setTimeout(() => {
-                        if (toast.parentNode) toast.parentNode.removeChild(toast);
-                    }, 300);
-                }
-            }, 5000);
-        }
-        
-        if (contactLink) {
-            contactLink.addEventListener('click', function(e) {
+            // Manejar el envío del formulario
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                showContactMessage();
+                loginUser();
             });
+            
+            // Manejar clic en "Olvidó su contraseña" - MODIFICADO
+            document.getElementById('forgotPassword').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('passwordModal').style.display = 'flex';
+            });
+            
+            // Manejar clic en ayuda técnica del footer
+            document.querySelector('.footer-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('helpModal').style.display = 'flex';
+            });
+            
+            // Cerrar modales
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.getElementById('passwordModal').style.display = 'none';
+            });
+            
+            document.getElementById('closeHelpModal').addEventListener('click', function() {
+                document.getElementById('helpModal').style.display = 'none';
+            });
+            
+            // Cerrar modal al hacer clic fuera del contenido
+            window.addEventListener('click', function(e) {
+                if (e.target === document.getElementById('passwordModal')) {
+                    document.getElementById('passwordModal').style.display = 'none';
+                }
+                if (e.target === document.getElementById('helpModal')) {
+                    document.getElementById('helpModal').style.display = 'none';
+                }
+            });
+        });
+        
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
         }
         
-        // 3. Pequeña protección: evitar que por accidente el usuario piense que hay un reloj.
-        //    No existe ningún elemento de cuenta regresiva, temporizador o fecha en el DOM.
-        //    Adicionalmente, si alguien intenta inspeccionar y agregar scripts externos, no es responsabilidad del código.
-        
-        // (Opcional) Añadir mensaje en consola solo informativo (sin ruido para el usuario).
-        console.log("Página de mantenimiento - Sin fecha de reapertura ni cronómetro. El sitio volverá cuando los trabajos concluyan.");
-        
-        // Mejora de accesibilidad: asegurar que el botón y enlace sean comprensibles
-        const style = document.createElement('style');
-        style.textContent = `
-            .custom-contact-toast {
-                animation: fadeInUp 0.2s ease-out;
-            }
-            @keyframes fadeInUp {
-                from {
-                    opacity: 0;
-                    transform: translateX(-50%) translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(-50%) translateY(0);
-                }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Prevenir cualquier posible script malicioso que pueda inyectar tiempos externos no deseados desde extensiones?
-        // No es necesario, pero garantizamos que el código base no contiene NINGUNA referencia a Date.now() para countdowns.
-        // Validación: revisar que no hay setInterval que muestre tiempo restante.
-        // (Seguro: no hay intervalos que actualicen texto con fechas)
-        // Podemos comprobar que ningún elemento tiene clases como "timer" o "countdown"
-        const allElements = document.querySelectorAll('*');
-        for(let el of allElements) {
-            if(el.classList && (el.classList.contains('timer') || el.classList.contains('countdown') || el.classList.contains('clock'))) {
-                // Por si acaso, aunque no existen, eliminamos estilos conflictivos? realmente no existen en el diseño.
-                console.warn("Elemento no esperado, pero no existe en esta página.");
+        function checkSavedSession() {
+            document.getElementById('loadingScreen').classList.remove('hidden');
+            
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                // Verificar si el usuario está en uactivos
+                activeUsersRef.child(rememberedUser).once('value')
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            // El usuario está activo, verificar credenciales
+                            verifyUserCredentials(rememberedUser);
+                        } else {
+                            // No está activo, mostrar formulario
+                            showLoginForm();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al verificar usuario activo:", error);
+                        showLoginForm();
+                    });
+            } else {
+                showLoginForm();
             }
         }
         
-        // Para mayor claridad visual, si el usuario pulsa F5 o recarga, sigue siendo la misma página informativa.
-        // No se muestra nada que pueda interpretarse como "fecha de vuelta".
+        function verifyUserCredentials(username) {
+            usersRef.child(username).once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        
+                        // Registrar como activo nuevamente
+                        registerActiveUser(username, userData);
+                        
+                        // Guardar datos de usuario en sessionStorage
+                        sessionStorage.setItem('currentUser', JSON.stringify({
+                            username: username,
+                            role: userData.role,
+                            name: userData.name,
+                            lastLogin: new Date().toISOString()
+                        }));
+                        
+                        // Redirigir al dashboard
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Usuario no existe, mostrar formulario
+                        localStorage.removeItem('rememberedUser');
+                        showLoginForm();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al verificar credenciales:", error);
+                    showLoginForm();
+                });
+        }
         
-        // También agregar un mensaje sutil en el título de la pestaña por si acaso (sin fechas)
-        document.title = "En mantenimiento | Sin fecha estimada";
+        function showLoginForm() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginFormContainer').classList.remove('hidden');
+            
+            // Verificar si hay una sesión guardada para autocompletar
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                document.getElementById('username').value = rememberedUser;
+                document.getElementById('remember').checked = true;
+                document.getElementById('password').focus();
+            } else {
+                document.getElementById('username').focus();
+            }
+        }
         
-        // Opcional: IntersectionObserver para algo? no necesario, solo por elegancia mantenemos la página estática pero amigable.
+        function decryptPassword(encrypted) {
+            // En un entorno real, usar un método más seguro
+            return atob(encrypted);
+        }
         
-        // Efecto de pequeña vibración o nada; pero todo es estático.
-        // Aseguramos que el enlace de contacto no indique tiempo de respuesta como reapertura.
+        function loginUser() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            const errorMessage = document.getElementById('errorMessage');
+            const loginButton = document.getElementById('loginButton');
+            const buttonText = document.getElementById('buttonText');
+            
+            errorMessage.textContent = '';
+            loginButton.disabled = true;
+            buttonText.innerHTML = '<span class="loading"></span> Verificando...';
+            
+            // Validación básica
+            if (!username || !password) {
+                errorMessage.textContent = 'Por favor complete todos los campos';
+                loginButton.disabled = false;
+                buttonText.textContent = 'Ingresar';
+                return;
+            }
+            
+            // Buscar usuario en la base de datos
+            usersRef.child(username).once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const decryptedPassword = decryptPassword(userData.password);
+                        
+                        if (password === decryptedPassword) {
+                            // Guardar en localStorage si marcó "Recordarme"
+                            if (remember) {
+                                localStorage.setItem('rememberedUser', username);
+                            } else {
+                                localStorage.removeItem('rememberedUser');
+                            }
+                            
+                            // Registrar usuario en uactivos
+                            registerActiveUser(username, userData);
+                            
+                            // Guardar datos de usuario en sessionStorage
+                            sessionStorage.setItem('currentUser', JSON.stringify({
+                                username: username,
+                                role: userData.role,
+                                name: userData.name,
+                                lastLogin: new Date().toISOString()
+                            }));
+                            
+                            // Redirigir al dashboard
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            errorMessage.textContent = 'Credenciales incorrectas';
+                            loginButton.disabled = false;
+                            buttonText.textContent = 'Ingresar';
+                            document.getElementById('password').focus();
+                        }
+                    } else {
+                        errorMessage.textContent = 'Usuario no encontrado';
+                        loginButton.disabled = false;
+                        buttonText.textContent = 'Ingresar';
+                        document.getElementById('username').focus();
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = 'Error al iniciar sesión. Intente nuevamente.';
+                    console.error("Error en login:", error);
+                    loginButton.disabled = false;
+                    buttonText.textContent = 'Ingresar';
+                });
+        }
         
-        // Y si alguien pregunta en el chat o consola, el mensaje es claro.
-        // Código completamente libre de:
-        // - setInterval, setTimeout para cuentas regresivas.
-        // - Fechas límite, countdowns, promesas de restauración.
-        // - Cronómetros visuales.
-        
-        // Sin embargo, existe el botón de recarga (refresh) que solo permite al usuario recargar manualmente.
-        // Eso no constituye un "cronómetro" ni da una fecha, simplemente es un helper para ver si el sitio ya está disponible.
-        
-        // Finalmente, agregamos un pequeño listener opcional para evitar que arrastres o algo, no interfiere.
-        // Todo correcto para los requerimientos: "avisar que el sitio esta en mantenimiento sin fecha de reapertura ni cronometro".
+        function registerActiveUser(username, userData) {
+            const userStatus = {
+                username: username,
+                name: userData.name,
+                role: userData.role,
+                lastLogin: firebase.database.ServerValue.TIMESTAMP,
+                status: 'active',
+                deviceType: isMobileDevice() ? 'mobile' : 'desktop',
+                os: navigator.platform
+            };
+            
+            activeUsersRef.child(username).set(userStatus)
+                .catch(error => {
+                    console.error("Error al registrar usuario activo:", error);
+                });
+        }
     </script>
+    <script src="footer.js"></script>
 </body>
 </html>
