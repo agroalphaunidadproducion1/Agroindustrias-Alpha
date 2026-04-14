@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Buscador de Fungicidas - FRAC | Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #5d4037;
+            --primary-dark: #3e2723;
+            --primary-light: #d7ccc8;
+            --secondary: #00695c;
+            --secondary-light: #e0f2f1;
+            --accent: #ff8f00;
+            --text: #333;
+            --text-light: #666;
+            --bg: #f9f9f9;
+            --card-bg: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --radius: 8px;
+            
+            /* Colores para grupos de fungicidas según FRAC */
+            --group-a: #e8f5e9;
+            --group-a-dark: #2e7d32;
+            --group-b: #f3e5f5;
+            --group-b-dark: #7b1fa2;
+            --group-c: #e3f2fd;
+            --group-c-dark: #1565c0;
+            --group-d: #fff3e0;
+            --group-d-dark: #ef6c00;
+            --group-e: #ffebee;
+            --group-e-dark: #c62828;
+            --group-f: #f5f5f5;
+            --group-f-dark: #616161;
+            --group-m: #e0f7fa;
+            --group-m-dark: #00838f;
+            --group-p: #fff8e1;
+            --group-p-dark: #ff8f00;
+            --group-u: #fce4ec;
+            --group-u-dark: #ad1457;
+            --group-nc: #eceff1;
+            --group-nc-dark: #455a64;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+        
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .legend-button {
+            background: linear-gradient(135deg, var(--secondary), #004d40);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .legend-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .search-section {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .search-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .suggestions {
+            flex: 1;
+            position: relative;
+        }
+        
+        #fungicide-search {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        #fungicide-search:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(93, 64, 55, 0.1);
+        }
+        
+        #search-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        #suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        
+        .suggestion-item:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .active-fungicide {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .fungicide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .fungicide-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .frac-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .fungicide-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .detail-item {
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .recommendations h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+            padding-left: 12px;
+        }
+        
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+        }
+        
+        .recommendation-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-light);
+        }
+        
+        .rec-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .rec-frac {
+            margin-bottom: 12px;
+        }
+        
+        .rec-details p {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            border-radius: 12px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1100;
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            margin: 2% auto;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .close-button:hover {
+            color: var(--danger-color);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        .action-section {
+            margin-bottom: 25px;
+            padding: 18px;
+            border-radius: 12px;
+        }
+        
+        .action-section h3 {
+            margin-bottom: 12px;
+        }
+        
+        .mode-list {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .mode-list li {
+            margin-bottom: 5px;
+        }
+        
+        .mode-of-action {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0 2px;
+        }
+        
+        .group-a-section { background-color: var(--group-a); border-left: 4px solid var(--group-a-dark); }
+        .group-a-mode { background-color: var(--group-a-dark); color: white; }
+        .group-b-section { background-color: var(--group-b); border-left: 4px solid var(--group-b-dark); }
+        .group-b-mode { background-color: var(--group-b-dark); color: white; }
+        .group-c-section { background-color: var(--group-c); border-left: 4px solid var(--group-c-dark); }
+        .group-c-mode { background-color: var(--group-c-dark); color: white; }
+        .group-d-section { background-color: var(--group-d); border-left: 4px solid var(--group-d-dark); }
+        .group-d-mode { background-color: var(--group-d-dark); color: white; }
+        .group-e-section { background-color: var(--group-e); border-left: 4px solid var(--group-e-dark); }
+        .group-e-mode { background-color: var(--group-e-dark); color: white; }
+        .group-m-section { background-color: var(--group-m); border-left: 4px solid var(--group-m-dark); }
+        .group-m-mode { background-color: var(--group-m-dark); color: white; }
+        .group-p-section { background-color: var(--group-p); border-left: 4px solid var(--group-p-dark); }
+        .group-p-mode { background-color: var(--group-p-dark); color: white; }
+        .group-u-section { background-color: var(--group-u); border-left: 4px solid var(--group-u-dark); }
+        .group-u-mode { background-color: var(--group-u-dark); color: white; }
+        .group-nc-section { background-color: var(--group-nc); border-left: 4px solid var(--group-nc-dark); }
+        .group-nc-mode { background-color: var(--group-nc-dark); color: white; }
+        
+        .modal-note {
+            background-color: #fffde7;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #fbc02d;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .fungicide-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .recommendation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <div class="main-content">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / Buscador de Fungicidas - FRAC
+            </div>
+            
+            <div class="header-actions">
+                <button class="legend-button" id="legend-btn">
+                    <i class="fas fa-info-circle"></i> Leyenda Grupos FRAC
+                </button>
+            </div>
+            
+            <div class="search-section">
+                <h2><i class="fas fa-search"></i> Buscar Fungicida</h2>
+                <div class="search-box">
+                    <div class="suggestions">
+                        <input type="text" id="fungicide-search" placeholder="Ej: Azoxistrobina, Tebuconazol, Mancozeb...">
+                        <div id="suggestions-list"></div>
+                    </div>
+                    <button id="search-btn">Buscar</button>
+                </div>
+            </div>
+            
+            <div class="results-section" id="results-section">
+                <div class="active-fungicide" id="active-fungicide"></div>
+                
+                <div class="recommendations">
+                    <h3><i class="fas fa-sync-alt"></i> Fungicidas con Modos de Acción Diferentes</h3>
+                    <div class="recommendation-grid" id="recommendation-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Información -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="modal-title">Clasificación FRAC de Fungicidas</h2>
+            
+            <div class="action-section group-a-section">
+                <h3>Grupo A - Inhibidores de la síntesis de ácidos nucleicos</h3>
+                <p>Fungicidas que afectan la síntesis de ARN y ADN en los hongos.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>A1: Inhibidores de la RNA polimerasa I</li>
+                    <li>A2: Inhibidores de la adenosina desaminasa</li>
+                    <li>A3: Inhibidores de la DNA/RNA síntesis</li>
+                    <li>A4: Inhibidores de la tubulina</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-a-mode">Grupo A</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-b-section">
+                <h3>Grupo B - Inhibidores de la respiración mitocondrial</h3>
+                <p>Fungicidas que afectan la cadena respiratoria en las mitocondrias.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>B1: Inhibidores del complejo I</li>
+                    <li>B2: Inhibidores del complejo II</li>
+                    <li>B3: Inhibidores del complejo III</li>
+                    <li>B4: Desacoplantes de la fosforilación oxidativa</li>
+                    <li>B5: Inhibidores de la ATP sintasa</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-b-mode">Grupo B</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-c-section">
+                <h3>Grupo C - Inhibidores de la síntesis de aminoácidos y proteínas</h3>
+                <p>Fungicidas que interfieren con la síntesis de proteínas en los hongos.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>C1: Inhibidores de la metionina síntesis</li>
+                    <li>C2: Inhibidores de la síntesis proteica</li>
+                    <li>C3: Inhibidores de la treonina desaminasa</li>
+                    <li>C4: Inhibidores de la síntesis de isoleucina/valina</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-c-mode">Grupo C</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-d-section">
+                <h3>Grupo D - Inhibidores de la división celular</h3>
+                <p>Fungicidas que afectan la mitosis y citoquinesis en hongos.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>D1: Inhibidores de la tubulina</li>
+                    <li>D2: Inhibidores de la división celular</li>
+                    <li>D3: Inhibidores de la septina</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-d-mode">Grupo D</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-e-section">
+                <h3>Grupo E - Inhibidores de la señalización celular</h3>
+                <p>Fungicidas que interfieren con procesos de señalización en hongos.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>E1: Inhibidores de la MAP quinasa</li>
+                    <li>E2: Inhibidores de la histidina quinasa</li>
+                    <li>E3: Inhibidores de la G proteína</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-e-mode">Grupo E</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-m-section">
+                <h3>Grupo M - Fungicidas multi-sitio</h3>
+                <p>Fungicidas con acción en múltiples sitios bioquímicos.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>M1: Inorgánicos</li>
+                    <li>M2: Ditlocarbamatos</li>
+                    <li>M3: Derivados del cloro</li>
+                    <li>M4: Ftálmicos</li>
+                    <li>M5: Cloronitrilos</li>
+                    <li>M7: Sulfamidas</li>
+                    <li>M8: Triazoles inorgánicos</li>
+                    <li>M9: Ditionatos</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-m-mode">Grupo M</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-p-section">
+                <h3>Grupo P - Inductores de resistencia en plantas</h3>
+                <p>Compuestos que activan los mecanismos de defensa de las plantas.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>P1: Inductores de fitoalexinas</li>
+                    <li>P2: Activadores de resistencia sistémica</li>
+                    <li>P3: Elicitores</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-p-mode">Grupo P</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-u-section">
+                <h3>Grupo U - Modo de acción desconocido</h3>
+                <p>Fungicidas con modo de acción no completamente elucidado.</p>
+                <p><strong>Grupos principales:</strong></p>
+                <ul class="mode-list">
+                    <li>U1: Compuestos cúpricos</li>
+                    <li>U2: Compuestos de azufre</li>
+                    <li>U3: Compuestos diversos</li>
+                    <li>U4: Compuestos microbianos</li>
+                    <li>U5: Compuestos botánicos</li>
+                    <li>U6: Aceites minerales y vegetales</li>
+                    <li>U7: Extractos naturales</li>
+                    <li>U8: Modo de acción desconocido</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-u-mode">Grupo U</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="action-section group-nc-section">
+                <h3>Grupo NC - No clasificados</h3>
+                <p>Fungicidas que no han sido clasificados en los grupos anteriores.</p>
+                <p><strong>Características:</strong></p>
+                <ul class="mode-list">
+                    <li>Nuevos compuestos en evaluación</li>
+                    <li>Compuestos con mecanismos novedosos</li>
+                    <li>Productos en proceso de clasificación</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action group-nc-mode">Grupo NC</span> pertenecen a esta categoría.</p>
+            </div>
+            
+            <div class="modal-note">
+                <p><strong>Nota importante FRAC:</strong> La rotación de fungicidas con diferentes modos de acción es fundamental para prevenir el desarrollo de resistencia. Siempre consulte las recomendaciones locales y las etiquetas de los productos.</p>
+                <p><strong>Las estrategias de manejo de resistencia deben basarse en los códigos de grupo FRAC.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <footer-component></footer-component>
+
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        
+        let currentUser = null;
+        
+        // Base de datos de fungicidas según clasificación FRAC
+        const fungicidesDatabase = [
+            { name: "Benomilo", fracCode: "1", fracGroup: "Inhibidores de la beta-tubulina", targetSite: "División celular", chemicalGroup: "Benzimidazoles", resistanceRisk: "Alta", commonUses: "Control de enfermedades foliares y de suelo" },
+            { name: "Carbendazima", fracCode: "1", fracGroup: "Inhibidores de la beta-tubulina", targetSite: "División celular", chemicalGroup: "Benzimidazoles", resistanceRisk: "Alta", commonUses: "Amplio espectro contra hongos" },
+            { name: "Tiofanato-metilo", fracCode: "1", fracGroup: "Inhibidores de la beta-tubulina", targetSite: "División celular", chemicalGroup: "Benzimidazoles", resistanceRisk: "Alta", commonUses: "Control de oídio y otras enfermedades" },
+            { name: "Tebuconazol", fracCode: "3", fracGroup: "Inhibidores de la desmetilación (DMI)", targetSite: "Síntesis de membranas", chemicalGroup: "Triazoles", resistanceRisk: "Moderada-Alta", commonUses: "Amplio espectro en cereales y frutales" },
+            { name: "Propiconazol", fracCode: "3", fracGroup: "Inhibidores de la desmetilación (DMI)", targetSite: "Síntesis de membranas", chemicalGroup: "Triazoles", resistanceRisk: "Moderada-Alta", commonUses: "Control de royas y otras enfermedades" },
+            { name: "Epoxiconazol", fracCode: "3", fracGroup: "Inhibidores de la desmetilación (DMI)", targetSite: "Síntesis de membranas", chemicalGroup: "Triazoles", resistanceRisk: "Moderada-Alta", commonUses: "Cereales y cultivos extensivos" },
+            { name: "Iprodiona", fracCode: "2", fracGroup: "Inhibidores de la histidina quinasa", targetSite: "Señalización celular", chemicalGroup: "Dicarboximidas", resistanceRisk: "Alta", commonUses: "Control de Botrytis y Sclerotinia" },
+            { name: "Vinclozolina", fracCode: "2", fracGroup: "Inhibidores de la histidina quinasa", targetSite: "Señalización celular", chemicalGroup: "Dicarboximidas", resistanceRisk: "Alta", commonUses: "Enfermedades en frutales y hortalizas" },
+            { name: "Boscalida", fracCode: "7", fracGroup: "Inhibidores de la succinato deshidrogenasa", targetSite: "Respiración mitocondrial", chemicalGroup: "Carboxamidas", resistanceRisk: "Moderada-Alta", commonUses: "Control de Botrytis y otras enfermedades" },
+            { name: "Fluxapiroxad", fracCode: "7", fracGroup: "Inhibidores de la succinato deshidrogenasa", targetSite: "Respiración mitocondrial", chemicalGroup: "Carboxamidas", resistanceRisk: "Moderada-Alta", commonUses: "Amplio espectro en múltiples cultivos" },
+            { name: "Penthiopirad", fracCode: "7", fracGroup: "Inhibidores de la succinato deshidrogenasa", targetSite: "Respiración mitocondrial", chemicalGroup: "Carboxamidas", resistanceRisk: "Moderada-Alta", commonUses: "Control de enfermedades foliares" },
+            { name: "Azoxistrobina", fracCode: "11", fracGroup: "Inhibidores de la quinona externa", targetSite: "Respiración mitocondrial", chemicalGroup: "Estrobilurinas", resistanceRisk: "Alta", commonUses: "Amplio espectro en múltiples cultivos" },
+            { name: "Piraclostrobina", fracCode: "11", fracGroup: "Inhibidores de la quinona externa", targetSite: "Respiración mitocondrial", chemicalGroup: "Estrobilurinas", resistanceRisk: "Alta", commonUses: "Cereales, soja y otros cultivos" },
+            { name: "Trifloxistrobina", fracCode: "11", fracGroup: "Inhibidores de la quinona externa", targetSite: "Respiración mitocondrial", chemicalGroup: "Estrobilurinas", resistanceRisk: "Alta", commonUses: "Frutales y cultivos hortícolas" },
+            { name: "Mancozeb", fracCode: "M3", fracGroup: "Fungicidas multi-sitio", targetSite: "Múltiples sitios", chemicalGroup: "Ditiocarbamatos", resistanceRisk: "Baja", commonUses: "Protector de amplio espectro" },
+            { name: "Clorotalonil", fracCode: "M5", fracGroup: "Fungicidas multi-sitio", targetSite: "Múltiples sitios", chemicalGroup: "Cloronitrilos", resistanceRisk: "Baja", commonUses: "Protector de amplio espectro" },
+            { name: "Captan", fracCode: "M4", fracGroup: "Fungicidas multi-sitio", targetSite: "Múltiples sitios", chemicalGroup: "Ftálmicos", resistanceRisk: "Baja", commonUses: "Tratamiento de semillas y frutales" },
+            { name: "Fenpicoxamida", fracCode: "12", fracGroup: "Inhibidores de la fosfatidil-inositol quinasa", targetSite: "Señalización celular", chemicalGroup: "Pirazolcarboxamidas", resistanceRisk: "Moderada", commonUses: "Control de enfermedades en cereales" },
+            { name: "Triciclozol", fracCode: "13", fracGroup: "Inhibidores de la síntesis de melanina", targetSite: "Formación de apresorio", chemicalGroup: "Carboxanilidas", resistanceRisk: "Moderada", commonUses: "Control específico de Pyricularia en arroz" },
+            { name: "Fosetil-Al", fracCode: "33", fracGroup: "Fosfonatos", targetSite: "Múltiples sitios", chemicalGroup: "Fosfonatos", resistanceRisk: "Baja", commonUses: "Control de enfermedades de suelo y follaje" },
+            { name: "Fenhexamida", fracCode: "17", fracGroup: "Inhibidores de la hidroximetilglutaril-CoA reductasa", targetSite: "Síntesis de esteroles", chemicalGroup: "Hidroximanilidas", resistanceRisk: "Moderada", commonUses: "Control específico de Botrytis" },
+            { name: "Acibenzolar-S-metilo", fracCode: "P1", fracGroup: "Inductores de resistencia sistémica", targetSite: "Sistema defensivo de la planta", chemicalGroup: "Benzotiadiazoles", resistanceRisk: "Baja", commonUses: "Activador de defensas en múltiples cultivos" }
+        ];
+        
+        const fracColors = {
+            "1": { background: "var(--group-a-dark)", text: "white" },
+            "2": { background: "var(--group-b-dark)", text: "white" },
+            "3": { background: "var(--group-c-dark)", text: "white" },
+            "7": { background: "var(--group-e-dark)", text: "white" },
+            "11": { background: "var(--group-m-dark)", text: "white" },
+            "12": { background: "var(--group-p-dark)", text: "white" },
+            "13": { background: "var(--group-u-dark)", text: "white" },
+            "17": { background: "var(--group-nc-dark)", text: "white" },
+            "33": { background: "var(--group-a-dark)", text: "white" },
+            "M3": { background: "var(--group-m-dark)", text: "white" },
+            "M4": { background: "var(--group-m-dark)", text: "white" },
+            "M5": { background: "var(--group-m-dark)", text: "white" },
+            "P1": { background: "var(--group-p-dark)", text: "white" }
+        };
+        
+        let currentFungicide = null;
+        let recommendationMode = 'frac';
+        
+        // Verificar sesión
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentUser = userData;
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try { await activeUsersRef.child(currentUser.username).remove(); } catch(e) {}
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => cerrarSesion());
+            window.addEventListener('message', (event) => { if (event.data === 'logout') cerrarSesion(); });
+        }
+        
+        // Funciones de búsqueda
+        const searchInput = document.getElementById('fungicide-search');
+        const searchBtn = document.getElementById('search-btn');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const resultsSection = document.getElementById('results-section');
+        const activeFungicideDiv = document.getElementById('active-fungicide');
+        const recommendationGrid = document.getElementById('recommendation-grid');
+        const legendBtn = document.getElementById('legend-btn');
+        const infoModal = document.getElementById('info-modal');
+        const closeButton = document.querySelector('.close-button');
+        
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            suggestionsList.innerHTML = '';
+            if (query.length < 2) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+            const matches = fungicidesDatabase.filter(f => f.name.toLowerCase().includes(query));
+            if (matches.length > 0) {
+                matches.forEach(f => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = f.name;
+                    div.addEventListener('click', () => {
+                        searchInput.value = f.name;
+                        suggestionsList.style.display = 'none';
+                        searchFungicide(f.name);
+                    });
+                    suggestionsList.appendChild(div);
+                });
+                suggestionsList.style.display = 'block';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+                suggestionsList.style.display = 'none';
+            }
+        });
+        
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) searchFungicide(query);
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) searchFungicide(query);
+            }
+        });
+        
+        function searchFungicide(query) {
+            const fungicide = fungicidesDatabase.find(f => f.name.toLowerCase() === query.toLowerCase());
+            if (!fungicide) {
+                alert('Fungicida no encontrado. Intente con otro nombre.');
+                return;
+            }
+            currentFungicide = fungicide;
+            displayActiveFungicide(fungicide);
+            displayRecommendations(getRecommendations(fungicide));
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function displayActiveFungicide(fungicide) {
+            const colorStyle = fracColors[fungicide.fracCode] || { background: "var(--group-nc-dark)", text: "white" };
+            activeFungicideDiv.innerHTML = `
+                <div class="fungicide-header">
+                    <h2 class="fungicide-name">${fungicide.name}</h2>
+                    <span class="frac-badge" style="background-color: ${colorStyle.background}">Grupo ${fungicide.fracCode} - ${fungicide.fracGroup}</span>
+                </div>
+                <div class="fungicide-details">
+                    <div>
+                        <div class="detail-item"><span class="detail-label">Sitio de Acción:</span> ${fungicide.targetSite}</div>
+                        <div class="detail-item"><span class="detail-label">Grupo Químico:</span> ${fungicide.chemicalGroup}</div>
+                    </div>
+                    <div>
+                        <div class="detail-item"><span class="detail-label">Riesgo de Resistencia:</span> ${fungicide.resistanceRisk}</div>
+                        <div class="detail-item"><span class="detail-label">Usos Comunes:</span> ${fungicide.commonUses}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getRecommendations(activeFungicide) {
+            let filtered = fungicidesDatabase.filter(f => f.name !== activeFungicide.name);
+            switch(recommendationMode) {
+                case 'frac':
+                    return filtered.filter(f => f.fracCode !== activeFungicide.fracCode);
+                case 'chemical':
+                    return filtered.filter(f => f.chemicalGroup !== activeFungicide.chemicalGroup);
+                case 'target':
+                    return filtered.filter(f => f.targetSite !== activeFungicide.targetSite);
+                default:
+                    return filtered;
+            }
+        }
+        
+        function displayRecommendations(recommendations) {
+            if (recommendations.length === 0) {
+                recommendationGrid.innerHTML = `<div class="no-results"><p>No se encontraron fungicidas con modos de acción diferentes según el criterio seleccionado.</p></div>`;
+                return;
+            }
+            recommendationGrid.innerHTML = '';
+            recommendations.forEach(f => {
+                const colorStyle = fracColors[f.fracCode] || { background: "var(--group-nc-dark)", text: "white" };
+                const card = document.createElement('div');
+                card.className = 'recommendation-card';
+                card.innerHTML = `
+                    <div class="rec-name">${f.name}</div>
+                    <div class="rec-frac">Grupo FRAC: <span class="frac-badge" style="background-color: ${colorStyle.background}">${f.fracCode} - ${f.fracGroup}</span></div>
+                    <div class="rec-details">
+                        <p><strong>Sitio de Acción:</strong> ${f.targetSite}</p>
+                        <p><strong>Grupo Químico:</strong> ${f.chemicalGroup}</p>
+                        <p><strong>Riesgo de Resistencia:</strong> ${f.resistanceRisk}</p>
+                        <p><strong>Usos Comunes:</strong> ${f.commonUses}</p>
+                    </div>
+                `;
+                recommendationGrid.appendChild(card);
+            });
+        }
+        
+        // Configurar modo de recomendación
+        document.querySelectorAll('input[name="recommendation-mode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                recommendationMode = this.value;
+                if (currentFungicide) {
+                    displayRecommendations(getRecommendations(currentFungicide));
+                }
+            });
+        });
+        
+        // Modal
+        legendBtn.addEventListener('click', () => infoModal.style.display = 'block');
+        closeButton.addEventListener('click', () => infoModal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
+        
+        // Tema
+        const temas = ['light', 'dark', 'blue', 'orange', 'purple'];
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && temas.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            setupLogoutListener();
+            
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+    </script>
+</body>
+</html>

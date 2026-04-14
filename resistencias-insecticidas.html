@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Buscador de Modos de Acción - IRAC | Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #c8e6c9;
+            --secondary: #1565c0;
+            --secondary-light: #e3f2fd;
+            --accent: #ff9800;
+            --text: #333;
+            --text-light: #666;
+            --bg: #f9f9f9;
+            --card-bg: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --radius: 8px;
+            
+            /* Colores para categorías de modos de acción */
+            --nervous-system: #e3f2fd;
+            --nervous-system-dark: #1565c0;
+            --growth-development: #f3e5f5;
+            --growth-development-dark: #7b1fa2;
+            --respiration: #ffebee;
+            --respiration-dark: #c62828;
+            --digestive-system: #fff3e0;
+            --digestive-system-dark: #ef6c00;
+            --unknown-action: #f5f5f5;
+            --unknown-action-dark: #616161;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+        
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .legend-button {
+            background: linear-gradient(135deg, var(--secondary), #0d47a1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .legend-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .search-section {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .search-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .suggestions {
+            flex: 1;
+            position: relative;
+        }
+        
+        #ingredient-search {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        #ingredient-search:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+        
+        #search-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        #suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+        
+        .suggestion-item:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .active-ingredient {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .ingredient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .ingredient-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .moa-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .ingredient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .detail-item {
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        .recommendations h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+            padding-left: 12px;
+        }
+        
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+        }
+        
+        .recommendation-card {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-light);
+        }
+        
+        .rec-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .rec-moa {
+            margin-bottom: 12px;
+        }
+        
+        .rec-details p {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            border-radius: 12px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1100;
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            margin: 2% auto;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .close-button:hover {
+            color: var(--danger-color);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        .action-section {
+            margin-bottom: 25px;
+            padding: 18px;
+            border-radius: 12px;
+        }
+        
+        .action-section h3 {
+            margin-bottom: 12px;
+        }
+        
+        .mode-list {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .mode-list li {
+            margin-bottom: 5px;
+        }
+        
+        .mode-of-action {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0 2px;
+        }
+        
+        .nervous-system-section { background-color: var(--nervous-system); border-left: 4px solid var(--nervous-system-dark); }
+        .nervous-system-mode { background-color: var(--nervous-system-dark); color: white; }
+        .growth-development-section { background-color: var(--growth-development); border-left: 4px solid var(--growth-development-dark); }
+        .growth-development-mode { background-color: var(--growth-development-dark); color: white; }
+        .respiration-section { background-color: var(--respiration); border-left: 4px solid var(--respiration-dark); }
+        .respiration-mode { background-color: var(--respiration-dark); color: white; }
+        .digestive-system-section { background-color: var(--digestive-system); border-left: 4px solid var(--digestive-system-dark); }
+        .digestive-system-mode { background-color: var(--digestive-system-dark); color: white; }
+        .unknown-action-section { background-color: var(--unknown-action); border-left: 4px solid var(--unknown-action-dark); }
+        .unknown-action-mode { background-color: var(--unknown-action-dark); color: white; }
+        
+        .modal-note {
+            background-color: #fffde7;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #fbc02d;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .ingredient-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .recommendation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <div class="main-content">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / Buscador de Modos de Acción - IRAC
+            </div>
+            
+            <div class="header-actions">
+                <button class="legend-button" id="legend-btn">
+                    <i class="fas fa-info-circle"></i> Leyenda de Funciones Fisiológicas
+                </button>
+            </div>
+            
+            <div class="search-section">
+                <h2><i class="fas fa-search"></i> Buscar Ingrediente Activo</h2>
+                <div class="search-box">
+                    <div class="suggestions">
+                        <input type="text" id="ingredient-search" placeholder="Ej: Imidacloprid, Clorpirifos, Metomilo...">
+                        <div id="suggestions-list"></div>
+                    </div>
+                    <button id="search-btn">Buscar</button>
+                </div>
+            </div>
+            
+            <div class="results-section" id="results-section">
+                <div class="active-ingredient" id="active-ingredient"></div>
+                
+                <div class="recommendations">
+                    <h3><i class="fas fa-sync-alt"></i> Ingredientes con Modos de Acción Diferentes</h3>
+                    <div class="recommendation-grid" id="recommendation-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Leyenda -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="modal-title">Funciones Fisiológicas de Insecticidas</h2>
+            
+            <div class="action-section nervous-system-section">
+                <h3>Acción sobre el sistema nervioso o muscular</h3>
+                <p>La mayoría de los insecticidas actúan sobre el sistema nervioso o muscular. Generalmente suelen ser de acción rápida.</p>
+                <p><strong>Grupos que actúan en el sistema nervioso:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 1: Inhibidores de acetilcolinesterasa (AChE)</li>
+                    <li>Grupo 2: Antagonistas del receptor de GABA</li>
+                    <li>Grupo 3: Moduladores de canales de sodio</li>
+                    <li>Grupo 4: Moduladores de receptores nicotínicos de acetilcolina (nAChR)</li>
+                    <li>Grupo 5: Moduladores de receptores de glutamato</li>
+                    <li>Grupo 6: Activadores de canales de cloro</li>
+                    <li>Grupo 9: Moduladores de receptores de octopamina</li>
+                    <li>Grupo 14: Inhibidores de la biosíntesis de lípidos</li>
+                    <li>Grupo 19: Moduladores de canales de calcio</li>
+                    <li>Grupo 22: Inhibidores de canales de voltaje de calcio</li>
+                    <li>Grupo 28: Moduladores de canales de iones Ryanodina</li>
+                    <li>Grupo 30: Inhibidores de la síntesis de acetilcolina</li>
+                    <li>Grupo 32: Inhibidores de la captación de GABA</li>
+                    <li>Grupo 33: Inhibidores de la captación de octopamina</li>
+                    <li>Grupo 35: Moduladores de canales de cloro activados por glutamato</li>
+                    <li>Grupo 36: Inhibidores de la síntesis de glutamato</li>
+                    <li>Grupo 37: Moduladores de canales de potasio</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action nervous-system-mode">Sistema Nervioso</span> y fondo celeste pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section growth-development-section">
+                <h3>Acción sobre el crecimiento y desarrollo</h3>
+                <p>Los reguladores del crecimiento de los insectos actúan imitando hormonas o perturbando la formación de la cutícula o la biosíntesis de lípidos. Generalmente de acción lenta a moderadamente lenta.</p>
+                <p><strong>Grupos que actúan en el crecimiento y desarrollo:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 7: Análogos de la hormona juvenil (JH)</li>
+                    <li>Grupo 10: Inhibidores de la biosíntesis de quitina</li>
+                    <li>Grupo 15: Inhibidores de la biosíntesis de quitina (tipo 1)</li>
+                    <li>Grupo 16: Inhibidores de la síntesis de lípidos</li>
+                    <li>Grupo 17: Inhibidores de la biosíntesis de quitina (tipo 2)</li>
+                    <li>Grupo 18: Ecdisona agonistas/disruptores de la muda</li>
+                    <li>Grupo 23: Inhibidores de la síntesis de ATP mitocondrial</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action growth-development-mode">Crecimiento y Desarrollo</span> y fondo lila pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section respiration-section">
+                <h3>Acción sobre la respiración</h3>
+                <p>Varios insecticidas interfieren en la respiración mitocondrial mediante la inhibición del transporte de electrones y/o la fosforilación oxidativa. Generalmente de acción rápida a moderadamente rápida.</p>
+                <p><strong>Grupos que actúan en la respiración:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 12: Inhibidores del transporte de electrones mitocondrial</li>
+                    <li>Grupo 13: Desacopladores de la fosforilación oxidativa</li>
+                    <li>Grupo 20: Inhibidores del transporte de electrones mitocondrial (Complexo I)</li>
+                    <li>Grupo 21: Inhibidores del transporte de electrones mitocondrial (Complexo III)</li>
+                    <li>Grupo 24: Inhibidores del transporte de electrones mitocondrial (Complexo IV)</li>
+                    <li>Grupo 25: Desacopladores de la fosforilación oxidativa</li>
+                    <li>Grupo 34: Inhibidores de la síntesis de ATP</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action respiration-mode">Respiración</span> y fondo rojo claro pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section digestive-system-section">
+                <h3>Acción sobre el sistema digestivo</h3>
+                <p>Toxinas microbianas específicas de lepidópteros y baculovirus.</p>
+                <p><strong>Grupos que actúan en el sistema digestivo:</strong></p>
+                <ul class="mode-list">
+                    <li>Grupo 11: Toxinas microbianas disruptoras de la membrana</li>
+                    <li>Grupo 31: Toxinas de Bacillus thuringiensis (Bt) y otros bioinsecticidas</li>
+                </ul>
+                <p>Los productos marcados con <span class="mode-of-action digestive-system-mode">Sistema Digestivo</span> y fondo naranja claro pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="action-section unknown-action-section">
+                <h3>Modo de acción desconocido o incierto</h3>
+                <p>Varios insecticidas que afectan a funciones o puntos de acción de un modo menos conocido, o actúan inespecíficamente.</p>
+                <p>Los productos marcados con <span class="mode-of-action unknown-action-mode">Modo Desconocido</span> y fondo gris claro pertenecen a estos grupos.</p>
+            </div>
+            
+            <div class="modal-note">
+                <p><strong>Nota importante:</strong> Las rotaciones para el manejo de la resistencia deben basarse únicamente en los grupos numerados de modo de acción.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer-component></footer-component>
+
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        
+        let currentUser = null;
+        
+        // Base de datos de ingredientes activos (resumida para funcionalidad)
+        const ingredientsDatabase = [
+            // Grupo 1A - Carbamatos (Sistema Nervioso)
+            { name: "Metomilo", moaCode: "1A", moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)", chemicalGroup: "Carbamatos", family: "Carbamatos", physiologicalFunction: "Sistema Nervioso", commonUses: "Amplio espectro contra insectos en múltiples cultivos" },
+            { name: "Carbaril", moaCode: "1A", moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)", chemicalGroup: "Carbamatos", family: "Carbamatos", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos en frutales y hortalizas" },
+            { name: "Aldicarb", moaCode: "1A", moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)", chemicalGroup: "Carbamatos", family: "Carbamatos", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos y nematodos" },
+            
+            // Grupo 1B - Organofosforados (Sistema Nervioso)
+            { name: "Clorpirifos", moaCode: "1B", moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)", chemicalGroup: "Organofosforados", family: "Organofosforados", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos masticadores y chupadores" },
+            { name: "Malatión", moaCode: "1B", moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)", chemicalGroup: "Organofosforados", family: "Organofosforados", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos en agricultura" },
+            { name: "Diazinón", moaCode: "1B", moaGroup: "Inhibidores de la acetilcolinesterasa (AChE)", chemicalGroup: "Organofosforados", family: "Organofosforados", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos del suelo y foliares" },
+            
+            // Grupo 3 - Piretroides (Sistema Nervioso)
+            { name: "Lambda-cihalotrina", moaCode: "3A", moaGroup: "Moduladores de canales de sodio", chemicalGroup: "Piretroides", family: "Piretroides", physiologicalFunction: "Sistema Nervioso", commonUses: "Amplio espectro contra insectos masticadores y chupadores" },
+            { name: "Deltametrina", moaCode: "3A", moaGroup: "Moduladores de canales de sodio", chemicalGroup: "Piretroides", family: "Piretroides", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos en cultivos y salud pública" },
+            { name: "Cipermetrina", moaCode: "3A", moaGroup: "Moduladores de canales de sodio", chemicalGroup: "Piretroides", family: "Piretroides", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos en agricultura" },
+            
+            // Grupo 4 - Neonicotinoides (Sistema Nervioso)
+            { name: "Imidacloprid", moaCode: "4A", moaGroup: "Moduladores de receptores nicotínicos (nAChR)", chemicalGroup: "Neonicotinoides", family: "Neonicotinoides", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos chupadores" },
+            { name: "Tiametoxam", moaCode: "4A", moaGroup: "Moduladores de receptores nicotínicos (nAChR)", chemicalGroup: "Neonicotinoides", family: "Neonicotinoides", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de insectos chupadores" },
+            { name: "Acetamiprid", moaCode: "4A", moaGroup: "Moduladores de receptores nicotínicos (nAChR)", chemicalGroup: "Neonicotinoides", family: "Neonicotinoides", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de pulgones, moscas blancas y trips" },
+            
+            // Grupo 5 - Spinosinas (Sistema Nervioso)
+            { name: "Spinosad", moaCode: "5", moaGroup: "Activadores de receptores de nicotina", chemicalGroup: "Spinosinas", family: "Spinosinas", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de trips, minadores y lepidópteros" },
+            
+            // Grupo 6 - Avermectinas (Sistema Nervioso)
+            { name: "Abamectina", moaCode: "6", moaGroup: "Activadores de canales de cloro", chemicalGroup: "Avermectinas", family: "Avermectinas", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de ácaros y minadores" },
+            
+            // Grupo 15 - Benzoylureas (Crecimiento y Desarrollo)
+            { name: "Diflubenzuron", moaCode: "15", moaGroup: "Inhibidores de la biosíntesis de quitina", chemicalGroup: "Benzoylureas", family: "Benzoylureas", physiologicalFunction: "Crecimiento y Desarrollo", commonUses: "Control de insectos en estado larval" },
+            { name: "Lufenuron", moaCode: "15", moaGroup: "Inhibidores de la biosíntesis de quitina", chemicalGroup: "Benzoylureas", family: "Benzoylureas", physiologicalFunction: "Crecimiento y Desarrollo", commonUses: "Control de insectos en estado larval" },
+            
+            // Grupo 11 - Sistema Digestivo
+            { name: "Bacillus thuringiensis", moaCode: "11A", moaGroup: "Toxinas microbianas", chemicalGroup: "Toxinas microbianas", family: "Bacillus thuringiensis", physiologicalFunction: "Sistema Digestivo", commonUses: "Control específico de lepidópteros" },
+            
+            // Grupo 28 - Diamidas (Sistema Nervioso)
+            { name: "Clorantraniliprol", moaCode: "28", moaGroup: "Moduladores del receptor de rianodina", chemicalGroup: "Diamidas", family: "Diamidas", physiologicalFunction: "Sistema Nervioso", commonUses: "Control de lepidópteros" },
+            
+            // Modo Desconocido
+            { name: "Azadiractina", moaCode: "UN", moaGroup: "Modo de acción desconocido", chemicalGroup: "Limonoides", family: "Azadiractina", physiologicalFunction: "Modo Desconocido", commonUses: "Control de insectos en agricultura orgánica" }
+        ];
+        
+        const functionColors = {
+            "Sistema Nervioso": { background: "var(--nervous-system-dark)", text: "white" },
+            "Crecimiento y Desarrollo": { background: "var(--growth-development-dark)", text: "white" },
+            "Respiración": { background: "var(--respiration-dark)", text: "white" },
+            "Sistema Digestivo": { background: "var(--digestive-system-dark)", text: "white" },
+            "Modo Desconocido": { background: "var(--unknown-action-dark)", text: "white" }
+        };
+        
+        let currentIngredient = null;
+        let recommendationMode = 'physiological';
+        
+        // Verificar sesión
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentUser = userData;
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try { await activeUsersRef.child(currentUser.username).remove(); } catch(e) {}
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => cerrarSesion());
+            window.addEventListener('message', (event) => { if (event.data === 'logout') cerrarSesion(); });
+        }
+        
+        // Funciones de búsqueda
+        const searchInput = document.getElementById('ingredient-search');
+        const searchBtn = document.getElementById('search-btn');
+        const suggestionsList = document.getElementById('suggestions-list');
+        const resultsSection = document.getElementById('results-section');
+        const activeIngredientDiv = document.getElementById('active-ingredient');
+        const recommendationGrid = document.getElementById('recommendation-grid');
+        const legendBtn = document.getElementById('legend-btn');
+        const infoModal = document.getElementById('info-modal');
+        const closeButton = document.querySelector('.close-button');
+        
+        // Sugerencias
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            suggestionsList.innerHTML = '';
+            if (query.length < 2) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+            const matches = ingredientsDatabase.filter(ing => ing.name.toLowerCase().includes(query));
+            if (matches.length > 0) {
+                matches.forEach(ing => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = ing.name;
+                    div.addEventListener('click', () => {
+                        searchInput.value = ing.name;
+                        suggestionsList.style.display = 'none';
+                        searchIngredient(ing.name);
+                    });
+                    suggestionsList.appendChild(div);
+                });
+                suggestionsList.style.display = 'block';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
+                suggestionsList.style.display = 'none';
+            }
+        });
+        
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) searchIngredient(query);
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) searchIngredient(query);
+            }
+        });
+        
+        function searchIngredient(query) {
+            const ingredient = ingredientsDatabase.find(ing => ing.name.toLowerCase() === query.toLowerCase());
+            if (!ingredient) {
+                alert('Ingrediente no encontrado. Intente con otro nombre.');
+                return;
+            }
+            currentIngredient = ingredient;
+            displayActiveIngredient(ingredient);
+            displayRecommendations(getRecommendations(ingredient));
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function displayActiveIngredient(ingredient) {
+            const colorStyle = functionColors[ingredient.physiologicalFunction] || functionColors["Modo Desconocido"];
+            activeIngredientDiv.innerHTML = `
+                <div class="ingredient-header">
+                    <h2 class="ingredient-name">${ingredient.name}</h2>
+                    <span class="moa-badge" style="background-color: ${colorStyle.background}">Grupo ${ingredient.moaCode} - ${ingredient.moaGroup}</span>
+                </div>
+                <div class="ingredient-details">
+                    <div>
+                        <div class="detail-item"><span class="detail-label">Función Fisiológica:</span> ${ingredient.physiologicalFunction}</div>
+                        <div class="detail-item"><span class="detail-label">Familia:</span> ${ingredient.family}</div>
+                    </div>
+                    <div>
+                        <div class="detail-item"><span class="detail-label">Grupo Químico:</span> ${ingredient.chemicalGroup}</div>
+                        <div class="detail-item"><span class="detail-label">Usos Comunes:</span> ${ingredient.commonUses}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getRecommendations(activeIngredient) {
+            let filtered = ingredientsDatabase.filter(ing => ing.name !== activeIngredient.name);
+            switch(recommendationMode) {
+                case 'physiological':
+                    return filtered.filter(ing => ing.physiologicalFunction !== activeIngredient.physiologicalFunction);
+                case 'family':
+                    return filtered.filter(ing => ing.family !== activeIngredient.family);
+                case 'chemical':
+                    return filtered.filter(ing => ing.chemicalGroup !== activeIngredient.chemicalGroup);
+                default:
+                    return filtered;
+            }
+        }
+        
+        function displayRecommendations(recommendations) {
+            if (recommendations.length === 0) {
+                recommendationGrid.innerHTML = `<div class="no-results"><p>No se encontraron ingredientes con modos de acción diferentes según el criterio seleccionado.</p></div>`;
+                return;
+            }
+            recommendationGrid.innerHTML = '';
+            recommendations.forEach(ing => {
+                const colorStyle = functionColors[ing.physiologicalFunction] || functionColors["Modo Desconocido"];
+                const card = document.createElement('div');
+                card.className = 'recommendation-card';
+                card.innerHTML = `
+                    <div class="rec-name">${ing.name}</div>
+                    <div class="rec-moa">Grupo: <span class="moa-badge" style="background-color: ${colorStyle.background}">${ing.moaCode} - ${ing.moaGroup}</span></div>
+                    <div class="rec-details">
+                        <p><strong>Función Fisiológica:</strong> ${ing.physiologicalFunction}</p>
+                        <p><strong>Familia:</strong> ${ing.family}</p>
+                        <p><strong>Grupo Químico:</strong> ${ing.chemicalGroup}</p>
+                        <p><strong>Usos Comunes:</strong> ${ing.commonUses}</p>
+                    </div>
+                `;
+                recommendationGrid.appendChild(card);
+            });
+        }
+        
+        // Configurar modo de recomendación
+        document.querySelectorAll('input[name="recommendation-mode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                recommendationMode = this.value;
+                if (currentIngredient) {
+                    displayRecommendations(getRecommendations(currentIngredient));
+                }
+            });
+        });
+        
+        // Modal
+        legendBtn.addEventListener('click', () => infoModal.style.display = 'block');
+        closeButton.addEventListener('click', () => infoModal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
+        
+        // Tema
+        const temas = ['light', 'dark', 'blue', 'orange', 'purple'];
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && temas.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            setupLogoutListener();
+            
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+    </script>
+</body>
+</html>

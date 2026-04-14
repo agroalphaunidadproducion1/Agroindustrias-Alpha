@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Productos Químicos - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- html2canvas para capturar tabla como imagen -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-hover: #1b5e20;
+            --light-bg: #f3fdf5;
+            --light-border: #c8e6c9;
+            --table-header: #a5d6a7;
+            --table-hover: #e8f5e9;
+            --danger: #c62828;
+            --danger-hover: #b71c1c;
+            --white: #ffffff;
+            --modal-bg: rgba(0, 0, 0, 0.5);
+            --link-color: #1565c0;
+            --link-hover: #0d47a1;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .filter-container {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        #filtro-categoria, #filtro-cultivo, #buscador {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        #filtro-categoria:focus, #filtro-cultivo:focus, #buscador:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .epa-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 18px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .epa-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .menu-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            height: 42px;
+            width: 42px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-button:hover {
+            transform: scale(1.02);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .menu-line {
+            height: 3px;
+            width: 22px;
+            background-color: white;
+            border-radius: 3px;
+            margin: 0 auto;
+        }
+
+        /* Modal de acciones */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-bg);
+            z-index: 1000;
+            justify-content: flex-end;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            width: 280px;
+            height: 100%;
+            padding: 25px 20px;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .close-modal {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-actions button, .modal-actions a {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-actions button:hover, .modal-actions a:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        /* Tabla */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: var(--bg-primary);
+            min-width: 1100px;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--table-header), #c8e6c9);
+            color: var(--primary-hover);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background-color: var(--table-hover);
+        }
+
+        .banda-color {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            margin: 0 auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .epa-link {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .epa-link:hover {
+            color: var(--link-hover);
+            text-decoration: underline;
+        }
+
+        .epa-link::after {
+            content: "↗";
+            font-size: 0.8em;
+        }
+
+        .no-link {
+            color: var(--text-secondary);
+        }
+
+        .empty-row {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .header-container {
+                flex-direction: column;
+            }
+            
+            .filters-container {
+                width: 100%;
+            }
+            
+            .epa-button, .menu-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .menu-button {
+                width: 100%;
+                flex-direction: row;
+                gap: 8px;
+            }
+            
+            .menu-line {
+                width: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <div class="main-content">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / Productos Químicos
+            </div>
+            
+            <h2><i class="fas fa-flask"></i> Productos Químicos Registrados</h2>
+
+            <div class="header-container">
+                <div class="filters-container">
+                    <div class="filter-container">
+                        <select id="filtro-categoria">
+                            <option value="">Todas las categorías</option>
+                            <option value="Insecticida">Insecticida</option>
+                            <option value="Fungicida">Fungicida</option>
+                            <option value="Aminoácido">Aminoácido</option>
+                            <option value="Herbicida">Herbicida</option>
+                            <option value="Bactericida">Bactericida</option>
+                        </select>
+                    </div>
+                    <div class="filter-container">
+                        <input type="text" id="buscador" placeholder="🔍 Buscar por nombre, ingrediente o plaga...">
+                    </div>
+                    <div class="filter-container">
+                        <select id="filtro-cultivo">
+                            <option value="">Todos los cultivos</option>
+                            <option value="mini">MINI</option>
+                            <option value="tomate">TOMATE</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-E/part-180/subpart-B/section-180.41" target="_blank" class="epa-button">
+                    <i class="fas fa-file-alt"></i> Ver normativa EPA
+                </a>
+                
+                <button class="menu-button" id="menu-button">
+                    <div class="menu-line"></div>
+                    <div class="menu-line"></div>
+                    <div class="menu-line"></div>
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table id="tabla-productos-completa">
+                    <thead>
+                        <tr>
+                            <th>Nombre Comercial</th>
+                            <th>Grupo Químico</th>
+                            <th>Familia Química</th>
+                            <th>Ingrediente Activo</th>
+                            <th>Dosis/Litro</th>
+                            <th>Días a Cosecha</th>
+                            <th>Periodo de Reingreso</th>
+                            <th>Dosis Máxima</th>
+                            <th>Plagas</th>
+                            <th>Registro EPA</th>
+                            <th>Registro Senasa</th>
+                            <th>Banda</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-productos">
+                        <tr>
+                            <td colspan="12" class="empty-row">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando productos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para acciones -->
+    <div class="modal" id="actions-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal">&times;</button>
+            <div class="modal-actions">
+                <a href="formulario.html" style="display: contents;">
+                    <button><i class="fas fa-plus"></i> Agregar Producto</button>
+                </a>
+                <button onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+                <button onclick="capturarTabla()"><i class="fas fa-camera"></i> Capturar Imagen</button>
+            </div>
+        </div>
+    </div>
+
+    <footer-component></footer-component>
+
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        // Configuración de Firebase - Misma que el resto del sistema
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        const productosRef = database.ref('productos');
+        
+        let currentUser = null;
+        let productos = [];
+        
+        const temas = ['light', 'dark', 'blue', 'orange', 'purple'];
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && temas.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+        
+        // Verificar sesión
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            
+            currentUser = userData;
+            
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try {
+                    await activeUsersRef.child(currentUser.username).remove();
+                } catch(e) { console.error(e); }
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => cerrarSesion());
+            window.addEventListener('message', (event) => {
+                if (event.data === 'logout') cerrarSesion();
+            });
+        }
+        
+        // Funciones de la tabla
+        function obtenerColorBanda(banda) {
+            if (!banda) return '#9E9E9E';
+            const bandaLower = banda.toLowerCase();
+            if (bandaLower.includes('verde') || bandaLower.includes('green')) return '#4CAF50';
+            if (bandaLower.includes('azul') || bandaLower.includes('blue')) return '#2196F3';
+            if (bandaLower.includes('amarill') || bandaLower.includes('yellow')) return '#FFEB3B';
+            if (bandaLower.includes('roja') || bandaLower.includes('rojo') || bandaLower.includes('red')) return '#F44336';
+            return '#9E9E9E';
+        }
+        
+        function crearEnlacesEPA(producto) {
+            // Formato nuevo: array de registros EPA
+            if (producto.registros_epa && Array.isArray(producto.registros_epa) && producto.registros_epa.length > 0) {
+                let enlacesHTML = '';
+                producto.registros_epa.forEach((registro, index) => {
+                    if (registro.registro) {
+                        if (registro.enlace) {
+                            let url = registro.enlace;
+                            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                url = 'https://' + url;
+                            }
+                            enlacesHTML += `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${escapeHtml(registro.registro)}</a>`;
+                        } else {
+                            enlacesHTML += `<span title="Sin enlace EPA">${escapeHtml(registro.registro)}</span>`;
+                        }
+                        if (index < producto.registros_epa.length - 1) enlacesHTML += ', ';
+                    }
+                });
+                return enlacesHTML || '<span class="no-link">-</span>';
+            }
+            // Formato antiguo: campos individuales
+            else if (producto.epa) {
+                if (producto.enlace_epa) {
+                    let url = producto.enlace_epa;
+                    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                        url = 'https://' + url;
+                    }
+                    return `<a href="${url}" target="_blank" class="epa-link" title="Abrir enlace EPA">${escapeHtml(producto.epa)}</a>`;
+                }
+                return `<span title="Sin enlace EPA">${escapeHtml(producto.epa)}</span>`;
+            }
+            return '<span class="no-link">-</span>';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function mostrarProductos(lista) {
+            const tablaBody = document.getElementById('tabla-productos');
+            const filtroCultivo = document.getElementById('filtro-cultivo').value;
+            
+            if (!lista || lista.length === 0) {
+                tablaBody.innerHTML = '<tr><td colspan="12" class="empty-row"><i class="fas fa-inbox"></i> No hay productos registrados</td></tr>';
+                return;
+            }
+            
+            // Ordenar productos por nombre comercial
+            lista.sort((a, b) => {
+                const nombreA = a.nombre || '';
+                const nombreB = b.nombre || '';
+                return nombreA.localeCompare(nombreB, 'es', { sensitivity: 'base' });
+            });
+            
+            tablaBody.innerHTML = lista.map(p => {
+                const cultivoFiltro = filtroCultivo;
+                let dias, reingreso, plagas, dosisMaxima, dosisLitro;
+                
+                if (cultivoFiltro === "mini" || (!cultivoFiltro && p.dias_mini)) {
+                    dias = p.dias_mini;
+                    reingreso = p.reingreso_mini;
+                    plagas = p.plagas_mini;
+                    dosisMaxima = p.dosis_maxima_mini;
+                    dosisLitro = p.dosis_litro_mini;
+                } else if (cultivoFiltro === "tomate" || (!cultivoFiltro && p.dias_tomate && !p.dias_mini)) {
+                    dias = p.dias_tomate;
+                    reingreso = p.reingreso_tomate;
+                    plagas = p.plagas_tomate;
+                    dosisMaxima = p.dosis_maxima_tomate;
+                    dosisLitro = p.dosis_litro_tomate;
+                } else {
+                    dias = p.dias_mini || p.dias_tomate;
+                    reingreso = p.reingreso_mini || p.reingreso_tomate;
+                    plagas = p.plagas_mini || p.plagas_tomate;
+                    dosisMaxima = p.dosis_maxima_mini || p.dosis_maxima_tomate;
+                    dosisLitro = p.dosis_litro_mini || p.dosis_litro_tomate;
+                }
+                
+                const colorBanda = obtenerColorBanda(p.banda);
+                const enlacesEPA = crearEnlacesEPA(p);
+                
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(p.nombre) || '-'}</strong></td>
+                        <td>${escapeHtml(p.grupo_quimico) || '-'}</td>
+                        <td>${escapeHtml(p.familia_quimica) || '-'}</td>
+                        <td>${escapeHtml(p.ingredientes) || '-'}</td>
+                        <td>${dosisLitro || '-'}</td>
+                        <td>${dias || '-'}</td>
+                        <td>${reingreso || '-'}</td>
+                        <td>${dosisMaxima || '-'}</td>
+                        <td>${escapeHtml(plagas) || '-'}</td>
+                        <td>${enlacesEPA}</td>
+                        <td>${escapeHtml(p.senasa) || '-'}</td>
+                        <td><div class="banda-color" style="background-color: ${colorBanda}" title="${escapeHtml(p.banda) || 'Sin banda'}"></div></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function filtrarProductos() {
+            const categoria = document.getElementById('filtro-categoria').value;
+            const cultivo = document.getElementById('filtro-cultivo').value;
+            const termino = document.getElementById('buscador').value.toLowerCase().trim();
+            
+            const resultados = productos.filter(p => {
+                const coincideCategoria = !categoria || p.categoria === categoria;
+                let coincideCultivo = true;
+                if (cultivo === "mini") {
+                    coincideCultivo = p.dias_mini || p.reingreso_mini || p.plagas_mini;
+                } else if (cultivo === "tomate") {
+                    coincideCultivo = p.dias_tomate || p.reingreso_tomate || p.plagas_tomate;
+                }
+                let coincideBusqueda = true;
+                if (termino) {
+                    coincideBusqueda = (p.nombre && p.nombre.toLowerCase().includes(termino)) ||
+                        (p.ingredientes && p.ingredientes.toLowerCase().includes(termino)) ||
+                        (p.plagas_mini && p.plagas_mini.toLowerCase().includes(termino)) ||
+                        (p.plagas_tomate && p.plagas_tomate.toLowerCase().includes(termino));
+                }
+                return coincideCategoria && coincideCultivo && coincideBusqueda;
+            });
+            mostrarProductos(resultados);
+        }
+        
+        function exportarExcel() {
+            const cultivoFiltro = document.getElementById('filtro-cultivo').value;
+            let tablaHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>td { mso-number-format:"\\@"; }</style></head><body><table border="1"><thead><tr><th>Nombre Comercial</th><th>Grupo Químico</th><th>Familia Química</th><th>Ingrediente Activo</th><th>Dosis/Litro</th><th>Días a Cosecha</th><th>Periodo de Reingreso</th><th>Dosis Máxima</th><th>Plagas</th><th>Registro EPA</th><th>Registro Senasa</th><th>Banda</th></tr></thead><tbody>`;
+            
+            const productosOrdenados = [...productos].sort((a, b) => (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' }));
+            
+            productosOrdenados.forEach(p => {
+                if (!cultivoFiltro) {
+                    if (p.dias_mini) {
+                        let epaText = p.registros_epa ? p.registros_epa.map(r => r.registro).filter(r => r).join(', ') : (p.epa || '');
+                        tablaHTML += `<tr><td>${p.nombre || ''}</td><td>${p.grupo_quimico || ''}</td><td>${p.familia_quimica || ''}</td><td>${p.ingredientes || ''}</td><td>${p.dosis_litro_mini || ''}</td><td>${p.dias_mini || ''}</td><td>${p.reingreso_mini || ''}</td><td>${p.dosis_maxima_mini || ''}</td><td>${p.plagas_mini || ''}</td><td>${epaText}</td><td>${p.senasa || ''}</td><td>${p.banda || ''}</td></tr>`;
+                    }
+                    if (p.dias_tomate) {
+                        let epaText = p.registros_epa ? p.registros_epa.map(r => r.registro).filter(r => r).join(', ') : (p.epa || '');
+                        tablaHTML += `<tr><td>${p.nombre || ''}</td><td>${p.grupo_quimico || ''}</td><td>${p.familia_quimica || ''}</td><td>${p.ingredientes || ''}</td><td>${p.dosis_litro_tomate || ''}</td><td>${p.dias_tomate || ''}</td><td>${p.reingreso_tomate || ''}</td><td>${p.dosis_maxima_tomate || ''}</td><td>${p.plagas_tomate || ''}</td><td>${epaText}</td><td>${p.senasa || ''}</td><td>${p.banda || ''}</td></tr>`;
+                    }
+                } else {
+                    const datos = cultivoFiltro === "mini" ? 
+                        {dias: p.dias_mini, reingreso: p.reingreso_mini, plagas: p.plagas_mini, dosisMaxima: p.dosis_maxima_mini, dosisLitro: p.dosis_litro_mini} :
+                        {dias: p.dias_tomate, reingreso: p.reingreso_tomate, plagas: p.plagas_tomate, dosisMaxima: p.dosis_maxima_tomate, dosisLitro: p.dosis_litro_tomate};
+                    if (datos.dias || datos.reingreso || datos.plagas) {
+                        let epaText = p.registros_epa ? p.registros_epa.map(r => r.registro).filter(r => r).join(', ') : (p.epa || '');
+                        tablaHTML += `<tr><td>${p.nombre || ''}</td><td>${p.grupo_quimico || ''}</td><td>${p.familia_quimica || ''}</td><td>${p.ingredientes || ''}</td><td>${datos.dosisLitro || ''}</td><td>${datos.dias || ''}</td><td>${datos.reingreso || ''}</td><td>${datos.dosisMaxima || ''}</td><td>${datos.plagas || ''}</td><td>${epaText}</td><td>${p.senasa || ''}</td><td>${p.banda || ''}</td></tr>`;
+                    }
+                }
+            });
+            
+            tablaHTML += `</tbody></table></body></html>`;
+            const blob = new Blob([tablaHTML], { type: "application/vnd.ms-excel" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "productos_quimicos.xls";
+            link.click();
+            URL.revokeObjectURL(link.href);
+            document.getElementById('actions-modal').style.display = 'none';
+        }
+        
+        function capturarTabla() {
+            html2canvas(document.getElementById("tabla-productos-completa")).then(canvas => {
+                const link = document.createElement("a");
+                link.download = "tabla_productos.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+            document.getElementById('actions-modal').style.display = 'none';
+        }
+        
+        // Cargar productos desde Firebase
+        function cargarProductos() {
+            productosRef.on('value', (snapshot) => {
+                const productosData = snapshot.val();
+                productos = [];
+                
+                if (productosData) {
+                    for (const key in productosData) {
+                        if (productosData.hasOwnProperty(key)) {
+                            const producto = productosData[key];
+                            producto.id = key;
+                            productos.push(producto);
+                        }
+                    }
+                    console.log('Productos cargados:', productos.length);
+                } else {
+                    console.log('No hay productos en la base de datos');
+                }
+                
+                mostrarProductos(productos);
+            }, (error) => {
+                console.error('Error al cargar productos:', error);
+                const tablaBody = document.getElementById('tabla-productos');
+                tablaBody.innerHTML = '<tr><td colspan="12" class="empty-row"><i class="fas fa-exclamation-triangle"></i> Error al cargar productos. Verifique su conexión.</td></tr>';
+            });
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            
+            setupLogoutListener();
+            cargarProductos();
+            
+            // Event listeners
+            document.getElementById('filtro-categoria').addEventListener('change', filtrarProductos);
+            document.getElementById('buscador').addEventListener('input', filtrarProductos);
+            document.getElementById('filtro-cultivo').addEventListener('change', filtrarProductos);
+            
+            const menuButton = document.getElementById('menu-button');
+            const actionsModal = document.getElementById('actions-modal');
+            const closeModal = document.getElementById('close-modal');
+            
+            menuButton.addEventListener('click', () => actionsModal.style.display = 'flex');
+            closeModal.addEventListener('click', () => actionsModal.style.display = 'none');
+            window.addEventListener('click', (e) => { if (e.target === actionsModal) actionsModal.style.display = 'none'; });
+            
+            window.exportarExcel = exportarExcel;
+            window.capturarTabla = capturarTabla;
+            
+            // Observar cambios de tema
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+    </script>
+</body>
+</html>
