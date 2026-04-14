@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Gestión Fitosanitaria - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        /* Grid de tarjetas - 4 botones principales */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            border-radius: 20px;
+            padding: 28px 20px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--primary-light);
+        }
+
+        .card:active {
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .card h3 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 8px 0 6px;
+            line-height: 1.4;
+        }
+
+        .card p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Mensajes de carga */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary-color);
+        }
+
+        .loading i {
+            margin-right: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 16px;
+            }
+            
+            .card {
+                padding: 20px 15px;
+            }
+            
+            .card-icon {
+                width: 65px;
+                height: 65px;
+                font-size: 2rem;
+            }
+            
+            .card h3 {
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            
+            .card {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 20px;
+                text-align: left;
+                padding: 18px;
+            }
+            
+            .card-icon {
+                margin-bottom: 0;
+                width: 55px;
+                height: 55px;
+                font-size: 1.8rem;
+            }
+            
+            .card h3 {
+                margin: 0;
+                font-size: 1rem;
+            }
+            
+            .card p {
+                margin-top: 4px;
+            }
+        }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <div class="main-content">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / Gestión Fitosanidad
+            </div>
+            
+            <h1>
+                <i class="fas fa-leaf"></i> 
+                Gestión Fitosanidad
+            </h1>
+            
+            <!-- Solo 4 botones principales -->
+            <div class="cards-container" id="mainCards">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando opciones...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer-component></footer-component>
+
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        
+        let currentUser = null;
+        
+        const themes = ['light', 'dark', 'blue', 'orange', 'purple'];
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && themes.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+        
+        // Configuración de los 4 botones solicitados
+        const mainModules = [
+            {
+                icono: 'fa-cube',
+                titulo: 'Lista de Agroquímicos',
+                descripcion: 'Inventario completo de productos fitosanitarios',
+                link: 'lista-agroquimicos.html',
+                color: 'var(--primary-color)'
+            },
+            {
+                icono: 'fa-bug',
+                titulo: 'Manejo de Resistencias Insecticidas',
+                descripcion: 'Monitoreo y rotación de insecticidas',
+                link: 'resistencias-insecticidas.html',
+                color: 'var(--warning-color)'
+            },
+            {
+                icono: 'fa-fungus',
+                titulo: 'Manejo de Resistencias Fungicidas',
+                descripcion: 'Control de resistencia en hongos',
+                link: 'resistencias-fungicidas.html',
+                color: 'var(--warning-color)'
+            },
+            {
+                icono: 'fa-heartbeat',
+                titulo: 'Daño de Químicos a Beneficos',
+                descripcion: 'Evaluación de impacto en organismos benéficos',
+                link: 'dano-beneficos.html',
+                color: 'var(--danger-color)'
+            }
+        ];
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Renderizar las 4 tarjetas
+        function renderMainCards() {
+            const container = document.getElementById('mainCards');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            mainModules.forEach(module => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => {
+                    window.location.href = module.link;
+                };
+                
+                card.innerHTML = `
+                    <div class="card-icon">
+                        <i class="fas ${module.icono}"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <h3>${escapeHtml(module.titulo)}</h3>
+                        <p>${escapeHtml(module.descripcion)}</p>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Verificar sesión
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            
+            currentUser = userData;
+            
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try {
+                    await activeUsersRef.child(currentUser.username).remove();
+                } catch(e) { console.error(e); }
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => {
+                cerrarSesion();
+            });
+            
+            window.addEventListener('message', (event) => {
+                if (event.data === 'logout') {
+                    cerrarSesion();
+                }
+            });
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            
+            renderMainCards();
+            setupLogoutListener();
+            
+            // Observar cambios de tema
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+        
+        window.navigateTo = function(page) {
+            window.location.href = page;
+        };
+    </script>
+</body>
+</html>
