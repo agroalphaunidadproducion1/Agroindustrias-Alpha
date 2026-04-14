@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Gestor de Documentos OneDrive - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --admin-color: #2196F3;
+            --error-color: #f44336;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --dark-gray: #000000;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --sidebar-active: #3498db;
+            
+            /* Colores específicos para documentos */
+            --light-bg: #f1f8e9;
+            --table-header: #c8e6c9;
+            --light-border: #a5d6a7;
+            --row-hover: #f1f8e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .btn-leyenda {
+            background: linear-gradient(135deg, var(--admin-color), #1976d2);
+            color: white;
+        }
+
+        .btn-leyenda:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .search-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+            background: var(--bg-primary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .search-label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        input, select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .document-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .document-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-light);
+        }
+
+        .document-menu {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+        }
+
+        .dropdown-toggle-btn {
+            background: rgba(255,255,255,0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dropdown-toggle-btn:hover {
+            background: var(--primary-light);
+        }
+
+        .dropdown-menu-custom {
+            position: absolute;
+            top: 35px;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            min-width: 130px;
+            display: none;
+            z-index: 20;
+            box-shadow: var(--card-shadow);
+        }
+
+        .dropdown-menu-custom.show {
+            display: block;
+        }
+
+        .dropdown-menu-custom a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .dropdown-menu-custom a:hover {
+            background: var(--bg-primary);
+        }
+
+        .dropdown-menu-custom .text-danger {
+            color: var(--error-color) !important;
+        }
+
+        .document-icon {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 25px;
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .document-info {
+            padding: 16px;
+        }
+
+        .document-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 1rem;
+        }
+
+        .document-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .document-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .document-link {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .document-link:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .type-word { color: #2b579a; }
+        .type-excel { color: #217346; }
+        .type-powerpoint { color: #b7472a; }
+        .type-pdf { color: #d83b01; }
+        .type-image { color: #ff8c00; }
+        .type-video { color: #b4009e; }
+        .type-audio { color: #e81123; }
+        .type-zip { color: #737373; }
+        .type-other { color: #666666; }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            font-size: 0.85rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--error-color);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .alert-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 1050;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .alert-danger {
+            background: var(--error-color);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-group {
+                min-width: 100%;
+            }
+            
+            .header-buttons {
+                justify-content: center;
+            }
+            
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 15% auto;
+                padding: 20px;
+            }
+        }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <div class="main-content">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / Gestor de Documentos OneDrive
+            </div>
+            
+            <h1><i class="fas fa-cloud-upload-alt"></i> Documentos en OneDrive</h1>
+
+            <div class="header-buttons">
+                <button class="btn btn-primary" id="btnAgregarDocumento">
+                    <i class="fas fa-plus"></i> Agregar Documento
+                </button>
+                <button class="btn btn-leyenda" id="btnLeyenda">
+                    <i class="fas fa-info-circle"></i> Leyenda
+                </button>
+                <button class="btn btn-primary" id="btnActualizar">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+            </div>
+
+            <div class="search-container">
+                <div class="search-group">
+                    <label for="search" class="search-label">Buscar documentos</label>
+                    <input type="text" id="search" placeholder="Escribe para buscar...">
+                </div>
+                <div class="search-group">
+                    <label for="type" class="search-label">Tipo de documento</label>
+                    <select id="type">
+                        <option value="">Todos los tipos</option>
+                        <option value="word">Word</option>
+                        <option value="excel">Excel</option>
+                        <option value="powerpoint">PowerPoint</option>
+                        <option value="pdf">PDF</option>
+                        <option value="image">Imagen</option>
+                        <option value="video">Video</option>
+                        <option value="audio">Audio</option>
+                        <option value="zip">Archivo comprimido</option>
+                        <option value="other">Otros</option>
+                    </select>
+                </div>
+                <button id="searchButton" class="btn btn-primary">Buscar</button>
+            </div>
+            
+            <div class="documents-grid" id="documentsGrid">
+                <div class="no-results"><i class="fas fa-spinner fa-spin"></i> Cargando documentos...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Documento -->
+    <div id="modalDocumento" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeDocumentoModal">&times;</span>
+            <h3 id="modalTitulo" style="margin-bottom: 20px; color: var(--primary-color);">Agregar Nuevo Documento</h3>
+            
+            <form id="documentoForm">
+                <input type="hidden" id="documentoId">
+                
+                <div class="form-group">
+                    <label for="documentoNombre" class="form-label required-field">Nombre del documento</label>
+                    <input type="text" id="documentoNombre" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentoTipo" class="form-label required-field">Tipo de documento</label>
+                    <select id="documentoTipo" class="form-control" required>
+                        <option value="">Seleccione un tipo</option>
+                        <option value="word">Word</option>
+                        <option value="excel">Excel</option>
+                        <option value="powerpoint">PowerPoint</option>
+                        <option value="pdf">PDF</option>
+                        <option value="image">Imagen</option>
+                        <option value="video">Video</option>
+                        <option value="audio">Audio</option>
+                        <option value="zip">Archivo comprimido</option>
+                        <option value="other">Otros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentoFecha" class="form-label required-field">Fecha</label>
+                    <input type="date" id="documentoFecha" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentoTamano" class="form-label">Tamaño (MB)</label>
+                    <input type="number" id="documentoTamano" class="form-control" placeholder="Ej: 5.2" step="0.1" min="0">
+                    <small class="text-muted" style="color: var(--text-secondary);">Ingrese solo el número, se agregará "MB" automáticamente</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentoURL" class="form-label required-field">URL de OneDrive</label>
+                    <input type="url" id="documentoURL" class="form-control" required placeholder="https://...">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelarDocumento">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Documento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Leyenda -->
+    <div id="modalLeyenda" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-modal" id="closeLeyendaModal">&times;</span>
+            <h3 style="margin-bottom: 20px; color: var(--primary-color);"><i class="fas fa-info-circle"></i> Leyenda de Documentos</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <h4 style="font-size: 1rem; margin-bottom: 10px;">Tipos de archivos</h4>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom: 8px;"><i class="fas fa-file-excel type-excel" style="margin-right: 8px;"></i> Excel - Hojas de cálculo</li>
+                    <li style="margin-bottom: 8px;"><i class="fas fa-file-word type-word" style="margin-right: 8px;"></i> Word - Documentos de texto</li>
+                    <li style="margin-bottom: 8px;"><i class="fas fa-file-powerpoint type-powerpoint" style="margin-right: 8px;"></i> PowerPoint - Presentaciones</li>
+                    <li style="margin-bottom: 8px;"><i class="fas fa-file-pdf type-pdf" style="margin-right: 8px;"></i> PDF - Documentos PDF</li>
+                    <li style="margin-bottom: 8px;"><i class="fas fa-folder type-other" style="margin-right: 8px;"></i> Carpeta - Colección de archivos</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="font-size: 1rem; margin-bottom: 10px;">Información adicional</h4>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom: 8px;">✓ Haga clic en "Abrir en OneDrive" para acceder al documento</li>
+                    <li style="margin-bottom: 8px;">✓ Use los filtros para encontrar rápidamente lo que necesita</li>
+                    <li style="margin-bottom: 8px;">✓ Los documentos se actualizan automáticamente</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer-component></footer-component>
+
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const activeUsersRef = database.ref('uactivos');
+        const documentosRef = database.ref('documentos');
+        
+        let currentUser = null;
+        let documentos = [];
+        let documentoEditando = null;
+        let currentDropdown = null;
+        
+        const temas = ['light', 'dark', 'blue', 'orange', 'purple'];
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme && temas.includes(savedTheme)) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        }
+        
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            currentUser = userData;
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try { await activeUsersRef.child(currentUser.username).remove(); } catch(e) {}
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => cerrarSesion());
+            window.addEventListener('message', (event) => { if (event.data === 'logout') cerrarSesion(); });
+        }
+        
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert-message alert-${type}`;
+            alertDiv.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i> ${message}`;
+            document.body.appendChild(alertDiv);
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                setTimeout(() => alertDiv.remove(), 300);
+            }, 3000);
+        }
+        
+        function obtenerIconoPorTipo(tipo) {
+            const iconos = {
+                'word': 'fa-file-word',
+                'excel': 'fa-file-excel',
+                'powerpoint': 'fa-file-powerpoint',
+                'pdf': 'fa-file-pdf',
+                'image': 'fa-file-image',
+                'video': 'fa-file-video',
+                'audio': 'fa-file-audio',
+                'zip': 'fa-file-archive',
+                'other': 'fa-folder'
+            };
+            return iconos[tipo] || 'fa-file';
+        }
+        
+        function getTypeName(type) {
+            const typeNames = {
+                'word': 'Documento Word',
+                'excel': 'Hoja de cálculo',
+                'powerpoint': 'Presentación',
+                'pdf': 'Documento PDF',
+                'image': 'Imagen',
+                'video': 'Video',
+                'audio': 'Audio',
+                'zip': 'Archivo comprimido',
+                'other': 'Carpeta'
+            };
+            return typeNames[type] || 'Documento';
+        }
+        
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+        
+        function displayDocuments(docs) {
+            const grid = document.getElementById('documentsGrid');
+            grid.innerHTML = '';
+            
+            if (docs.length === 0) {
+                grid.innerHTML = '<div class="no-results">📂 No se encontraron documentos con los criterios de búsqueda</div>';
+                return;
+            }
+            
+            docs.forEach(doc => {
+                const typeClass = `type-${doc.type}`;
+                const icon = doc.icon || obtenerIconoPorTipo(doc.type);
+                const docId = doc.id;
+                
+                const card = document.createElement('div');
+                card.className = 'document-card';
+                card.innerHTML = `
+                    <div class="document-menu">
+                        <div class="dropdown-toggle-btn" data-id="${docId}">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                        <div class="dropdown-menu-custom" id="dropdown-${docId}">
+                            <a href="#" class="editar-documento" data-id="${docId}"><i class="fas fa-edit"></i> Editar</a>
+                            <hr style="margin: 4px 0;">
+                            <a href="#" class="text-danger eliminar-documento" data-id="${docId}"><i class="fas fa-trash"></i> Eliminar</a>
+                        </div>
+                    </div>
+                    <div class="document-icon">
+                        <i class="fas ${icon} ${typeClass}"></i>
+                    </div>
+                    <div class="document-info">
+                        <div class="document-name" title="${escapeHtml(doc.name)}">${escapeHtml(doc.name)}</div>
+                        <div class="document-meta">
+                            <span>${formatDate(doc.date)}</span>
+                            <span>${doc.size || '0 MB'}</span>
+                        </div>
+                        <div class="document-type ${typeClass}">${getTypeName(doc.type)}</div>
+                        <a href="${doc.url}" target="_blank" class="document-link">
+                            <i class="fas fa-external-link-alt"></i> Abrir en OneDrive
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            
+            // Event listeners para dropdowns
+            document.querySelectorAll('.dropdown-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    const dropdown = document.getElementById(`dropdown-${id}`);
+                    
+                    if (currentDropdown && currentDropdown !== dropdown) {
+                        currentDropdown.classList.remove('show');
+                    }
+                    dropdown.classList.toggle('show');
+                    currentDropdown = dropdown.classList.contains('show') ? dropdown : null;
+                });
+            });
+            
+            document.querySelectorAll('.editar-documento').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    const doc = documentos.find(d => d.id === id);
+                    if (doc) abrirModalDocumento(doc);
+                    if (currentDropdown) currentDropdown.classList.remove('show');
+                });
+            });
+            
+            document.querySelectorAll('.eliminar-documento').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    eliminarDocumento(id);
+                    if (currentDropdown) currentDropdown.classList.remove('show');
+                });
+            });
+            
+            document.addEventListener('click', () => {
+                if (currentDropdown) currentDropdown.classList.remove('show');
+                currentDropdown = null;
+            });
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function filterDocuments() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const typeFilter = document.getElementById('type').value;
+            
+            const filtered = documentos.filter(doc => {
+                const matchesSearch = doc.name.toLowerCase().includes(searchTerm);
+                const matchesType = !typeFilter || doc.type === typeFilter;
+                return matchesSearch && matchesType;
+            });
+            displayDocuments(filtered);
+        }
+        
+        function cargarDocumentos() {
+            documentosRef.on('value', (snapshot) => {
+                documentos = [];
+                snapshot.forEach(childSnapshot => {
+                    const doc = childSnapshot.val();
+                    doc.id = childSnapshot.key;
+                    documentos.push(doc);
+                });
+                displayDocuments(documentos);
+            }, (error) => {
+                console.error('Error al cargar documentos:', error);
+                showAlert('Error al cargar documentos', 'danger');
+            });
+        }
+        
+        function guardarDocumento(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('documentoId').value;
+            const nombre = document.getElementById('documentoNombre').value.trim();
+            const tipo = document.getElementById('documentoTipo').value;
+            const fecha = document.getElementById('documentoFecha').value;
+            const tamano = document.getElementById('documentoTamano').value;
+            const url = document.getElementById('documentoURL').value.trim();
+            
+            if (!nombre || !tipo || !fecha || !url) {
+                showAlert('Por favor complete todos los campos requeridos', 'danger');
+                return;
+            }
+            
+            const tamanoFormateado = tamano ? `${tamano} MB` : '0 MB';
+            const icono = obtenerIconoPorTipo(tipo);
+            
+            const documentoData = {
+                name: nombre,
+                type: tipo,
+                date: fecha,
+                size: tamanoFormateado,
+                url: url,
+                icon: icono,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (id) {
+                documentosRef.child(id).update(documentoData)
+                    .then(() => {
+                        showAlert('Documento actualizado correctamente', 'success');
+                        cerrarModalDocumento();
+                    })
+                    .catch((error) => {
+                        showAlert('Error al actualizar: ' + error.message, 'danger');
+                    });
+            } else {
+                documentosRef.push().set(documentoData)
+                    .then(() => {
+                        showAlert('Documento agregado correctamente', 'success');
+                        cerrarModalDocumento();
+                    })
+                    .catch((error) => {
+                        showAlert('Error al agregar: ' + error.message, 'danger');
+                    });
+            }
+        }
+        
+        function eliminarDocumento(id) {
+            if (confirm('¿Está seguro de que desea eliminar este documento?')) {
+                documentosRef.child(id).remove()
+                    .then(() => showAlert('Documento eliminado correctamente', 'success'))
+                    .catch((error) => showAlert('Error al eliminar: ' + error.message, 'danger'));
+            }
+        }
+        
+        function abrirModalDocumento(documento = null) {
+            const modal = document.getElementById('modalDocumento');
+            const titulo = document.getElementById('modalTitulo');
+            const form = document.getElementById('documentoForm');
+            
+            if (documento) {
+                titulo.textContent = 'Editar Documento';
+                document.getElementById('documentoId').value = documento.id;
+                document.getElementById('documentoNombre').value = documento.name;
+                document.getElementById('documentoTipo').value = documento.type;
+                document.getElementById('documentoFecha').value = documento.date;
+                const tamanoNumerico = documento.size ? documento.size.replace(' MB', '') : '';
+                document.getElementById('documentoTamano').value = tamanoNumerico;
+                document.getElementById('documentoURL').value = documento.url;
+                documentoEditando = documento;
+            } else {
+                titulo.textContent = 'Agregar Nuevo Documento';
+                form.reset();
+                document.getElementById('documentoId').value = '';
+                document.getElementById('documentoFecha').value = new Date().toISOString().split('T')[0];
+                documentoEditando = null;
+            }
+            modal.style.display = 'block';
+        }
+        
+        function cerrarModalDocumento() {
+            document.getElementById('modalDocumento').style.display = 'none';
+            document.getElementById('documentoForm').reset();
+            documentoEditando = null;
+        }
+        
+        function cerrarModalLeyenda() {
+            document.getElementById('modalLeyenda').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            
+            setupLogoutListener();
+            cargarDocumentos();
+            
+            document.getElementById('searchButton').addEventListener('click', filterDocuments);
+            document.getElementById('search').addEventListener('keyup', (e) => { if (e.key === 'Enter') filterDocuments(); });
+            document.getElementById('type').addEventListener('change', filterDocuments);
+            document.getElementById('btnActualizar').addEventListener('click', () => cargarDocumentos());
+            document.getElementById('btnAgregarDocumento').addEventListener('click', () => abrirModalDocumento());
+            document.getElementById('btnLeyenda').addEventListener('click', () => document.getElementById('modalLeyenda').style.display = 'block');
+            document.getElementById('closeDocumentoModal').addEventListener('click', cerrarModalDocumento);
+            document.getElementById('closeLeyendaModal').addEventListener('click', cerrarModalLeyenda);
+            document.getElementById('btnCancelarDocumento').addEventListener('click', cerrarModalDocumento);
+            document.getElementById('documentoForm').addEventListener('submit', guardarDocumento);
+            
+            window.onclick = (event) => {
+                const modalDoc = document.getElementById('modalDocumento');
+                const modalLey = document.getElementById('modalLeyenda');
+                if (event.target === modalDoc) cerrarModalDocumento();
+                if (event.target === modalLey) cerrarModalLeyenda();
+            };
+            
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+    </script>
+</body>
+</html>
