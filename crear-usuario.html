@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Crear Usuario - Sistema Agroalpha</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Estilos globales (mismos que dashboard) -->
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="components.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Contenido principal (coincide con dashboard) */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: margin-left 0.3s;
+        }
+
+        /* Sección estilo dashboard */
+        .dashboard-section {
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: var(--text-secondary);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 28px;
+            text-align: center;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        /* Formulario */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        label i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 4px solid #28a745;
+            display: block;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Badge para roles en mensajes */
+        .role-badge-mini {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            input, select {
+                padding: 10px 14px;
+            }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+</head>
+<body data-theme="light">
+    <!-- COMPONENTES GLOBALES: header y sidebar (idénticos al dashboard) -->
+    <header-component></header-component>
+    <sidebar-component></sidebar-component>
+
+    <!-- Contenido principal -->
+    <div class="main-content" id="mainContent">
+        <div class="dashboard-section">
+            <div class="breadcrumb">
+                <a href="/dashboard.html">Dashboard</a> / 
+                <a href="manejo-users.html">Gestión de Usuarios</a> / 
+                <span>Crear Usuario</span>
+            </div>
+            
+            <h1>
+                <i class="fas fa-user-plus"></i> 
+                Crear Nuevo Usuario
+            </h1>
+            
+            <div class="form-container">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombre de Usuario</label>
+                    <input type="text" id="username" placeholder="Ej: jperez, mrodriguez" autocomplete="off">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <input type="password" id="password" placeholder="Mínimo 6 caracteres">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Nombre Completo</label>
+                    <input type="text" id="fullname" placeholder="Ej: Juan Pérez García">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> Rol del Usuario</label>
+                    <select id="role">
+                        <option value="">Seleccione un rol</option>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Gerente General">Gerente General</option>
+                        <option value="Gerente de Producción">Gerente de Producción</option>
+                        <option value="Supervisor">Supervisor</option>
+                        <option value="Jefe de Vivero">Jefe de Vivero</option>
+                        <option value="Grower">Grower</option>
+                        <option value="Grower Junior">Grower Junior</option>
+                        <option value="Digitador">Digitador</option>
+                        <option value="Técnico Fitosanidad">Técnico Fitosanidad</option>
+                        <option value="Técnico Prácticas Culturales">Técnico Prácticas Culturales</option>
+                        <option value="Técnico Riego">Técnico Riego</option>
+                        <option value="Mezclero Fitosanidad">Mezclero Fitosanidad</option>
+                        <option value="Consultor">Consultor</option>
+                        <option value="Usuario1">Usuario1</option>
+                        <option value="Usuario2">Usuario2</option>
+                        <option value="Usuario3">Usuario3</option>
+                        <option value="Usuario4">Usuario4</option>
+                        <option value="Invitado">Invitado</option>
+                    </select>
+                </div>
+                
+                <button id="createBtn">
+                    <span id="btnText">Crear Usuario</span>
+                </button>
+                
+                <div id="message" class="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer global -->
+    <footer-component></footer-component>
+
+    <!-- Scripts de componentes -->
+    <script src="header-component.js"></script>
+    <script src="sidebar-component.js"></script>
+    <script src="footer.js"></script>
+    
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            databaseURL: "https://agro-productos-default-rtdb.firebaseio.com/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const usersRef = database.ref('login');
+        const activeUsersRef = database.ref('uactivos');
+        
+        let currentUser = null;
+        
+        // Sistema de temas (compatible con dashboard)
+        const themes = ['light', 'dark', 'blue', 'orange', 'purple'];
+        let currentThemeIndex = 0;
+        
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('agroalpha-theme');
+            if (savedTheme) {
+                currentThemeIndex = themes.indexOf(savedTheme);
+                if (currentThemeIndex === -1) currentThemeIndex = 0;
+                document.body.setAttribute('data-theme', themes[currentThemeIndex]);
+            }
+        }
+        
+        // Obtener clase CSS para el badge según el rol
+        function getBadgeClass(role) {
+            const roleClasses = {
+                'Administrador': 'admin-badge',
+                'Admin': 'admin-badge',
+                'Gerente General': 'gerente-general-badge',
+                'Gerente de Producción': 'gerente-produccion-badge',
+                'Supervisor': 'supervisor-badge',
+                'Jefe de Vivero': 'jefe-vivero-badge',
+                'Grower': 'grower-badge',
+                'Grower Junior': 'grower-junior-badge',
+                'Digitador': 'digitador-badge',
+                'Técnico Fitosanidad': 'fitosanidad-badge',
+                'Fitosanidad': 'fitosanidad-badge',
+                'Técnico Prácticas Culturales': 'culturales-badge',
+                'Prácticas Culturales': 'culturales-badge',
+                'Culturales': 'culturales-badge',
+                'Técnico Riego': 'riego-badge',
+                'Riego': 'riego-badge',
+                'Mezclero Fitosanidad': 'mezclero-fitosanidad-badge',
+                'Consultor': 'consultor-badge',
+                'Usuario1': 'usuario1-badge',
+                'Usuario2': 'usuario2-badge',
+                'Usuario3': 'usuario3-badge',
+                'Usuario4': 'usuario4-badge',
+                'Invitado': 'invitado-badge'
+            };
+            return roleClasses[role] || 'default-badge';
+        }
+        
+        // Encriptar contraseña (Base64)
+        function encryptPassword(password) {
+            return btoa(password);
+        }
+        
+        // Mostrar mensaje
+        function showMessage(text, type, isHtml = false) {
+            const messageDiv = document.getElementById('message');
+            if (isHtml) {
+                messageDiv.innerHTML = text;
+            } else {
+                messageDiv.textContent = text;
+            }
+            messageDiv.className = 'message ' + type;
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+                messageDiv.className = 'message';
+            }, 5000);
+        }
+        
+        // Limpiar formulario
+        function resetForm() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('fullname').value = '';
+            document.getElementById('role').value = '';
+            document.getElementById('username').focus();
+        }
+        
+        // Crear usuario
+        async function createUser() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const fullname = document.getElementById('fullname').value.trim();
+            const role = document.getElementById('role').value;
+            const createBtn = document.getElementById('createBtn');
+            const btnText = document.getElementById('btnText');
+            
+            // Validaciones
+            if (!username || !password || !fullname || !role) {
+                showMessage('❌ Por favor complete todos los campos', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('❌ La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            // Estado de carga
+            createBtn.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span> Creando usuario...';
+            
+            try {
+                // Verificar si el usuario ya existe
+                const snapshot = await usersRef.child(username).once('value');
+                
+                if (snapshot.exists()) {
+                    showMessage(`❌ El usuario "${username}" ya existe. Por favor elija otro nombre.`, 'error');
+                    createBtn.disabled = false;
+                    btnText.textContent = 'Crear Usuario';
+                    return;
+                }
+                
+                // Crear usuario
+                const userData = {
+                    password: encryptPassword(password),
+                    name: fullname,
+                    role: role,
+                    unit: 'Unidad de Producción 1',
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                };
+                
+                await usersRef.child(username).set(userData);
+                
+                // Mensaje de éxito con HTML
+                const roleBadgeClass = getBadgeClass(role);
+                const successHtml = `
+                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                    Usuario <strong>${username}</strong> creado exitosamente como 
+                    <span class="role-badge-mini ${roleBadgeClass}" style="background-color: var(--${roleBadgeClass.split('-')[0]}-color, #4CAF50); color: white;">${role}</span>
+                `;
+                showMessage(successHtml, 'success', true);
+                
+                // Limpiar formulario
+                resetForm();
+                
+            } catch (error) {
+                console.error('Error al crear usuario:', error);
+                showMessage(`❌ Error al crear usuario: ${error.message}`, 'error');
+            } finally {
+                createBtn.disabled = false;
+                btnText.textContent = 'Crear Usuario';
+            }
+        }
+        
+        // Verificar sesión
+        async function verificarSesion() {
+            const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            if (!userData || !userData.username) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            
+            currentUser = userData;
+            
+            try {
+                const snapshot = await activeUsersRef.child(userData.username).once('value');
+                if (!snapshot.exists()) {
+                    await cerrarSesion();
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                return true;
+            }
+        }
+        
+        async function cerrarSesion() {
+            if (currentUser?.username) {
+                try {
+                    await activeUsersRef.child(currentUser.username).remove();
+                } catch(e) { console.error(e); }
+            }
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        // Configurar evento de logout desde componentes
+        function setupLogoutListener() {
+            document.addEventListener('logout', () => {
+                cerrarSesion();
+            });
+            
+            window.addEventListener('message', (event) => {
+                if (event.data === 'logout') {
+                    cerrarSesion();
+                }
+            });
+        }
+        
+        // Permitir enviar con Enter
+        function setupEnterKey() {
+            const inputs = ['username', 'password', 'fullname', 'role'];
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            createUser();
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async function() {
+            loadSavedTheme();
+            
+            const sesionValida = await verificarSesion();
+            if (!sesionValida) return;
+            
+            setupLogoutListener();
+            setupEnterKey();
+            
+            // Evento del botón crear
+            document.getElementById('createBtn').addEventListener('click', createUser);
+            
+            // Observar cambios de tema
+            const observer = new MutationObserver(() => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                if (currentTheme) localStorage.setItem('agroalpha-theme', currentTheme);
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        });
+    </script>
+</body>
+</html>
