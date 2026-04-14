@@ -1,4 +1,4 @@
-// footer.js - Pie de página para Sistema Agroalpha - VERSIÓN CORREGIDA
+// footer.js - Pie de página para Sistema Agroalpha - VERSIÓN CORREGIDA (SOLO FOOTER)
 
 class FooterManager {
     constructor() {
@@ -31,6 +31,7 @@ class FooterManager {
         document.body.appendChild(footer);
         
         this.aplicarEstilosDinamicos();
+        this.aplicarEstilosPosicionFija(); // Nuevo método para pegar el footer al fondo
     }
 
     generarHTML() {
@@ -57,6 +58,83 @@ class FooterManager {
             backdrop-filter: blur(5px);
             margin-top: 40px;
         `;
+    }
+
+    aplicarEstilosPosicionFija() {
+        // Verificar si los estilos ya existen
+        if (document.getElementById('footer-fixed-styles')) {
+            return;
+        }
+
+        const style = document.createElement('style');
+        style.id = 'footer-fixed-styles';
+        style.textContent = `
+            /* Estilos para mantener el footer al fondo sin modificar el layout existente */
+            html {
+                position: relative;
+                min-height: 100%;
+            }
+            
+            body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            
+            footer {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin-top: 0 !important;
+            }
+            
+            /* Ajustar el padding-bottom del body si el contenido es corto */
+            body:has(footer) {
+                min-height: 100vh;
+            }
+            
+            /* Si el contenido es más grande que la pantalla, el footer sigue al final */
+            @media (min-height: 100vh) {
+                body {
+                    position: relative;
+                    min-height: 100vh;
+                }
+                
+                footer {
+                    position: relative;
+                    margin-top: 40px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Ajustar dinámicamente según la altura del contenido
+        this.ajustarPosicionFooter();
+        
+        // Reajustar cuando la ventana cambie de tamaño
+        window.addEventListener('resize', () => this.ajustarPosicionFooter());
+    }
+
+    ajustarPosicionFooter() {
+        const footer = document.querySelector('footer');
+        if (!footer) return;
+        
+        const bodyHeight = document.body.scrollHeight;
+        const windowHeight = window.innerHeight;
+        
+        // Si el contenido es menor que la ventana, usar posición absoluta
+        if (bodyHeight <= windowHeight) {
+            footer.style.position = 'absolute';
+            footer.style.bottom = '0';
+            footer.style.marginTop = '0';
+            document.body.style.position = 'relative';
+            document.body.style.minHeight = `${windowHeight}px`;
+        } else {
+            // Si el contenido es mayor, usar posición relativa normal
+            footer.style.position = 'relative';
+            footer.style.marginTop = '40px';
+            document.body.style.minHeight = 'auto';
+        }
     }
 
     aplicarEstilosDinamicos() {
