@@ -18,6 +18,8 @@ class HeaderComponent extends HTMLElement {
     setTimeout(() => {
       this.initializeHeader();
     }, 500);
+    // Inicializar notificaciones globales
+    this.initGlobalNotifications();
   }
 
   render() {
@@ -61,7 +63,7 @@ class HeaderComponent extends HTMLElement {
               <div class="btn-container">
                 <button class="header-btn" id="notificationsBtn" title="Notificaciones">
                   <i class="fas fa-bell"></i>
-                  <span class="notification-badge">3</span>
+                  <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
                 </button>
               </div>
               <!-- Botón de temas oculto según components.css -->
@@ -106,6 +108,95 @@ class HeaderComponent extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  // Inicializar notificaciones globales (se carga una sola vez)
+  initGlobalNotifications() {
+    // Verificar si el script ya fue cargado
+    if (document.querySelector('script[src="notifications-global.js"]')) {
+      console.log('[Header] Script de notificaciones globales ya cargado');
+      this.setupNotificationBadge();
+      return;
+    }
+    
+    // Crear y agregar el script global de notificaciones
+    const script = document.createElement('script');
+    script.src = 'notifications-global.js';
+    script.defer = true;
+    script.onload = () => {
+      console.log('[Header] Script de notificaciones globales cargado');
+      this.setupNotificationBadge();
+    };
+    script.onerror = () => {
+      console.warn('[Header] Error cargando script de notificaciones globales');
+    };
+    document.head.appendChild(script);
+  }
+
+  // Configurar el badge de notificaciones
+  setupNotificationBadge() {
+    // Esperar a que el objeto global de notificaciones esté disponible
+    const checkGlobal = setInterval(() => {
+      if (window.NotificationManager || window.initGlobalNotifications) {
+        clearInterval(checkGlobal);
+        this.updateNotificationBadge();
+        
+        // Escuchar cambios en las notificaciones no leídas
+        if (window.NotificationManager) {
+          window.NotificationManager.onUnreadCountChange = (count) => {
+            this.updateBadgeCount(count);
+          };
+        }
+      }
+    }, 500);
+  }
+
+  updateNotificationBadge() {
+    // Obtener contador de notificaciones no leídas
+    const username = this.userData?.username;
+    if (!username) return;
+    
+    if (window.NotificationManager && window.NotificationManager.getUnreadCount) {
+      const count = window.NotificationManager.getUnreadCount(username);
+      this.updateBadgeCount(count);
+    } else {
+      // Si no hay NotificationManager, intentar obtener de Firebase directamente
+      this.fetchUnreadCountFromFirebase(username);
+    }
+  }
+
+  async fetchUnreadCountFromFirebase(username) {
+    if (!this.isFirebaseInitialized || !username) return;
+    
+    try {
+      const database = firebase.database();
+      const notificationsRef = database.ref('notificaciones');
+      const snapshot = await notificationsRef.once('value');
+      let unreadCount = 0;
+      
+      snapshot.forEach((childSnapshot) => {
+        const notif = childSnapshot.val();
+        if (!notif.readBy || !notif.readBy[username]) {
+          unreadCount++;
+        }
+      });
+      
+      this.updateBadgeCount(unreadCount);
+    } catch (error) {
+      console.error('Error obteniendo notificaciones no leídas:', error);
+    }
+  }
+
+  updateBadgeCount(count) {
+    const badge = this.querySelector('#notificationBadge');
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
   }
 
   initializeFirebase() {
@@ -195,6 +286,9 @@ class HeaderComponent extends HTMLElement {
       // Mostrar información del usuario
       this.updateUserInfo(userData);
       
+      // Actualizar badge de notificaciones
+      this.updateNotificationBadge();
+      
     } catch (error) {
       console.error('Error verificando sesión:', error);
       // No redirigir inmediatamente en caso de error
@@ -228,14 +322,10 @@ class HeaderComponent extends HTMLElement {
       });
     }
 
-    // Notificaciones
+    // Notificaciones - redirigir a la página de notificaciones
     if (notificationsBtn) {
       notificationsBtn.addEventListener('click', () => {
-        const event = new CustomEvent('showNotifications', { 
-          bubbles: true,
-          detail: { userData: this.userData }
-        });
-        this.dispatchEvent(event);
+        window.location.href = '/notificaciones.html';
       });
     }
 
@@ -268,6 +358,7 @@ class HeaderComponent extends HTMLElement {
       if (e.detail && e.detail.userData) {
         this.userData = e.detail.userData;
         this.updateUserInfo(e.detail.userData);
+        this.updateNotificationBadge();
       }
     });
 
@@ -328,6 +419,7 @@ class HeaderComponent extends HTMLElement {
         this.userData = userData;
         // Actualizar con datos de sessionStorage inmediatamente
         this.updateUserInfo(userData);
+        this.updateNotificationBadge();
         
         return userData;
       } else {
