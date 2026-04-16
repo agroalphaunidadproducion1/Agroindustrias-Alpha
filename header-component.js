@@ -325,7 +325,7 @@ class HeaderComponent extends HTMLElement {
     // Notificaciones - redirigir a la página de notificaciones
     if (notificationsBtn) {
       notificationsBtn.addEventListener('click', () => {
-        window.location.href = '/notificaciones.html';
+        window.location.href = './notificaciones.html';
       });
     }
 
@@ -546,7 +546,7 @@ class HeaderComponent extends HTMLElement {
   redirectToLogin() {
     console.log('Redirigiendo al login...');
     sessionStorage.removeItem('currentUser');
-    window.location.href = '/index.html';
+    window.location.href = './index.html';
   }
 
   getUserInitials(name) {
