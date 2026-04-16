@@ -28,7 +28,7 @@ class SidebarComponent extends HTMLElement {
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
           </a>
-          <a class="nav-item" href="notificaciones.html">
+          <a class="nav-item" href="./notificaciones.html">
             <i class="fas fa-bell"></i>
             <span>Notificaciones</span>
           </a>
