@@ -14,12 +14,88 @@ class HeaderComponent extends HTMLElement {
   connectedCallback() {
     this.render();
     this.initializeFirebase();
+    
+    // Cargar el script de notificaciones UNA SOLA VEZ
+    this.loadNotificationsScript();
+    
     // Esperar un poco antes de inicializar el header para dar tiempo a la carga
     setTimeout(() => {
       this.initializeHeader();
     }, 500);
-    // Inicializar notificaciones globales
-    this.initGlobalNotifications();
+  }
+
+  // Cargar script de notificaciones globales (solo una vez)
+  loadNotificationsScript() {
+    // Verificar si ya se inicializaron las notificaciones globalmente
+    if (window.__notificationsInitialized) {
+      console.log('[Header] Notificaciones ya inicializadas globalmente');
+      this.setupNotificationBadge();
+      return;
+    }
+    
+    // Verificar si el script ya existe en el DOM
+    if (document.querySelector('script[src="init-notifications.js"]')) {
+      console.log('[Header] Script de notificaciones ya existe en el DOM');
+      this.setupNotificationBadge();
+      return;
+    }
+    
+    // Crear y agregar el script
+    const script = document.createElement('script');
+    script.src = 'init-notifications.js';
+    script.defer = true;
+    script.onload = () => {
+      console.log('[Header] Script de notificaciones cargado exitosamente');
+      this.setupNotificationBadge();
+    };
+    script.onerror = () => {
+      console.warn('[Header] Error cargando script de notificaciones');
+    };
+    document.head.appendChild(script);
+  }
+
+  // Configurar el badge de notificaciones
+  setupNotificationBadge() {
+    // Actualizar badge cada 5 segundos
+    this.updateNotificationBadge();
+    setInterval(() => {
+      this.updateNotificationBadge();
+    }, 5000);
+  }
+
+  async updateNotificationBadge() {
+    const username = this.userData?.username;
+    if (!username) return;
+    
+    try {
+      const database = firebase.database();
+      const notificationsRef = database.ref('notificaciones');
+      const snapshot = await notificationsRef.once('value');
+      let unreadCount = 0;
+      
+      snapshot.forEach((childSnapshot) => {
+        const notif = childSnapshot.val();
+        if (!notif.readBy || !notif.readBy[username]) {
+          unreadCount++;
+        }
+      });
+      
+      this.updateBadgeCount(unreadCount);
+    } catch (error) {
+      console.error('Error obteniendo notificaciones no leídas:', error);
+    }
+  }
+
+  updateBadgeCount(count) {
+    const badge = this.querySelector('#notificationBadge');
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
   }
 
   render() {
@@ -108,95 +184,6 @@ class HeaderComponent extends HTMLElement {
         </div>
       </div>
     `;
-  }
-
-  // Inicializar notificaciones globales (se carga una sola vez)
-  initGlobalNotifications() {
-    // Verificar si el script ya fue cargado
-    if (document.querySelector('script[src="notifications-global.js"]')) {
-      console.log('[Header] Script de notificaciones globales ya cargado');
-      this.setupNotificationBadge();
-      return;
-    }
-    
-    // Crear y agregar el script global de notificaciones
-    const script = document.createElement('script');
-    script.src = 'notifications-global.js';
-    script.defer = true;
-    script.onload = () => {
-      console.log('[Header] Script de notificaciones globales cargado');
-      this.setupNotificationBadge();
-    };
-    script.onerror = () => {
-      console.warn('[Header] Error cargando script de notificaciones globales');
-    };
-    document.head.appendChild(script);
-  }
-
-  // Configurar el badge de notificaciones
-  setupNotificationBadge() {
-    // Esperar a que el objeto global de notificaciones esté disponible
-    const checkGlobal = setInterval(() => {
-      if (window.NotificationManager || window.initGlobalNotifications) {
-        clearInterval(checkGlobal);
-        this.updateNotificationBadge();
-        
-        // Escuchar cambios en las notificaciones no leídas
-        if (window.NotificationManager) {
-          window.NotificationManager.onUnreadCountChange = (count) => {
-            this.updateBadgeCount(count);
-          };
-        }
-      }
-    }, 500);
-  }
-
-  updateNotificationBadge() {
-    // Obtener contador de notificaciones no leídas
-    const username = this.userData?.username;
-    if (!username) return;
-    
-    if (window.NotificationManager && window.NotificationManager.getUnreadCount) {
-      const count = window.NotificationManager.getUnreadCount(username);
-      this.updateBadgeCount(count);
-    } else {
-      // Si no hay NotificationManager, intentar obtener de Firebase directamente
-      this.fetchUnreadCountFromFirebase(username);
-    }
-  }
-
-  async fetchUnreadCountFromFirebase(username) {
-    if (!this.isFirebaseInitialized || !username) return;
-    
-    try {
-      const database = firebase.database();
-      const notificationsRef = database.ref('notificaciones');
-      const snapshot = await notificationsRef.once('value');
-      let unreadCount = 0;
-      
-      snapshot.forEach((childSnapshot) => {
-        const notif = childSnapshot.val();
-        if (!notif.readBy || !notif.readBy[username]) {
-          unreadCount++;
-        }
-      });
-      
-      this.updateBadgeCount(unreadCount);
-    } catch (error) {
-      console.error('Error obteniendo notificaciones no leídas:', error);
-    }
-  }
-
-  updateBadgeCount(count) {
-    const badge = this.querySelector('#notificationBadge');
-    if (badge) {
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'flex';
-      } else {
-        badge.style.display = 'none';
-      }
-    }
   }
 
   initializeFirebase() {
@@ -325,7 +312,7 @@ class HeaderComponent extends HTMLElement {
     // Notificaciones - redirigir a la página de notificaciones
     if (notificationsBtn) {
       notificationsBtn.addEventListener('click', () => {
-        window.location.href = './notificaciones.html';
+        window.location.href = '/notificaciones.html';
       });
     }
 
@@ -546,7 +533,7 @@ class HeaderComponent extends HTMLElement {
   redirectToLogin() {
     console.log('Redirigiendo al login...');
     sessionStorage.removeItem('currentUser');
-    window.location.href = './index.html';
+    window.location.href = '/index.html';
   }
 
   getUserInitials(name) {
