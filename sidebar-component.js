@@ -24,11 +24,11 @@ class SidebarComponent extends HTMLElement {
         
         <div class="nav-section">
           <h3>Navegación Principal</h3>
-          <a class="nav-item" href="/dashboard.html" id="dashboard-link">
+          <a class="nav-item" href="dashboard.html" id="dashboard-link">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
           </a>
-          <a class="nav-item" href="/notificaciones.html">
+          <a class="nav-item" href="notificaciones.html">
             <i class="fas fa-bell"></i>
             <span>Notificaciones</span>
           </a>
@@ -44,7 +44,7 @@ class SidebarComponent extends HTMLElement {
             <i class="fas fa-chevron-down"></i>
           </div>
           <div class="submenu" id="configSubmenu">
-            <a class="submenu-item" href="/temas.html">
+            <a class="submenu-item" href="temas.html">
               <i class="fas fa-palette"></i>
               <span>Temas</span>
             </a>
@@ -52,19 +52,19 @@ class SidebarComponent extends HTMLElement {
               <i class="fas fa-bell"></i>
               <span>Notificaciones</span>
             </a>
-            <a class="submenu-item" href="/usuarios.html">
+            <a class="submenu-item" href="usuarios.html">
               <i class="fas fa-users"></i>
               <span>Gestión de Usuarios</span>
             </a>
-            <a class="submenu-item" href="/parametros.html">
+            <a class="submenu-item" href="parametros.html">
               <i class="fas fa-sliders-h"></i>
               <span>Parámetros del Sistema</span>
             </a>
-            <a class="submenu-item" href="/backup.html">
+            <a class="submenu-item" href="backup.html">
               <i class="fas fa-database"></i>
               <span>Backup y Restauración</span>
             </a>
-            <a class="submenu-item" href="/logs.html">
+            <a class="submenu-item" href="logs.html">
               <i class="fas fa-clipboard-list"></i>
               <span>Registros del Sistema</span>
             </a>
