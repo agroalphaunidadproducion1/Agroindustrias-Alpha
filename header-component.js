@@ -15,57 +15,65 @@ class HeaderComponent extends HTMLElement {
     this.render();
     this.initializeFirebase();
     
-    // Cargar el script de notificaciones UNA SOLA VEZ
-    this.loadNotificationsScript();
+    // Cargar notificaciones de manera NO BLOQUEANTE (después de todo)
+    setTimeout(() => {
+      this.loadNotificationsScript();
+    }, 2000); // Esperar 2 segundos para no bloquear el dashboard
     
-    // Esperar un poco antes de inicializar el header para dar tiempo a la carga
     setTimeout(() => {
       this.initializeHeader();
     }, 500);
   }
 
-  // Cargar script de notificaciones globales (solo una vez)
+  // Cargar script de notificaciones de forma ASYNC (no bloqueante)
   loadNotificationsScript() {
-    // Verificar si ya se inicializaron las notificaciones globalmente
+    // Verificar si ya se inicializaron las notificaciones
     if (window.__notificationsInitialized) {
-      console.log('[Header] Notificaciones ya inicializadas globalmente');
-      this.setupNotificationBadge();
       return;
     }
     
-    // Verificar si el script ya existe en el DOM
+    // Verificar si el script ya existe
     if (document.querySelector('script[src="init-notifications.js"]')) {
-      console.log('[Header] Script de notificaciones ya existe en el DOM');
-      this.setupNotificationBadge();
       return;
     }
     
-    // Crear y agregar el script
+    // Crear script con atributo ASYNC (no bloquea la carga)
     const script = document.createElement('script');
     script.src = 'init-notifications.js';
+    script.async = true; // IMPORTANTE: no bloquea
     script.defer = true;
     script.onload = () => {
-      console.log('[Header] Script de notificaciones cargado exitosamente');
+      console.log('[Header] Notificaciones cargadas en segundo plano');
       this.setupNotificationBadge();
     };
     script.onerror = () => {
-      console.warn('[Header] Error cargando script de notificaciones');
+      console.warn('[Header] Error cargando notificaciones (no afecta al dashboard)');
     };
-    document.head.appendChild(script);
+    document.body.appendChild(script); // Usar body en lugar de head para no bloquear
   }
 
-  // Configurar el badge de notificaciones
   setupNotificationBadge() {
-    // Actualizar badge cada 5 segundos
+    // Solo actualizar si el elemento existe
+    const badge = this.querySelector('#notificationBadge');
+    if (!badge) return;
+    
+    // Actualizar cada 10 segundos (menos frecuente)
     this.updateNotificationBadge();
     setInterval(() => {
-      this.updateNotificationBadge();
-    }, 5000);
+      if (this.querySelector('#notificationBadge')) {
+        this.updateNotificationBadge();
+      }
+    }, 10000);
   }
 
   async updateNotificationBadge() {
     const username = this.userData?.username;
     if (!username) return;
+    
+    // Verificar que Firebase esté disponible
+    if (typeof firebase === 'undefined' || !firebase.database) {
+      return;
+    }
     
     try {
       const database = firebase.database();
@@ -82,7 +90,8 @@ class HeaderComponent extends HTMLElement {
       
       this.updateBadgeCount(unreadCount);
     } catch (error) {
-      console.error('Error obteniendo notificaciones no leídas:', error);
+      // Silenciar errores para no afectar el dashboard
+      console.debug('Error actualizando badge:', error);
     }
   }
 
@@ -104,7 +113,6 @@ class HeaderComponent extends HTMLElement {
       <div class="header">
         <div class="header-content">
           <div class="header-left">
-            <!-- Botón del menú -->
             <div class="header-actions">
               <div class="btn-container">
                 <button class="header-btn" id="menuToggle" title="Menú">
@@ -113,7 +121,6 @@ class HeaderComponent extends HTMLElement {
               </div>
             </div>
             
-            <!-- Marca -->
             <div class="brand">
               <div class="brand-icon">
                 <i class="fas fa-seedling"></i>
@@ -126,7 +133,6 @@ class HeaderComponent extends HTMLElement {
           </div>
           
           <div class="header-right">
-            <!-- Información del usuario en desktop -->
             <div class="user-info">
               <div class="user-details">
                 <span class="user-name" id="user-name">Cargando...</span>
@@ -134,7 +140,6 @@ class HeaderComponent extends HTMLElement {
               </div>
             </div>
             
-            <!-- Botones de acción -->
             <div class="header-actions">
               <div class="btn-container">
                 <button class="header-btn" id="notificationsBtn" title="Notificaciones">
@@ -142,7 +147,6 @@ class HeaderComponent extends HTMLElement {
                   <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
                 </button>
               </div>
-              <!-- Botón de temas oculto según components.css -->
               <div class="theme-btn-container" style="display: none !important">
                 <button class="header-btn" id="themeToggle" title="Cambiar tema">
                   <i class="fas fa-palette"></i>
@@ -150,7 +154,6 @@ class HeaderComponent extends HTMLElement {
               </div>
             </div>
             
-            <!-- Menú de usuario móvil -->
             <div class="mobile-user-menu">
               <div class="user-avatar" id="userAvatar">
                 ...
@@ -188,7 +191,6 @@ class HeaderComponent extends HTMLElement {
 
   initializeFirebase() {
     try {
-      // Verificar si Firebase ya está inicializado
       if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
         firebase.initializeApp(this.firebaseConfig);
         console.log('Firebase inicializado por HeaderComponent');
@@ -198,8 +200,6 @@ class HeaderComponent extends HTMLElement {
       this.isFirebaseInitialized = true;
     } catch (error) {
       console.error('Error inicializando Firebase:', error);
-      // No bloquear la aplicación si Firebase falla
-      console.log('Continuando sin Firebase...');
     }
   }
 
@@ -208,16 +208,9 @@ class HeaderComponent extends HTMLElement {
     
     console.log('Inicializando header component...');
     
-    // Configurar event listeners primero
     this.setupEventListeners();
-    
-    // Luego verificar sesión de forma no bloqueante
     this.verifySession();
-    
-    // Escuchar eventos de cambio de usuario
     this.setupUserChangeListener();
-    
-    // Escuchar cambios de tema
     this.setupThemeListener();
     
     this.initialized = true;
@@ -231,54 +224,39 @@ class HeaderComponent extends HTMLElement {
         this.sessionCheckAttempts++;
         
         if (this.sessionCheckAttempts >= this.maxSessionCheckAttempts) {
-          console.log('Máximos intentos alcanzados, redirigiendo al login...');
           this.redirectToLogin();
           return;
         }
         
-        console.log(`No hay usuario en sesión (intento ${this.sessionCheckAttempts}/${this.maxSessionCheckAttempts}), reintentando...`);
-        
-        // Reintentar después de un tiempo
         setTimeout(() => {
           this.verifySession();
         }, 1000);
         return;
       }
       
-      // Si llegamos aquí, tenemos datos de usuario
       console.log('Usuario encontrado en sesión:', userData.username);
-      this.sessionCheckAttempts = 0; // Resetear contador
-      
-      // Guardar el rol del usuario
+      this.sessionCheckAttempts = 0;
       this.userRole = userData.role;
       
-      // Verificar si el usuario sigue activo en uactivos (solo si Firebase está disponible)
       if (this.isFirebaseInitialized) {
         try {
           const database = firebase.database();
           const activeUsersRef = database.ref('uactivos');
-          
           const snapshot = await activeUsersRef.child(userData.username).once('value');
           if (!snapshot.exists()) {
-            console.log('Usuario no activo en Firebase, cerrando sesión...');
             this.showSessionExpiredMessage();
             return;
           }
         } catch (firebaseError) {
-          console.warn('Error verificando usuario activo en Firebase, continuando...', firebaseError);
-          // Continuar incluso si hay error en Firebase
+          console.warn('Error verificando usuario activo:', firebaseError);
         }
       }
       
-      // Mostrar información del usuario
       this.updateUserInfo(userData);
-      
-      // Actualizar badge de notificaciones
       this.updateNotificationBadge();
       
     } catch (error) {
       console.error('Error verificando sesión:', error);
-      // No redirigir inmediatamente en caso de error
       this.showDefaultUserInfo();
     }
   }
@@ -290,7 +268,6 @@ class HeaderComponent extends HTMLElement {
     const mobileLogoutBtn = this.querySelector('#mobileLogoutBtn');
     const notificationsBtn = this.querySelector('#notificationsBtn');
 
-    // Abrir sidebar
     if (menuToggle) {
       menuToggle.addEventListener('click', () => {
         const event = new CustomEvent('openSidebar', { 
@@ -301,7 +278,6 @@ class HeaderComponent extends HTMLElement {
       });
     }
 
-    // Toggle dropdown de usuario
     if (userAvatar) {
       userAvatar.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -309,21 +285,18 @@ class HeaderComponent extends HTMLElement {
       });
     }
 
-    // Notificaciones - redirigir a la página de notificaciones
     if (notificationsBtn) {
       notificationsBtn.addEventListener('click', () => {
         window.location.href = '/notificaciones.html';
       });
     }
 
-    // Cerrar dropdown al hacer clic fuera
     document.addEventListener('click', () => {
       if (userDropdown) {
         userDropdown.classList.remove('active');
       }
     });
 
-    // Logout desde móvil
     if (mobileLogoutBtn) {
       mobileLogoutBtn.addEventListener('click', () => {
         this.logout();
@@ -332,16 +305,13 @@ class HeaderComponent extends HTMLElement {
   }
 
   setupUserChangeListener() {
-    // Escuchar cambios en sessionStorage
     window.addEventListener('storage', (e) => {
       if (e.key === 'currentUser') {
         this.loadUserDataFromSession();
       }
     });
 
-    // Escuchar eventos personalizados de actualización de usuario
     document.addEventListener('userDataUpdated', (e) => {
-      console.log('Evento userDataUpdated recibido:', e.detail);
       if (e.detail && e.detail.userData) {
         this.userData = e.detail.userData;
         this.updateUserInfo(e.detail.userData);
@@ -349,7 +319,6 @@ class HeaderComponent extends HTMLElement {
       }
     });
 
-    // También escuchar cuando la página termina de cargar
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
@@ -364,7 +333,6 @@ class HeaderComponent extends HTMLElement {
   }
 
   setupThemeListener() {
-    // Observar cambios en el atributo data-theme del body
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
@@ -378,44 +346,33 @@ class HeaderComponent extends HTMLElement {
       attributeFilter: ['data-theme']
     });
 
-    // Manejar tema inicial
     this.handleThemeChange();
   }
 
   handleThemeChange() {
     const currentTheme = document.body.getAttribute('data-theme') || 'light';
-    console.log('Tema actual detectado:', currentTheme);
-    
-    // Actualizar estilos específicos del tema si es necesario
     const header = this.querySelector('.header');
     if (header) {
-      // El CSS de components.css ya maneja los temas, solo necesitamos asegurar que se aplique
       header.style.setProperty('--current-theme', currentTheme);
     }
   }
 
   async loadUserDataFromSession() {
     try {
-      console.log('Cargando datos de sessionStorage...');
       const userDataString = sessionStorage.getItem('currentUser');
       
       if (userDataString) {
         const userData = JSON.parse(userDataString);
-        console.log('Datos encontrados en sessionStorage:', userData);
-        
         this.userData = userData;
-        // Actualizar con datos de sessionStorage inmediatamente
         this.updateUserInfo(userData);
         this.updateNotificationBadge();
-        
         return userData;
       } else {
-        console.log('No hay datos de usuario en sessionStorage');
         this.showDefaultUserInfo();
         return null;
       }
     } catch (error) {
-      console.error('Error cargando datos de sessionStorage:', error);
+      console.error('Error cargando datos:', error);
       this.showDefaultUserInfo();
       return null;
     }
@@ -430,9 +387,6 @@ class HeaderComponent extends HTMLElement {
     const userName = userData.nombre || userData.name || userData.username || 'Usuario';
     const userRole = userData.rol || userData.role || 'Rol no asignado';
 
-    console.log('Actualizando header con:', { userName, userRole });
-
-    // Actualizar elementos del header
     const userNameElement = this.querySelector('#user-name');
     const userRoleElement = this.querySelector('#user-role');
     const dropdownUserName = this.querySelector('#dropdown-user-name');
@@ -447,13 +401,11 @@ class HeaderComponent extends HTMLElement {
     if (dropdownUserName) dropdownUserName.textContent = userName;
     if (dropdownUserRole) dropdownUserRole.textContent = userRole;
     
-    // Actualizar avatar
     if (userAvatar) {
       userAvatar.textContent = this.getUserInitials(userName);
       userAvatar.setAttribute('title', userName);
     }
 
-    // Disparar evento de que el header se actualizó
     const event = new CustomEvent('headerUpdated', {
       detail: { userData }
     });
@@ -461,8 +413,6 @@ class HeaderComponent extends HTMLElement {
   }
 
   showDefaultUserInfo() {
-    console.log('Mostrando información de usuario por defecto');
-    
     const userNameElement = this.querySelector('#user-name');
     const userRoleElement = this.querySelector('#user-role');
     const dropdownUserName = this.querySelector('#dropdown-user-name');
@@ -480,7 +430,6 @@ class HeaderComponent extends HTMLElement {
   }
 
   showSessionExpiredMessage() {
-    // Mostrar mensaje en lugar de redirigir inmediatamente
     const userNameElement = this.querySelector('#user-name');
     const userRoleElement = this.querySelector('#user-role');
     
@@ -492,17 +441,14 @@ class HeaderComponent extends HTMLElement {
       userRoleElement.onclick = () => this.redirectToLogin();
     }
     
-    // Mostrar toast o alerta
     this.showToast('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.', 'warning');
     
-    // Redirigir después de 5 segundos
     setTimeout(() => {
       this.redirectToLogin();
     }, 5000);
   }
 
   showToast(message, type = 'info') {
-    // Crear un toast simple que respete los temas
     const toast = document.createElement('div');
     const backgroundColor = type === 'warning' ? 'var(--gerente-color)' : 'var(--primary-color)';
     
@@ -531,7 +477,6 @@ class HeaderComponent extends HTMLElement {
   }
 
   redirectToLogin() {
-    console.log('Redirigiendo al login...');
     sessionStorage.removeItem('currentUser');
     window.location.href = '/index.html';
   }
@@ -569,13 +514,10 @@ class HeaderComponent extends HTMLElement {
     return roleClasses[role] || 'invitado-badge';
   }
 
-  // Método público para forzar actualización
   refreshUserData() {
-    console.log('Refrescando datos de usuario...');
     this.loadUserDataFromSession();
   }
 
-  // Cerrar sesión
   async logout() {
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
       try {
@@ -584,34 +526,26 @@ class HeaderComponent extends HTMLElement {
         if (userData?.username && this.isFirebaseInitialized) {
           const database = firebase.database();
           const activeUsersRef = database.ref('uactivos');
-          
-          // Eliminar de usuarios activos
           await activeUsersRef.child(userData.username).remove();
-          console.log('Usuario eliminado de uactivos');
         }
         
-        // Limpiar sessionStorage y redirigir
         this.redirectToLogin();
         
       } catch (error) {
         console.error('Error al cerrar sesión:', error);
-        // En caso de error, igualmente limpiar y redirigir
         this.redirectToLogin();
       }
     }
   }
 
-  // Método para verificar estado de Firebase
   checkFirebaseStatus() {
     return this.isFirebaseInitialized;
   }
 
-  // Método para obtener datos del usuario actual
   getCurrentUser() {
     return this.userData;
   }
 
-  // Método para obtener el rol del usuario actual
   getCurrentUserRole() {
     return this.userRole;
   }
